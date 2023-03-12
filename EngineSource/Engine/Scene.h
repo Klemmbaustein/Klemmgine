@@ -1,8 +1,8 @@
 #pragma once
 #include "Objects/WorldObject.h"
 #include <fstream>
-#include <Objects/MeshObject.h>
 
+class Camera;
 
 namespace Scene
 {

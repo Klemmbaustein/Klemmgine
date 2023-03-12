@@ -1099,7 +1099,9 @@ void EditorUI::Tick()
 					}
 					if (Ext == "jsm")
 					{
-						NewObject = Objects::CreateNewMeshObject(Name, Transform(SpawnPosition, Vector3(0), Vector3(1.f)), Name);
+						NewObject = Objects::SpawnObject<MeshObject>(Transform(SpawnPosition, Vector3(0), Vector3(1.f)));
+						((MeshObject*)NewObject)->LoadFromFile(Name);
+						NewObject->SetName(Name);
 						ChangedScene = true;
 						
 					}

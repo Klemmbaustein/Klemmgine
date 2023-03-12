@@ -24,6 +24,10 @@
 #include <Rendering/Utility/SSAO.h>
 #include <Rendering/Utility/Bloom.h>
 #include <Rendering/Texture/Cubemap.h>
+#include <Rendering/Camera/Camera.h>
+#include <Rendering/Camera/FrustumCulling.h>
+
+#include <Math/Collision/Collision.h>
 
 
 // World includes

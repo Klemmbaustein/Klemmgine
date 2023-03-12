@@ -3,24 +3,17 @@
 #include <World/Stats.h>
 
 #include <Rendering/Utility/Bloom.h>
-#include <fstream>
-#include "Objects/MeshObject.h"
-#include <iostream>
+#include <Rendering/Utility/SSAO.h>
 #include <filesystem>
 #include <Objects/Components/CollisionComponent.h>
 #include <Engine/EngineProperties.h>
 #include <UI/Default/ScrollObject.h>
 #include <Engine/FileUtility.h>
-#include <Engine/Scene.h>
-#include <Rendering/Utility/SSAO.h>
-#include <Engine/Log.h>
 #include <Rendering/Utility/Framebuffer.h>
-#include <UI/Default/TextRenderer.h>
 #include <UI/UIBox.h>
 #include <Engine/OS.h>
 #include <map>
-
-#include <SDL.h>
+#include <Engine/Log.h>
 
 namespace Engine
 {
@@ -63,18 +56,6 @@ namespace Graphics
 		SSAO::ResizeBuffer(NewResolution.X, NewResolution.Y);
 		Bloom::OnResized();
 		UIBox::ForceUpdateUI();
-	}
-	void RecompileShaders()
-	{
-		Uint64 PerfCounterFrequency = SDL_GetPerformanceFrequency();
-		Uint64 LastCounter = SDL_GetPerformanceCounter();
-		UIShader->Recompile();
-		TextShader->Recompile();
-		MainShader->Recompile();
-		Uint64 EndCounter = SDL_GetPerformanceCounter();
-		Uint64 counterElapsed = EndCounter - LastCounter;
-		float LoadTime = ((float)counterElapsed) / ((float)PerfCounterFrequency);
-		Log::Print(std::string("Recompiled Shaders. (").append(std::to_string(LoadTime)).append(" seconds)"), Vector3(1, 0.6f, 0.f));
 	}
 	float Gamma = 1;
 	float ChrAbbSize = 0, Vignette = 0.2;
@@ -168,15 +149,6 @@ namespace Performance
 namespace Objects
 {
 	std::vector<WorldObject*> AllObjects;
-
-	MeshObject* CreateNewMeshObject(std::string FilePath, Transform Transform, std::string Name)
-	{
-		MeshObject* NewMeshObject = new MeshObject();
-		NewMeshObject->LoadFromFile(FilePath);
-		NewMeshObject->Start(Name, Transform);
-		NewMeshObject->CurrentScene = Scene::CurrentScene;
-		return NewMeshObject;
-	}
 	std::vector<WorldObject*> GetAllObjectsWithID(uint32_t ID)
 	{
 		std::vector<WorldObject*> FoundObjects;

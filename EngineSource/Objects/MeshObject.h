@@ -2,8 +2,10 @@
 #include "Objects/WorldObject.h"
 #include <Objects/Components/CollisionComponent.h>
 #include <Objects/Components/MeshComponent.h>
-#include "Rendering/Mesh/Model.h"
 #include <GENERATED/GENERATED_MeshObject.h>
+
+class Model;
+
 class MeshObject : public WorldObject
 {
 public:

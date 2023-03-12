@@ -1,9 +1,8 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <glm/vec3.hpp>
-#include <glm/mat4x4.hpp>
 #include <glm/fwd.hpp>
+#include "glm/ext/vector_float3.hpp"
 
 struct Transform;
 

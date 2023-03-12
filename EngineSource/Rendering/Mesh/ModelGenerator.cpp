@@ -4,6 +4,8 @@
 #include <iostream>
 #include <World/Assets.h>
 #include <Engine/Log.h>
+#include <glm/ext/vector_float2.hpp>
+#include <glm/geometric.hpp>
 
 
 namespace ModelGenerator

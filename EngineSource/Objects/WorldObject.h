@@ -84,7 +84,6 @@ namespace Objects
 	bool DestroyObject(WorldObject* Object);
 	WorldObject* SpawnObjectFromID(uint32_t ID, Transform ObjectTransform);
 	extern const std::vector<ObjectDescription> EditorObjects;
-	MeshObject* CreateNewMeshObject(std::string FilePath, Transform Transform, std::string Name = "NONE");
 	std::vector<WorldObject*> GetAllObjectsWithID(uint32_t ID);
 	extern std::vector<WorldObject*> AllObjects;
 	std::string GetCategoryFromID(uint32_t ID);

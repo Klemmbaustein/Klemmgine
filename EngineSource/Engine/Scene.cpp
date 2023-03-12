@@ -11,7 +11,9 @@
 #include <Engine/Input.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <UI/UIBox.h>
+#include <Math/Collision/Collision.h>
 #include <Rendering/Camera/CameraShake.h>
+#include <Rendering/Camera/Camera.h>
 
 // Old maps do not save the fog and sun properties
 #define SAVE_FOG_AND_SUN 1
