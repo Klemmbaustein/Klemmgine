@@ -26,76 +26,88 @@ inline uint32_t hash_str_uint32(const std::string& str) {
 
 }
 
-void WriteObjectList(std::vector<std::string> Objects, std::string TargetFolder)
+struct Object
+{
+	std::string Name;
+	std::string Path;
+};
+
+void WriteObjectList(std::vector<Object> Objects, std::string TargetFolder)
 {
 	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_ListOfObjects.h", std::ios::out);
 	Log::Print("Written: " + TargetFolder + "/GENERATED_ListOfObjects.h");
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		uint32_t ID = hash_str_uint32(Objects[i]);
-		OutStream << "ObjectDescription(\"" << Objects[i] << "\", " << ID << ")," << std::endl;
+		uint32_t ID = hash_str_uint32(Objects[i].Name);
+		OutStream << "ObjectDescription(\"" << Objects[i].Name << "\", " << ID << ")," << std::endl;
 	}
 	OutStream.close();
 }
 
-void WriteIncludeList(std::vector<std::string> Objects, std::string TargetFolder)
+void WriteIncludeList(std::vector<Object> Objects, std::string TargetFolder)
 {
 	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_ObjectIncludes.h", std::ios::out);
 	Log::Print("Written: " + TargetFolder + "/GENERATED_ObjectIncludes.h");
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		OutStream << "#include <Objects/" + Objects[i] + ".h>" << std::endl;
+		OutStream << "#include <Objects" + Objects[i].Path + "/" + Objects[i].Name + ".h>" << std::endl;
 	}
 	OutStream.close();
 }
 
-void WriteSpawnList(std::vector<std::string> Objects, std::string TargetFolder)
+void WriteSpawnList(std::vector<Object> Objects, std::string TargetFolder)
 {
 	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_Spawnlist.h", std::ios::out);
 	Log::Print("Written: " + TargetFolder + "/GENERATED_Spawnlist.h");
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		uint32_t ID = hash_str_uint32(Objects[i]);
-		OutStream << "case " + std::to_string(ID) + ": return (WorldObject*)SpawnObject<" + Objects[i] + ">(ObjectTransform); " << std::endl;
+		uint32_t ID = hash_str_uint32(Objects[i].Name);
+		OutStream << "case " + std::to_string(ID) + ": return (WorldObject*)SpawnObject<" + Objects[i].Name + ">(ObjectTransform); " << std::endl;
 	}
 	OutStream.close();
 }
 
-void WriteCategoryList(std::vector<std::string> Objects, std::string TargetFolder)
+void WriteCategoryList(std::vector<Object> Objects, std::string TargetFolder)
 {
 	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_Categories.h", std::ios::out);
 	Log::Print("Written: " + TargetFolder + "/GENERATED_Categories.h");
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		uint32_t ID = hash_str_uint32(Objects[i]);
-		OutStream << "case " + std::to_string(ID) + ": return " + Objects[i] + "::GetCategory();" << std::endl;
+		uint32_t ID = hash_str_uint32(Objects[i].Name);
+		OutStream << "case " + std::to_string(ID) + ": return " + Objects[i].Name + "::GetCategory();" << std::endl;
 	}
 	OutStream.close();
 }
 
-void WriteHeaderForObject(std::string TargetFolder, std::string Object)
+void WriteHeaderForObject(std::string TargetFolder, Object Object)
 {
-	Log::Print("Written: " + TargetFolder + "/GENERATED_" + Object + ".h");
-	unsigned int ID = hash_str_uint32(Object);
-	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_" + Object + ".h", std::ios::out);
+	Log::Print("Written: " + TargetFolder + "/GENERATED_" + Object.Name + ".h");
+	unsigned int ID = hash_str_uint32(Object.Name);
+	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_" + Object.Name + ".h", std::ios::out);
 	OutStream << "#pragma once" << std::endl;
-	std::string UppercaseName = Object;
-	std::transform(Object.begin(), Object.end(), UppercaseName.begin(), ::toupper);
+	std::string UppercaseName = Object.Name;
+	std::transform(Object.Name.begin(), Object.Name.end(), UppercaseName.begin(), ::toupper);
 	OutStream << "#define " << UppercaseName << "_GENERATED(Category) "
-		<< Object << "() : WorldObject(ObjectDescription(\"" << Object << "\", " << std::to_string(ID) << ")) {}\\\n"
+		<< Object.Name << "() : WorldObject(ObjectDescription(\"" << Object.Name << "\", " << std::to_string(ID) << ")) {}\\\n"
 		<< "static std::string GetCategory() { return Category; }\\\n";
 	OutStream << "static uint32_t GetID() { return " << std::to_string(ID) << ";}";
 	OutStream.close();
 }
 
-void RecursiveSearch(std::string InLoc, std::vector<std::string>& Objects)
+void RecursiveSearch(std::string InLoc, std::vector<Object>& Objects, std::string RelativePath = "")
 {
 
 	for (const auto& entry : std::filesystem::directory_iterator(InLoc))
 	{
 		if (entry.is_directory())
 		{
-			RecursiveSearch(entry.path().string(), Objects);
+			std::string DirName = entry.path().filename().string();
+			if (DirName != "Components")
+			{
+				Log::Print(DirName);
+
+				RecursiveSearch(entry.path().string(), Objects, RelativePath + "/" + DirName);
+			}
 		}
 		else
 		{
@@ -108,7 +120,7 @@ void RecursiveSearch(std::string InLoc, std::vector<std::string>& Objects)
 				auto Ext = Filename.substr(Filename.find_last_of(".") + 1);
 				if (Ext == "h" || Ext == "hpp")
 				{
-					Objects.push_back(Name);
+					Objects.push_back(Object(Name, RelativePath));
 				}
 			}
 		}
@@ -158,7 +170,7 @@ int main(int argc, char** argv)
 		}
 
 		std::filesystem::create_directories(OutLoc);
-		std::vector<std::string> Objects;
+		std::vector<Object> Objects;
 		for (const auto& location : InLoc)
 		{
 			RecursiveSearch(location, Objects);

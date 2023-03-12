@@ -1,14 +1,5 @@
-#include <Objects/CameraComponent.h>
-#include <Objects/CollisionComponent.h>
-#include <Objects/Component.h>
-#include <Objects/InstancedMeshComponent.h>
-#include <Objects/MeshComponent.h>
-#include <Objects/MoveComponent.h>
-#include <Objects/ParticleComponent.h>
-#include <Objects/PointLightComponent.h>
 #include <Objects/InstancedMeshObject.h>
 #include <Objects/LightObject.h>
 #include <Objects/MeshObject.h>
 #include <Objects/ParticleObject.h>
 #include <Objects/SoundObject.h>
-#include <Objects/PlayerObject.h>
