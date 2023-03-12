@@ -1,0 +1,25 @@
+#pragma once
+#include "Objects/WorldObject.h"
+#include <Objects/Components/CollisionComponent.h>
+#include <Objects/Components/MeshComponent.h>
+#include "Rendering/Mesh/Model.h"
+#include <GENERATED/GENERATED_MeshObject.h>
+class MeshObject : public WorldObject
+{
+public:
+	MESHOBJECT_GENERATED("Default/Mesh")
+
+	virtual void Destroy();
+	virtual void Tick();
+	virtual void Begin();
+	void LoadFromFile(std::string Filename);
+	virtual void OnPropertySet() override;
+protected:
+	void GenerateDefaultCategories();
+	MeshComponent* Mesh = nullptr;
+	CollisionComponent* MeshCollision = nullptr;
+	std::string PreviousFilename;
+	std::string Filename;
+	bool MeshCastShadow = true;
+	std::vector<std::string> MaterialNames;
+};

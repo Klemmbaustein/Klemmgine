@@ -1,0 +1,23 @@
+# Folders not related to the engine itself
+Exports/
+Games/
+# VS files
+x64/
+Release/
+.vs/
+*.sln
+*.vcxproj
+*.filters
+*.user
+Tools/ProjectGenerator/x64/
+Tools/ProjectGenerator/Release/
+Tools/BuildTool/x64/
+Tools/BuildTool/Release/
+# binary files
+*.exe
+*.dll
+*.lib
+Components/
+# Generated engine files
+paths.txt
+cppinfo.txt

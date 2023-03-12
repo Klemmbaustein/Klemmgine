@@ -1,0 +1,42 @@
+#pragma once
+#include <UI/UIBox.h>
+#include <UI/Default/UICanvas.h>
+#include <World/Graphics.h>
+
+class TextRenderer;
+class UIText;
+struct VertexBuffer;
+
+class UITextField : public UIBox
+{
+	VertexBuffer* ButtonVertexBuffer = nullptr;
+	bool IsHovered = false;
+	bool IsPressed = false;
+	Vector3 Color = Vector3(0.5);
+	Shader* ButtonShader = nullptr;
+	UICanvas* ParentUI;
+	UIText* TextObject = nullptr;
+	int ButtonIndex;
+	bool IsEdited = false;
+	std::string EnteredText = "";
+	float TextSize = 0.5f;
+	void ScrollTick(Shader* UsedShader);
+	void MakeGLBuffers();
+	void Tick() override;
+	float ButtonColorMultiplier = 1;
+public:
+	UIBox* ParentOverride = nullptr;
+	bool GetIsEdited() { return IsEdited; }
+	void SetText(std::string NewText);
+	void SetTextSize(float NewTextSize);
+	float GetTextSize();
+	std::string GetText();
+	std::string HintText; // Will be displayed when the text field is empty
+	bool GetIsHovered();
+	bool GetIsPressed();
+
+	UITextField(bool Horizontal, Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, TextRenderer* Renderer, Shader* ButtonShader = Graphics::UIShader);
+	~UITextField() override;
+	void Draw() override;
+	void Update() override;
+};
