@@ -51,6 +51,15 @@ std::map<std::string, std::string> LibraryFiles =
 
 void GenerateFiles()
 {
+	for (auto i : LibraryPaths)
+	{
+		if (i.second.empty())
+		{
+			Util::Notify("Not all paths have been specified.");
+			return;
+		}
+	}
+
 	//std::filesystem::current_path("../");
 	std::string compiler = "msvc";
 	std::ofstream Out = std::ofstream("../cppinfo.txt");
@@ -140,6 +149,9 @@ void Installation::ManageFirstInstall(TextRenderer* t)
 		->SetBorder(UIBox::E_ROUNDED, 0.75)
 		->AddChild((new UIText(0.4, 0, "Generate", Text))
 			->SetPadding(0.03));
+
+	(new UIText(0.8, 0, "Installation", Text))
+		->SetPosition(Vector2f(-0.9, 0.8));
 
 	if (std::filesystem::exists("../paths.txt"))
 	{
