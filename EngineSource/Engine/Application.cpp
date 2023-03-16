@@ -565,7 +565,14 @@ void ApplicationLoop()
 	{
 		if (b.c)
 		{
-			b.c->OnButtonClicked(b.Index);
+			if (b.IsDraggedEvent)
+			{
+				b.c->OnButtonDragged(b.Index);
+			}
+			else
+			{
+				b.c->OnButtonClicked(b.Index);
+			}
 		}
 		if (b.o)
 		{

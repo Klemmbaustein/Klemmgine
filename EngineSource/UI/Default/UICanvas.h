@@ -52,6 +52,7 @@ struct ButtonEvent
 	UIBox* o = nullptr;
 	UICanvas* c = nullptr;
 	int Index;
+	bool IsDraggedEvent = false;
 };
 inline bool operator<(const ButtonEvent& a, const ButtonEvent& b)
 {

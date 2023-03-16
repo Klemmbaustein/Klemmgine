@@ -92,9 +92,9 @@ void UIButton::Tick()
 		IsSelected = false;
 		IsPressed = false;
 		RedrawUI();
-		if (CanBeDragged)
+		if (CanBeDragged && ParentUI)
 		{
-			if (ParentUI) ParentUI->OnButtonDragged(ButtonIndex);
+			if (ParentUI) Application::ButtonEvents.insert(ButtonEvent(nullptr, ParentUI, ButtonIndex, true));
 		}
 	}
 
