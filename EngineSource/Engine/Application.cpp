@@ -160,14 +160,21 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	}
 	else return;
 
-	if ((!Buffer->ReflectionCubemapName.empty() || !Buffer->PreviousReflectionCubemapName.empty()) && (Buffer->PreviousReflectionCubemapName != Buffer->ReflectionCubemapName))
+	if (Buffer->PreviousReflectionCubemapName != Buffer->ReflectionCubemapName)
 	{
 		Buffer->PreviousReflectionCubemapName = Buffer->ReflectionCubemapName;
 		if (Buffer->ReflectionCubemap)
 		{
 			Cubemap::UnloadCubemapFile(Buffer->ReflectionCubemap);
 		}
-		Buffer->ReflectionCubemap = Cubemap::LoadCubemapFile(Buffer->ReflectionCubemapName);
+		if (!Buffer->ReflectionCubemapName.empty())
+		{
+			Buffer->ReflectionCubemap = Cubemap::LoadCubemapFile(Buffer->ReflectionCubemapName);
+		}
+		else
+		{
+			Buffer->ReflectionCubemap = 0;
+		}
 	}
 
 	for (auto* p : Buffer->ParticleEmitters)

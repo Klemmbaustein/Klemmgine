@@ -72,6 +72,7 @@ namespace Scene
 				Objects::AllObjects.at(i)->IsSelected = false;
 			}
 			TextInput::PollForText = false;
+			Graphics::MainFramebuffer->ReflectionCubemapName.clear();
 			Debugging::EngineStatus = "Loading Scene";
 			for (int i = 0; i < Objects::AllObjects.size(); i++)
 			{
@@ -81,8 +82,6 @@ namespace Scene
 				}
 			}
 			WorldObject::DestroyMarkedObjects();
-
-
 
 			Graphics::Lights.clear();
 			Objects::AllObjects.clear();
