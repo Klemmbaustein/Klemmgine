@@ -793,7 +793,6 @@ void EditorUI::OnButtonDragged(int Index)
 {
 	if (!UserDraggingButton)
 	{
-		Log::Print("HI");
 		auto ObjectsInFolder = GetContentsOfCurrentCPPFolder();
 		Index -= 200;
 		if (ContentBrowserMode && ObjectsInFolder.size() < Index) return;
