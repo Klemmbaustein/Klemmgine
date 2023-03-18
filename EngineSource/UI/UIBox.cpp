@@ -121,8 +121,8 @@ void UIBox::InitUI()
 	glGenTextures(1, &UI::UITexture);
 	glBindTexture(GL_TEXTURE_2D, UI::UITexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Graphics::WindowResolution.X * 2, Graphics::WindowResolution.Y * 2, 0, GL_RGBA, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, UI::UIBuffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, UI::UITexture, 0);

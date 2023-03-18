@@ -52,11 +52,26 @@ vec4 sampleUI()
 {
 	vec4 UIsample = vec4(0);
 	vec2 texSize = 1.f / textureSize(u_ui, 0);
-	UIsample += texture(u_ui, v_uitexcoords);
-	UIsample += texture(u_ui, v_uitexcoords + vec2(0, texSize.y));
-	UIsample += texture(u_ui, v_uitexcoords + vec2(texSize.x, 0));
-	UIsample += texture(u_ui, v_uitexcoords + texSize);
-	return UIsample / 4.f;
+	int divs = 0;
+	for (int x = 0; x < 2; ++x)
+	{
+		for (int y = 0; y < 2; ++y)
+		{
+			vec4 newtex = texture(u_ui, v_uitexcoords + vec2(texSize.x * x, texSize.y * y));
+			UIsample.w += newtex.w;
+			if (newtex.w != 0)
+			{
+				UIsample.xyz += newtex.xyz;
+				++divs;
+			}
+		}
+	}
+	if (divs != 0)
+	{
+		UIsample.xyz /= divs;
+	}
+	UIsample.w /= 4;
+	return UIsample;
 }
 
 vec4 blursample(sampler2D tex, vec2 coords)
@@ -119,5 +134,5 @@ void main()
 	f_color = mix(f_color, enginearrows, length(enginearrows.rgb));
 	f_color *= (rand(v_texcoords) / 50) + 0.95; // To combat color banding
 	f_color -= Vignette * u_vignette;
-	f_color = mix(clamp(f_color, 0, 1), uicolor, clamp(uicolor.w, 0, 1));
+	f_color = mix(clamp(f_color, 0, 1), vec4(uicolor.xyz, 1), clamp(uicolor.w, 0, 1));
 }

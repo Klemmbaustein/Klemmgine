@@ -641,7 +641,7 @@ int Initialize(int argc, char** argv)
 
 	std::string ApplicationTitle = ProjectName;
 	if (IsInEditor) ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
-
+	if (EngineDebug && !IsInEditor) ApplicationTitle.append(" (Debug)");
 	Application::Window = SDL_CreateWindow(ApplicationTitle.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		Graphics::WindowResolution.X, Graphics::WindowResolution.Y,
