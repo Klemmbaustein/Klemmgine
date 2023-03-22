@@ -208,6 +208,7 @@ vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, v
 		}
 		else break;
 	}
+	lightingColor *= ambient / u_directionallight.AmbientIntensity;
 
 	return ambient + (DirectionalLightColor + specular) * shadow + lightingColor;
 }

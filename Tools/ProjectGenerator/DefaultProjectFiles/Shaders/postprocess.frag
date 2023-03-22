@@ -21,6 +21,8 @@ uniform bool u_ssao;
 uniform bool u_bloom;
 uniform float u_time;
 
+#define DEPTH_MAX 10000
+
 float rand(vec2 co){
 	return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
@@ -29,7 +31,7 @@ float rand(vec2 co){
 float LinearizeDepth(float depth)
 {
 	float z = depth * 2.0 - 1.0; // Back to NDC 
-	return (2.0 * 0.1f * 10000.f) / (10000.f + 0.1f - z * (10000.f - 0.1f));
+	return (2.0 * 0.1f * DEPTH_MAX) / (DEPTH_MAX + 0.1f - z * (DEPTH_MAX - 0.1f));
 }
 float blurssao()
 {
@@ -76,11 +78,11 @@ vec4 sampleUI()
 
 vec4 blursample(sampler2D tex, vec2 coords)
 {
-	vec4 color;
+	vec4 color = vec4(0);
 	vec2 texelSize = 0.5 / textureSize(u_texture, 0);
-	for(int x = -1; x <= 1; ++x)
+	for (int x = -1; x <= 1; ++x)
 	{
-		for(int y = -1; y <= 1; ++y)
+		for (int y = -1; y <= 1; ++y)
 		{
 			color.x += texture(u_texture, (vec2(x, y) * texelSize) + v_texcoords + vec2(u_chrabbsize * Vignette)).x;
 			color.y += texture(u_texture, (vec2(x, y) * texelSize) + v_texcoords + vec2(-u_chrabbsize * Vignette)).y;
@@ -107,16 +109,20 @@ void main()
 {
 	vec4 color = texture(u_texture, v_texcoords);
 	color *= 1.25;
-	vec2 texelSize = 3.5 / textureSize(u_texture, 0);
+	vec2 texelSize = 1.f / textureSize(u_texture, 0);
 	if (u_ssao) color *= blurssao();
 	vec3 outlinecolor = vec3(0.f);
-	for (int x = 0; x <= 1; ++x)
+	float outlinelevel = LinearizeDepth(texture(u_outlines, v_texcoords).x);
+
+	for (int x = -1; x <= 1; x += 2)
 	{
-		for(int y = 0; y <= 1; ++y)
+		for (int y = -1; y <= 1; y += 2)
 		{
-			if(abs(LinearizeDepth(texture(u_outlines, v_texcoords).x) -LinearizeDepth(texture(u_outlines, v_texcoords + vec2(x, y) * texelSize).x)) * 100 > 0.1f)
+			
+			float difference = outlinelevel - LinearizeDepth(texture(u_outlines, v_texcoords + vec2(x, y) * texelSize * 4).x);
+			if (difference > (outlinelevel / DEPTH_MAX * 1000))
 			{
-				outlinecolor += vec3(abs(texture(u_outlines, v_texcoords).x - texture(u_outlines, v_texcoords + (vec2(x, y) * texelSize))).x * 50);
+				outlinecolor += difference / 100;
 			}
 		}
 	}
@@ -131,6 +137,8 @@ void main()
 	float bloomstrength = clamp(length(bloomcolor) / 4.5, 0, 1);
 	color = vec4(mix(color.xyz, bloomcolor, clamp(bloomstrength, 0, 1)), 1);
 	f_color = pow(vec4(color.xyz + outlinecolor, color.w), vec4(u_gamma));
+	//f_color = vec4(vec3(outlinelevel / 100), 1);
+
 	f_color = mix(f_color, enginearrows, length(enginearrows.rgb));
 	f_color *= (rand(v_texcoords) / 50) + 0.95; // To combat color banding
 	f_color -= Vignette * u_vignette;
