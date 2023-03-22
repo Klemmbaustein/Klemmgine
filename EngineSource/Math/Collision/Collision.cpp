@@ -35,6 +35,7 @@ namespace Collision
 	bool TriangleAABBCollision(Vector3 v0, Vector3 v1, Vector3 v2, Collision::Box& b)
 	{
 		//TODO: L
+		return false;
 	}
 }
 
