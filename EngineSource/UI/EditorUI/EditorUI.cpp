@@ -1314,7 +1314,7 @@ void EditorUI::UpdateItemBrowser()
 	{
 		auto NewButton = new UIButton(true, 0, UIColors[0] * ((int)(ContentBrowserMode == (bool)i) + 1), this, Modes[i].Index);
 		NewButton->SetBorder(UIBox::E_DARKENED_EDGE, 0.1);
-		auto NewText = new UIText(0.5, UIColors[2], Modes[i].Name, &EngineUIText);
+		auto NewText = new UIText(0.45, UIColors[2], Modes[i].Name, &EngineUIText);
 		NewText->SetPadding(0);
 		NewButton->Align = UIBox::E_CENTERED;
 		NewButton->AddChild(NewText);
@@ -1341,6 +1341,7 @@ void EditorUI::UpdateItemBrowser()
 		ContainerBox->AddChild(BackButton);
 		ItemBrowserPath = new UITextField(true, 0, UIColors[1] * 2, this, 4, &EngineUIText);
 		ItemBrowserPath->SetMinSize(Vector2(0.2, 0.08));
+		ItemBrowserPath->SetMaxSize(Vector2(0.2, 0.08));
 		ItemBrowserPath->SetText(ContentBrowser::CurrentFilePath);
 		ItemBrowserPath->SetPadding(0.01);
 		ItemBrowserPath->SetBorder(UIBox::E_ROUNDED, 0.5);
@@ -1419,7 +1420,7 @@ void EditorUI::UpdateItemBrowser()
 			NewItemBrowserButton->AddChild(Text);
 			Text->SetPadding(0.001);
 			Text->Wrap = true;
-			Text->WrapDistance = 0.15;
+			Text->WrapDistance = 0.135;
 			NewBoxes[i / 2]->AddChild(NewItemBrowserButton);
 		}
 	}
@@ -1464,7 +1465,7 @@ void EditorUI::UpdateItemBrowser()
 			NewItemBrowserButton->AddChild(Text);
 			Text->SetPadding(0.001);
 			Text->Wrap = true;
-			Text->WrapDistance = 0.1;
+			Text->WrapDistance = 0.09;
 			NewBoxes.at(i / 3)->AddChild(NewItemBrowserButton);
 		}
 	}
@@ -1868,7 +1869,6 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 				CurrentList->Children[it].ListIndex = ObjectCategories.size() - 1;
 				NewList = &CurrentList->Children[it];
 			}
-
 			CurrentList = NewList;
 		}
 		if (CurrentList && !CurrentList->IsCollapsed)

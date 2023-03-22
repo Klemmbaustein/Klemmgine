@@ -176,7 +176,7 @@ protected:
 	std::vector<PopUpButton> PopUpButtons;
 	std::string PopUpMesage;
 	std::thread* BuildThread = nullptr;
-	TextRenderer EngineUIText = TextRenderer("Font.ttf", 60);
+	TextRenderer EngineUIText = TextRenderer("Font.ttf", 90);
 
 	std::set<std::string> CollapsedItems;
 
