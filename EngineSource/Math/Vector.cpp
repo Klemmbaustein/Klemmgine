@@ -381,6 +381,12 @@ Vector2& Vector2::operator*=(Vector2 b)
 	return *this;
 }
 
+Vector2 Vector2::operator*(Vector2 b)
+{
+	return Vector2(X * b.X, Y * b.Y);
+}
+
+
 glm::mat4 Transform::ToMatrix()
 {
 	glm::mat4 MatModel = glm::mat4(1.f);

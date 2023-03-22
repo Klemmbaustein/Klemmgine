@@ -30,6 +30,7 @@ struct Vector2
 
 	Vector2& operator+=(Vector2 b);
 	Vector2& operator*=(Vector2 b);
+	Vector2 operator*(Vector2 b);
 	std::string ToString();
 	float Length();
 	Vector2 Clamp(Vector2 Min, Vector2 Max);
