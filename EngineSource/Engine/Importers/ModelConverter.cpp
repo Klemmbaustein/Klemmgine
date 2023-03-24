@@ -87,22 +87,21 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 		ProcessMaterials(Scene);
 		ProcessNode(Scene->mRootNode, Scene);
 
-		std::string FileName = std::string(GetFileNameFromPath(Name));
+		std::string FileName = std::string(FileUtil::GetFileNameFromPath(Name));
 		std::string FileNameWithoutExtension = FileName.substr(0, FileName.find_last_of("."));
 		std::string OutputFileName = CurrentFilepath + "/" + FileNameWithoutExtension + ".jsm";
 		if (std::filesystem::exists(OutputFileName))
 		{
-			Log::Print("Test");
 			Importer::From = Name;
 			Importer::To = OutputFileName;
-			Editor::CurrentUI->ShowPopUpWindow("File already exists!", { PopUpButton("Replace", true, []()
-				{
-					std::string TargetPath = Importer::To.substr(0, Importer::To.find_last_of("/\\"));
-					std::filesystem::remove(Importer::To);
-					Log::Print(TargetPath, Log::LogColor::Blue);
-					Import(Importer::From, TargetPath);
-				}
-			), PopUpButton("Cancel", false, nullptr) });
+			//Editor::CurrentUI->ShowPopUpWindow("File already exists!", { PopUpButton("Replace", true, []()
+			//	{
+			//		std::string TargetPath = Importer::To.substr(0, Importer::To.find_last_of("/\\"));
+			//		std::filesystem::remove(Importer::To);
+			//		Log::Print(TargetPath, Log::LogColor::Blue);
+			//		Import(Importer::From, TargetPath);
+			//	}
+			//), PopUpButton("Cancel", false, nullptr) });
 			return "";
 		}
 		std::ofstream Output(OutputFileName, std::ios::out | std::ios::binary);

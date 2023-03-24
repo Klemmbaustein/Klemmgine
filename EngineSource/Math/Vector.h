@@ -153,6 +153,7 @@ struct Vector3
 	static Vector3 RotateVector(Vector3 Vec, Vector3 Rot);
 	static Vector3 TranslateVector(Vector3 Vec, Transform Transform);
 	static bool NearlyEqual(Vector3 a, Vector3 b, float Threshold);
+	static Vector3 Clamp(Vector3 v, Vector3 min, Vector3 max);
 };
 
 Vector3 operator+(Vector3 a, Vector3 b);

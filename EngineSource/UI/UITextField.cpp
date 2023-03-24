@@ -145,7 +145,7 @@ void UITextField::Tick()
 	TextObject->SetText(EnteredText.empty() && !IsEdited ? HintText : (IsEdited ? RendererdText : EnteredText));
 }
 
-void UITextField::SetText(std::string NewText)
+UITextField* UITextField::SetText(std::string NewText)
 {
 	if (NewText != EnteredText)
 	{
@@ -156,15 +156,17 @@ void UITextField::SetText(std::string NewText)
 			TextInput::Text = NewText;
 		}
 	}
+	return this;
 }
 
-void UITextField::SetTextSize(float NewTextSize)
+UITextField* UITextField::SetTextSize(float NewTextSize)
 {
 	if (NewTextSize != TextSize)
 	{
 		TextObject->SetTextSize(NewTextSize);
 		TextSize = NewTextSize;
 	}
+	return this;
 }
 
 float UITextField::GetTextSize()

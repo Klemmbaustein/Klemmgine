@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include "EditorTab.h"
 #include <UI/UITextField.h>
@@ -36,3 +37,4 @@ protected:
 	UIBox* CubemapSidesBox = nullptr;
 	std::string InitialName;
 };
+#endif

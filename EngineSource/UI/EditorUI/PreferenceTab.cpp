@@ -1,4 +1,4 @@
-#if EDITOR
+#if 0
 #include "PreferenceTab.h"
 #include <Engine/Save.h>
 

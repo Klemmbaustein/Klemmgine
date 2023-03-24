@@ -8,7 +8,7 @@ namespace Log
 	{
 		Vector3 Color;
 		std::string Text;
-		int Ammount = 0;
+		int Amount = 0;
 		Message(std::string Text, Vector3 Color)
 		{
 			this->Color = Color;

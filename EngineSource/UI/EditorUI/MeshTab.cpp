@@ -1,3 +1,4 @@
+#if 0
 #ifdef EDITOR
 #pragma once
 #include "MeshTab.h"
@@ -235,4 +236,5 @@ void MeshTab::UpdatePreviewModel()
 	PreviewBuffer->UseWith(PreviewModel);
 	PreviewModel->UpdateTransform();
 }
+#endif
 #endif

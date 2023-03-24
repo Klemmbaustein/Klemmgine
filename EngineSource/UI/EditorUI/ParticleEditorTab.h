@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include <UI/EditorUI/EditorTab.h>
 #include <Rendering/Utility/Framebuffer.h>
@@ -56,3 +57,4 @@ public:
 	void OnButtonClicked(int Index) override;
 	virtual ~ParticleEditorTab();
 };
+#endif

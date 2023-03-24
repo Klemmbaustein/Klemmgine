@@ -31,8 +31,8 @@ int main(int argc, char** argv)
 		for (Log::Message i : Log::Messages)
 		{
 			std::cout << "    " <<
-				std::string(i.Ammount != 0 ?
-					i.Text + std::string(" (x") + std::to_string(i.Ammount + 1) + std::string(")") :
+				std::string(i.Amount != 0 ?
+					i.Text + std::string(" (x") + std::to_string(i.Amount + 1) + std::string(")") :
 					i.Text) << "\n";
 		}
 		std::cout << "\nPress enter to continue";
@@ -53,8 +53,8 @@ int main(int argc, char** argv)
 		for (Log::Message i : Log::Messages)
 		{
 			std::cout << "    " <<
-				std::string(i.Ammount != 0 ?
-					i.Text + std::string(" (x") + std::to_string(i.Ammount + 1) + std::string(")") :
+				std::string(i.Amount != 0 ?
+					i.Text + std::string(" (x") + std::to_string(i.Amount + 1) + std::string(")") :
 					i.Text) << "\n";
 		}
 		std::cout << "\nPress enter to continue";

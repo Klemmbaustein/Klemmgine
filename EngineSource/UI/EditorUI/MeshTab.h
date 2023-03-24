@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include "EditorTab.h"
 #include <UI/UITextField.h>
@@ -58,3 +59,5 @@ protected:
 	};
 	Transform CameraTransform;
 };
+
+#endif

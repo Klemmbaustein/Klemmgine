@@ -1,4 +1,4 @@
-#if EDITOR
+#if 0
 #pragma once
 #include "MaterialTemplateTab.h"
 #include "MaterialFunctions.h"

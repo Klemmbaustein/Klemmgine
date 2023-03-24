@@ -1,4 +1,4 @@
-#if EDITOR
+#if 0
 #pragma once
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/EditorTab.h>

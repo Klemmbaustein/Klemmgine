@@ -163,7 +163,7 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 		}
 	}
 
-	return (Vector2(x, MaxHeight + y + 15) / Vector2(1800 * Graphics::AspectRatio, 1800)) * originalScale / CharacterSizeInPixels * 90;
+	return (Vector2(x, y + CharacterSizeInPixels) / Vector2(1800 * Graphics::AspectRatio, 1800)) * originalScale / CharacterSizeInPixels * 90;
 }
 
 Vector2 TextRenderer::RenderText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap, ScrollObject* CurrentScrollObject)
@@ -238,7 +238,7 @@ Vector2 TextRenderer::RenderText(ColoredText Text, Vector2 Pos, float Scale, Vec
 	}
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(FontVertex) * numVertices, fontVertexBufferData);
 	glDrawArrays(GL_TRIANGLES, 0, numVertices);
-	return (Vector2(x, MaxHeight + y + 15) / Vector2(1800 * Graphics::AspectRatio, 1800)) * originalScale;
+	return (Vector2(x, y + CharacterSizeInPixels) / Vector2(1800 * Graphics::AspectRatio, 1800)) * originalScale;
 }
 
 DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap)
