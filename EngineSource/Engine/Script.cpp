@@ -34,7 +34,7 @@ void Script::LoadScript(const char* Name)
 {
 
 	std::string Path = Assets::GetAsset(Name + std::string(".jss")); //JavaScriptScript, not to be confused with JavaScript
-	Log::Print("Running Script \"" + GetFilePathWithoutExtension(Name) + "\"");
+	Log::Print("Running Script \"" + FileUtil::GetFilePathWithoutExtension(Name) + "\"");
 
 	if (std::filesystem::exists(Path))
 	{

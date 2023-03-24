@@ -74,7 +74,7 @@ void Pack::SaveFolderToPack(std::string Folder, std::string Outf)
 				std::ifstream InFile = std::ifstream(entry.path(), std::ios::in | std::ios::binary);
 				std::stringstream InStream;
 				InStream << InFile.rdbuf();
-				PackedFiles.push_back(PackFile(GetFileNameFromPath(entry.path().string()), InStream.str()));
+				PackedFiles.push_back(PackFile(FileUtil::GetFileNameFromPath(entry.path().string()), InStream.str()));
 				InFile.close();
 			}
 		}
@@ -88,7 +88,7 @@ void Pack::SaveFolderToPack(std::string Folder, std::string Outf)
 
 std::string Pack::GetFile(std::string File)
 {
-	File = GetFileNameFromPath(File);
+	File = FileUtil::GetFileNameFromPath(File);
 	for (const auto& entry : std::filesystem::directory_iterator("Assets/"))
 	{
 		if (entry.path().string().substr(entry.path().string().find_last_of('.') + 1) == "pack")

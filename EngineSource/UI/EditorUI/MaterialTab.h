@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include <UI/UITextField.h>
 #include <UI/EditorUI/EditorTab.h>
@@ -34,3 +35,4 @@ private:
 	UIText* CutoutText = nullptr, *TranslucencyText = nullptr;
 	UIText* ShaderTexts[2];
 };
+#endif

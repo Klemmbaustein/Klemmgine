@@ -1,3 +1,4 @@
+#if 0
 #ifdef EDITOR
 #pragma once
 #include "CubemapTab.h"
@@ -72,7 +73,7 @@ void CubemapTab::Load(std::string File)
 		PreviewBuffer->GetBuffer()->ReInit(Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
 		Graphics::MainCamera->Position = Vector3(0, 4, 15);
 		Graphics::MainCamera->SetRotation(Vector3(0, -90, 0));
-		TabName->SetText("Cubemap: " + GetFileNameWithoutExtensionFromPath(File));
+		TabName->SetText("Cubemap: " + FileUtil::GetFileNameWithoutExtensionFromPath(File));
 		delete SaveFile;
 		InitialName = File;
 		SaveFile = new SaveGame(InitialName.substr(0, InitialName.size() - 4), "cbm", false);
@@ -154,7 +155,8 @@ void CubemapTab::UpdatePreviewModel()
 	PreviewModel = new Model(m);
 	PreviewBuffer->ClearContent();
 	PreviewBuffer->UseWith(PreviewModel);
-	PreviewBuffer->ReflectionCubemap = Cubemap::LoadCubemapFile(GetFileNameWithoutExtensionFromPath(InitialName));
+	PreviewBuffer->ReflectionCubemap = Cubemap::LoadCubemapFile(FileUtil::GetFileNameWithoutExtensionFromPath(InitialName));
 	PreviewModel->UpdateTransform();
 }
+#endif
 #endif

@@ -66,6 +66,8 @@ public:
 	static void ClearUI();
 	Vector2 GetScreenPosition();
 	virtual Vector2 GetUsedSize();
+	ScrollObject* CurrentScrollObject = nullptr;
+
 protected:
 	bool ShouldBeTicked = true;
 	bool TryFill = false;
@@ -88,7 +90,6 @@ protected:
 
 	std::vector<UIBox*> Children;
 	UIBox* Parent = nullptr;
-	ScrollObject* CurrentScrollObject = nullptr;
 	void UpdateSelfAndChildren();
 private:
 	bool ChildrenHorizontal;

@@ -13,19 +13,19 @@ namespace Importer
 }
 void Importer::Import(std::string InputFile, std::string CurrentFilePath)
 {
-	std::string FileName = std::string(GetFileNameFromPath(InputFile));
+	std::string FileName = std::string(FileUtil::GetFileNameFromPath(InputFile));
 	std::string FileNameWithoutExtension = FileName.substr(0, FileName.find_last_of("."));
 	std::string OutputFileName = CurrentFilePath + "/" + FileName;
 	if (std::filesystem::exists(OutputFileName))
 	{
 		From = InputFile;
 		To = OutputFileName;
-		Editor::CurrentUI->ShowPopUpWindow("File already exists!", { PopUpButton("Replace", true, []()
-			{
-				std::filesystem::remove(To);
-				std::filesystem::copy(From, To);
-			}
-		), PopUpButton("Cancel", false, nullptr) });
+		//Editor::CurrentUI->ShowPopUpWindow("File already exists!", { PopUpButton("Replace", true, []()
+		//	{
+		//		std::filesystem::remove(To);
+		//		std::filesystem::copy(From, To);
+		//	}
+		//), PopUpButton("Cancel", false, nullptr) });
 	}
 	else
 	{

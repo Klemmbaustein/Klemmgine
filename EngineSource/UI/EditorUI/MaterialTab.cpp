@@ -1,3 +1,4 @@
+#if 0
 #if EDITOR
 #pragma once
 #include "MaterialTab.h"
@@ -282,4 +283,5 @@ void MaterialTab::GenerateUI()
 	}
 }
 
+#endif
 #endif

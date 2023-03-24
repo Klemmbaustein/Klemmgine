@@ -103,7 +103,7 @@ namespace Log
 		{
 			if (Messages.at(Messages.size() - 1).Text == Text && Messages.at(Messages.size() - 1).Color == Color)
 			{
-				Messages.at(Messages.size() - 1).Ammount++;
+				Messages.at(Messages.size() - 1).Amount++;
 			}
 			else
 			{
@@ -213,7 +213,7 @@ namespace Assets
 					}
 				}
 #endif
-				Assets.push_back(Asset(Path, GetFileNameFromPath(Path)));
+				Assets.push_back(Asset(Path, FileUtil::GetFileNameFromPath(Path)));
 			}
 		}
 	}

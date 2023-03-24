@@ -27,8 +27,8 @@ class UITextField : public UIBox
 public:
 	UIBox* ParentOverride = nullptr;
 	bool GetIsEdited() { return IsEdited; }
-	void SetText(std::string NewText);
-	void SetTextSize(float NewTextSize);
+	UITextField* SetText(std::string NewText);
+	UITextField* SetTextSize(float NewTextSize);
 	float GetTextSize();
 	std::string GetText();
 	std::string HintText; // Will be displayed when the text field is empty

@@ -205,7 +205,7 @@ UIBox* UIBox::SetPosition(Vector2 NewPosition)
 
 Vector2 UIBox::GetPosition()
 {
-	return Position;
+	return OffsetPosition;
 }
 
 UIBox* UIBox::SetPadding(float Up, float Down, float Left, float Right)
@@ -481,7 +481,7 @@ void UIBox::DrawAllUIElements()
 				elem->DrawThisAndChildren();
 		}
 #if EDITOR
-		Application::EditorUserInterface->UpdateLogMessages();
+		//Application::EditorUserInterface->UpdateLogMessages();
 #endif
 		glClearColor(0, 0, 0, 1);
 		glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);

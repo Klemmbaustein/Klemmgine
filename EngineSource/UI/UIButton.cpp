@@ -7,7 +7,7 @@
 #include <Engine/Application.h>
 
 #if EDITOR
-extern bool UserDraggingButton;
+//extern bool UserDraggingButton;
 #endif
 
 void UIButton::ScrollTick(Shader* UsedShader)
@@ -117,7 +117,7 @@ void UIButton::Tick()
 		else if (IsPressed)
 		{
 #if EDITOR
-			if (!NeedsToBeSelected || IsSelected || UserDraggingButton)
+			if (!NeedsToBeSelected || IsSelected || false)
 #else
 			if (!NeedsToBeSelected || IsSelected)
 #endif

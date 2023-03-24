@@ -75,6 +75,18 @@ bool Vector3::NearlyEqual(Vector3 a, Vector3 b, float Threshold)
 	return _nearlyequal(a.X, b.X, Threshold) && _nearlyequal(a.Y, b.Y, Threshold) && _nearlyequal(a.Z, b.Z, Threshold);
 }
 
+Vector3 Vector3::Clamp(Vector3 v, Vector3 min, Vector3 max)
+{
+	Vector3 ret;
+	ret.X = std::max(v.X, min.X);
+	ret.Y = std::max(v.Y, min.Y);
+	ret.Z = std::max(v.Z, min.Z);
+	ret.X = std::min(ret.X, max.X);
+	ret.Y = std::min(ret.Y, max.Y);
+	ret.Z = std::min(ret.Z, max.Z);
+	return ret;
+}
+
 bool operator==(Vector2 a, Vector2 b)
 {
 	return (a.X == b.X && a.Y == b.Y);

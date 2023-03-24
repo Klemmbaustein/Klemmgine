@@ -27,11 +27,24 @@ float UIScrollBox::GetMaxScroll()
 	return MaxScroll;
 }
 
+UIScrollBox* UIScrollBox::SetScrollSpeed(float NewScrollSpeed)
+{
+	ScrollClass.Speed = NewScrollSpeed;
+	return this;
+}
+
+float UIScrollBox::GetScrollSpeed()
+{
+	return ScrollClass.Speed;
+}
+
 void UIScrollBox::Update()
 {
 	float Progress = ScrollClass.Percentage;
+	float Speed = ScrollClass.Speed;
 	ScrollClass = ScrollObject(OffsetPosition, Size, MaxScroll);
 	ScrollClass.Percentage = Progress;
+	ScrollClass.Speed = Speed;
 	UpdateScrollObjectOfObject(this);
 }
 

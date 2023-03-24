@@ -75,7 +75,7 @@ std::string OS::ShowOpenFileDialog()
 						// Display the file name to the user.
 						if (SUCCEEDED(hr))
 						{
-							FilePath = wstrtostr(pszFilePath);
+							FilePath = FileUtil::wstrtostr(pszFilePath);
 							return FilePath;
 						}
 						pItem->Release();

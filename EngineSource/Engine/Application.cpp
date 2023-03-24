@@ -360,7 +360,7 @@ void PollInput()
 						}
 					}
 #if IS_IN_EDITOR
-				Application::EditorUserInterface->UpdateObjectList();
+				//Application::EditorUserInterface->UpdateObjectList();
 				break;
 #endif
 			case SDLK_ESCAPE:
@@ -475,9 +475,9 @@ void DrawPostProcessing()
 	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0));
 #if IS_IN_EDITOR
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, Application::EditorUserInterface->OutlineFramebuffer->GetBuffer()->GetTextureID(1));
+	//glBindTexture(GL_TEXTURE_2D, Application::EditorUserInterface->OutlineFramebuffer->GetBuffer()->GetTextureID(1));
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, Application::EditorUserInterface->ArrowFramebuffer->GetTextureID());
+	//glBindTexture(GL_TEXTURE_2D, Application::EditorUserInterface->ArrowFramebuffer->GetTextureID());
 #endif
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, BloomTexture);

@@ -78,7 +78,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				std::string SolutionString = i.path().string();
 				if (SolutionString.substr(SolutionString.find_last_of(".")) == ".sln")
 				{
-					SolutionName = GetFileNameWithoutExtensionFromPath(SolutionString);
+					SolutionName = FileUtil::GetFileNameWithoutExtensionFromPath(SolutionString);
 				}
 			}
 			if (SolutionName.empty())

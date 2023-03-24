@@ -2,16 +2,20 @@
 #include <string>
 #include <vector>
 
-std::string GetFileNameFromPath(std::string FilePath);
 
-std::string GetFileNameWithoutExtensionFromPath(std::string FilePath);
+namespace FileUtil
+{
+	std::string GetFileNameFromPath(std::string FilePath);
 
-std::string GetFilePathWithoutExtension(std::string FilePath);
+	std::string GetFileNameWithoutExtensionFromPath(std::string FilePath);
 
-std::string wstrtostr(const std::wstring& wstr);
+	std::string GetFilePathWithoutExtension(std::string FilePath);
 
-std::vector<char> StringToCharVector(std::string In);
+	std::string wstrtostr(const std::wstring& wstr);
 
-std::string VectorToString(std::vector<char> In);
+	std::vector<char> StringToCharVector(std::string In);
 
-std::string GetExtension(std::string FileName);
+	std::string VectorToString(std::vector<char> In);
+
+	std::string GetExtension(std::string FileName);
+}

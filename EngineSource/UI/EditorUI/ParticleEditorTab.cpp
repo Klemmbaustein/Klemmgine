@@ -1,4 +1,4 @@
-#if EDITOR
+#if 0
 #include "ParticleEditorTab.h"
 #include <World/Stats.h>
 #include <UI/UIButton.h>

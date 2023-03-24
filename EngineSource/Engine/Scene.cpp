@@ -103,7 +103,7 @@ namespace Scene
 			std::ifstream Input(FilePath, std::ios::in | std::ios::binary);
 			std::vector<WorldObject> WorldObjects;
 			Editor::IsInSubscene = false;
-			CurrentScene = GetFilePathWithoutExtension(FilePath);
+			CurrentScene = FileUtil::GetFilePathWithoutExtension(FilePath);
 
 			if (std::filesystem::is_empty(FilePath))
 			{
@@ -235,7 +235,7 @@ namespace Scene
 		{
 			std::ifstream Input(FilePath, std::ios::in | std::ios::binary);
 			std::vector<WorldObject> WorldObjects;
-			CurrentScene = GetFilePathWithoutExtension(FilePath);
+			CurrentScene = FileUtil::GetFilePathWithoutExtension(FilePath);
 
 			if (std::filesystem::is_empty(FilePath))
 			{

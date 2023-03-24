@@ -1,3 +1,4 @@
+#if 0
 #pragma once
 #include <UI/EditorUI/EditorTab.h>
 #include <UI/UITextField.h>
@@ -27,3 +28,4 @@ private:
 	TextRenderer* Renderer;
 	std::string Filepath;
 };
+#endif
