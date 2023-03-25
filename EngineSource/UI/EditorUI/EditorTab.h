@@ -7,7 +7,6 @@ class EditorTab : public UICanvas
 private:
 	bool IsDragged = false;
 	bool IsDragHorizontal = false;
-	bool IsDraggingScale = false;
 	bool IsMouseDown = false;
 	Vector2 InitialMousePosition = 0;
 	Vector2 InitialScale = 0;

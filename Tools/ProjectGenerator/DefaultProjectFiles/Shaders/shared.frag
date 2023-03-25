@@ -38,12 +38,12 @@ uniform sampler2DArray shadowMap;
 uniform mat4 u_view;
 uniform int cascadeCount = 4;
 uniform float cascadePlaneDistances[8];
-uniform float u_biasmodifier;
+uniform float u_biasmodifier = 0;
 uniform DirectionalLight u_directionallight;
-uniform int u_shadowQuality;
-uniform int u_textureres;
-uniform vec3 u_cameraposition;
-uniform int u_shadows;
+uniform int u_shadowQuality = 0;
+uniform int u_textureres = 0;
+uniform vec3 u_cameraposition = vec3(0);
+uniform int u_shadows = 0;
 uniform PointLight u_lights[8];
 uniform bool u_ssao_reverse = true;
 uniform samplerCube Skybox;
@@ -54,10 +54,10 @@ layout (std140, binding = 0) uniform LightSpaceMatrices
 };
 
 
-uniform float FogFalloff;
-uniform float FogDistance;
-uniform float FogMaxDensity;
-uniform vec3 FogColor;
+uniform float FogFalloff = 0;
+uniform float FogDistance = 0;
+uniform float FogMaxDensity = 0;
+uniform vec3 FogColor = vec3(0);
 
 vec4 ApplyFogColor(vec4 InColor)
 {

@@ -1,3 +1,4 @@
+#if EDITOR
 #include "Toolbar.h"
 #include <Engine/Log.h>
 #include <UI/UIText.h>
@@ -11,11 +12,11 @@ void Toolbar::GenerateButtons()
 	TabBackground->DeleteChildren();
 	for (size_t i = 0; i < Buttons.size(); i++)
 	{
-		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5, Vector2(0.003, 0.2)))
+		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5, Vector2(0.001, 0.2)))
 			->SetPadding(0.01, 0.01, 0.02, 0.01));
 		auto Elem = new UIBox(false, 0);
 		Elem->Align = UIBox::E_REVERSE;
-		Elem->SetPadding(0.02, 0.0, 0, 0);
+		Elem->SetPadding(0.0, 0.0, 0, 0);
 		Elem->AddChild((new UIText(0.4, UIColors[2] * 0.7, Buttons[i].Name, Editor::CurrentUI->EngineUIText))->SetPadding(0));
 		TabBackground->AddChild(Elem);
 
@@ -27,9 +28,10 @@ void Toolbar::GenerateButtons()
 		for (auto& btn : Buttons[i].Buttons)
 		{
 			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[0] * 1.5, Vector2(0.1)))
+				->SetBorder(UIBox::E_ROUNDED, 0.5)
 				->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
 				->AddChild((new UIText(0.35, UIColors[2], btn.Name, Editor::CurrentUI->EngineUIText))
-					->SetPadding(0.001))
+					->SetPadding(0.005))
 				->AddChild((new UIButton(true, 0, 1, this, i * MAX_CATEGORY_BUTTONS + j))
 					->SetUseTexture(true, btn.Texture)
 					->SetMinSize(0.075)
@@ -40,7 +42,7 @@ void Toolbar::GenerateButtons()
 	}
 }
 
-Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorTab(Colors, Position, Scale, Vector2(0.8, 0.2), Vector2(2, 0.5))
+Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorTab(Colors, Position, Scale, Vector2(0.8, 0.22), Vector2(2, 0.5))
 {
 	RegisterNewButtonCategory(ButtonCategory("Scene", 
 		{
@@ -63,10 +65,11 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorTab(C
 		}));
 	RegisterNewButtonCategory(ButtonCategory("Project",
 		{
-			ButtonCategory::Button("Preferences", Editor::CurrentUI->Textures[15], []() { Log::Print("TODO"); }),
+			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[15], []() { Log::Print("TODO"); }),
 			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { Log::Print("hi"); })
 
 		}));
+
 	GenerateButtons();
 }
 
@@ -104,3 +107,4 @@ void Toolbar::RegisterNewButtonCategory(ButtonCategory NewButtons)
 {
 	Buttons.push_back(NewButtons);
 }
+#endif

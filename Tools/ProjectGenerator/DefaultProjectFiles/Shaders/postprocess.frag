@@ -13,13 +13,13 @@ uniform sampler2D u_bloomtexture;
 uniform sampler2D u_ssaotexture;
 uniform sampler2D u_depth;
 uniform sampler2D u_ui;
-uniform float u_gamma;
-uniform float u_chrabbsize;
-uniform float u_vignette;
-uniform bool u_fxaa;
-uniform bool u_ssao;
-uniform bool u_bloom;
-uniform float u_time;
+uniform float u_gamma = 1;
+uniform float u_chrabbsize = 0;
+uniform float u_vignette = 1;
+uniform bool u_fxaa = false;
+uniform bool u_ssao = false;
+uniform bool u_bloom = false;
+uniform float u_time = 0;
 
 #define DEPTH_MAX 10000
 
