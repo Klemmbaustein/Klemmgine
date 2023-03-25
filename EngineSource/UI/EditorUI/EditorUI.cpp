@@ -1,39 +1,21 @@
 ﻿#ifdef EDITOR
-// MSVC does not like the strerror() at line 703, without this it will throw a compiler error
-#define _CRT_SECURE_NO_WARNINGS
 #include "EditorUI.h"
 #include "Utility/stb_image.h"
 #include "Engine/FileUtility.h"
 #include <filesystem>
-#include <algorithm>
 #include "Math/Math.h"
-#include <fstream>
 #include "Math/Collision/Collision.h"
-#include "Engine/Importers/ModelConverter.h"
-#include "Engine/Importers/Importer.h"
-#include "Objects/MeshObject.h"
 #include "Engine/Scene.h"
-#include <Engine/Input.h>
-#include <Engine/Console.h>
-#include <Engine/Log.h>
-#include <Engine/OS.h>
 #include <Engine/EngineProperties.h>
-#include <thread>
-#include <Engine/Importers/Build/Build.h>
-#include <World/Assets.h>
-#include <World/Graphics.h>
-#include <World/Stats.h>
 #include <UI/UIScrollBox.h>	
-#include <Rendering/Texture/Texture.h>
 #include <UI/EditorUI/UIVectorField.h>
 #include <UI/EditorUI/LogUI.h>
 #include <UI/EditorUI/Toolbar.h>
 #include <UI/EditorUI/ItemBrowser.h>
-#include <Objects/ParticleObject.h>
-#include <Objects/InstancedMeshObject.h>
-#include <Objects/SoundObject.h>
-#include <Rendering/Mesh/InstancedModel.h>
+#include <UI/EditorUI/StatusBar.h>
+#include <UI/EditorUI/Viewport.h>
 #include <GL/glew.h>
+#include <Engine/Log.h>
 
 namespace Editor
 {
@@ -41,6 +23,7 @@ namespace Editor
 	bool DraggingTab = false;
 	bool TabDragHorizontal = false;
 	Vector2 DragMinMax;
+	Vector2 NewDragMinMax = DragMinMax;
 }
 // Collision model for the arrows
 
@@ -83,9 +66,11 @@ EditorUI::EditorUI()
 	Editor::CurrentUI = this;
 	//new UIBackground(true, -1, 0.5, 2);
 
-	new LogUI(UIColors, Vector2(-0.7, -1), Vector2(1.25, 0.4));
-	new Toolbar(UIColors, Vector2(-0.7, 0.75), Vector2(1.25, 0.25));
-	new ItemBrowser(UIColors, Vector2(-1, -1), Vector2(0.3, 2));
+	UIElements[0] = new StatusBar(UIColors);
+	UIElements[1] = new LogUI(UIColors, Vector2(-0.7, -1), Vector2(1.25, 0.4));
+	UIElements[2] = new Toolbar(UIColors, Vector2(-0.7, 0.73), Vector2(1.25, 0.22));
+	UIElements[3] = new ItemBrowser(UIColors, Vector2(-1, -1), Vector2(0.3, 1.95));
+	UIElements[4] = new Viewport(UIColors, Vector2(-0.7, -0.6), Vector2(1.25, 1.33));
 
 }
 
@@ -98,8 +83,10 @@ void EditorUI::Tick()
 {
 	if (!Editor::DraggingTab)
 	{
-		Editor::DragMinMax = Vector2(-1, 1);
+		Editor::NewDragMinMax = Vector2(-1, 1);
 	}
+	Editor::DragMinMax = Editor::NewDragMinMax;
+
 	if (UI::HoveredButton)
 	{
 		CurrentCursor = E_GRAB;
@@ -108,7 +95,7 @@ void EditorUI::Tick()
 	{
 		SDL_SetCursor(Cursors[CurrentCursor]);
 	}
-	CurrentCursor = Editor::DraggingTab ? E_RESIZE_WE : E_DEFAULT;
+	CurrentCursor = Editor::DraggingTab ? (Editor::TabDragHorizontal ? E_RESIZE_WE : E_RESIZE_NS) : E_DEFAULT;
 }
 
 std::vector<EditorClassesItem> EditorUI::GetContentsOfCurrentCPPFolder()

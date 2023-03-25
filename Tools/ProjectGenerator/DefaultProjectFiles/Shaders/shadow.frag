@@ -1,7 +1,7 @@
 #version 330 
 
 uniform sampler2D u_texture;
-uniform bool u_usetexture;
+uniform bool u_usetexture = false;
 in vec2 g_tex_coord;
 void main()
 {

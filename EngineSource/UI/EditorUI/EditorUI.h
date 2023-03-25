@@ -13,6 +13,7 @@
 #include <Engine/TypeEnun.h>
 #include <Objects/WorldObject.h>
 #include <Rendering/Utility/Framebuffer.h>
+#include <Engine/Importers/Build/Build.h>
 
 #include <SDL.h>
 #include <thread>
@@ -36,6 +37,7 @@ namespace Editor
 	extern bool DraggingTab;
 	extern bool TabDragHorizontal;
 	extern Vector2 DragMinMax;
+	extern Vector2 NewDragMinMax;
 }
 
 class EditorUI : public UICanvas
@@ -70,13 +72,14 @@ public:
 		E_LAST_CURSOR = 6
 	};
 
+	EditorTab* UIElements[5];
+
 	CursorType CurrentCursor = E_DEFAULT;
 	std::vector<unsigned int> Textures;
+	std::string CurrentPath = "Content";
 
 protected:
 	SDL_Cursor* Cursors[6];
-	float FPSUpdateTimer = 0;
-	unsigned int DisplayedFPS = 60;
 
 	std::set<std::string> CollapsedItems;
 	std::vector<std::string> ObjectCategories;

@@ -1,3 +1,4 @@
+#if EDITOR
 #include "LogUI.h"
 #include <UI/UIScrollBox.h>
 #include <UI/UIText.h>
@@ -91,3 +92,4 @@ void LogUI::Tick()
 		}
 	}
 }
+#endif

@@ -3,10 +3,6 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <World/Graphics.h>
-#if EDITOR
-#include <UI/EditorUI/EditorUI.h>
-#include <Engine/Application.h>
-#endif
 
 
 class UIButton;
@@ -480,9 +476,6 @@ void UIBox::DrawAllUIElements()
 			if (elem->Parent == nullptr)
 				elem->DrawThisAndChildren();
 		}
-#if EDITOR
-		//Application::EditorUserInterface->UpdateLogMessages();
-#endif
 		glClearColor(0, 0, 0, 1);
 		glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
 	}

@@ -473,7 +473,7 @@ void DrawPostProcessing()
 	Debugging::EngineStatus = "Rendering (Post process: Main)";
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0));
-#if IS_IN_EDITOR
+#if EDITOR
 	glActiveTexture(GL_TEXTURE2);
 	//glBindTexture(GL_TEXTURE_2D, Application::EditorUserInterface->OutlineFramebuffer->GetBuffer()->GetTextureID(1));
 	glActiveTexture(GL_TEXTURE3);
@@ -489,7 +489,13 @@ void DrawPostProcessing()
 	glBindTexture(GL_TEXTURE_2D, UIBox::GetUIFramebuffer());
 	Application::PostProcessShader->Bind();
 	glUniform1f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_gamma"), Graphics::Gamma);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "FullScreen"), !IsInEditor);
+#if EDITOR
+	auto ViewportTab = Application::EditorUserInterface->UIElements[4];
+	Vector2 ViewportPos = (ViewportTab->Position + ViewportTab->Scale * 0.5);
+	glUniform2f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "Position"), ViewportPos.X, ViewportPos.Y);
+	Vector2 ViewportScale = ViewportTab->Scale;
+	glUniform2f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "Scale"), ViewportScale.X, ViewportScale.Y);
+#endif
 	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_texture"), 1);
 	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_outlines"), 2);
 	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_enginearrows"), 3);
@@ -707,7 +713,6 @@ int Initialize(int argc, char** argv)
 #if EDITOR
 	// Initialize EditorUI
 	Application::EditorUserInterface = new EditorUI();
-	Graphics::UIToRender.push_back(Application::EditorUserInterface);
 
 	Config::LoadConfigs();
 #endif
