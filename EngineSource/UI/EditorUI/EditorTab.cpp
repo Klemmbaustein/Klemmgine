@@ -26,6 +26,10 @@ void EditorTab::SetPosition(Vector2 NewPosition)
 
 void EditorTab::UpdateTab()
 {
+	if (UI::HoveredButton && !Editor::DraggingTab)
+	{
+		return;
+	}
 	Vector2 ClampedMousePosition = Input::MouseLocation;
 	if (Editor::DraggingTab && Editor::TabDragHorizontal)
 	{
@@ -186,6 +190,7 @@ void EditorTab::UpdateTab()
 		{
 			PositionDifference = MinSize.Y - Scale.Y;
 		}
+		if (PositionDifference + Scale.Y > MaxSize.Y) return;
 
 		Position.Y -= PositionDifference;
 		SetScale(Vector2(Scale.X, Scale.Y + PositionDifference));

@@ -23,14 +23,6 @@ class UIVectorField;
 class UITextField;
 extern bool ChangedScene;
 
-struct EditorClassesItem
-{
-	std::string Name;
-	ObjectDescription Object = ObjectDescription("", 0);
-	std::vector<EditorClassesItem> SubItems;
-	bool IsFolder = false;
-};
-
 namespace Editor
 {
 	extern EditorUI* CurrentUI;
@@ -48,16 +40,16 @@ public:
 	virtual void Tick() override;
 	void GenUITextures();
 
-	UIBackground* DragUI = nullptr;
+	UIBox* DraggedItem = nullptr;
 
 	Vector3 UIColors[3] =
 	{
 		Vector3(0.1, 0.1, 0.11),	//Default background
 		Vector3(0.07f),				//Dark background
 		Vector3(1)					//Highlight color
-		//Vector3(0.9, 0.9, 1),		//Default background
-		//Vector3(0.6f),			//Dark background
-		//Vector3(1, 0, 1)			//Highlight color};
+		//Vector3(0.9, 0.9, 0.9),	//Default background
+		//Vector3(0.5f),			//Dark background
+		//Vector3(0.1)				//Highlight color};
 	};
 	TextRenderer* EngineUIText = new TextRenderer("Font.ttf", 90);
 
@@ -65,8 +57,8 @@ public:
 	{
 		E_DEFAULT = 0,
 		E_GRAB = 1,
-		E_LOADING = 2,
-		E_CROSS = 3,
+		E_CROSS = 2,
+		E_LOADING = 3,
 		E_RESIZE_WE = 4,
 		E_RESIZE_NS = 5,
 		E_LAST_CURSOR = 6
@@ -86,7 +78,6 @@ protected:
 
 
 	std::string ToShortString(float val);
-	std::vector<EditorClassesItem> GetEditorUIClasses();
 	struct ObjectListItem
 	{
 		ObjectListItem(std::string CategoryName, std::vector<ObjectListItem> Children, bool IsScene, bool IsCollapsed)
@@ -113,13 +104,9 @@ protected:
 	std::vector<ObjectListItem> GetObjectList();
 
 
-	std::vector<EditorClassesItem> GetContentsOfCurrentCPPFolder();
-	std::string GetCurrentCPPPathString();
 
 	UIBox* DropDownMenu = nullptr;
 	Vector2 DropDownMenuPosition;
 	friend WorldObject;
-	std::vector<EditorClassesItem> CPPClasses;
-	std::vector<size_t> CPPPath;
 };
 #endif

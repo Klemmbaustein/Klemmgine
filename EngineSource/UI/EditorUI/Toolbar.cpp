@@ -32,7 +32,7 @@ void Toolbar::GenerateButtons()
 				->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
 				->AddChild((new UIText(0.35, UIColors[2], btn.Name, Editor::CurrentUI->EngineUIText))
 					->SetPadding(0.005))
-				->AddChild((new UIButton(true, 0, 1, this, i * MAX_CATEGORY_BUTTONS + j))
+				->AddChild((new UIButton(true, 0, UIColors[2], this, i * MAX_CATEGORY_BUTTONS + j))
 					->SetUseTexture(true, btn.Texture)
 					->SetMinSize(0.075)
 					->SetPadding(0.015)
@@ -40,6 +40,8 @@ void Toolbar::GenerateButtons()
 			j++;
 		}
 	}
+	TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5, Vector2(0.001, 0.2)))
+		->SetPadding(0.01, 0.01, 0.02, 0.01));
 }
 
 Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorTab(Colors, Position, Scale, Vector2(0.8, 0.22), Vector2(2, 0.5))

@@ -16,6 +16,7 @@
 #include <UI/EditorUI/Viewport.h>
 #include <GL/glew.h>
 #include <Engine/Log.h>
+#include <Engine/Input.h>
 
 namespace Editor
 {
@@ -51,10 +52,24 @@ Collision::Box ArrowBoxZ
 	
 );
 
-
+// Experimental
+#define UI_LIGHT_MODE 0
 
 EditorUI::EditorUI()
 {
+	if (UI_LIGHT_MODE)
+	{
+		size_t it = 0;
+		for (auto i : {
+			Vector3(0.7, 0.7, 0.725),	//Default background
+			Vector3(0.5f),			//Dark background
+			Vector3(0)			//Highlight color};
+			})
+		{
+			UIColors[it++] = i;
+		}
+	}
+
 	GenUITextures();
 
 	Cursors[0] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
@@ -96,30 +111,20 @@ void EditorUI::Tick()
 		SDL_SetCursor(Cursors[CurrentCursor]);
 	}
 	CurrentCursor = Editor::DraggingTab ? (Editor::TabDragHorizontal ? E_RESIZE_WE : E_RESIZE_NS) : E_DEFAULT;
+
+
+	if (DraggedItem)
+	{
+		DraggedItem->SetPosition(Input::MouseLocation - DraggedItem->GetUsedSize() / 2);
+		if (!Input::IsLMBDown)
+		{
+			delete DraggedItem;
+			DraggedItem = nullptr;
+		}
+	}
 }
 
-std::vector<EditorClassesItem> EditorUI::GetContentsOfCurrentCPPFolder()
-{
-	EditorClassesItem RootNode;
-	RootNode.SubItems = CPPClasses;
-	std::vector<EditorClassesItem> CurrentItems = RootNode.SubItems;
-	for (const auto& path : CPPPath)
-	{
-		// Reorder the content so that folders are first and items are second.
-		// It looks prettier in the item browser this way.
-		std::vector<EditorClassesItem> ReordererdSubItems;
-		for (const auto& i : CurrentItems[path].SubItems)
-		{
-			if (i.IsFolder) ReordererdSubItems.push_back(i);
-		}
-		for (const auto& i : CurrentItems[path].SubItems)
-		{
-			if (!i.IsFolder) ReordererdSubItems.push_back(i);
-		}
-		CurrentItems = ReordererdSubItems;
-	}
-	return CurrentItems;
-}
+
 
 std::string EditorUI::ToShortString(float val)
 {
@@ -128,31 +133,6 @@ std::string EditorUI::ToShortString(float val)
 	return stream.str();
 }
 
-std::string EditorUI::GetCurrentCPPPathString()
-{
-	std::string PathString = "C++";
-	EditorClassesItem RootNode;
-	RootNode.SubItems = CPPClasses;
-	std::vector<EditorClassesItem> CurrentItems = RootNode.SubItems;
-	for (const auto& path : CPPPath)
-	{
-		// Reorder the content so that folders are first and items are second.
-		// It looks prettier in the item browser this way.
-		std::vector<EditorClassesItem> ReordererdSubItems;
-		for (const auto& i : CurrentItems[path].SubItems)
-		{
-			if (i.IsFolder) ReordererdSubItems.push_back(i);
-		}
-		for (const auto& i : CurrentItems[path].SubItems)
-		{
-			if (!i.IsFolder) ReordererdSubItems.push_back(i);
-		}
-		PathString.append("/" + CurrentItems[path].Name);
-		CurrentItems = ReordererdSubItems;
-	}
-	PathString.append("/");
-	return PathString;
-}
 
 void EditorUI::GenUITextures()
 {
@@ -289,80 +269,6 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 	return ObjectList;
 }
 
-std::vector<EditorClassesItem> EditorUI::GetEditorUIClasses()
-{
-	std::vector<std::string> IDs;
-	EditorClassesItem RootPath;
-	for (const auto& Object : Objects::EditorObjects)
-	{
-		// First seperate the Category into multiple names. For example: "Default/Rendering" -> { "Default", "Rendering" }
-		std::string CurrentPath = Objects::GetCategoryFromID(Object.ID);
-		EditorClassesItem* CurrentParent = &RootPath;
-		if (CurrentPath.empty())
-		{
-			EditorClassesItem NewItem;
-			NewItem.Name = Object.Name;
-			NewItem.Object = Object;
-			CurrentParent->SubItems.push_back(NewItem);
-		}
-		std::vector<std::string> PathElements;
-		size_t Index = CurrentPath.find_first_of("/");
 
-
-		while (Index != std::string::npos)
-		{
-			Index = CurrentPath.find_first_of("/");
-			PathElements.push_back(CurrentPath.substr(0, Index));
-			CurrentPath = CurrentPath.substr(Index + 1);
-			Index = CurrentPath.find_first_of("/");
-		}
-		PathElements.push_back(CurrentPath);
-
-		// Iterate through every 'element' we just got from the Category string
-		for (const auto& elem : PathElements)
-		{
-			bool Found = false;
-			// If that element already exists, we continue inside of it.
-			for (size_t i = 0; i < CurrentParent->SubItems.size(); i++)
-			{
-				if (elem == CurrentParent->SubItems[i].Name)
-				{
-					CurrentParent = &CurrentParent->SubItems[i];
-					Found = true;
-					break;
-				}
-			}
-			if (Found) continue;
-			// Else we create that new element.
-			EditorClassesItem NewPath;
-			NewPath.IsFolder = true;
-			NewPath.Name = elem;
-			CurrentParent->SubItems.push_back(NewPath);
-			CurrentParent = &CurrentParent->SubItems[CurrentParent->SubItems.size() - 1];
-		}
-		// Create a new item structure so we can add it to the folder "file system"
-		EditorClassesItem NewItem;
-		NewItem.Name = Object.Name;
-		NewItem.Object = Object;
-		CurrentParent->SubItems.push_back(NewItem);
-	}
-
-	// Debug view to display 'folder structure'
-	// its very basic and only goes 3 levels deep
-	// 
-	/*for (const auto& i : RootPath.SubItems)
-	{
-		Log::Print(i.Name);
-		for (const auto& j : i.SubItems)
-		{
-			Log::Print("   " + j.Name);
-			for (const auto& k : j.SubItems)
-			{
-				Log::Print("      " + k.Name);
-			}
-		}
-	}*/
-	return RootPath.SubItems;
-}
 
 #endif
