@@ -14,6 +14,7 @@
 #include <UI/UIBox.h>
 #include <UI/Default/TextRenderer.h>
 #include <UI/EditorUI/EditorUI.h>
+#include <UI/EditorUI/Viewport.h>
 
 #include <Rendering/Renderable.h>
 #include <Rendering/Shader.h>
@@ -101,6 +102,12 @@ namespace Application
 	bool GetFullScreen()
 	{
 		return IsWindowFullscreen;
+	}
+	void SetCursorPosition(Vector2 NewPos)
+	{
+		Vector2 TranslatedPos = Vector2(((NewPos.X + 1) / 2) * Graphics::WindowResolution.X, (((NewPos.Y) + 1) / 2) * Graphics::WindowResolution.Y);
+		TranslatedPos.Y = Graphics::WindowResolution.Y - TranslatedPos.Y;
+		SDL_WarpMouseInWindow(Window, TranslatedPos.X, TranslatedPos.Y);
 	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
 	std::thread ConsoleThread;
@@ -450,14 +457,13 @@ void PollInput()
 			}
 		}
 	}
-	Input::MouseLocation = GetMousePosition();
-	if (!IsInEditor)
+	if (Input::CursorVisible)
 	{
-		if (Input::CursorVisible)
-			SDL_SetRelativeMouseMode(SDL_FALSE);
-		else
-			SDL_SetRelativeMouseMode(SDL_TRUE);
+		Input::MouseLocation = GetMousePosition();
+		SDL_SetRelativeMouseMode(SDL_FALSE);
 	}
+	else
+		SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 void DrawPostProcessing()
@@ -475,7 +481,7 @@ void DrawPostProcessing()
 	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0));
 #if EDITOR
 	glActiveTexture(GL_TEXTURE2);
-	//glBindTexture(GL_TEXTURE_2D, Application::EditorUserInterface->OutlineFramebuffer->GetBuffer()->GetTextureID(1));
+	glBindTexture(GL_TEXTURE_2D, dynamic_cast<Viewport*>(Application::EditorUserInterface->UIElements[4])->OutlineBuffer->GetBuffer()->GetTextureID(1));
 	glActiveTexture(GL_TEXTURE3);
 	//glBindTexture(GL_TEXTURE_2D, Application::EditorUserInterface->ArrowFramebuffer->GetTextureID());
 #endif

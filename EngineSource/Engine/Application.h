@@ -5,6 +5,7 @@ class EditorUI;
 #endif
 
 #include <set>
+#include <Math/Vector.h>
 
 struct SDL_Window;
 struct ButtonEvent;
@@ -15,6 +16,7 @@ namespace Application
 	void Quit();
 	void SetFullScreen(bool NewFullScreen);
 	bool GetFullScreen();
+	void SetCursorPosition(Vector2 NewPos);
 
 #if EDITOR
 	extern EditorUI* EditorUserInterface;

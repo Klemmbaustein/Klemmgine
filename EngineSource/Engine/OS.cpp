@@ -204,7 +204,7 @@ void OS::SetConsoleColor(EConsoleColor NewColor)
 #if _WIN32
 void OS::OpenFile(std::string Path)
 {
-	system(("start " + Path).c_str());
+	system(("start \"\" \"" + Path + "\"").c_str());
 }
 #endif
 #if __linux__

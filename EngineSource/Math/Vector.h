@@ -37,7 +37,7 @@ struct Vector2
 };
 
 /// <summary>
-/// A struct holding X, Y and Z floats. Very useful.
+/// A struct holding X, Y and Z floats.
 /// </summary>
 struct Vector3
 {
