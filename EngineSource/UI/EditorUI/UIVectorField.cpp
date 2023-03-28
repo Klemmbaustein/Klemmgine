@@ -1,3 +1,4 @@
+#if EDITOR
 #include "UIVectorField.h"
 #include <UI/UITextField.h>
 #include <UI/UIBackground.h>
@@ -134,3 +135,4 @@ void UIVectorField::OnChildClicked(int Index)
 	{
 	}
 }
+#endif

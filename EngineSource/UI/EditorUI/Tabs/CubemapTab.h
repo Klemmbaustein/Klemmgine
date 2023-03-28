@@ -1,8 +1,8 @@
-#if 0
+#if EDITOR
 #pragma once
-#include "EditorTab.h"
+#include <UI/EditorUI/Tabs/EditorTab.h>
 #include <UI/UITextField.h>
-#include "MaterialFunctions.h"
+#include "../MaterialFunctions.h"
 #include <Engine/Save.h>
 
 class FramebufferObject;

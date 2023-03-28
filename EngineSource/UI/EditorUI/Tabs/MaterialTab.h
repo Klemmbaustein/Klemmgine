@@ -1,7 +1,7 @@
-#if 0
+#if EDITOR
 #pragma once
 #include <UI/UITextField.h>
-#include <UI/EditorUI/EditorTab.h>
+#include <UI/EditorUI/Tabs/EditorTab.h>
 #include <UI/EditorUI/UIVectorField.h>
 #include "MaterialTemplateTab.h"
 

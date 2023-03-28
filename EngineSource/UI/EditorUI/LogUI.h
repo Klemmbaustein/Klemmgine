@@ -1,11 +1,11 @@
 #if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorTab.h>
+#include <UI/EditorUI/EditorPanel.h>
 
 class UITextField;
 class UIText;
 
-class LogUI : public EditorTab
+class LogUI : public EditorPanel
 {
 	std::vector<UIText*> LogTexts;
 public:

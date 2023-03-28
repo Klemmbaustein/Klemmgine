@@ -6,10 +6,10 @@
 #include "UI/UIButton.h"
 #include <UI/UITextField.h>
 #include <UI/UIText.h>
-#include <UI/EditorUI/EditorTab.h>
-#include <UI/EditorUI/MaterialTemplateTab.h>
-#include "MeshTab.h"
-#include "ParticleEditorTab.h"
+#include <UI/EditorUI/EditorPanel.h>
+#include <UI/EditorUI/Tabs/MaterialTemplateTab.h>
+#include "Tabs/MeshTab.h"
+#include "Tabs/ParticleEditorTab.h"
 #include <Engine/TypeEnun.h>
 #include <Objects/WorldObject.h>
 #include <Rendering/Utility/Framebuffer.h>
@@ -30,6 +30,32 @@ namespace Editor
 	extern bool TabDragHorizontal;
 	extern Vector2 DragMinMax;
 	extern Vector2 NewDragMinMax;
+
+	inline std::map<std::string, Vector3> ItemColors
+	{
+		std::pair("dir", Vector3(0.8, 0.5, 0)),
+		std::pair("jsmat", Vector3(0, 0.7, 0)),
+		std::pair("jsmtmp", Vector3(0.1, 0.4, 0)),
+		std::pair("jsm", Vector3(0, 0, 0.75)),
+		std::pair("jscn", Vector3(1.0, 0.4, 0.4)),
+		std::pair("png", Vector3(0.3, 0, 1)),
+		std::pair("cbm", Vector3(0.7, 0.1, 0.4)),
+		std::pair("jspart", Vector3(0.7, 0.4, 0.4)),
+		std::pair("wav", Vector3(0.7, 0, 0.4)),
+		std::pair("cpp", Vector3(0.5))
+	};
+	inline std::map<std::string, unsigned int> ItemTextures
+	{
+		std::pair("dir", 5),
+		std::pair("jsmat", 9),
+		std::pair("jsmtmp", 10),
+		std::pair("jsm", 11),
+		std::pair("jscn", 7),
+		std::pair("png", 18),
+		std::pair("cbm", 17),
+		std::pair("wav", 6),
+		std::pair("cpp", 0)
+	};
 }
 
 class EditorUI : public UICanvas
@@ -41,7 +67,7 @@ public:
 	void GenUITextures();
 
 	UIBox* DraggedItem = nullptr;
-
+	UIBox* Dropdown = nullptr;
 	Vector3 UIColors[3] =
 	{
 		Vector3(0.1, 0.1, 0.11),	//Default background
@@ -64,7 +90,15 @@ public:
 		E_LAST_CURSOR = 6
 	};
 
-	EditorTab* UIElements[5];
+	struct DropdownItem
+	{
+		std::string Title;
+		void (*OnPressed)() = nullptr;
+	};
+
+	void ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position);
+
+	EditorPanel* UIElements[7] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 	CursorType CurrentCursor = E_DEFAULT;
 	std::vector<unsigned int> Textures;
@@ -72,12 +106,15 @@ public:
 
 protected:
 	SDL_Cursor* Cursors[6];
+	std::vector<DropdownItem> CurrentDropdown;
 
+public:
 	std::set<std::string> CollapsedItems;
 	std::vector<std::string> ObjectCategories;
 
 
-	std::string ToShortString(float val);
+	static std::string ToShortString(float val);
+
 	struct ObjectListItem
 	{
 		ObjectListItem(std::string CategoryName, std::vector<ObjectListItem> Children, bool IsScene, bool IsCollapsed)
@@ -102,11 +139,8 @@ protected:
 		bool IsScene = false;
 	};
 	std::vector<ObjectListItem> GetObjectList();
-
-
-
-	UIBox* DropDownMenu = nullptr;
-	Vector2 DropDownMenuPosition;
+	void OnButtonClicked(int Index);
+protected:
 	friend WorldObject;
 };
 #endif

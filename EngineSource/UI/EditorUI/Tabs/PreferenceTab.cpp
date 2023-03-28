@@ -86,7 +86,7 @@ void PreferenceTab::OnButtonClicked(int Index)
 	}
 }
 
-PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors)
+PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : EditorPanel(UIColors)
 {
 	this->Renderer = Renderer;
 	TabBackground->SetHorizontal(true);

@@ -1,22 +1,27 @@
 #if EDITOR
-#include "EditorTab.h"
+#include "EditorPanel.h"
 #include <Math/Math.h>
 #include <Engine/Input.h>
 #include <Engine/Log.h>
 #include <UI/EditorUI/EditorUI.h>
 
-void EditorTab::SetScale(Vector2 NewScale)
+void EditorPanel::SetScale(Vector2 NewScale)
 {
-	Scale.X = std::max(NewScale.X, MinSize.X);
-	Scale.Y = std::max(NewScale.Y, MinSize.Y);
-	Scale.X = std::min(Scale.X, MaxSize.X);
-	Scale.Y = std::min(Scale.Y, MaxSize.Y);
-	TabBackground->SetPosition(Position);
-	TabBackground->SetMinSize(Scale);
-	UpdateLayout();
+	Vector2 clampedScale;
+	clampedScale.X = std::max(NewScale.X, MinSize.X);
+	clampedScale.Y = std::max(NewScale.Y, MinSize.Y);
+	clampedScale.X = std::min(clampedScale.X, MaxSize.X);
+	clampedScale.Y = std::min(clampedScale.Y, MaxSize.Y);
+	if (Scale != clampedScale)
+	{
+		TabBackground->SetPosition(Position);
+		TabBackground->SetMinSize(clampedScale);
+		Scale = clampedScale;
+		UpdateLayout();
+	}
 }
 
-void EditorTab::SetPosition(Vector2 NewPosition)
+void EditorPanel::SetPosition(Vector2 NewPosition)
 {
 	Position = NewPosition;
 	TabBackground->SetPosition(Position);
@@ -24,7 +29,7 @@ void EditorTab::SetPosition(Vector2 NewPosition)
 	UpdateLayout();
 }
 
-void EditorTab::UpdateTab()
+void EditorPanel::UpdatePanel()
 {
 	if (UI::HoveredButton && !Editor::DraggingTab)
 	{
@@ -49,10 +54,6 @@ void EditorTab::UpdateTab()
 		}
 		IsDragged = false;
 		InitialMousePosition = 0;
-	}
-	if (IsDragged)
-	{
-		//Editor::CurrentUI->CurrentCursor = (IsDragHorizontal ? EditorUI::E_RESIZE_WE : EditorUI::E_RESIZE_NS);
 	}
 
 	if (Maths::NearlyEqual(ClampedMousePosition.Y, -1, BorderScale.Y)

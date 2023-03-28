@@ -71,6 +71,7 @@ protected:
 	std::vector<Component*> Components;
 	std::string Name = "Empty Object";
 	friend EditorUI;
+	friend class ContextMenu;
 	Transform ObjectTransform;
 private:
 };

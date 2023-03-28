@@ -1,9 +1,9 @@
 #if 0
 #pragma once
 #include <UI/EditorUI/EditorUI.h>
-#include <UI/EditorUI/EditorTab.h>
+#include <UI/EditorUI/EditorPanel.h>
 
-class PreferenceTab : public EditorTab
+class PreferenceTab : public EditorPanel
 {
 	struct SettingsCategory
 	{

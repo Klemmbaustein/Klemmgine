@@ -52,7 +52,7 @@ void MaterialTemplateTab::Tick()
 {
 }
 
-MaterialTemplateTab::MaterialTemplateTab(Vector3* UIColors, TextRenderer* Text, unsigned int XButtonIndex) : EditorTab(UIColors)
+MaterialTemplateTab::MaterialTemplateTab(Vector3* UIColors, TextRenderer* Text, unsigned int XButtonIndex) : EditorPanel(UIColors)
 {
 	XTexture = XButtonIndex;
 	this->Renderer = Text;

@@ -1,8 +1,7 @@
-#if 0
 #pragma once
 #include "EditorTab.h"
 #include <UI/UITextField.h>
-#include "MaterialFunctions.h"
+#include "../MaterialFunctions.h"
 #include <Rendering/Mesh/ModelGenerator.h>
 
 class FramebufferObject;
@@ -59,5 +58,3 @@ protected:
 	};
 	Transform CameraTransform;
 };
-
-#endif

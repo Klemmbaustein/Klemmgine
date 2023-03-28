@@ -1,6 +1,6 @@
 #if 0
 #pragma once
-#include <UI/EditorUI/EditorTab.h>
+#include <UI/EditorUI/EditorPanel.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <Rendering/Particle.h>
 #include <World/Graphics.h>
@@ -10,7 +10,7 @@
 class TextRenderer;
 class UIText;
 
-class ParticleEditorTab : public EditorTab
+class ParticleEditorPanel : public EditorPanel
 {
 	std::vector<std::string> ElementMaterials = 
 	{
@@ -48,13 +48,13 @@ class ParticleEditorTab : public EditorTab
 	UIText* ParticleViewportText = nullptr;
 	UIText* SelectedElementText = nullptr;
 public:
-	ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture);
+	ParticleEditorPanel(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture);
 	void Tick() override;
 	void Load(std::string File) override;
 	void ReloadMesh();
 	void Save() override;
 	void Generate();
 	void OnButtonClicked(int Index) override;
-	virtual ~ParticleEditorTab();
+	virtual ~ParticleEditorPanel();
 };
 #endif

@@ -1,4 +1,3 @@
-#if 0
 #ifdef EDITOR
 #pragma once
 #include "MeshTab.h"
@@ -88,7 +87,7 @@ void MeshTab::Load(std::string File)
 		PreviewBuffer->GetBuffer()->ReInit(Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
 		Graphics::MainCamera->Position = Vector3(0, 4, 15);
 		Graphics::MainCamera->SetRotation(Vector3(0, -90, 0));
-		TabName->SetText("Model: " + GetFileNameWithoutExtensionFromPath(File));
+		TabName->SetText("Model: " + FileUtil::GetFileNameWithoutExtensionFromPath(File));
 		ModelData = ModelGenerator::ModelData();
 		ModelData.LoadModelFromFile(File);
 		if (!MESHTAB_DEBUG)
@@ -236,5 +235,4 @@ void MeshTab::UpdatePreviewModel()
 	PreviewBuffer->UseWith(PreviewModel);
 	PreviewModel->UpdateTransform();
 }
-#endif
 #endif

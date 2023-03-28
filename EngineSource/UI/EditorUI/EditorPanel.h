@@ -2,7 +2,7 @@
 #include "UI/UIBackground.h"
 #include "UI/Default/UICanvas.h"
 
-class EditorTab : public UICanvas
+class EditorPanel : public UICanvas
 {
 private:
 	bool IsDragged = false;
@@ -20,7 +20,7 @@ public:
 	Vector2 Position, Scale;
 	Vector2 MinSize;
 	Vector2 MaxSize;
-	EditorTab(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vector2 MinSize, Vector2 MaxSize = 9999) : UICanvas()
+	EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vector2 MinSize, Vector2 MaxSize = 9999) : UICanvas()
 	{
 		this->UIColors = UIColors;
 
@@ -43,7 +43,7 @@ public:
 	virtual void Save() = 0;
 	virtual void Load(std::string File) = 0;
 		
-	void UpdateTab();
+	void UpdatePanel();
 	void SetVisible(bool NewVisible)
 	{
 		if (NewVisible != TabBackground->IsVisible)

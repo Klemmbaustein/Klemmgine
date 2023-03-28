@@ -59,7 +59,7 @@ void MaterialTab::OnButtonClicked(int Index)
 	}
 }
 
-MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int ReloadTexture) : EditorTab(UIColors)
+MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int ReloadTexture) : EditorPanel(UIColors)
 {
 	Renderer = Text;
 	this->ReloadTexture = ReloadTexture;

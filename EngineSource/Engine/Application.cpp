@@ -46,6 +46,15 @@
 #include <iostream>
 #include <thread>
 
+
+Vector2 GetMousePosition()
+{
+	int x;
+	int y;
+	SDL_GetMouseState(&x, &y);
+	return Vector2((x / Graphics::WindowResolution.X - 0.5f) * 2, 1 - (y / Graphics::WindowResolution.Y * 2));
+}
+
 namespace Application
 {
 	SDL_Window* Window = nullptr;
@@ -108,6 +117,10 @@ namespace Application
 		Vector2 TranslatedPos = Vector2(((NewPos.X + 1) / 2) * Graphics::WindowResolution.X, (((NewPos.Y) + 1) / 2) * Graphics::WindowResolution.Y);
 		TranslatedPos.Y = Graphics::WindowResolution.Y - TranslatedPos.Y;
 		SDL_WarpMouseInWindow(Window, TranslatedPos.X, TranslatedPos.Y);
+	}
+	Vector2 GetCursorPosition()
+	{
+		return GetMousePosition();
 	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
 	std::thread ConsoleThread;
@@ -295,13 +308,6 @@ void InitializeShaders()
 	std::cout << "." << std::endl;
 }
 
-Vector2 GetMousePosition()
-{
-	int x;
-	int y;
-	SDL_GetMouseState(&x, &y);
-	return Vector2((x / Graphics::WindowResolution.X - 0.5f) * 2, 1 - (y / Graphics::WindowResolution.Y * 2));
-}
 
 void PollInput()
 {
@@ -483,7 +489,7 @@ void DrawPostProcessing()
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_2D, dynamic_cast<Viewport*>(Application::EditorUserInterface->UIElements[4])->OutlineBuffer->GetBuffer()->GetTextureID(1));
 	glActiveTexture(GL_TEXTURE3);
-	//glBindTexture(GL_TEXTURE_2D, Application::EditorUserInterface->ArrowFramebuffer->GetTextureID());
+	glBindTexture(GL_TEXTURE_2D, dynamic_cast<Viewport*>(Application::EditorUserInterface->UIElements[4])->ArrowsBuffer->GetBuffer()->GetTextureID(0));
 #endif
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, BloomTexture);
