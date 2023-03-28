@@ -9,7 +9,7 @@
 #include <Engine/Input.h>
 #include <UI/UIText.h>
 
-LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorTab(UIColors, Position, Scale, Vector2(0.8, 0.35), Vector2(2, 0.6))
+LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(UIColors, Position, Scale, Vector2(0.8, 0.35), Vector2(2, 0.6))
 {
 	LogScrollBox = new UIScrollBox(false, 0, 0);
 	LogScrollBox->Align = UIBox::E_REVERSE;
@@ -58,7 +58,7 @@ void LogUI::OnButtonClicked(int Index)
 
 void LogUI::Tick()
 {
-	UpdateTab();
+	UpdatePanel();
 	if (Log::Messages.size() != PrevLogLength || (Log::Messages.size() && PrevAmount != Log::Messages[Log::Messages.size() - 1].Amount))
 	{
 		PrevLogLength = Log::Messages.size();

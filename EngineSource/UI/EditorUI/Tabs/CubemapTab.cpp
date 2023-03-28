@@ -1,4 +1,3 @@
-#if 0
 #ifdef EDITOR
 #pragma once
 #include "CubemapTab.h"
@@ -158,5 +157,4 @@ void CubemapTab::UpdatePreviewModel()
 	PreviewBuffer->ReflectionCubemap = Cubemap::LoadCubemapFile(FileUtil::GetFileNameWithoutExtensionFromPath(InitialName));
 	PreviewModel->UpdateTransform();
 }
-#endif
 #endif

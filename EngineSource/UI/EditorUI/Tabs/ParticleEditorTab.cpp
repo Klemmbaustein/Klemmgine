@@ -1,5 +1,5 @@
 #if 0
-#include "ParticleEditorTab.h"
+#include "ParticleEditorPanel.h"
 #include <World/Stats.h>
 #include <UI/UIButton.h>
 #include <UI/EditorUI/UIVectorField.h>
@@ -13,7 +13,7 @@
 #include <UI/UIScrollBox.h>
 #include <Rendering/Mesh/Mesh.h>
 
-ParticleEditorTab::ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture) : EditorTab(UIColors)
+ParticleEditorPanel::ParticleEditorPanel(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture) : EditorPanel(UIColors)
 {
 	ParticleFramebufferObject = new FramebufferObject();
 	ParticleFramebufferObject->UseMainWindowResolution = true;
@@ -39,7 +39,7 @@ ParticleEditorTab::ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsi
 	Generate();
 }
 
-void ParticleEditorTab::Tick()
+void ParticleEditorPanel::Tick()
 {
 	ParticleFramebufferObject->FramebufferCamera = Graphics::MainCamera;
 	ParticleViewport->SetUseTexture(true, ParticleFramebufferObject->GetTextureID());
@@ -73,7 +73,7 @@ void ParticleEditorTab::Tick()
 	}
 }
 
-void ParticleEditorTab::Load(std::string File)
+void ParticleEditorPanel::Load(std::string File)
 {
 	CurrentSystemFile = File;
 	Graphics::MainCamera->Position = Vector3(0, 4, 15);
@@ -107,16 +107,16 @@ void ParticleEditorTab::Load(std::string File)
 	Generate();
 }
 
-void ParticleEditorTab::ReloadMesh()
+void ParticleEditorPanel::ReloadMesh()
 {
 }
 
-void ParticleEditorTab::Save()
+void ParticleEditorPanel::Save()
 {
 	Particles::ParticleEmitter::SaveToFile(Particle->ParticleElements, ElementMaterials, CurrentSystemFile);
 }
 
-void ParticleEditorTab::Generate()
+void ParticleEditorPanel::Generate()
 {
 	Particle->Reset();
 	for (auto* elem : SettingsButtons)
@@ -289,7 +289,7 @@ void ParticleEditorTab::Generate()
 	}
 }
 
-void ParticleEditorTab::OnButtonClicked(int Index)
+void ParticleEditorPanel::OnButtonClicked(int Index)
 {
 	if (!TabBackground->IsVisible) return;
 	try
@@ -387,7 +387,7 @@ void ParticleEditorTab::OnButtonClicked(int Index)
 	}
 }
 
-ParticleEditorTab::~ParticleEditorTab()
+ParticleEditorPanel::~ParticleEditorPanel()
 {
 }
 #endif

@@ -7,6 +7,7 @@
 #include <Engine/Application.h>
 
 #if EDITOR
+#include <UI/EditorUI/EditorUI.h>
 //extern bool UserDraggingButton;
 #endif
 
@@ -117,7 +118,7 @@ void UIButton::Tick()
 		else if (IsPressed)
 		{
 #if EDITOR
-			if (!NeedsToBeSelected || IsSelected || false)
+			if ((!NeedsToBeSelected || IsSelected) && !Editor::DraggingTab)
 #else
 			if (!NeedsToBeSelected || IsSelected)
 #endif

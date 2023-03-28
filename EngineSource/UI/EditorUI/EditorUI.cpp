@@ -14,6 +14,8 @@
 #include <UI/EditorUI/ItemBrowser.h>
 #include <UI/EditorUI/StatusBar.h>
 #include <UI/EditorUI/Viewport.h>
+#include <UI/EditorUI/ObjectList.h>
+#include <UI/EditorUI/ContextMenu.h>
 #include <GL/glew.h>
 #include <Engine/Log.h>
 #include <Engine/Input.h>
@@ -26,37 +28,16 @@ namespace Editor
 	Vector2 DragMinMax;
 	Vector2 NewDragMinMax = DragMinMax;
 }
-// Collision model for the arrows
 
-Collision::Box ArrowBoxX
-(
-	 0.0f, 1.0f,
-	-0.1f, 0.1f,
-	-0.1f, 0.1f
-
-);
-
-Collision::Box ArrowBoxY
-(
-	-0.1f, 0.1f,
-	 0.0f, 1.0f,
-	-0.1f, 0.1f
-
-);
-
-Collision::Box ArrowBoxZ
-(
-	-0.1f, 0.1f,
-	-0.1f, 0.1f,
-	-1.0f, 0.0f
-	
-);
+bool ChangedScene = false;
 
 // Experimental
 #define UI_LIGHT_MODE 0
 
 EditorUI::EditorUI()
 {
+	Editor::CurrentUI = this;
+
 	if (UI_LIGHT_MODE)
 	{
 		size_t it = 0;
@@ -78,14 +59,15 @@ EditorUI::EditorUI()
 	Cursors[3] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAITARROW);
 	Cursors[4] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
 	Cursors[5] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
-	Editor::CurrentUI = this;
 	//new UIBackground(true, -1, 0.5, 2);
 
 	UIElements[0] = new StatusBar(UIColors);
-	UIElements[1] = new LogUI(UIColors, Vector2(-0.7, -1), Vector2(1.25, 0.4));
-	UIElements[2] = new Toolbar(UIColors, Vector2(-0.7, 0.73), Vector2(1.25, 0.22));
+	UIElements[1] = new LogUI(UIColors, Vector2(-0.7, -1), Vector2(1.4, 0.4));
+	UIElements[2] = new Toolbar(UIColors, Vector2(-0.7, 0.73), Vector2(1.4, 0.22));
 	UIElements[3] = new ItemBrowser(UIColors, Vector2(-1, -1), Vector2(0.3, 1.95));
-	UIElements[4] = new Viewport(UIColors, Vector2(-0.7, -0.6), Vector2(1.25, 1.33));
+	UIElements[4] = new Viewport(UIColors, Vector2(-0.7, -0.6), Vector2(1.4, 1.33));
+	UIElements[5] = new ObjectList(UIColors, Vector2(0.7, -0.2), Vector2(0.3, 1.15));
+	UIElements[6] = new ContextMenu(UIColors, Vector2(0.7, -1), Vector2(0.3, 0.8));
 
 }
 
@@ -112,7 +94,6 @@ void EditorUI::Tick()
 	}
 	CurrentCursor = Editor::DraggingTab ? (Editor::TabDragHorizontal ? E_RESIZE_WE : E_RESIZE_NS) : E_DEFAULT;
 
-
 	if (DraggedItem)
 	{
 		DraggedItem->SetPosition(Input::MouseLocation - DraggedItem->GetUsedSize() / 2);
@@ -125,6 +106,42 @@ void EditorUI::Tick()
 }
 
 
+
+void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position)
+{
+	if (Dropdown)
+	{
+		delete Dropdown;
+	}
+
+	CurrentDropdown = Menu;
+	Dropdown = new UIBackground(false, Position, UIColors[0] * 2);
+	Dropdown->Align = UIBox::E_REVERSE;
+	Dropdown->SetBorder(UIBox::E_ROUNDED, 0.4);
+	for (size_t i = 0; i < Menu.size(); i++)
+	{
+		UIBox* NewElement = nullptr;
+		if (Menu[i].Title[0] == '#')
+		{
+			NewElement = new UIBackground(true, 0, UIColors[0] * 2);
+			Menu[i].Title = " " + Menu[i].Title.substr(Menu[i].Title.find_first_not_of("# "));
+		}
+		else
+		{
+			NewElement = new UIButton(true, 0, UIColors[0] * 2, this, i);
+			Menu[i].Title = "   " + Menu[i].Title;
+		}
+		NewElement->SetBorder(UIBox::E_ROUNDED, 0.4);
+		NewElement->SetMinSize(Vector2(0.14, 0));
+		NewElement->SetPadding(0);
+		NewElement->AddChild((new UIText(0.4, UIColors[2], Menu[i].Title, EngineUIText))
+			->SetPadding(0));
+		Dropdown->AddChild(NewElement);
+	}
+
+	UIBox::DrawAllUIElements();
+	Dropdown->SetPosition(Dropdown->GetPosition() - Vector2(0, Dropdown->GetUsedSize().Y));
+}
 
 std::string EditorUI::ToShortString(float val)
 {
@@ -267,6 +284,19 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 		ListIndex++;
 	}
 	return ObjectList;
+}
+
+void EditorUI::OnButtonClicked(int Index)
+{
+	if (Index >= 0)
+	{
+		if (CurrentDropdown[Index].OnPressed)
+		{
+			CurrentDropdown[Index].OnPressed();
+		}
+		delete Dropdown;
+		Dropdown = nullptr;
+	}
 }
 
 

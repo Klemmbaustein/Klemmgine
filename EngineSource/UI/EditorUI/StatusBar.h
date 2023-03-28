@@ -1,9 +1,9 @@
 #if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorTab.h>
+#include <UI/EditorUI/EditorPanel.h>
 #include <UI/UIfwd.h>
 
-class StatusBar : public EditorTab
+class StatusBar : public EditorPanel
 {
 	UIText* Texts[3];
 	float FPSUpdateTimer = 1;

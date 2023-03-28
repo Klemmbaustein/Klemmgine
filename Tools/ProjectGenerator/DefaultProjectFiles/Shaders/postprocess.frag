@@ -35,19 +35,19 @@ float LinearizeDepth(float depth)
 }
 float blurssao()
 {
-	vec2 texelSize = 1.0f / vec2(textureSize(u_ssaotexture, 0));
+	vec2 texelSize = 1.f / vec2(textureSize(u_ssaotexture, 0));
 	float result = 0.0;
 	for (int x = -2; x < 2; ++x) 
 	{
 		for (int y = -2; y < 2; ++y) 
 		{
-			vec2 offset = vec2(float(x), float(y)) * texelSize;
+			vec2 offset = vec2(float(x), float(y)) * texelSize + texelSize / 2;
 			result += texture(u_ssaotexture, v_texcoords + offset).r;
 		}
 	}
 	result = mix(result, 16, min(max(LinearizeDepth(texture(u_depth, v_texcoords).z), 0), 1) / 3);
 	result += LinearizeDepth(texture(u_depth, v_texcoords).z) / 6.f;
-	return pow(min((result + 1) / 16, 1), 1);
+	return pow(min((result + 1) / 16, 1), 1.1);
 }
 
 vec4 sampleUI()

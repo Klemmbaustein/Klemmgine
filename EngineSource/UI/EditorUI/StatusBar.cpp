@@ -4,7 +4,7 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/EngineProperties.h>
 
-StatusBar::StatusBar(Vector3* Colors) : EditorTab(Colors, Vector2(-1, 0.95), Vector2(2, 0.05), Vector2(2, 0.05), Vector2(2, 0.05))
+StatusBar::StatusBar(Vector3* Colors) : EditorPanel(Colors, Vector2(-1, 0.95), Vector2(2, 0.05), Vector2(2, 0.05), Vector2(2, 0.05))
 {
 	TabBackground->SetColor(Colors[1]);
 	Texts[0] = new UIText(0.6, UIColors[2] * 0.9, "FPS: ?", Editor::CurrentUI->EngineUIText);
@@ -29,7 +29,7 @@ void StatusBar::UpdateLayout()
 
 void StatusBar::Tick()
 {
-	UpdateTab();
+	UpdatePanel();
 	if (FPSUpdateTimer >= 1)
 	{
 		Texts[0]->SetText("FPS: " + std::to_string(DisplayedFPS));

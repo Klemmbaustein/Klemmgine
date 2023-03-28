@@ -1,7 +1,7 @@
 #if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorTab.h>
-class Toolbar : public EditorTab
+#include <UI/EditorUI/EditorPanel.h>
+class Toolbar : public EditorPanel
 {
 public:
 	struct ButtonCategory

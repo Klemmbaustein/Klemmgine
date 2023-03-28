@@ -4,6 +4,8 @@
 #include <UI/UIText.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Scene.h>
+#include <thread>
+#include <Engine/Importers/Build/Build.h>
 
 #define MAX_CATEGORY_BUTTONS 16
 
@@ -44,7 +46,7 @@ void Toolbar::GenerateButtons()
 		->SetPadding(0.01, 0.01, 0.02, 0.01));
 }
 
-Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorTab(Colors, Position, Scale, Vector2(0.8, 0.22), Vector2(2, 0.5))
+Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.8, 0.22), Vector2(2, 0.45))
 {
 	RegisterNewButtonCategory(ButtonCategory("Scene", 
 		{
@@ -68,7 +70,7 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorTab(C
 	RegisterNewButtonCategory(ButtonCategory("Project",
 		{
 			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[15], []() { Log::Print("TODO"); }),
-			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { Log::Print("hi"); })
+			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { new std::thread(Build::TryBuildProject, "Build/"); })
 
 		}));
 
@@ -89,7 +91,7 @@ void Toolbar::UpdateLayout()
 
 void Toolbar::Tick()
 {
-	UpdateTab();
+	UpdatePanel();
 }
 
 void Toolbar::OnButtonClicked(int Index)

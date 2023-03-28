@@ -51,8 +51,8 @@ void SSAO::Init()
 	glGenTextures(1, &noiseTexture);
 	glBindTexture(GL_TEXTURE_2D, noiseTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
@@ -60,9 +60,9 @@ void SSAO::Init()
 	glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 	glGenTextures(1, &ssaoColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Graphics::WindowResolution.X / ResolutionDivider, Graphics::WindowResolution.Y / ResolutionDivider, 0, GL_RED, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Graphics::WindowResolution.X / ResolutionDivider, Graphics::WindowResolution.Y / ResolutionDivider, 0, GL_RED, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
@@ -87,7 +87,7 @@ unsigned int SSAO::Render(unsigned int NormalBuffer, unsigned int PositionBuffer
 	AOShader->Bind();
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "FullScreen"), 1);
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "kernelSize"), Samples);
-	glUniform1f(glGetUniformLocation(AOShader->GetShaderID(), "radius"), 15);
+	glUniform1f(glGetUniformLocation(AOShader->GetShaderID(), "radius"), 35);
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "gPosition"), 0);
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "gNormal"), 1);
 	glUniform1f(glGetUniformLocation(AOShader->GetShaderID(), "ResDiv"), ResolutionDivider);
@@ -116,9 +116,9 @@ void SSAO::ResizeBuffer(unsigned int X, unsigned int Y)
 	glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 	glGenTextures(1, &ssaoColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, Graphics::WindowResolution.X / ResolutionDivider, Graphics::WindowResolution.Y / ResolutionDivider, 0, GL_RED, GL_FLOAT, NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Graphics::WindowResolution.X / ResolutionDivider, Graphics::WindowResolution.Y / ResolutionDivider, 0, GL_RED, GL_FLOAT, NULL);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
