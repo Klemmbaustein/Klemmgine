@@ -150,7 +150,7 @@ UITextField* UITextField::SetText(std::string NewText)
 	if (NewText != EnteredText)
 	{
 		EnteredText = NewText;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 		if (IsEdited)
 		{
 			TextInput::Text = NewText;
