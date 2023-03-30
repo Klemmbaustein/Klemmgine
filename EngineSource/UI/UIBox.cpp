@@ -22,7 +22,7 @@ UIBox* UIBox::SetSizeMode(E_SizeMode NewMode)
 	if (SizeMode != NewMode)
 	{
 		SizeMode = NewMode;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -32,13 +32,13 @@ UIBox::UIBox(bool Horizontal, Vector2 Position)
 	this->Position = Position;
 	this->Size = Size;
 	this->ChildrenHorizontal = Horizontal;
-	GetAbsoluteParent()->InvalidateLayout();
+	InvalidateLayout();
 	UI::UIElements.push_back(this);
 }
 
 UIBox::~UIBox()
 {
-	GetAbsoluteParent()->InvalidateLayout();
+	InvalidateLayout();
 	DeleteChildren();
 	for (unsigned int i = 0; i < UI::UIElements.size(); i++)
 	{
@@ -87,7 +87,7 @@ UIBox* UIBox::SetBorder(E_BorderType Type, float Size)
 	{
 		BorderType = Type;
 		BorderRadius = Size;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -104,10 +104,8 @@ void UIBox::ForceUpdateUI()
 	InitUI();
 	for (auto i : UI::UIElements)
 	{
-		if (!i->Parent)
-		{
-			i->InvalidateLayout();
-		}
+		if (!i->HasChanged)
+		i->InvalidateLayout();
 	}
 }
 
@@ -169,7 +167,7 @@ UIBox* UIBox::SetMaxSize(Vector2 NewMaxSize)
 	if (NewMaxSize != MaxSize)
 	{
 		MaxSize = NewMaxSize;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -184,7 +182,7 @@ UIBox* UIBox::SetMinSize(Vector2 NewMinSize)
 	if (NewMinSize != MinSize)
 	{
 		MinSize = NewMinSize;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -218,7 +216,7 @@ UIBox* UIBox::SetPadding(float Up, float Down, float Left, float Right)
 		DownPadding = Down;
 		LeftPadding = Left;
 		RightPadding = Right;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -231,7 +229,7 @@ UIBox* UIBox::SetPadding(float AllDirs)
 		DownPadding = AllDirs;
 		LeftPadding = AllDirs;
 		RightPadding = AllDirs;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -241,7 +239,7 @@ UIBox* UIBox::SetTryFill(bool NewTryFill)
 	if (TryFill != NewTryFill)
 	{
 		TryFill = NewTryFill;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -251,7 +249,7 @@ UIBox* UIBox::SetHorizontal(bool IsHorizontal)
 	if (IsHorizontal != ChildrenHorizontal)
 	{
 		ChildrenHorizontal = IsHorizontal;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -420,6 +418,7 @@ void UIBox::UpdateSelfAndChildren()
 	Size.Y = std::max(AdjustedMinSize.Y, Size.Y);
 	for (auto c : Children)
 	{
+		if (c->HasChanged)
 		c->UpdateSelfAndChildren();
 	}
 	Update();
@@ -428,7 +427,16 @@ void UIBox::UpdateSelfAndChildren()
 void UIBox::InvalidateLayout()
 {
 	UI::RequiresRedraw = true;
-	UI::ElementsToUpdate.insert(this);
+	HasChanged = true;
+	if (Parent)
+	{
+		Parent->InvalidateLayout();
+	}
+	else
+	{
+		UI::ElementsToUpdate.insert(this);
+	}
+
 }
 
 UIBox* UIBox::AddChild(UIBox* NewChild)
@@ -438,7 +446,7 @@ UIBox* UIBox::AddChild(UIBox* NewChild)
 		NewChild->Parent = this;
 		Children.push_back(NewChild);
 		NewChild->OnAttached();
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	else
 	{
@@ -489,6 +497,7 @@ void UIBox::DrawAllUIElements()
 
 void UIBox::DrawThisAndChildren()
 {
+	HasChanged = false;
 	for (auto c : Children)
 	{
 		c->UpdateTickState();

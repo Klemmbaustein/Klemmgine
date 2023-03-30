@@ -15,7 +15,7 @@ UIText* UIText::SetColor(Vector3 NewColor)
 		{
 			i.Color = Color;
 		}
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -35,7 +35,7 @@ UIText* UIText::SetTextSize(float Size)
 	if (Size != TextSize)
 	{
 		TextSize = Size;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -50,7 +50,7 @@ UIText* UIText::SetTextWidthOverride(float NewTextWidthOverride)
 	if (TextWidthOverride != NewTextWidthOverride)
 	{
 		TextWidthOverride = NewTextWidthOverride;
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 	return this;
 }
@@ -71,7 +71,7 @@ void UIText::SetText(std::string NewText)
 				return;
 			}
 		}
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 }
 
@@ -91,7 +91,7 @@ void UIText::SetText(ColoredText NewText)
 				return;
 			}
 		}
-		GetAbsoluteParent()->InvalidateLayout();
+		InvalidateLayout();
 	}
 }
 

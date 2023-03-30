@@ -7,6 +7,7 @@ class UIScrollBox;
 class UIButton;
 class UIBox
 {
+	bool HasChanged = true;
 public:	
 	bool IsVisible = true;
 	enum E_UIAlign
