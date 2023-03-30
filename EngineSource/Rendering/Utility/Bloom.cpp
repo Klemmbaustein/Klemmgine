@@ -11,7 +11,7 @@ namespace Bloom
 	Shader* BloomShader;
 	unsigned int pingpongFBO[2];
 	unsigned int pingpongBuffer[2];
-	float BloomResolutionMultiplier = 0.15;
+	float BloomResolutionMultiplier = 0.1;
 }
 
 unsigned int Bloom::BlurFramebuffer(unsigned int buf)
@@ -20,7 +20,7 @@ unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 	{
 		glViewport(0, 0, Graphics::WindowResolution.X * BloomResolutionMultiplier, Graphics::WindowResolution.Y * BloomResolutionMultiplier);
 		bool horizontal = true, first_iteration = true;
-		int amount = 15;
+		int amount = 20;
 		BloomShader->Bind();
 		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

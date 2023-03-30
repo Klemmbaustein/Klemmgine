@@ -16,6 +16,7 @@
 #include <UI/EditorUI/Viewport.h>
 #include <UI/EditorUI/ObjectList.h>
 #include <UI/EditorUI/ContextMenu.h>
+
 #include <GL/glew.h>
 #include <Engine/Log.h>
 #include <Engine/Input.h>
@@ -33,6 +34,23 @@ bool ChangedScene = false;
 
 // Experimental
 #define UI_LIGHT_MODE 0
+
+void EditorUI::MakeEmptyFile(std::string NewFile)
+{
+	std::string FileName = FileUtil::GetFileNameWithoutExtensionFromPath(NewFile),
+		FilePath = NewFile.substr(0, NewFile.find_last_of("/\\")),
+		Extension = FileUtil::GetExtension(NewFile);
+
+	size_t AppendedNumber = 0;
+	std::string OutFile = FilePath + "/" + FileName+ "." + Extension;
+
+	while (std::filesystem::exists(OutFile))
+	{
+		OutFile = FilePath + "/" + FileName + "_" + std::to_string(++AppendedNumber) + "." + Extension;
+	}
+	std::ofstream out = std::ofstream(OutFile);
+	out.close();
+}
 
 EditorUI::EditorUI()
 {
@@ -78,6 +96,15 @@ void EditorUI::OnLeave(void(*ReturnF)())
 
 void EditorUI::Tick()
 {
+
+	if (Dropdown && 
+		((Input::IsLMBDown
+		&& !Maths::IsPointIn2DBox(Dropdown->GetPosition(), Dropdown->GetPosition() + Dropdown->GetUsedSize(), Input::MouseLocation))
+		|| Input::IsKeyDown(SDLK_ESCAPE)))
+	{
+		delete Dropdown;
+		Dropdown = nullptr;
+	}
 	if (!Editor::DraggingTab)
 	{
 		Editor::NewDragMinMax = Vector2(-1, 1);
@@ -132,7 +159,7 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 			Menu[i].Title = "   " + Menu[i].Title;
 		}
 		NewElement->SetBorder(UIBox::E_ROUNDED, 0.4);
-		NewElement->SetMinSize(Vector2(0.14, 0));
+		NewElement->SetMinSize(Vector2(0.17, 0));
 		NewElement->SetPadding(0);
 		NewElement->AddChild((new UIText(0.4, UIColors[2], Menu[i].Title, EngineUIText))
 			->SetPadding(0));

@@ -15,8 +15,12 @@
 #include <UI/EditorUI/Viewport.h>
 #include <Objects/SoundObject.h>
 #include <Objects/ParticleObject.h>
+#include <stdbool.h>
 
 #define MAX_ITEM_NAME_LENGTH 19
+
+std::vector<ItemBrowser::FileEntry> ItemBrowser::CurrentFiles;
+std::vector<UIButton*> ItemBrowser::Buttons;
 
 std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 {
@@ -156,6 +160,15 @@ void ItemBrowser::ScanForAssets()
 		CurrentFiles.push_back(FileEntry(entry.path().string(), false));
 	}
 }
+namespace _item
+{
+	size_t HoveredButton = 0;
+}
+void ItemBrowser::DeleteFile()
+{
+	std::filesystem::remove_all(CurrentFiles[_item::HoveredButton].Name);
+	Editor::CurrentUI->UIElements[3]->UpdateLayout();
+}
 
 ItemBrowser::ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2, 1), Vector2(0.9, 4))
 {
@@ -251,6 +264,15 @@ void ItemBrowser::UpdateLayout()
 		}
 	}
 
+	if (!DisplayedFiles.size())
+	{
+		UIText* NewText = new UIText(0.4, UIColors[2], "Right click to create a new file", Editor::CurrentUI->EngineUIText);
+		NewText->SetPadding(0.01);
+		NewText->Wrap = true;
+		NewText->WrapDistance = Scale.X * 1.2;
+		BrowserScrollBox->AddChild(NewText);
+	}
+
 	HorizontalSlices.resize(DisplayedFiles.size() / ITEMS_PER_SLICE + 1);
 	for (UIBox*& i : HorizontalSlices)
 	{
@@ -319,11 +341,86 @@ void ItemBrowser::UpdateLayout()
 
 void ItemBrowser::Tick()
 {
-	if (Input::IsRMBDown && !Editor::DraggingTab)
+	if (Input::IsRMBDown && !RMBDown && !Editor::DraggingTab && TabBackground->IsHovered() && !SelectedTab) 
 	{
-		Editor::CurrentUI->ShowDropdownMenu(
-			{ EditorUI::DropdownItem("# Fuck finn"),
-			EditorUI::DropdownItem("true", []() { Log::Print("Fuck finn"); }) }, Input::MouseLocation);
+		RMBDown = true;
+		bool IsHovered = false;
+		for (size_t i = 0; i < Buttons.size(); i++)
+		{
+			if (Buttons[i]->GetIsHovered())
+			{
+				IsHovered = true;
+				_item::HoveredButton = i;
+			}
+		}
+		if (IsHovered)
+		{
+			Editor::CurrentUI->ShowDropdownMenu(
+				{ EditorUI::DropdownItem("# " + FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[_item::HoveredButton].Name)),
+				EditorUI::DropdownItem("Open", []()
+					{
+						Editor::CurrentUI->UIElements[3]->OnButtonClicked(_item::HoveredButton);
+					}),
+				EditorUI::DropdownItem("Rename", []()
+					{
+						throw "Finn issue";
+					}),
+				EditorUI::DropdownItem("Copy", []()
+					{
+						try
+						{
+							std::string Name = CurrentFiles[_item::HoveredButton].Name;
+							std::string NewName = FileUtil::GetFilePathWithoutExtension(Name) + "_Copy." + FileUtil::GetExtension(Name);
+							std::filesystem::copy(Name, NewName, std::filesystem::copy_options::recursive);
+							Editor::CurrentUI->UIElements[3]->UpdateLayout();
+						}
+						catch (std::exception& e)
+						{
+
+						}
+					}),
+				EditorUI::DropdownItem("Delete", DeleteFile)
+				}, Input::MouseLocation);
+		}
+		else
+		{
+			Editor::CurrentUI->ShowDropdownMenu(
+				{ 
+				EditorUI::DropdownItem("# Create"),
+				EditorUI::DropdownItem("Folder", []()
+					{
+						try
+						{
+							std::filesystem::create_directory(Editor::CurrentUI->CurrentPath + "/Folder");
+							Editor::CurrentUI->UIElements[3]->UpdateLayout();
+						}
+						catch (std::exception& e)
+						{
+
+						}
+					}),
+				EditorUI::DropdownItem("Material", []()
+					{
+						EditorUI::MakeEmptyFile(Editor::CurrentUI->CurrentPath + "/Material.jsmat");
+						Editor::CurrentUI->UIElements[3]->UpdateLayout();
+					}),
+				EditorUI::DropdownItem("Material Template", []()
+					{
+						EditorUI::MakeEmptyFile(Editor::CurrentUI->CurrentPath + "/MaterialTemplate.jsmtmp");
+						Editor::CurrentUI->UIElements[3]->UpdateLayout();
+					}),
+				EditorUI::DropdownItem("# Other"),
+				EditorUI::DropdownItem("Import", []()
+					{
+						Editor::CurrentUI->UIElements[3]->OnButtonClicked(-1);
+					}),
+				},
+				Input::MouseLocation);
+		}
+	}
+	if (!Input::IsRMBDown)
+	{
+		RMBDown = false;
 	}
 
 	UpdatePanel();
@@ -418,6 +515,12 @@ void ItemBrowser::OnButtonDragged(int Index)
 	if (SelectedTab == 1)
 	{
 		ext = "cpp";
+		if (GetContentsOfCurrentCPPFolder()[Index].IsFolder)
+		{
+			DraggedButton = 0;
+			IsDraggingButton = 0;
+			return;
+		}
 	}
 	else
 	{
@@ -484,6 +587,7 @@ void ItemBrowser::OnButtonClicked(int Index)
 		{
 			CPPPath.pop_back();
 		}
+
 		UpdateLayout();
 		return;
 	}
@@ -528,9 +632,9 @@ void ItemBrowser::OnButtonClicked(int Index)
 		{
 			OS::OpenFile(CurrentFiles[Index].Name);
 		}
-		if (Ext == "jsm")
+		if (ExtensionTabIDs.contains(Ext))
 		{
-			Viewport::ViewportInstance->OpenTab(1, CurrentFiles[Index].Name);
+			Viewport::ViewportInstance->OpenTab(ExtensionTabIDs[Ext], CurrentFiles[Index].Name);
 		}
 	}
 	if (Index >= 0 && SelectedTab == 1)

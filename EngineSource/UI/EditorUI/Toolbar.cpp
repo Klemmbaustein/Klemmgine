@@ -58,6 +58,7 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 				}
 				else
 				{
+					Log::Print("Saving scene \"" + Scene::CurrentScene + "\"", Vector3(0.3, 0.4, 1));
 					Scene::SaveSceneAs(Scene::CurrentScene);
 				}
 				}),

@@ -14,22 +14,30 @@ struct EditorClassesItem
 
 class ItemBrowser : public EditorPanel
 {
+	std::map<std::string, size_t> ExtensionTabIDs =
+	{
+		{"jsm", 1},
+		{"jsmat", 2},
+		{"jsmtmp", 3}
 
+	};
+
+	bool RMBDown = false;
 	struct FileEntry
 	{
 		std::string Name;
 		bool IsDirectory;
 	};
-	std::vector<FileEntry> CurrentFiles;
+	static std::vector<FileEntry> CurrentFiles;
 	int IsDraggingButton = 0;
-	std::vector<UIButton*> Buttons;
+	static std::vector<UIButton*> Buttons;
 	int DraggedButton = 0;
 	UIBox* ContentBox = nullptr;
 public:
 	void ScanForAssets();
 	std::vector<EditorClassesItem> CPPClasses;
 	std::vector<size_t> CPPPath;
-
+	static void DeleteFile();
 	int SelectedTab = 0;
 	std::vector<std::string> Tabs =
 	{
