@@ -61,8 +61,6 @@ namespace Editor
 class EditorUI : public UICanvas
 {
 public:
-	static void MakeEmptyFile(std::string NewFile);
-
 	EditorUI();
 	void OnLeave(void(*ReturnF)());
 	virtual void Tick() override;

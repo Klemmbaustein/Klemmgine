@@ -11,12 +11,9 @@
 #include <Math/Collision/Collision.h>
 #include <Engine/Log.h>
 #include <Rendering/Mesh/Model.h>
-#include <Engine/FileUtility.h>
-
 #include <UI/EditorUI/Tabs/MeshTab.h>
 #include <UI/EditorUI/Tabs/CubemapTab.h>
-#include <UI/EditorUI/Tabs/MaterialTab.h>
-
+#include <Engine/FileUtility.h>
 
 
 Viewport* Viewport::ViewportInstance = nullptr;
@@ -45,7 +42,7 @@ Collision::Box ArrowBoxZ
 (
 	-0.1f, 0.1f,
 	-0.1f, 0.1f,
-	0.0f, 1.0f
+	-1.0f, 0.0f
 
 );
 
@@ -59,7 +56,7 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 	ArrowsBuffer->FramebufferCamera = Graphics::MainCamera;
 	ArrowsModel = new Model("EditorContent/Models/Arrows.jsm");
 	ArrowsModel->ModelTransform.Scale = Vector3(1, 1, -1);
-	ArrowsModel->ModelTransform.Rotation.Y = Maths::PI * 1.5;
+	ArrowsModel->ModelTransform.Rotation.Y = -M_PI_2;
 	ArrowsBuffer->Renderables.push_back(ArrowsModel);
 	TabBackground->IsVisible = false;
 
@@ -67,8 +64,6 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 	{
 		nullptr,
 		new MeshTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
-		new MaterialTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[12]),
-		new MaterialTemplateTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4]),
 		new CubemapTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText)
 	};
 
@@ -124,18 +119,8 @@ void Viewport::Tick()
 	if (SelectedObjects.size())
 	{
 		ArrowsModel->ModelTransform.Location = SelectedObjects[0]->GetTransform().Location;
-		ArrowsModel->ModelTransform.Scale = Vector3(-1, 1, -1) * Vector3::Distance(Graphics::MainCamera->Position, ArrowsModel->ModelTransform.Location) * 0.03f;
+		ArrowsModel->ModelTransform.Scale = Vector3(1, 1, -1) * Vector3::Distance(Graphics::MainCamera->Position, ArrowsModel->ModelTransform.Location) * 0.03f;
 		ArrowsModel->UpdateTransform();
-	}
-
-	bool IsInTab = TabInstances[Tabs[SelectedTab].Index] != nullptr;
-
-	for (EditorTab* i : TabInstances)
-	{
-		if (i)
-		{
-			i->Tick();
-		}
 	}
 
 	SelectedObjects.clear();
@@ -178,7 +163,7 @@ void Viewport::Tick()
 	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Viewport->Position + (Viewport->Scale * 0.5));
 	Vector3 Rotation = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
-	if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !Dragging && !IsInTab)
+	if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !Dragging)
 	{
 
 		if (!Editor::CurrentUI->CurrentCursor) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
@@ -192,12 +177,12 @@ void Viewport::Tick()
 			InitialMousePosition = Input::MouseLocation;
 		}
 	}
-	if (ViewportLock && (!Input::IsRMBDown || IsInTab))
+	if (ViewportLock && !Input::IsRMBDown)
 	{
 		Application::SetCursorPosition(InitialMousePosition);
 		ViewportLock = false;
 	}
-	if (Input::IsLMBDown && !PressedLMB && !Editor::DraggingTab && !IsInTab)
+	if (Input::IsLMBDown && !PressedLMB && !Editor::DraggingTab)
 	{
 		PressedLMB = true;
 		if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !UI::HoveredButton)
@@ -266,12 +251,11 @@ void Viewport::Tick()
 		if (Dragging)
 		{
 			Dragging = false;
-			Editor::CurrentUI->UIElements[6]->UpdateLayout();
 		}
 	}
 
 
-	if (ViewportLock && !Dragging && !IsInTab)
+	if (ViewportLock && !Dragging)
 	{
 		Input::CursorVisible = false;
 		Graphics::MainCamera->OnMouseMoved(Input::MouseMovement.X * 6, -Input::MouseMovement.Y * 6);
@@ -317,7 +301,7 @@ void Viewport::Tick()
 	{
 		Input::CursorVisible = true;
 	}
-	if (Dragging && !IsInTab)
+	if (Dragging)
 	{
 		Vector3 DistanceScaleMultiplier;
 		if (SelectedObjects.size() > 0)
@@ -412,7 +396,6 @@ void Viewport::OnButtonClicked(int Index)
 			TabInstances[Tabs[SelectedTab].Index]->Load(Tabs[SelectedTab].Name);
 		}
 		UpdateLayout();
-		UIBox::RedrawUI();
 	}
 }
 void Viewport::OpenTab(size_t TabID, std::string File)
@@ -424,7 +407,6 @@ void Viewport::OpenTab(size_t TabID, std::string File)
 		TabInstances[Tabs[SelectedTab].Index]->Load(Tabs[SelectedTab].Name);
 	}
 	UpdateLayout();
-	UIBox::RedrawUI();
 }
 
 #endif

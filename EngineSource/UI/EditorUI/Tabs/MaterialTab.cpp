@@ -1,7 +1,8 @@
+#if 0
 #if EDITOR
 #pragma once
 #include "MaterialTab.h"
-#include "../MaterialFunctions.h"
+#include "MaterialFunctions.h"
 #include <fstream>
 #include <filesystem>
 #include <Engine/Log.h>
@@ -58,13 +59,13 @@ void MaterialTab::OnButtonClicked(int Index)
 	}
 }
 
-MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int ReloadTexture) : EditorTab(UIColors)
+MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int ReloadTexture) : EditorPanel(UIColors)
 {
 	Renderer = Text;
 	this->ReloadTexture = ReloadTexture;
 
 	TabBackground->Align = UIBox::E_REVERSE;
-	TabName = new UIText(1, 1, "Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
+	TabName = new UIText(1, 1, "Material: " + GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
 	TabName->SetPadding(0.05, 0, 0.05, 0);
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
@@ -135,11 +136,7 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int Rel
 }
 void MaterialTab::Tick()
 {
-	if (RightRow->IsVisible != TabBackground->IsVisible)
-	{
-		RightRow->IsVisible = TabBackground->IsVisible;
-		UIBox::RedrawUI();
-	}
+	RightRow->IsVisible = TabBackground->IsVisible;
 }
 
 
@@ -149,7 +146,7 @@ void MaterialTab::Load(std::string File)
 	LoadedMaterial = Material();
 	try
 	{
-		TabName->SetText("Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath));
+		TabName->SetText("Material: " + GetFileNameWithoutExtensionFromPath(Filepath));
 		LoadedMaterial = Material::LoadMaterialFile(Filepath, false);
 		GenerateUI();
 	}
@@ -286,4 +283,5 @@ void MaterialTab::GenerateUI()
 	}
 }
 
+#endif
 #endif

@@ -1,7 +1,7 @@
-#if EDITOR
+#if 0
 #pragma once
 #include "MaterialTemplateTab.h"
-#include "../MaterialFunctions.h"
+#include "MaterialFunctions.h"
 #include <UI/EditorUI/UIVectorField.h>
 #include <fstream>
 #include <Engine/Log.h>
@@ -52,7 +52,7 @@ void MaterialTemplateTab::Tick()
 {
 }
 
-MaterialTemplateTab::MaterialTemplateTab(Vector3* UIColors, TextRenderer* Text, unsigned int XButtonIndex) : EditorTab(UIColors)
+MaterialTemplateTab::MaterialTemplateTab(Vector3* UIColors, TextRenderer* Text, unsigned int XButtonIndex) : EditorPanel(UIColors)
 {
 	XTexture = XButtonIndex;
 	this->Renderer = Text;
@@ -80,7 +80,7 @@ void MaterialTemplateTab::Load(std::string File)
 	LoadedMaterial = Material();
 	try
 	{
-		TabName->SetText("Material Template: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath));
+		TabName->SetText("Material Template: " + GetFileNameWithoutExtensionFromPath(Filepath));
 		LoadedMaterial = Material::LoadMaterialFile(Filepath, true);
 		GenerateUI();
 	}

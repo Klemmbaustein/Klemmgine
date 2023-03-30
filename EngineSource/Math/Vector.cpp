@@ -219,9 +219,9 @@ Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
 	if (Radiants)
-		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + Maths::PI / 2.f, 0);
+		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + M_PI / 2.f, 0);
 	else
-		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + Maths::PI / 2.f, 0).RadiantsToDegrees();
+		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + M_PI / 2.f, 0).RadiantsToDegrees();
 }
 Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)
 {
