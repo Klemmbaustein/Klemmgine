@@ -1,6 +1,8 @@
 #pragma once
+#define _USE_MATH_DEFINES
 #include "Vector.h"
 #include <string>
+#include <math.h>
 namespace Maths
 {
 	inline constexpr const double PI = 3.14159265359;
