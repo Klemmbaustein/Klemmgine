@@ -67,7 +67,7 @@ public:
 	Vector2 GetScreenPosition();
 	virtual Vector2 GetUsedSize();
 	ScrollObject* CurrentScrollObject = nullptr;
-
+	bool IsHovered();
 protected:
 	bool ShouldBeTicked = true;
 	bool TryFill = false;

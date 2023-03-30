@@ -9,18 +9,20 @@
 #include <UI/EditorUI/Viewport.h>
 #include <Engine/FileUtility.h>
 #include <Engine/Scene.h>
+#include <Engine/Log.h>
 
 ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.3, 0.5))
 {
 	BackgroundBox = new UIScrollBox(false, 0, 25);
 	BackgroundBox->SetPadding(0.01);
 	BackgroundBox->Align = UIBox::E_REVERSE;
+	Title = new UIText(0.6, UIColors[2], "title", Editor::CurrentUI->EngineUIText);
 	UpdateLayout();
 }
 
 UITextField* ContextMenu::GenerateTextField(std::string Content)
 {
-	auto NewElement = new UITextField(true, 0, 0.2, this, 0, Editor::CurrentUI->EngineUIText);
+	auto NewElement = new UITextField(true, 0, 0.2, this, 1, Editor::CurrentUI->EngineUIText);
 	((UITextField*)NewElement)->SetText(Content);
 	((UITextField*)NewElement)->SetTextSize(0.4);
 	NewElement->SetPadding(0.005, 0.005, 0.02, 0.005);
@@ -32,7 +34,7 @@ UITextField* ContextMenu::GenerateTextField(std::string Content)
 
 void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index)
 {
-	auto SeperatorBorder = new UIButton(true, 0, 0.5, this, Index - 60);
+	auto SeperatorBorder = new UIButton(true, 0, 0.5, this, Index);
 
 	std::string Prefix = ContextObject ? "OBJ_CAT_" : "SCN_";
 
@@ -110,60 +112,81 @@ void ContextMenu::Tick()
 {
 	UpdatePanel();	
 	BackgroundBox->SetPosition(TabBackground->GetPosition());
-
+	if (Viewport::ViewportInstance->SelectedObjects.size() && Viewport::ViewportInstance->SelectedObjects[0]->Properties != PrevProperties)
+	{
+		PrevProperties = Viewport::ViewportInstance->SelectedObjects[0]->Properties;
+		UpdateLayout();
+	}
 }
 
 void ContextMenu::OnButtonClicked(int Index)
 {
-	for (size_t i = 0; i < ContextButtons.size(); i++)
+	if (Index == -1)
 	{
-		switch (ContextSettings[i].Type)
+		for (size_t i = 0; i < ContextButtons.size(); i++)
 		{
-		case Type::E_VECTOR3_COLOR:
-		case Type::E_VECTOR3:
-			if (ContextSettings[i].Normalized) *(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
-			else
-				*(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue();
-			break;
-		case Type::E_FLOAT:
-			*(float*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
-			break;
-		case Type::E_INT:
-			*(int*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
-			break;
-		case Type::E_STRING:
-			*(std::string*)(ContextSettings[i].Variable) = ((UITextField*)ContextButtons[i])->GetText();
-			if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-				&& ContextSettings[i].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
+			switch (ContextSettings[i].Type)
 			{
-				Editor::CurrentUI->UIElements[5]->UpdateLayout();
+			case Type::E_VECTOR3_COLOR:
+			case Type::E_VECTOR3:
+				if (ContextSettings[i].Normalized) *(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
+				else
+					*(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue();
+				break;
+			case Type::E_FLOAT:
+				*(float*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
+				break;
+			case Type::E_INT:
+				*(int*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
+				break;
+			case Type::E_STRING:
+				*(std::string*)(ContextSettings[i].Variable) = ((UITextField*)ContextButtons[i])->GetText();
+				if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
+					&& ContextSettings[i].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
+				{
+					Editor::CurrentUI->UIElements[5]->UpdateLayout();
+				}
+				break;
+			case Type::E_BOOL:
+				if (((UIButton*)ContextButtons[i])->GetIsHovered())
+				{
+					*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
+				}
+				break;
+			default:
+				break;
 			}
-			break;
-		case Type::E_BOOL:
-			if (((UIButton*)ContextButtons[i])->GetIsHovered())
-			{
-				*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
-			}
-			break;
-		default:
-			break;
 		}
+		if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
+			&& ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Properties.size())
+		{
+			((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->OnPropertySet();
+		}
+		ChangedScene = true;
+		UpdateLayout();
 	}
-	if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-		&& ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Properties.size())
+	if (Index >= 0)
 	{
-		((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->OnPropertySet();
+		std::string Name = (Viewport::ViewportInstance->SelectedObjects.size() ? "OBJ_CAT_" : "SCN_") + ContextCategories[Index];
+		if (Editor::CurrentUI->CollapsedItems.contains(Name))
+		{
+			Editor::CurrentUI->CollapsedItems.erase(Name);
+		}
+		else
+		{
+			Editor::CurrentUI->CollapsedItems.insert(Name);
+		}
+		UpdateLayout();
 	}
-	ChangedScene = true;
-	UpdateLayout();
 }
 
 void ContextMenu::UpdateLayout()
 {
-	BackgroundBox->SetPosition(TabBackground->GetPosition());
-	BackgroundBox->SetMinSize(Scale);
-	BackgroundBox->SetMaxSize(Scale);
+	BackgroundBox->SetPosition(Position - Vector2(0, 0.08));
+	BackgroundBox->SetMinSize(Scale - Vector2(0, 0.1));
+	BackgroundBox->SetMaxSize(Scale - Vector2(0, 0.1));
 	BackgroundBox->DeleteChildren();
+	Title->SetPosition(Position + Vector2(0.01, Scale.Y - 0.1));
 	ContextSettings.clear();
 	ContextButtons.clear();
 	ContextCategories.clear();
@@ -173,7 +196,7 @@ void ContextMenu::UpdateLayout()
 	{
 		Properties.clear();
 		WorldObject* SelectedObject = ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0];
-		BackgroundBox->AddChild((new UIText(0.6, 1, "Object: " + SelectedObject->GetName(), Editor::CurrentUI->EngineUIText))->SetPadding(0.01));
+		Title->SetText("Object: " + SelectedObject->GetName());
 		GenerateSection(
 			{
 				ContextMenuSection(&SelectedObject->GetTransform().Location, Type::E_VECTOR3, "Location"),
@@ -212,8 +235,7 @@ void ContextMenu::UpdateLayout()
 	}
 	else
 	{
-		BackgroundBox->AddChild((new UIText(0.6, 1, "Scene: " + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), Editor::CurrentUI->EngineUIText))
-			->SetPadding(0.01));
+		Title->SetText("Scene: " + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene));
 		GenerateSection(
 			{
 				ContextMenuSection(&Graphics::WorldSun.Direction, Type::E_VECTOR3, "Direction", true),

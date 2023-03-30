@@ -3,7 +3,8 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <World/Graphics.h>
-
+#include <Math/Math.h>
+#include <Engine/Input.h>
 
 class UIButton;
 
@@ -152,6 +153,11 @@ void UIBox::ClearUI()
 Vector2 UIBox::GetUsedSize()
 {
 	return Size;
+}
+
+bool UIBox::IsHovered()
+{
+	return Maths::IsPointIn2DBox(OffsetPosition, OffsetPosition + Size, Input::MouseLocation);
 }
 
 void UIBox::OnAttached()

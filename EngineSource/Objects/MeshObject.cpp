@@ -56,6 +56,19 @@ void MeshObject::LoadFromFile(std::string Filename)
 		Attach(MeshCollision);
 		MeshCollision->Init(Mesh->GetModelData().GetMergedVertices(), Mesh->GetModelData().GetMergedIndices(), Transform(Vector3(), Vector3(), Vector3(1)));
 	}
+	Properties.clear();
+	GenerateDefaultCategories();
+	MaterialNames.clear();
+	MaterialNames.resize(Mesh->GetModel()->ModelMeshData.Materials.size());
+	for (size_t i = 0; i < Mesh->GetModel()->ModelMeshData.Materials.size(); i++)
+	{
+		MaterialNames[i] = Mesh->GetModel()->ModelMeshData.Materials[i];
+		if (MaterialNames[i].substr(0, 8) == "Content/")
+		{
+			MaterialNames[i] = MaterialNames[i].substr(8);
+		}
+		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::E_STRING, &MaterialNames[i]));
+	}
 }
 
 void MeshObject::OnPropertySet()

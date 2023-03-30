@@ -30,6 +30,10 @@ namespace Objects
 		std::string Name;
 		Type::TypeEnum Type;
 		void* Data;
+		bool operator==(Property b) const
+		{
+			return Name == b.Name && Type == b.Type && Data == b.Data;
+		}
 	};
 }
 

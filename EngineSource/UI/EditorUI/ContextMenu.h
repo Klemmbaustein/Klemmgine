@@ -10,7 +10,9 @@ class WorldObject;
 class ContextMenu : public EditorPanel
 {
 public:
+	std::vector<Objects::Property> PrevProperties;
 	UIScrollBox* BackgroundBox;
+	UIText* Title;
 	std::vector<Objects::Property> Properties;
 	ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale);
 	struct ContextMenuSection
