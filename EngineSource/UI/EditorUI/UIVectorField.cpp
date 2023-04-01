@@ -54,7 +54,12 @@ void UIVectorField::Update()
 
 void UIVectorField::UpdateValues()
 {
-
+	for (size_t i = 0; i < 3; i++)
+	{
+		std::stringstream stream;
+		stream << std::fixed << std::setprecision(2) << Value.at(i);
+		TextFields[i]->SetText(stream.str());
+	}
 	if (ColorDisplay)
 	{
 		ColorDisplay->SetColor(Value.Length() > 1 ? Value.Normalize() : Value);

@@ -34,6 +34,19 @@ bool ChangedScene = false;
 // Experimental
 #define UI_LIGHT_MODE 0
 
+void EditorUI::CreateFile(std::string Path, std::string Name, std::string Ext)
+{
+	std::string Addition;
+	size_t AdditionNum = 0;
+	while (std::filesystem::exists(Path + "/" + Name + Addition + "." + Ext))
+	{
+		Addition = "_" + std::to_string(++AdditionNum);
+	}
+
+	std::ofstream out = std::ofstream(Path + "/" + Name + Addition + "." + Ext);
+	out.close();
+}
+
 EditorUI::EditorUI()
 {
 	Editor::CurrentUI = this;
@@ -94,7 +107,7 @@ void EditorUI::Tick()
 	}
 	CurrentCursor = Editor::DraggingTab ? (Editor::TabDragHorizontal ? E_RESIZE_WE : E_RESIZE_NS) : E_DEFAULT;
 
-	if (Input::IsLMBDown && Dropdown)
+	if (Input::IsLMBDown && Dropdown && !Dropdown->IsHovered())
 	{
 		delete Dropdown;
 		Dropdown = nullptr;
@@ -138,7 +151,7 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 			Menu[i].Title = "   " + Menu[i].Title;
 		}
 		NewElement->SetBorder(UIBox::E_ROUNDED, 0.4);
-		NewElement->SetMinSize(Vector2(0.14, 0));
+		NewElement->SetMinSize(Vector2(0.16, 0));
 		NewElement->SetPadding(0);
 		NewElement->AddChild((new UIText(0.4, UIColors[2], Menu[i].Title, EngineUIText))
 			->SetPadding(0));

@@ -12,6 +12,8 @@
 #include <Engine/Log.h>
 #include <Rendering/Mesh/Model.h>
 #include <UI/EditorUI/Tabs/MeshTab.h>
+#include <UI/EditorUI/Tabs/MaterialTab.h>
+#include <UI/EditorUI/Tabs/MaterialTemplateTab.h>
 #include <UI/EditorUI/Tabs/CubemapTab.h>
 #include <Engine/FileUtility.h>
 
@@ -64,6 +66,8 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 	{
 		nullptr,
 		new MeshTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
+		new MaterialTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[3]),
+		new MaterialTemplateTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4]),
 		new CubemapTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText)
 	};
 
@@ -163,7 +167,9 @@ void Viewport::Tick()
 	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Viewport->Position + (Viewport->Scale * 0.5));
 	Vector3 Rotation = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
-	if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !Dragging)
+	if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation)
+		&& !Dragging
+		&& !TabInstances[Tabs[SelectedTab].Index])
 	{
 
 		if (!Editor::CurrentUI->CurrentCursor) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
@@ -182,7 +188,7 @@ void Viewport::Tick()
 		Application::SetCursorPosition(InitialMousePosition);
 		ViewportLock = false;
 	}
-	if (Input::IsLMBDown && !PressedLMB && !Editor::DraggingTab)
+	if (Input::IsLMBDown && !PressedLMB && !Editor::DraggingTab && !TabInstances[Tabs[SelectedTab].Index])
 	{
 		PressedLMB = true;
 		if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !UI::HoveredButton)

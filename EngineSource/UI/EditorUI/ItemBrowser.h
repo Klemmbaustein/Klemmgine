@@ -20,9 +20,10 @@ class ItemBrowser : public EditorPanel
 		std::string Name;
 		bool IsDirectory;
 	};
-	std::vector<FileEntry> CurrentFiles;
+	static size_t SelectedButton;
+	static std::vector<FileEntry> CurrentFiles;
 	int IsDraggingButton = 0;
-	std::vector<UIButton*> Buttons;
+	static std::vector<UIButton*> Buttons;
 	int DraggedButton = 0;
 	bool RMBDown = false;
 	UIBox* ContentBox = nullptr;

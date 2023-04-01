@@ -18,6 +18,11 @@
 
 #define MAX_ITEM_NAME_LENGTH 19
 
+std::vector<ItemBrowser::FileEntry> ItemBrowser::CurrentFiles;
+std::vector<UIButton*> ItemBrowser::Buttons;
+size_t ItemBrowser::SelectedButton = 0;
+
+
 std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 {
 	std::vector<std::string> IDs;
@@ -213,9 +218,9 @@ void ItemBrowser::UpdateLayout()
 		TabBox->AddChild(NewButton
 			->SetBorder(UIBox::E_DARKENED_EDGE, 0.25)
 			->SetPadding(0)
-			->SetMinSize(Vector2(Scale.X / Tabs.size(), 0.06f))
+			->SetMinSize(Vector2(Scale.X / Tabs.size(), 0.05f))
 			->AddChild((new UIText(0.45, UIColors[2], i, Editor::CurrentUI->EngineUIText))
-				->SetPadding(0.02, 0, 0, 0)));
+				->SetPadding(0.01, 0.01, 0, 0)));
 		ButtonIndex++;
 	}
 
@@ -319,12 +324,60 @@ void ItemBrowser::UpdateLayout()
 
 void ItemBrowser::Tick()
 {
-	if (Input::IsRMBDown && !RMBDown && !Editor::DraggingTab && BrowserScrollBox->IsHovered())
+	if (Input::IsRMBDown && !RMBDown && !Editor::DraggingTab && TabBackground->IsHovered())
 	{
+		bool ButtonHovered = false;
 		RMBDown = true;
-		Editor::CurrentUI->ShowDropdownMenu(
-			{ EditorUI::DropdownItem("# Fuck finn"),
-			EditorUI::DropdownItem("true", []() { Log::Print("Fuck finn"); }) }, Input::MouseLocation);
+
+		for (size_t i = 0; i < Buttons.size(); i++)
+		{
+			if (Buttons[i]->GetIsHovered())
+			{
+				SelectedButton = i;
+				ButtonHovered = true;
+				Editor::CurrentUI->ShowDropdownMenu(
+				{
+					EditorUI::DropdownItem("# " + FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[i].Name)),
+					EditorUI::DropdownItem("Open", []()
+					{
+						Editor::CurrentUI->UIElements[3]->OnButtonClicked(SelectedButton);
+					}),
+					EditorUI::DropdownItem("Rename", []()
+					{
+					}),
+					EditorUI::DropdownItem("Delete", []()
+					{
+						std::filesystem::remove_all(CurrentFiles[SelectedButton].Name);
+						Editor::CurrentUI->UIElements[3]->UpdateLayout();
+					}),
+				},
+				Input::MouseLocation);
+			}
+		}
+
+		if (!ButtonHovered)
+		{
+			Editor::CurrentUI->ShowDropdownMenu(
+			{
+				EditorUI::DropdownItem("# Create"),
+				EditorUI::DropdownItem("Material", []()
+				{
+					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Material", "jsmat");
+					Editor::CurrentUI->UIElements[3]->UpdateLayout();
+				}),
+				EditorUI::DropdownItem("Material Template", []()
+				{
+					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "MaterialTemplate", "jsmtmp");
+					Editor::CurrentUI->UIElements[3]->UpdateLayout();
+				}),
+				EditorUI::DropdownItem("Scene", []()
+				{
+					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Scene", "jscn");
+					Editor::CurrentUI->UIElements[3]->UpdateLayout();
+				})
+			},
+			Input::MouseLocation);
+		}
 	}
 
 	if (!Input::IsRMBDown)
@@ -537,6 +590,14 @@ void ItemBrowser::OnButtonClicked(int Index)
 		if (Ext == "jsm")
 		{
 			Viewport::ViewportInstance->OpenTab(1, CurrentFiles[Index].Name);
+		}
+		if (Ext == "jsmat")
+		{
+			Viewport::ViewportInstance->OpenTab(2, CurrentFiles[Index].Name);
+		}
+		if (Ext == "jsmtmp")
+		{
+			Viewport::ViewportInstance->OpenTab(3, CurrentFiles[Index].Name);
 		}
 	}
 	if (Index >= 0 && SelectedTab == 1)

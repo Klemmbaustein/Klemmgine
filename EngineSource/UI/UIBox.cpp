@@ -331,8 +331,15 @@ void UIBox::UpdatePosition()
 	{
 		if (Align == E_CENTERED)
 		{
-			c->OffsetPosition = OffsetPosition + Vector2(Size.X / 2 - ChildrenSize / 2, 0);
-			Offset += c->Size.X + c->LeftPadding + c->RightPadding;
+			if (ChildrenHorizontal)
+			{
+				c->OffsetPosition = OffsetPosition + Vector2(Size.X / 2 - ChildrenSize / 2 - c->LeftPadding, c->DownPadding);
+				Offset += c->Size.X + c->LeftPadding + c->RightPadding;
+			}
+			else
+			{
+
+			}
 		}
 		else
 		{
