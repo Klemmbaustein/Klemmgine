@@ -1,13 +1,12 @@
-#if 0
+#if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorPanel.h>
 #include <UI/UITextField.h>
-#include <UI/EditorUI/EditorPanel.h>
+#include <UI/EditorUI/Tabs/EditorTab.h>
 #include <Rendering/Texture/Material.h>
 class Model;
 class UIText;
 class UIScrollBox;
-class MaterialTemplateTab : public EditorPanel
+class MaterialTemplateTab : public EditorTab
 {
 public:
 	virtual void OnButtonClicked(int Index) override;

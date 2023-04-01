@@ -9,6 +9,7 @@
 #include <UI/EditorUI/Viewport.h>
 #include <Engine/FileUtility.h>
 #include <Engine/Scene.h>
+#include <Engine/Log.h>
 
 ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.3, 0.5))
 {
@@ -20,7 +21,7 @@ ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edi
 
 UITextField* ContextMenu::GenerateTextField(std::string Content)
 {
-	auto NewElement = new UITextField(true, 0, 0.2, this, 0, Editor::CurrentUI->EngineUIText);
+	auto NewElement = new UITextField(true, 0, 0.2, this, -1, Editor::CurrentUI->EngineUIText);
 	((UITextField*)NewElement)->SetText(Content);
 	((UITextField*)NewElement)->SetTextSize(0.4);
 	NewElement->SetPadding(0.005, 0.005, 0.02, 0.005);
@@ -32,7 +33,7 @@ UITextField* ContextMenu::GenerateTextField(std::string Content)
 
 void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index)
 {
-	auto SeperatorBorder = new UIButton(true, 0, 0.5, this, Index - 60);
+	auto SeperatorBorder = new UIButton(true, 0, 0.5, this, Index);
 
 	std::string Prefix = ContextObject ? "OBJ_CAT_" : "SCN_";
 
@@ -40,7 +41,7 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 	SeperatorArrow->SetPadding(0, 0, 0.01, 0);
 	SeperatorArrow->SetUseTexture(true,
 		Editor::CurrentUI->CollapsedItems.contains(Prefix + Name) ? Editor::CurrentUI->Textures[14] : Editor::CurrentUI->Textures[13]);
-	SeperatorArrow->SetTryFill(true);
+	//SeperatorArrow->SetTryFill(true);
 	SeperatorBorder->AddChild(SeperatorArrow);
 
 	auto SeperatorText = new UIText(0.5, 0, Name, Editor::CurrentUI->EngineUIText);
@@ -68,7 +69,7 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 			// Vector3_Colors and Vector3s both use VectorFields, so we basically treat them the same
 		case Type::E_VECTOR3_COLOR:
 		case Type::E_VECTOR3:
-			NewElement = new UIVectorField(0, *(Vector3*)i.Variable, this, 0, Editor::CurrentUI->EngineUIText);
+			NewElement = new UIVectorField(0, *(Vector3*)i.Variable, this, -1, Editor::CurrentUI->EngineUIText);
 			NewElement->SetPadding(0.005, 0, 0.02, 0);
 			// Here we tell the VectorField to use RGB values instead of XYZ if required
 			((UIVectorField*)NewElement)->SetValueType(i.Type == Type::E_VECTOR3 ? UIVectorField::E_XYZ : UIVectorField::E_RGB);
@@ -84,7 +85,7 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 			NewElement = GenerateTextField(*((std::string*)i.Variable));
 			break;
 		case Type::E_BOOL:
-			NewElement = new UIButton(true, 0, 0.75, this, 0);
+			NewElement = new UIButton(true, 0, 0.75, this, -1);
 			NewElement->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
 			NewElement->SetMinSize(0.04);
 			NewElement->SetBorder(UIBox::E_ROUNDED, 0.3);
@@ -115,47 +116,64 @@ void ContextMenu::Tick()
 
 void ContextMenu::OnButtonClicked(int Index)
 {
-	for (size_t i = 0; i < ContextButtons.size(); i++)
+	if (Index >= 0)
 	{
-		switch (ContextSettings[i].Type)
+		std::string Name = ContextCategories.at(Index);
+		Name = (Viewport::ViewportInstance->SelectedObjects.size() ? "OBJ_CAT_" : "SCN_") + Name;
+		if (Editor::CurrentUI->CollapsedItems.contains(Name))
 		{
-		case Type::E_VECTOR3_COLOR:
-		case Type::E_VECTOR3:
-			if (ContextSettings[i].Normalized) *(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
-			else
-				*(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue();
-			break;
-		case Type::E_FLOAT:
-			*(float*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
-			break;
-		case Type::E_INT:
-			*(int*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
-			break;
-		case Type::E_STRING:
-			*(std::string*)(ContextSettings[i].Variable) = ((UITextField*)ContextButtons[i])->GetText();
-			if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-				&& ContextSettings[i].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
-			{
-				Editor::CurrentUI->UIElements[5]->UpdateLayout();
-			}
-			break;
-		case Type::E_BOOL:
-			if (((UIButton*)ContextButtons[i])->GetIsHovered())
-			{
-				*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
-			}
-			break;
-		default:
-			break;
+			Editor::CurrentUI->CollapsedItems.erase(Name);
 		}
+		else
+		{
+			Editor::CurrentUI->CollapsedItems.insert(Name);
+		}
+		UpdateLayout();
 	}
-	if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-		&& ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Properties.size())
+	if (Index == -1)
 	{
-		((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->OnPropertySet();
+		for (size_t i = 0; i < ContextButtons.size(); i++)
+		{
+			switch (ContextSettings[i].Type)
+			{
+			case Type::E_VECTOR3_COLOR:
+			case Type::E_VECTOR3:
+				if (ContextSettings[i].Normalized) *(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
+				else
+					*(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue();
+				break;
+			case Type::E_FLOAT:
+				*(float*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
+				break;
+			case Type::E_INT:
+				*(int*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
+				break;
+			case Type::E_STRING:
+				*(std::string*)(ContextSettings[i].Variable) = ((UITextField*)ContextButtons[i])->GetText();
+				if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
+					&& ContextSettings[i].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
+				{
+					Editor::CurrentUI->UIElements[5]->UpdateLayout();
+				}
+				break;
+			case Type::E_BOOL:
+				if (((UIButton*)ContextButtons[i])->GetIsHovered())
+				{
+					*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
+				}
+				break;
+			default:
+				break;
+			}
+		}
+		if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
+			&& ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Properties.size())
+		{
+			((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->OnPropertySet();
+		}
+		ChangedScene = true;
+		UpdateLayout();
 	}
-	ChangedScene = true;
-	UpdateLayout();
 }
 
 void ContextMenu::UpdateLayout()
