@@ -24,6 +24,7 @@ class ItemBrowser : public EditorPanel
 	int IsDraggingButton = 0;
 	std::vector<UIButton*> Buttons;
 	int DraggedButton = 0;
+	bool RMBDown = false;
 	UIBox* ContentBox = nullptr;
 public:
 	void ScanForAssets();

@@ -31,6 +31,7 @@ void UIVectorField::SetValue(Vector3 NewValue)
 		i->SetText(stream.str());
 		Index++;
 	}
+	UpdateValues();
 }
 
 UIVectorField::UIVectorField(Vector2 Position, Vector3 StartValue, UICanvas* ParentUI, int Index, TextRenderer* Renderer) : UIBox(false, Position)
@@ -50,6 +51,15 @@ void UIVectorField::Update()
 {
 }
 
+
+void UIVectorField::UpdateValues()
+{
+
+	if (ColorDisplay)
+	{
+		ColorDisplay->SetColor(Value.Length() > 1 ? Value.Normalize() : Value);
+	}
+}
 
 void UIVectorField::Generate()
 {
@@ -79,12 +89,12 @@ void UIVectorField::Generate()
 	//TODO: add color picker to editor UI in some way
 	if (Type == E_RGB)
 	{
-		UIBackground* ColorPickerButton = new UIBackground(true, 0, Value);
-		AddChild(ColorPickerButton);
-		ColorPickerButton->SetTryFill(true);
-		ColorPickerButton->SetMinSize(Vector2(0, 0.03));
-		ColorPickerButton->SetBorder(E_ROUNDED, 0.25);
-		ColorPickerButton->SetPadding(0);
+		ColorDisplay = new UIBackground(true, 0, Value);
+		AddChild(ColorDisplay);
+		ColorDisplay->SetTryFill(true);
+		ColorDisplay->SetMinSize(Vector2(0.2675, 0.03));
+		ColorDisplay->SetBorder(E_ROUNDED, 0.25);
+		ColorDisplay->SetPadding(0);
 	}
 	AddChild(FieldBox);
 	for (int i = 0; i < 3; i++)
@@ -129,7 +139,8 @@ void UIVectorField::OnChildClicked(int Index)
 			Value[Index] = std::stof(TextFields[Index]->GetText());
 			if (ParentUI) Application::ButtonEvents.insert(ButtonEvent(nullptr, ParentUI, this->Index));
 		}
-		Generate();
+		UpdateValues();
+
 	}
 	catch (std::exception)
 	{

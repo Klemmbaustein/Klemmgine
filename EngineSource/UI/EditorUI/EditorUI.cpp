@@ -94,6 +94,12 @@ void EditorUI::Tick()
 	}
 	CurrentCursor = Editor::DraggingTab ? (Editor::TabDragHorizontal ? E_RESIZE_WE : E_RESIZE_NS) : E_DEFAULT;
 
+	if (Input::IsLMBDown && Dropdown)
+	{
+		delete Dropdown;
+		Dropdown = nullptr;
+	}
+
 	if (DraggedItem)
 	{
 		DraggedItem->SetPosition(Input::MouseLocation - DraggedItem->GetUsedSize() / 2);

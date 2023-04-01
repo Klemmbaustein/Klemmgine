@@ -1,5 +1,17 @@
 #include "UIText.h"
 #include <Engine/Log.h>
+#include <iostream>
+
+void UIText::Tick()
+{
+	Vector2 NewMin = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, WrapDistance)
+		/ ((30 + Renderer->CharacterSizeInPixels / 2) / 60.f);
+	if (TextWidthOverride > 0)
+	{
+		NewMin.X = std::max(MinSize.X, TextWidthOverride);
+	}
+	SetMinSize(NewMin);
+}
 
 Vector3 UIText::GetColor()
 {
@@ -161,9 +173,6 @@ void UIText::Update()
 			Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - 0.025f), TextSize * 2, Color, Opacity, 999);
 		}
 	}
-	MinSize = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, WrapDistance)
-		/ ((30 + Renderer->CharacterSizeInPixels / 2) / 60.f);
-	MinSize.X = std::max(MinSize.X, TextWidthOverride);
 }
 
 void UIText::OnAttached()

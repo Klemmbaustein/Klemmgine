@@ -215,7 +215,7 @@ void ItemBrowser::UpdateLayout()
 			->SetPadding(0)
 			->SetMinSize(Vector2(Scale.X / Tabs.size(), 0.06f))
 			->AddChild((new UIText(0.45, UIColors[2], i, Editor::CurrentUI->EngineUIText))
-				->SetPadding(0.02, -0.02, 0, 0)));
+				->SetPadding(0.02, 0, 0, 0)));
 		ButtonIndex++;
 	}
 
@@ -319,11 +319,17 @@ void ItemBrowser::UpdateLayout()
 
 void ItemBrowser::Tick()
 {
-	if (Input::IsRMBDown && !Editor::DraggingTab)
+	if (Input::IsRMBDown && !RMBDown && !Editor::DraggingTab && BrowserScrollBox->IsHovered())
 	{
+		RMBDown = true;
 		Editor::CurrentUI->ShowDropdownMenu(
 			{ EditorUI::DropdownItem("# Fuck finn"),
 			EditorUI::DropdownItem("true", []() { Log::Print("Fuck finn"); }) }, Input::MouseLocation);
+	}
+
+	if (!Input::IsRMBDown)
+	{
+		RMBDown = false;
 	}
 
 	UpdatePanel();

@@ -109,7 +109,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 		}
 		NewListEntryBackground->SetMinSize(Vector2(Scale.X / 1.2 - Depth, 0));
 		NewListEntryBackground->SetPadding(0.01, 0.0, 0.01 + Depth, 0.01);
-		auto ListEntryObjectColor = new UIBackground(true, 0, Vector3(0.5, 0.5, 0.5), Vector2(0.01, 0));
+		auto ListEntryObjectColor = new UIBackground(true, 0, Vector3(0.5, 0.5, 0.5), Vector2(0.01, 0.05));
 		ListEntryObjectColor->SetTryFill(true);
 		ListEntryObjectColor->SetPadding(0);
 		NewListEntryBackground->AddChild(ListEntryObjectColor);
@@ -121,7 +121,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 			CollapsedArrow->SetPadding(0, 0, 0.01, 0);
 			CollapsedArrow->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
 			CollapsedArrow->SetUseTexture(true, Object.IsCollapsed ? Editor::CurrentUI->Textures[14] : Editor::CurrentUI->Textures[13]);
-			CollapsedArrow->SetTryFill(true);
+			//CollapsedArrow->SetTryFill(true);
 			NewListEntryBackground->AddChild(CollapsedArrow);
 		}
 

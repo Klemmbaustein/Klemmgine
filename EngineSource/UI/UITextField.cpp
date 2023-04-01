@@ -62,6 +62,8 @@ void UITextField::MakeGLBuffers()
 
 void UITextField::Tick()
 {
+	TextObject->WrapDistance = std::max(std::max(Size.X, GetMinSize().X), 0.1f);
+
 	ButtonColorMultiplier = 1.f;
 	Vector2 Offset;
 	if (CurrentScrollObject != nullptr)
@@ -237,12 +239,10 @@ void UITextField::Update()
 {
 	if (!TryFill)
 	{
-		TextObject->WrapDistance = std::max(std::max(TextObject->GetUsedSize().X, GetMinSize().X), 0.1f);
-		Vector2 TextDesiredSize = TextObject->GetUsedSize();
-		TextDesiredSize += 0.005;
-		TextDesiredSize = TextDesiredSize.Clamp(MinSize, MaxSize);
-		Size = TextDesiredSize;
+		//TextObject->WrapDistance = std::max(std::max(TextObject->GetUsedSize().X, GetMinSize().X), 0.1f);
+		//Vector2 TextDesiredSize = TextObject->GetUsedSize();
+		//TextDesiredSize += 0.005;
+		//TextDesiredSize = TextDesiredSize.Clamp(MinSize, MaxSize);
+		//Size = TextDesiredSize;
 	}
-	TextObject->WrapDistance = std::max(std::max(Size.X, GetMinSize().X), 0.1f);
-	TextObject->Update();
 }
