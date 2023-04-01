@@ -7,7 +7,6 @@ class UIScrollBox;
 class UIButton;
 class UIBox
 {
-	bool HasChanged = true;
 public:	
 	bool IsVisible = true;
 	enum E_UIAlign
@@ -29,8 +28,8 @@ public:
 	};
 
 	UIBox* SetSizeMode(E_SizeMode NewMode);
-	E_BorderType BorderType;
-	float BorderRadius;
+	E_BorderType BorderType = E_NONE;
+	float BorderRadius = 0;
 	E_UIAlign Align = E_DEFAULT;
 
 	UIBox(bool Horizontal, Vector2 Position);
@@ -66,6 +65,7 @@ public:
 	static void RedrawUI();
 	static void ClearUI();
 	Vector2 GetScreenPosition();
+	bool IsHovered();
 	virtual Vector2 GetUsedSize();
 	ScrollObject* CurrentScrollObject = nullptr;
 
@@ -87,13 +87,15 @@ protected:
 	float RightPadding = 0.02;
 	float LeftPadding = 0.02;
 	Vector2 Size;
-	E_SizeMode SizeMode;
+	E_SizeMode SizeMode = E_SCREEN_RELATIVE;
 
 	std::vector<UIBox*> Children;
 	UIBox* Parent = nullptr;
 	void UpdateSelfAndChildren();
+	void UpdateScale();
+	void UpdatePosition();
 private:
-	bool ChildrenHorizontal;
+	bool ChildrenHorizontal = true;
 };
 
 namespace UI

@@ -3,7 +3,8 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <World/Graphics.h>
-
+#include <Math/Math.h>
+#include <Engine/Input.h>
 
 class UIButton;
 
@@ -103,7 +104,6 @@ void UIBox::ForceUpdateUI()
 	InitUI();
 	for (auto i : UI::UIElements)
 	{
-		if (!i->HasChanged)
 		i->InvalidateLayout();
 	}
 }
@@ -145,6 +145,11 @@ void UIBox::ClearUI()
 	}
 	UI::UIElements.clear();
 	UI::RequiresRedraw = true;
+}
+
+bool UIBox::IsHovered()
+{
+	return Maths::IsPointIn2DBox(OffsetPosition, OffsetPosition + Size, Input::MouseLocation);
 }
 
 Vector2 UIBox::GetUsedSize()
@@ -259,169 +264,127 @@ void UIBox::Update()
 
 void UIBox::UpdateSelfAndChildren()
 {
+	UpdateScale();
+	UpdatePosition();
+
+	Update();
+}
+
+void UIBox::UpdateScale()
+{
 	for (auto c : Children)
 	{
-		c->UpdateSelfAndChildren();
+		c->UpdateScale();
 	}
-	Update();
-	if (Parent == nullptr)
+	Size = 0;
+	for (auto c : Children)
+	{
+		if (ChildrenHorizontal)
+		{
+			Size.X += c->Size.X + c->LeftPadding + c->RightPadding;
+			Size.Y = std::max(Size.Y, c->Size.Y + c->UpPadding + c->DownPadding);
+		}
+		else
+		{
+			Size.Y += c->Size.Y + c->UpPadding + c->DownPadding;
+			Size.X = std::max(Size.X, c->Size.X + c->LeftPadding + c->RightPadding);
+		}
+	}
+
+	Vector2 AdjustedMinSize = MinSize;
+	Vector2 AdjustedMaxSize = MaxSize;
+	if (SizeMode == E_PIXEL_RELATIVE)
+	{
+		AdjustedMinSize.X /= Graphics::AspectRatio;
+		AdjustedMaxSize.X /= Graphics::AspectRatio;
+	}
+
+	Size = Size.Clamp(AdjustedMinSize, AdjustedMaxSize);
+	for (auto c : Children)
+	{
+		c->UpdateScale();
+	}
+}
+
+void UIBox::UpdatePosition()
+{
+	float Offset = 0;
+
+
+	if (!Parent)
 	{
 		OffsetPosition = Position;
 	}
-	Vector2 PreviousSize = Size;
-	Vector2 AdjustedMinSize = MinSize;
-	Vector2 AdjustedMaxSize = MaxSize;
 
-	if (SizeMode == E_PIXEL_RELATIVE)
-	{
-		AdjustedMinSize = AdjustedMinSize / Vector2(Graphics::AspectRatio, 1);
-		AdjustedMaxSize = AdjustedMaxSize / Vector2(Graphics::AspectRatio, 1);
-	}
+	float ChildrenSize = 0;
 
-	float TestSize = 0.0f;
-	float TestWidth = 0.0f;
-	if (ChildrenHorizontal)
+	if (Align == E_CENTERED)
 	{
 		for (auto c : Children)
 		{
-			TestSize += c->Size.X + c->LeftPadding + c->RightPadding;
-			if (!c->TryFill)
-			{
-				TestWidth += c->Size.Y + c->LeftPadding + c->RightPadding;
-			}
+			ChildrenSize += ChildrenHorizontal ? (c->Size.X + c->LeftPadding + c->RightPadding) : (c->Size.Y + c->UpPadding + c->DownPadding);
 		}
-		TestSize = std::min(AdjustedMaxSize.X, TestSize);
-		TestSize = std::max(AdjustedMinSize.X, TestSize);
-		TestWidth = std::max(AdjustedMinSize.Y, TestWidth);
 	}
-	else
-	{
-		for (auto c : Children)
-		{
-			TestSize += c->Size.Y + c->LeftPadding + c->RightPadding;
-			if (!c->TryFill)
-			{
-				TestWidth += c->Size.X + c->LeftPadding + c->RightPadding;
-			}
-		}
-		TestSize = std::min(MaxSize.Y, TestSize);
-		TestSize = std::max(AdjustedMinSize.Y, TestSize);
-		TestWidth = std::max(AdjustedMinSize.X, TestWidth);
-	}
-	Size = Vector2();
+
+
 	for (auto c : Children)
 	{
-		if (ChildrenHorizontal)
+		if (Align == E_CENTERED)
 		{
-			if (Align == E_REVERSE)
-			{
-				c->OffsetPosition = Vector2((Size.X - (c->Size.X + c->RightPadding * 2) + TestSize), c->DownPadding) + OffsetPosition;
-				Size.X -= c->Size.X;
-				Size.X -= c->LeftPadding + c->RightPadding;
-			}
-			else if (Align == E_CENTERED)
-			{
-				c->OffsetPosition = Vector2((Size.X - (c->Size.X + c->RightPadding * 2) + TestSize), c->DownPadding) + OffsetPosition;
-				Vector2 PosB = Vector2(Size.X + c->LeftPadding, c->DownPadding) + OffsetPosition;
-				c->OffsetPosition = Vector2(
-					std::lerp(c->OffsetPosition.X, PosB.X, 0.5),
-					OffsetPosition.Y + 0.02f
-				);
-				Size.X -= c->Size.X;
-				Size.X -= c->LeftPadding + c->RightPadding;
-			}
-			else
-			{
-				c->OffsetPosition = Vector2(Size.X + c->LeftPadding, c->DownPadding) + OffsetPosition;
-				Size.X += c->Size.X;
-				Size.X += c->LeftPadding + c->RightPadding;
-			}
-			Size.Y = std::max(c->UpPadding + c->DownPadding + c->Size.Y, Size.Y);
+			c->OffsetPosition = OffsetPosition + Vector2(Size.X / 2 - ChildrenSize / 2, 0);
+			Offset += c->Size.X + c->LeftPadding + c->RightPadding;
 		}
 		else
-		{
-			c->OffsetPosition = Vector2(c->LeftPadding, c->DownPadding + Size.Y) + OffsetPosition;
-
-			if (Align == E_REVERSE)
-			{
-				c->OffsetPosition = Vector2(c->LeftPadding, (Size.Y - (c->Size.Y + c->UpPadding * 2) + TestSize)) + OffsetPosition;
-				Size.Y -= c->Size.Y;
-				Size.Y -= c->UpPadding + c->DownPadding;
-			}
-			else
-			{
-				c->OffsetPosition = Vector2(c->LeftPadding, Size.Y + c->DownPadding) + OffsetPosition;
-				Size.Y += c->Size.Y;
-				Size.Y += c->UpPadding + c->DownPadding;
-			}
-			Size.X = std::max(c->LeftPadding + c->RightPadding + c->Size.X, Size.X);
-		}
-	}
-	if (Align == E_REVERSE || Align == E_CENTERED)
-	{
-		if (!Parent)
 		{
 			if (ChildrenHorizontal)
 			{
-				OffsetPosition = Vector2(0, -Size.Y) + Position;
+				if (Align == E_REVERSE)
+				{
+					c->OffsetPosition = OffsetPosition + Vector2(Size.X - Offset - c->Size.X - c->LeftPadding, c->DownPadding);
+				}
+				else
+				{
+					c->OffsetPosition = OffsetPosition + Vector2(Offset + c->LeftPadding, c->DownPadding);
+				}
+				Offset += c->Size.X + c->LeftPadding + c->RightPadding;
 			}
 			else
 			{
-				OffsetPosition = Position;
+				if (Align == E_REVERSE)
+				{
+					c->OffsetPosition = OffsetPosition + Vector2(c->LeftPadding, Size.Y - Offset - c->Size.Y - c->DownPadding);
+				}
+				else
+				{
+					c->OffsetPosition = OffsetPosition + Vector2(c->LeftPadding, Offset + c->DownPadding);
+				}
+				Offset += c->Size.Y + c->DownPadding + c->UpPadding;
 			}
-		}
-		if (ChildrenHorizontal)
-		{
-			Size.X = -Size.X;
-			Size.Y = Size.Y;
-		}
-		else
-		{
-			Size.X = Size.X;
-			Size.Y = -Size.Y;
 		}
 	}
 	for (auto c : Children)
 	{
+		c->UpdatePosition();
+		c->Update();
 		if (c->TryFill)
 		{
 			if (ChildrenHorizontal)
 			{
-				c->Size.Y = TestWidth - c->DownPadding - c->UpPadding;
+				c->Size.Y = Size.Y - (c->UpPadding + c->DownPadding);
+				c->Size = c->Size.Clamp(c->MinSize, c->MaxSize);
 			}
 			else
 			{
-				c->Size.X = TestWidth - c->LeftPadding - c->RightPadding;
+				c->Size.X = Size.X - (c->LeftPadding + c->RightPadding);
+				c->Size = c->Size.Clamp(c->MinSize, c->MaxSize);
 			}
 		}
 	}
-	if (TryFill && Parent)
-	{
-		if (Parent->ChildrenHorizontal && Size.Y < PreviousSize.Y)
-		{
-			Size.Y = PreviousSize.Y;
-		}
-		if (!Parent->ChildrenHorizontal && Size.X < PreviousSize.X)
-		{
-			Size.X = PreviousSize.X;
-		}
-	}
-	Size.X = std::min(AdjustedMaxSize.X, Size.X);
-	Size.Y = std::min(AdjustedMaxSize.Y, Size.Y);
-	Size.X = std::max(AdjustedMinSize.X, Size.X);
-	Size.Y = std::max(AdjustedMinSize.Y, Size.Y);
-	for (auto c : Children)
-	{
-		if (c->HasChanged)
-		c->UpdateSelfAndChildren();
-	}
-	Update();
 }
 
 void UIBox::InvalidateLayout()
 {
 	UI::RequiresRedraw = true;
-	HasChanged = true;
 	if (Parent)
 	{
 		Parent->InvalidateLayout();
@@ -491,7 +454,6 @@ void UIBox::DrawAllUIElements()
 
 void UIBox::DrawThisAndChildren()
 {
-	HasChanged = false;
 	for (auto c : Children)
 	{
 		c->UpdateTickState();

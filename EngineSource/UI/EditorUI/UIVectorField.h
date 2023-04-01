@@ -3,6 +3,7 @@
 
 class UICanvas;
 class UITextField;
+class UIBackground;
 class TextRenderer;
 
 class UIVectorField : public UIBox
@@ -15,6 +16,8 @@ public:
 	};
 protected:
 	UITextField* TextFields[3];
+	UIBackground* ColorDisplay = nullptr;
+	void UpdateValues();
 	Vector3 Value;
 	void Generate();
 	TextRenderer* Renderer;
