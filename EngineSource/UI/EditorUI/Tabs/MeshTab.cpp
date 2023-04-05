@@ -34,7 +34,7 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 
 	TabBackground->Align = UIBox::E_REVERSE;
 	TabName = new UIText(1, 1, "Model: ", Renderer);
-	TabName->SetPadding(0.05, 0, 0.05, 0);
+	TabName->SetPadding(0.1, 0.05, 0.05, 0);
 	if (!PreviewBuffer)
 	{
 		PreviewBuffer = new FramebufferObject();

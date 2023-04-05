@@ -1,6 +1,6 @@
-#if 0
+#if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorPanel.h>
+#include <UI/EditorUI/Tabs/EditorTab.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <Rendering/Particle.h>
 #include <World/Graphics.h>
@@ -10,7 +10,7 @@
 class TextRenderer;
 class UIText;
 
-class ParticleEditorPanel : public EditorPanel
+class ParticleEditorTab : public EditorTab
 {
 	std::vector<std::string> ElementMaterials = 
 	{
@@ -35,7 +35,6 @@ class ParticleEditorPanel : public EditorPanel
 	std::vector<UIBox*> GeneratedUI;
 	std::vector<UIBox*> SettingsButtons;
 
-	ScrollObject ElementScrollObject = ScrollObject(Vector2(0.3f, 0.65f), Vector2(0.4, 1.2), 15);
 	TextRenderer* TabText = nullptr;
 	UIBackground* ParticleViewport = nullptr;
 	UIScrollBox* ParticleSettingsScrollBox = nullptr;
@@ -48,13 +47,14 @@ class ParticleEditorPanel : public EditorPanel
 	UIText* ParticleViewportText = nullptr;
 	UIText* SelectedElementText = nullptr;
 public:
-	ParticleEditorPanel(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture);
+	void UpdateLayout() override;
+	ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture);
 	void Tick() override;
 	void Load(std::string File) override;
 	void ReloadMesh();
 	void Save() override;
 	void Generate();
 	void OnButtonClicked(int Index) override;
-	virtual ~ParticleEditorPanel();
+	virtual ~ParticleEditorTab();
 };
 #endif

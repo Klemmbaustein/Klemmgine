@@ -4,8 +4,7 @@
 
 void UIText::Tick()
 {
-	Vector2 NewMin = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, WrapDistance)
-		/ ((30 + Renderer->CharacterSizeInPixels / 2) / 60.f);
+	Vector2 NewMin = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, WrapDistance);
 	if (TextWidthOverride > 0)
 	{
 		NewMin.X = std::max(MinSize.X, TextWidthOverride);
@@ -150,7 +149,8 @@ void UIText::Draw()
 {
 	if (IsDynamic)
 	{
-		Renderer->RenderText(RenderedText, OffsetPosition, TextSize * 2, Color, Opacity, 999, CurrentScrollObject);
+		Renderer->RenderText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
+			TextSize * 2, Color, Opacity, 999, CurrentScrollObject);
 	}
 	else if (Text)
 	{
@@ -166,11 +166,13 @@ void UIText::Update()
 		if (Text) delete Text;
 		if (Wrap)
 		{
-			Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - 0.025f), TextSize * 2, Color, Opacity, WrapDistance);
+			Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
+				TextSize * 2, Color, Opacity, WrapDistance);
 		}
 		else
 		{
-			Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - 0.025f), TextSize * 2, Color, Opacity, 999);
+			Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
+				TextSize * 2, Color, Opacity, 999);
 		}
 	}
 }

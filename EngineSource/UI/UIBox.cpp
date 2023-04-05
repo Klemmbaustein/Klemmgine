@@ -333,12 +333,13 @@ void UIBox::UpdatePosition()
 		{
 			if (ChildrenHorizontal)
 			{
-				c->OffsetPosition = OffsetPosition + Vector2(Size.X / 2 - ChildrenSize / 2 - c->LeftPadding, c->DownPadding);
+				c->OffsetPosition = OffsetPosition + Vector2(Size.X / 2 - ChildrenSize / 2 + c->LeftPadding, c->DownPadding);
 				Offset += c->Size.X + c->LeftPadding + c->RightPadding;
 			}
 			else
 			{
-
+				c->OffsetPosition = OffsetPosition + Vector2(c->LeftPadding, Size.Y / 2 - ChildrenSize / 2 + c->DownPadding);
+				Offset += c->Size.Y + c->DownPadding + c->UpPadding;
 			}
 		}
 		else
@@ -347,7 +348,7 @@ void UIBox::UpdatePosition()
 			{
 				if (Align == E_REVERSE)
 				{
-					c->OffsetPosition = OffsetPosition + Vector2(Size.X - Offset - c->Size.X - c->LeftPadding, c->DownPadding);
+					c->OffsetPosition = OffsetPosition + Vector2(Size.X - Offset - c->Size.X - c->RightPadding, c->DownPadding);
 				}
 				else
 				{
@@ -359,7 +360,7 @@ void UIBox::UpdatePosition()
 			{
 				if (Align == E_REVERSE)
 				{
-					c->OffsetPosition = OffsetPosition + Vector2(c->LeftPadding, Size.Y - Offset - c->Size.Y - c->DownPadding);
+					c->OffsetPosition = OffsetPosition + Vector2(c->LeftPadding, Size.Y - Offset - c->Size.Y - c->UpPadding);
 				}
 				else
 				{

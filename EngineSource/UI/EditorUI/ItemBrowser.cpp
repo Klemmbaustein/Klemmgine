@@ -360,6 +360,18 @@ void ItemBrowser::Tick()
 			Editor::CurrentUI->ShowDropdownMenu(
 			{
 				EditorUI::DropdownItem("# Create"),
+				EditorUI::DropdownItem("Folder", []()
+				{
+					try
+					{
+						std::filesystem::create_directory(Editor::CurrentUI->CurrentPath + "/Folder");
+					}
+					catch(std::exception)
+					{
+
+					}
+					Editor::CurrentUI->UIElements[3]->UpdateLayout();
+				}),
 				EditorUI::DropdownItem("Material", []()
 				{
 					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Material", "jsmat");
@@ -373,6 +385,11 @@ void ItemBrowser::Tick()
 				EditorUI::DropdownItem("Scene", []()
 				{
 					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Scene", "jscn");
+					Editor::CurrentUI->UIElements[3]->UpdateLayout();
+				}),
+				EditorUI::DropdownItem("Particle", []()
+				{
+					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Particle", "jspart");
 					Editor::CurrentUI->UIElements[3]->UpdateLayout();
 				})
 			},
@@ -598,6 +615,10 @@ void ItemBrowser::OnButtonClicked(int Index)
 		if (Ext == "jsmtmp")
 		{
 			Viewport::ViewportInstance->OpenTab(3, CurrentFiles[Index].Name);
+		}
+		if (Ext == "jspart")
+		{
+			Viewport::ViewportInstance->OpenTab(4, CurrentFiles[Index].Name);
 		}
 	}
 	if (Index >= 0 && SelectedTab == 1)

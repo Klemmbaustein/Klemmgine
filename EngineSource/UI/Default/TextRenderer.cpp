@@ -129,9 +129,8 @@ TextRenderer::TextRenderer(std::string filename, float CharacterSizeInPixels)
 Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, float LengthBeforeWrap)
 {
 	float originalScale = Scale;
-	Scale /= 2.f;
 	Scale /= CharacterSizeInPixels;
-	Scale *= 30.0f;
+	Scale *= 60.0f;
 	LengthBeforeWrap *= 1350 * Graphics::AspectRatio;
 	stbtt_bakedchar* cdata = (stbtt_bakedchar*)cdatapointer;
 	std::string TextString = TextSegment::CombineToString(Text);
@@ -163,7 +162,7 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 		}
 	}
 
-	return (Vector2(x, y + CharacterSizeInPixels) / Vector2(1800 * Graphics::AspectRatio, 1800)) * originalScale / CharacterSizeInPixels * 90;
+	return (Vector2(x, y + CharacterSizeInPixels) / Vector2(1800 * Graphics::AspectRatio, 1800)) * Scale;
 }
 
 Vector2 TextRenderer::RenderText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap, ScrollObject* CurrentScrollObject)

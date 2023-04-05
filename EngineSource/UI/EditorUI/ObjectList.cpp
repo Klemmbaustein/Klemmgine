@@ -138,7 +138,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 			ListEntryObjectColor->SetColor(Editor::ItemColors["dir"]);
 			ListEntryText = new UIText(0.3, 0.7, Object.IsScene ? "Scene" : "Category", Editor::CurrentUI->EngineUIText);
 		}
-		ListEntryText->SetPadding(-0.01, 0.01, 0.01, 0.01);
+		ListEntryText->SetPadding(0.005, 0.005, 0.01, 0.01);
 		ListEntryText->Wrap = true;
 		ListEntryText->WrapDistance = 0.3;
 		TextBox->AddChild(ListEntryText);
