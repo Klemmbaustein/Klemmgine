@@ -60,7 +60,7 @@ MaterialTemplateTab::MaterialTemplateTab(Vector3* UIColors, TextRenderer* Text, 
 
 	TabBackground->Align = UIBox::E_REVERSE;
 	TabName = new UIText(1, 1, "Material Template: ", Renderer);
-	TabName->SetPadding(0.05, 0, 0.05, 0);
+	TabName->SetPadding(0.05, 0.1, 0.05, 0);
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);

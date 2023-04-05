@@ -17,8 +17,10 @@ public:
 	void Load(std::string File) override;
 	void LoadTemplate(std::string Template);
 	void FetchTemplate(std::string Template);
+	void UpdateLayout() override;
 	void Save();
 	void GenerateUI();
+	void GenerateMaterialProperties();
 private:
 	UITextField* ShaderTextFields[2];
 	std::vector<UIBox*> TextFields;

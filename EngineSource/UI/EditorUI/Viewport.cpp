@@ -14,6 +14,7 @@
 #include <UI/EditorUI/Tabs/MeshTab.h>
 #include <UI/EditorUI/Tabs/MaterialTab.h>
 #include <UI/EditorUI/Tabs/MaterialTemplateTab.h>
+#include <UI/EditorUI/Tabs/ParticleEditorTab.h>
 #include <UI/EditorUI/Tabs/CubemapTab.h>
 #include <Engine/FileUtility.h>
 
@@ -66,8 +67,9 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 	{
 		nullptr,
 		new MeshTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
-		new MaterialTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[3]),
+		new MaterialTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[12]),
 		new MaterialTemplateTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4]),
+		new ParticleEditorTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4], Editor::CurrentUI->Textures[12]),
 		new CubemapTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText)
 	};
 
@@ -257,6 +259,7 @@ void Viewport::Tick()
 		if (Dragging)
 		{
 			Dragging = false;
+			Editor::CurrentUI->UIElements[6]->UpdateLayout();
 		}
 	}
 
@@ -363,7 +366,7 @@ void Viewport::UpdateTabBar()
 			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01, 0.05)))
 				->SetPadding(0))
 			->AddChild((new UIText(0.45, 1, FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText))
-				->SetPadding(0.005, 0.005, 0.005, 0));
+				->SetPadding(0.005, 0.005, 0.005, 0.005));
 		elem->SetTryFill(true);
 		if (Tabs[i].CanBeClosed)
 		{

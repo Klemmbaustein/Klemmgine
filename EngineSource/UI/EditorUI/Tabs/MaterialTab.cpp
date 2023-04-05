@@ -65,12 +65,11 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int Rel
 
 	TabBackground->Align = UIBox::E_REVERSE;
 	TabName = new UIText(1, 1, "Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
-	TabName->SetPadding(0.05, 0, 0.05, 0);
+	TabName->SetPadding(0.1, 0.05, 0.05, 0);
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);
 	Rows[0] = new UIScrollBox(false, 0, 25);
-	Rows[0]->SetMaxSize(Vector2(999, 1.1));
 	RowBox->AddChild(Rows[0]);
 	Rows[0]->Align = UIBox::E_REVERSE;
 
@@ -193,6 +192,14 @@ void MaterialTab::FetchTemplate(std::string Template)
 	GenerateUI();
 }
 
+void MaterialTab::UpdateLayout()
+{
+	Rows[0]->SetMinSize(Vector2(0, TabBackground->GetMinSize().Y - 0.275));
+	Rows[0]->SetMaxSize(Vector2(2, TabBackground->GetMinSize().Y - 0.275));
+	GenerateMaterialProperties();
+
+}
+
 void MaterialTab::Save()
 {
 	Material::SaveMaterialFile(Filepath, LoadedMaterial, false);
@@ -280,6 +287,13 @@ void MaterialTab::GenerateUI()
 		Rows[0]->AddChild(ElementBox);
 		ButtonIndex++;
 	}
+}
+
+void MaterialTab::GenerateMaterialProperties()
+{
+	Rows[1]->DeleteChildren();
+	Rows[1]->AddChild(new UIText(1, 1, "hi", Renderer));
+
 }
 
 #endif

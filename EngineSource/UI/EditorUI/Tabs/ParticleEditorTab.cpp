@@ -1,5 +1,5 @@
-#if 0
-#include "ParticleEditorPanel.h"
+#if EDITOR
+#include "ParticleEditorTab.h"
 #include <World/Stats.h>
 #include <UI/UIButton.h>
 #include <UI/EditorUI/UIVectorField.h>
@@ -13,7 +13,13 @@
 #include <UI/UIScrollBox.h>
 #include <Rendering/Mesh/Mesh.h>
 
-ParticleEditorPanel::ParticleEditorPanel(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture) : EditorPanel(UIColors)
+void ParticleEditorTab::UpdateLayout()
+{
+	ParticleViewport->SetPosition(TabBackground->GetPosition());
+	Generate();
+}
+
+ParticleEditorTab::ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture) : EditorTab(UIColors)
 {
 	ParticleFramebufferObject = new FramebufferObject();
 	ParticleFramebufferObject->UseMainWindowResolution = true;
@@ -33,13 +39,13 @@ ParticleEditorPanel::ParticleEditorPanel(Vector3* UIColors, TextRenderer* Text, 
 	ParticleViewportText->SetPadding(0.01);
 	SelectedElementText = new UIText(0.7, Vector3(1), "Particle has no elements", Text);
 	SelectedElementText->IsVisible = false;
-	SelectedElementText->SetPosition(Vector2(-0.05, 0.5));
+	SelectedElementText->SetPosition(Vector2(TabBackground->GetPosition() + TabBackground->GetUsedSize() * Vector2(0.5, 0.9)));
 	ParticleViewport->AddChild(ParticleViewportText);
 	TabText = Text;
 	Generate();
 }
 
-void ParticleEditorPanel::Tick()
+void ParticleEditorTab::Tick()
 {
 	ParticleFramebufferObject->FramebufferCamera = Graphics::MainCamera;
 	ParticleViewport->SetUseTexture(true, ParticleFramebufferObject->GetTextureID());
@@ -59,7 +65,7 @@ void ParticleEditorPanel::Tick()
 	{
 		UIBox::RedrawUI();
 	}
-	ParticleViewportText->SetText("Particle: " + GetFileNameWithoutExtensionFromPath(CurrentSystemFile)
+	ParticleViewportText->SetText("Particle: " + FileUtil::GetFileNameWithoutExtensionFromPath(CurrentSystemFile)
 		+ " (" + std::to_string(Particle->ParticleElements.size()) + "/255 elements)");
 
 	if (!Particle->IsActive)
@@ -73,7 +79,7 @@ void ParticleEditorPanel::Tick()
 	}
 }
 
-void ParticleEditorPanel::Load(std::string File)
+void ParticleEditorTab::Load(std::string File)
 {
 	CurrentSystemFile = File;
 	Graphics::MainCamera->Position = Vector3(0, 4, 15);
@@ -107,16 +113,16 @@ void ParticleEditorPanel::Load(std::string File)
 	Generate();
 }
 
-void ParticleEditorPanel::ReloadMesh()
+void ParticleEditorTab::ReloadMesh()
 {
 }
 
-void ParticleEditorPanel::Save()
+void ParticleEditorTab::Save()
 {
 	Particles::ParticleEmitter::SaveToFile(Particle->ParticleElements, ElementMaterials, CurrentSystemFile);
 }
 
-void ParticleEditorPanel::Generate()
+void ParticleEditorTab::Generate()
 {
 	Particle->Reset();
 	for (auto* elem : SettingsButtons)
@@ -128,11 +134,11 @@ void ParticleEditorPanel::Generate()
 		delete elem;
 	}
 	GeneratedUI.clear();
-
+	SelectedElementText->SetPosition(Vector2(TabBackground->GetPosition() + TabBackground->GetUsedSize() * Vector2(0.5, 1) - Vector2(0.1, 0.2)));
 	for (unsigned int i = 0; i < Particle->ParticleElements.size(); i++)
 	{
 		Vector3 Color = i == SelectedElement ? Vector3(0.3f) : Vector3(0.15f);
-		auto ButtonBox = new UIBox(true, Vector2(-0.65f, 0.4f - (i / 8.f)));
+		auto ButtonBox = new UIBox(true, TabBackground->GetPosition() + Vector2(0.05, TabBackground->GetUsedSize().Y - 0.2 - (i / 10.f)));
 		auto NewButton = new UIButton(true, 0, Color, this, 200 + i);
 		NewButton->SetMinSize(Vector2(0.2, 0));
 		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
@@ -156,7 +162,7 @@ void ParticleEditorPanel::Generate()
 		SelectedElementText->SetText("Particle has no elements");
 	}
 	{
-		auto NewButton = new UIButton(true, Vector2(-0.65f, 0.4f - (Particle->ParticleElements.size() / 8.f)), 1, this, 0);
+		auto NewButton = new UIButton(true, TabBackground->GetPosition() + Vector2(0.05, TabBackground->GetUsedSize().Y - 0.2 - (Particle->ParticleElements.size() / 10.f)), 1, this, 0);
 		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
 		GeneratedUI.push_back(NewButton);
 		NewButton->SetMinSize(Vector2(0.2, 0));
@@ -164,20 +170,20 @@ void ParticleEditorPanel::Generate()
 	}
 	SettingsButtons.clear();
 	if (ParticleSettingsScrollBox) delete ParticleSettingsScrollBox;
-	ParticleSettingsScrollBox = new UIScrollBox(true, Vector2(-0.1f, -0.59), 15);
-	ParticleSettingsScrollBox->SetMaxSize(Vector2(0.6, 1));
-	ParticleSettingsScrollBox->SetMinSize(Vector2(0, 1));
+	ParticleSettingsScrollBox = new UIScrollBox(true, TabBackground->GetPosition() + Vector2(TabBackground->GetUsedSize().X * 0.5 - 0.1, 0), 10);
+	float ScrollSize = TabBackground->GetUsedSize().Y - 0.2;
+	ParticleSettingsScrollBox->SetMaxSize(Vector2(0.6, ScrollSize));
+	ParticleSettingsScrollBox->SetMinSize(Vector2(0, ScrollSize));
 	UIBox* ScrollBoxes[2];
-	ScrollBoxes[0] = new UIBox(false, 0);
-	ScrollBoxes[1] = new UIBox(false, 0);
-	ScrollBoxes[0]->Align = UIBox::E_REVERSE;
-	ScrollBoxes[1]->Align = UIBox::E_REVERSE;
-	ScrollBoxes[0]->SetMinSize(Vector2(0.3, 1));
-	ScrollBoxes[1]->SetMinSize(Vector2(0.3, 1));
-	ScrollBoxes[0]->SetMaxSize(Vector2(0.3, 1));
-	ScrollBoxes[1]->SetMaxSize(Vector2(0.3, 1));
-	ParticleSettingsScrollBox->AddChild(ScrollBoxes[0]);
-	ParticleSettingsScrollBox->AddChild(ScrollBoxes[1]);
+	for (auto& i : ScrollBoxes)
+	{
+		i = new UIBox(false, 0);
+		i->Align = UIBox::E_REVERSE;
+		i->SetPadding(0);
+		i->SetMinSize(Vector2(0.3, ScrollSize));
+		i->SetMaxSize(Vector2(0.3, ScrollSize));
+		ParticleSettingsScrollBox->AddChild(i);
+	}
 
 	if (SelectedElement < Particle->ParticleElements.size())
 	{
@@ -289,7 +295,7 @@ void ParticleEditorPanel::Generate()
 	}
 }
 
-void ParticleEditorPanel::OnButtonClicked(int Index)
+void ParticleEditorTab::OnButtonClicked(int Index)
 {
 	if (!TabBackground->IsVisible) return;
 	try
@@ -387,7 +393,7 @@ void ParticleEditorPanel::OnButtonClicked(int Index)
 	}
 }
 
-ParticleEditorPanel::~ParticleEditorPanel()
+ParticleEditorTab::~ParticleEditorTab()
 {
 }
 #endif

@@ -71,7 +71,7 @@ public:
 	UIBox* Dropdown = nullptr;
 	Vector3 UIColors[3] =
 	{
-		Vector3(0.1, 0.1, 0.11),	//Default background
+		Vector3(0.09, 0.09, 0.1),	//Default background
 		Vector3(0.07f),				//Dark background
 		Vector3(1)					//Highlight color
 		//Vector3(0.9, 0.9, 0.9),	//Default background

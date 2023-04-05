@@ -8,7 +8,7 @@ StatusBar::StatusBar(Vector3* Colors) : EditorPanel(Colors, Vector2(-1, 0.95), V
 {
 	TabBackground->SetColor(Colors[1]);
 	Texts[0] = new UIText(0.6, UIColors[2] * 0.9, "FPS: ?", Editor::CurrentUI->EngineUIText);
-	TabBackground->AddChild(Texts[0]->SetPadding(0, -0.01, 0.01, 0));
+	TabBackground->AddChild(Texts[0]->SetPadding(0.005, 0.005, 0.01, 0.025));
 	Texts[1] = new UIText(0.4, UIColors[2] * 0.7, ProjectName, Editor::CurrentUI->EngineUIText);
 	TabBackground->AddChild(Texts[1]->SetPadding(0, 0.01, 0.01, 0));
 	Texts[2] = new UIText(0.4, UIColors[2] * 0.7, std::string(VERSION_STRING) + "-Editor", Editor::CurrentUI->EngineUIText);

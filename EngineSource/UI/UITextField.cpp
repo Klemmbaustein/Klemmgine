@@ -62,7 +62,7 @@ void UITextField::MakeGLBuffers()
 
 void UITextField::Tick()
 {
-	TextObject->WrapDistance = std::max(std::max(Size.X, GetMinSize().X), 0.1f);
+	TextObject->WrapDistance = std::max(std::max(Size.X * 1.3f, GetMinSize().X), 0.1f);
 
 	ButtonColorMultiplier = 1.f;
 	Vector2 Offset;
@@ -201,7 +201,10 @@ UITextField::UITextField(bool Horizontal, Vector2 Position, Vector3 Color, UICan
 	TextObject = new UIText(0, Vector3(1), HintText, Renderer);
 	TextObject->SetTextSize(0.5);
 	TextObject->SetPadding(0.005);
-	TextObject->SetTryFill(true);
+	SetHorizontal(false);
+	this->Align = UIBox::E_REVERSE;
+	
+	//TextObject->SetTryFill(true);
 	TextObject->Wrap = true;
 	AddChild(TextObject);
 	MakeGLBuffers();
