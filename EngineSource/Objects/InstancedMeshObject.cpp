@@ -12,8 +12,8 @@ void InstancedMeshObject::Tick()
 	{
 		for (int i = 0; i < Ammount; i++)
 		{
-			Vector3 Loc = Vector3(Random::GetRandomNumber(-Range, Range),
-				0, Random::GetRandomNumber(-Range, Range));
+			Vector3 Loc = Vector3(Random::GetRandomFloat(-Range, Range),
+				0, Random::GetRandomFloat(-Range, Range));
 
 			Collision::HitResponse Hit = Collision::LineTrace(GetTransform().Location + Loc, GetTransform().Location + Loc - Vector3(0, 100, 0));
 			Vector3 AxisA = Vector3(Hit.Normal.Y, Hit.Normal.Z, Hit.Normal.X);
@@ -26,13 +26,13 @@ void InstancedMeshObject::Tick()
 				{
 					AddInstance(Transform(Hit.ImpactPoint - GetTransform().Location,
 						Rotation,
-						Scale * Random::GetRandomNumber(15, 25) / 20));
+						Scale * Random::GetRandomFloat(15, 25) / 20));
 				}
 				else if (ComponentName == Hit.HitObject->GetName())
 				{
 					AddInstance(Transform(Hit.ImpactPoint - GetTransform().Location,
 						Rotation,
-						Scale * Random::GetRandomNumber(15, 25) / 20));
+						Scale * Random::GetRandomFloat(15, 25) / 20));
 				}
 			}
 
