@@ -51,7 +51,7 @@ std::map<std::string, std::string> LibraryFiles =
 
 void GenerateFiles()
 {
-	for (auto i : LibraryPaths)
+	for (auto& i : LibraryPaths)
 	{
 		if (i.second.empty())
 		{
@@ -77,7 +77,7 @@ void GenerateFiles()
 	Values.insert(std::pair("al_lib", LibraryPaths["OpenAL library path"]));
 	Out = std::ofstream("../paths.txt");
 
-	for (auto v : Values)
+	for (auto& v : Values)
 	{
 		Out << v.first << "=" << v.second << std::endl;
 	}
@@ -87,7 +87,7 @@ void GenerateFiles()
 		try
 		{
 			auto f = Util::GetAllFilesInFolder("../EngineSource", true, true);
-			for (auto i : f)
+			for (auto& i : f)
 			{
 				Log::Print("Found engine source code: " + i);
 			}
@@ -119,6 +119,48 @@ namespace Background
 	extern std::string BackgroundTask;
 }
 
+void LoadLibraryPackage(std::string Package)
+{
+	std::map<std::string, std::string> Folders =
+	{
+		std::pair("Assimp", "assimp"),
+		std::pair("GLEW", "glew"),
+		std::pair("glm", "glm"),
+		std::pair("OpenAL", "OpenAL"),
+		std::pair("SDL2", "SDL2")
+	};
+	if (Package.empty()) return;
+	for (auto& i : Folders)
+	{
+		if (!std::filesystem::exists(Package + "/" + i.first))
+		{
+			Util::Notify(Package + " does not have all required libraries.\nMissing: " + i.first);
+			return;
+		}
+		if (!std::filesystem::exists(Package + "/" + i.first + "/include"))
+		{
+			Util::Notify(Package + " does not have all required files.\nMissing: " + i.first + " include files");
+			return;
+		}
+		if (!std::filesystem::exists(Package + "/" + i.first + "/lib") && i.first != "glm")
+		{
+			Util::Notify(Package + " does not have all required files.\nMissing: " + i.first + " library files");
+			return;
+		}
+	}
+	
+	for (auto& i : Folders)
+	{
+		LibraryPaths[i.second + " include path"] = std::filesystem::absolute(Package + "/" + i.first + "/include").string();
+		if (i.first != "glm")
+		{
+			LibraryPaths[i.second + " library path"] = std::filesystem::absolute(Package + "/" + i.first + "/lib").string();
+		}
+	}
+	Installation::UpdateLibrayPaths();
+}
+
+
 void AskForInstallation(std::string Filepath)
 {
 	Background::BackgroundTask = "Setting filepath";
@@ -133,18 +175,35 @@ namespace Installation
 	unsigned int LoadFileTexture;
 	TextRenderer* Text;
 	std::vector<UIButton*> FileButtons;
+	UIBox* PackageBackground = nullptr;
 }
 
 void Installation::ManageFirstInstall(TextRenderer* t)
 {
 	Log::Print("A new installation has been detected");
 	Text = t;
-	TextBackground = new UIBox(false, Vector2f(-0.9, -0.4));
+	auto HorizontalBox = new UIBox(true, Vector2f(-0.95, -0.4));
+
+	TextBackground = new UIBox(false, Vector2f(-0.95, -0.4));
 	TextBackground->Align = UIBox::E_REVERSE;
 	TextBackground->SetMaxSize(1);
 	TextBackground->SetMinSize(1);
-	LoadFileTexture = Texture::LoadTexture("Textures/Folder.png");
+	TextBackground->SetPadding(0);
+	HorizontalBox->AddChild(TextBackground);
+	HorizontalBox->AddChild((new UIBackground(true, 0, 0.4, Vector2f(0.005, 1)))
+		->SetPadding(0, 0, 0.05, 0.05));
 
+	PackageBackground = new UIBox(false, 0);
+	HorizontalBox->AddChild(PackageBackground
+		->AddChild((new UIText(0.5, 0, "or provide path to library package", Text))
+			->SetPadding(0))
+		->AddChild((new UIButton(true, 0, Vector3f32(0, 0.8, 0), []() { LoadLibraryPackage(Util::ShowSelectFolderDialog()); }))
+			->SetBorder(UIBox::E_ROUNDED, 0.75)
+			->AddChild((new UIText(0.4, 0, "Open library package", Text))->SetPadding(0.025))));
+	LoadFileTexture = Texture::LoadTexture("Textures/Folder.png");
+	PackageBackground->Align = UIBox::E_REVERSE;
+	PackageBackground->SetMinSize(1);
+	PackageBackground->SetMaxSize(1);
 	(new UIButton(true, Vector2f32(-0.9, -0.9), Vector3f32(0, 0.85, 0), []() {GenerateFiles(); }))
 		->SetBorder(UIBox::E_ROUNDED, 0.75)
 		->AddChild((new UIText(0.4, 0, "Generate", Text))
@@ -173,20 +232,30 @@ void Installation::ManageFirstInstall(TextRenderer* t)
 	UpdateLibrayPaths();
 }
 
+#define MAX_PATH_LENGTH 60
+
 void Installation::UpdateLibrayPaths()
 {
 	TextBackground->DeleteChildren();
+	TextBackground->AddChild(new UIText(0.5, 0, "Enter paths to required libraries here", Text));
 	TextBackground->AddChild((new UIBackground(true, 0, 0.4, Vector2f(1, 0.01)))->SetPadding(0));
 	FileButtons.clear();
-	for (auto& i : LibraryPaths)
+	for (std::pair i : LibraryPaths)
 	{
 		UIBox* b = new UIBox(true, 0);
 		std::string s = i.first;
-		s.resize(40, ' ');
+		s.resize(44, ' ');
+		std::string PathText = i.second;
+		if (PathText.size() > MAX_PATH_LENGTH - 3)
+		{
+			PathText = PathText.substr(0, MAX_PATH_LENGTH - 3) + "...";
+		}
+
+
 		b->AddChild((new UIBox(false, 0))
 			->AddChild((new UIText(0.275, std::filesystem::exists(i.second + "/" + LibraryFiles[i.first]) ? Vector3f32(0, 0.5, 0) : Vector3f32(0.5, 0, 0),
-				i.second.empty() ? "[No path selected]" : i.second, Text))->SetPadding(0.01, 0.01, 0, 0))
-			->AddChild((new UIText(0.4, 0, s, Text))->SetPadding(0)));
+				i.second.empty() ? "[No path selected]" : PathText, Text))->SetPadding(0))
+			->AddChild((new UIText(0.4, 0, s, Text))->SetPadding(-0.01, -0.01, 0, 0)));
 
 		UIButton* Button = (new UIButton(true, 0, Vector3f32(1, 0.8, 0), []() {
 			if (Background::BackgroundThread)

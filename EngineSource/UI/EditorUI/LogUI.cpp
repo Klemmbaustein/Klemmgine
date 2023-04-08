@@ -28,14 +28,6 @@ LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(U
 			->SetMaxSize((Scale * Vector2(0.68, 0.65)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)))));
 }
 
-void LogUI::Save()
-{
-}
-
-void LogUI::Load(std::string File)
-{
-}
-
 void LogUI::UpdateLayout()
 {
 	LogPromt->SetTryFill(true);

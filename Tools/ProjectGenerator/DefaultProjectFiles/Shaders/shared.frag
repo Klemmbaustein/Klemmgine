@@ -28,11 +28,9 @@ layout(location = 2) out vec4 f_position;
 
 in vec2 v_texcoord;
 in vec3 v_position;
-in vec3 v_modelnormal;
-in vec3 v_screenposition;
 in vec3 v_normal;
+in vec3 v_screenposition;
 in vec3 v_screennormal;
-in vec3 v_normmodelnormal;
 
 uniform sampler2DArray shadowMap;
 uniform mat4 u_view;
@@ -67,28 +65,24 @@ vec4 ApplyFogColor(vec4 InColor)
 	return vec4(mix(InColor, vec4(FogColor * 0.7, 1), clamp((Intensity), 0, 1)).xyz, 1);
 }
 
-float SampleFromShadowMap(vec2 Texcoords, float bias, vec2 texelSize, int layer, vec2 distances, float currentDepth)
-{
-	int i = 0;
-	float points[4];
 
-	for (int x = 0; x <= 1; ++x)
+#define PCF_SIZE 4
+#define PCF_HALF_SIZE 2
+
+
+float shadowValues[PCF_SIZE][PCF_SIZE];
+
+float SampleFromShadowMap(vec2 distances)
+{
+	float ShadowVal = 0;
+	for (int x = 0; x < PCF_SIZE - 1; ++x)
 	{
-		for (int y = 0; y <= 1; ++y)
+		for (int y = 0; y < PCF_SIZE - 1; ++y)
 		{
-			float pcfDepth;
-			pcfDepth = texture(shadowMap, vec3(Texcoords + vec2(x, y) * texelSize.rg, layer)).r;
-			points[i] = currentDepth > pcfDepth + bias ? 1.0 : 0.0;
-			i++;
+			ShadowVal += mix(mix(shadowValues[x][y], shadowValues[x + 1][y], distances.x), mix(shadowValues[x][y + 1], shadowValues[x + 1][y +  1], distances.x), distances.y);
 		}
 	}
-	return mix(mix(points[0], points[2], distances.x), mix(points[1], points[3], distances.x), distances.y);
-}
-float SampleFromShadowMapCheap(vec2 Texcoords, float bias, int layer, float currentDepth)
-{
-	float pcfDepth;
-	pcfDepth = texture(shadowMap, vec3(Texcoords, layer)).r;
-	return currentDepth > pcfDepth + bias ? 1.0 : 0.0;
+	return ShadowVal / ((PCF_SIZE - 1) * (PCF_SIZE - 1));
 }
 
 float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal)
@@ -138,26 +132,22 @@ float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal)
 	bias *= max((abs(u_biasmodifier * 2)), 0.5f) / 15.f;
 	if (u_biasmodifier < -0.95)
 		bias *= 2;
-	bias *= 0.05;
+	bias *= 0.07;
 	bias *= max(4096 / textureSize(shadowMap, 0).x*1.5f, 1);
+
 	// PCF
 	float shadow = 0.f;
 	vec2 distances = vec2(mod(projCoords.x, texelSize.x), mod(projCoords.y, texelSize.y)) * vec2(u_textureres);
-	int i = 0;
-	for (int x = 0; x <= 1; x += 1)
+	for (int x = 0; x < PCF_SIZE; ++x)
 	{
-		for (int y = 0; y <= 1; y += 1)
+		for (int y = 0; y < PCF_SIZE; ++y)
 		{
-			shadow += SampleFromShadowMap(projCoords.xy + vec2(x, y) * (u_shadowQuality - 1) * texelSize, bias, texelSize, layer, distances, currentDepth);
-			i++;
+			float pcfDepth = texture(shadowMap, vec3(projCoords.xy + ivec2(x - PCF_HALF_SIZE, y - PCF_HALF_SIZE) * texelSize.rg, layer)).r;
+			shadowValues[x][y] = currentDepth > pcfDepth + bias ? 1.0 : 0.0;
 		}
 	}
-	shadow /= i;
-	shadow -= 0.1f;
-	shadow = max(shadow, 0);
-	shadow *= 1.3f;
-	shadow = min(shadow, 1.f);
-	return shadow;
+
+	return SampleFromShadowMap(distances);
 }
 
 vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, vec3 normal)
@@ -215,7 +205,7 @@ vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, v
 
 vec3 GetLighting(vec3 color, float specularstrength, float specularsize)
 {
-	return GetLightingNormal(color, specularstrength, specularsize, normalize(v_modelnormal));
+	return GetLightingNormal(color, specularstrength, specularsize, normalize(v_normal));
 }
 
 

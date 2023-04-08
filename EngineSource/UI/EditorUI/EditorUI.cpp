@@ -25,6 +25,7 @@ namespace Editor
 	EditorUI* CurrentUI = nullptr;
 	bool DraggingTab = false;
 	bool TabDragHorizontal = false;
+	bool DraggingPopup = false;
 	Vector2 DragMinMax;
 	Vector2 NewDragMinMax = DragMinMax;
 }
@@ -72,6 +73,7 @@ EditorUI::EditorUI()
 	Cursors[3] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_WAITARROW);
 	Cursors[4] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
 	Cursors[5] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
+	Cursors[6] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 	//new UIBackground(true, -1, 0.5, 2);
 
 	UIElements[0] = new StatusBar(UIColors);
@@ -91,6 +93,7 @@ void EditorUI::OnLeave(void(*ReturnF)())
 
 void EditorUI::Tick()
 {
+	Editor::DraggingPopup = false;
 	if (!Editor::DraggingTab)
 	{
 		Editor::NewDragMinMax = Vector2(-1, 1);

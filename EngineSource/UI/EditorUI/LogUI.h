@@ -10,8 +10,6 @@ class LogUI : public EditorPanel
 	std::vector<UIText*> LogTexts;
 public:
 	LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale);
-	void Save() override;
-	void Load(std::string File) override;
 	void UpdateLayout() override;
 
 	UITextField* LogPromt = nullptr;

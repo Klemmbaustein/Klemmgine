@@ -79,15 +79,6 @@ void ObjectList::UpdateLayout()
 	GenerateObjectListSection(ObjectList, 0);
 }
 
-void ObjectList::Save()
-{
-}
-
-void ObjectList::Load(std::string File)
-{
-}
-
-
 void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem> Section, float Depth)
 {
 	for (auto& Object : Section)
@@ -109,8 +100,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 		}
 		NewListEntryBackground->SetMinSize(Vector2(Scale.X / 1.2 - Depth, 0));
 		NewListEntryBackground->SetPadding(0.01, 0.0, 0.01 + Depth, 0.01);
-		auto ListEntryObjectColor = new UIBackground(true, 0, Vector3(0.5, 0.5, 0.5), Vector2(0.01, 0.05));
-		ListEntryObjectColor->SetTryFill(true);
+		auto ListEntryObjectColor = new UIBackground(true, 0, Vector3(0.5, 0.5, 0.5), Vector2(0.01, 0.055));
 		ListEntryObjectColor->SetPadding(0);
 		NewListEntryBackground->AddChild(ListEntryObjectColor);
 		auto TextBox = new UIBox(false, 0);
