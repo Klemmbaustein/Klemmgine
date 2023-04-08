@@ -4,6 +4,7 @@
 #include <Engine/Input.h>
 #include <Engine/Log.h>
 #include <UI/EditorUI/EditorUI.h>
+#include <UI/UIText.h>
 
 void EditorPanel::SetScale(Vector2 NewScale)
 {
@@ -14,8 +15,18 @@ void EditorPanel::SetScale(Vector2 NewScale)
 	clampedScale.Y = std::min(clampedScale.Y, MaxSize.Y);
 	if (Scale != clampedScale)
 	{
-		TabBackground->SetPosition(Position);
-		TabBackground->SetMinSize(clampedScale);
+		if (!IsPopup)
+		{
+			TabBackground->SetPosition(Position);
+			TabBackground->SetMinSize(clampedScale);
+		}
+		else
+		{
+			TabBackground->SetMinSize(clampedScale);
+			MainBackground->SetPosition(Position);
+			MainBackground->SetMinSize(clampedScale);
+			TitleBackground->SetMinSize(Vector2(clampedScale.X, 0));
+		}
 		Scale = clampedScale;
 		UpdateLayout();
 	}
@@ -24,14 +35,74 @@ void EditorPanel::SetScale(Vector2 NewScale)
 void EditorPanel::SetPosition(Vector2 NewPosition)
 {
 	Position = NewPosition;
-	TabBackground->SetPosition(Position);
-	TabBackground->SetMinSize(Scale);
+	if (!IsPopup)
+	{
+		TabBackground->SetPosition(Position);
+		TabBackground->SetMinSize(Scale);
+	}
+	else
+	{
+		TabBackground->SetMinSize(Scale);
+		MainBackground->SetPosition(Position);
+		MainBackground->SetMinSize(Scale);
+		TitleBackground->SetMinSize(Vector2(Scale.X, 0));
+	}
 	UpdateLayout();
+}
+
+EditorPanel::EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vector2 MinSize, Vector2 MaxSize, bool IsPopup, std::string Title) : UICanvas()
+{
+	this->UIColors = UIColors;
+
+	Scale.X = std::max(Scale.X, MinSize.X);
+	Scale.Y = std::max(Scale.Y, MinSize.Y);
+	Scale.X = std::min(Scale.X, MaxSize.X);
+	Scale.Y = std::min(Scale.Y, MaxSize.Y);
+
+	this->MinSize = MinSize;
+	this->MaxSize = MaxSize;
+
+	TabBackground = new UIBackground(true, Position, UIColors[0], Scale);
+	TabBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2);
+	this->Position = Position;
+	this->Scale = Scale;
+	//TabBackground->IsVisible = false;
+
+	if (IsPopup)
+	{
+		Position = Position - (Scale * 0.5);
+		MainBackground = new UIBox(false, Position);
+		MainBackground->AddChild(TabBackground);
+		TitleBackground = new UIBackground(true, Position, UIColors[0] * 0.75, Vector2(Scale.X, 0));
+		TitleText = new UIText(0.5, UIColors[2], Title, Editor::CurrentUI->EngineUIText);
+		TitleText->SetPadding(0.005);
+		TitleBackground->AddChild(TitleText);
+		MainBackground->AddChild(TitleBackground);
+		TabBackground->SetHorizontal(false);
+		TabBackground->Align = UIBox::E_REVERSE;
+		TabBackground->SetPadding(0);
+		TitleBackground->SetPadding(0);
+		this->Position = Position;
+		this->Scale = Scale;
+	}
+	this->IsPopup = IsPopup;
+}
+
+EditorPanel::~EditorPanel()
+{
+	if (IsPopup)
+	{
+		delete MainBackground;
+	}
+	else
+	{
+		delete TabBackground;
+	}
 }
 
 void EditorPanel::UpdatePanel()
 {
-	if (UI::HoveredButton && !Editor::DraggingTab)
+	if ((UI::HoveredButton && !Editor::DraggingTab) || Editor::CurrentUI->DraggedItem)
 	{
 		return;
 	}
@@ -44,6 +115,8 @@ void EditorPanel::UpdatePanel()
 	{
 		ClampedMousePosition = Input::MouseLocation.Clamp(Vector2(0, Editor::DragMinMax.X), Vector2(0, Editor::DragMinMax.Y));
 	}
+
+
 
 	Vector2 BorderScale = Vector2(0.01) * Vector2(1, Graphics::AspectRatio);
 	if (!Input::IsLMBDown)
@@ -67,13 +140,21 @@ void EditorPanel::UpdatePanel()
 		return;
 	}
 
-	bool HorizontalOverride = Editor::DraggingTab && !IsDragged && Editor::TabDragHorizontal
-		&& (Maths::NearlyEqual(ClampedMousePosition.X, Position.X, 0.02)
-		|| Maths::NearlyEqual(ClampedMousePosition.X, Position.X + Scale.X, 0.02));
+	if (IsPopup)
+	{
+		if (MainBackground->IsHovered() && Editor::CurrentUI->CurrentCursor == EditorUI::E_CROSS)
+		{
+			Editor::CurrentUI->CurrentCursor = EditorUI::E_DEFAULT;
+		}
+	}
 
-	bool VerticalOverride = Editor::DraggingTab && !IsDragged && !Editor::TabDragHorizontal
+	bool HorizontalOverride = !IsPopup && !Editor::DraggingPopup && (Editor::DraggingTab && !IsDragged && Editor::TabDragHorizontal
+		&& (Maths::NearlyEqual(ClampedMousePosition.X, Position.X, 0.02)
+		|| Maths::NearlyEqual(ClampedMousePosition.X, Position.X + Scale.X, 0.02)));
+
+	bool VerticalOverride = !IsPopup && !Editor::DraggingPopup && (Editor::DraggingTab && !IsDragged && !Editor::TabDragHorizontal
 		&& (Maths::NearlyEqual(ClampedMousePosition.Y, Position.Y, 0.02)
-			|| Maths::NearlyEqual(ClampedMousePosition.Y, Position.Y + Scale.Y, 0.02));
+			|| Maths::NearlyEqual(ClampedMousePosition.Y, Position.Y + Scale.Y, 0.02)));
 	if (HorizontalOverride || VerticalOverride || Maths::IsPointIn2DBox(Position, Position + Scale, ClampedMousePosition) && !IsDragged)
 	{
 		if (HorizontalOverride || (!VerticalOverride && !Maths::IsPointIn2DBox(Position + BorderScale * Vector2(1, 0),
@@ -83,12 +164,16 @@ void EditorPanel::UpdatePanel()
 			{
 				return;
 			}
-			if (Input::IsLMBDown)
+			if (Input::IsLMBDown && !Editor::DraggingPopup)
 			{
 				IsDragged = true;
-				Editor::DraggingTab = true;
-				Editor::TabDragHorizontal = true;
+				if (!IsPopup)
+				{
+					Editor::DraggingTab = true;
+					Editor::TabDragHorizontal = true;
+				}
 				IsDragHorizontal = true;
+				IsDraggingAll = false;
 			}
 			Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_WE;
 		}
@@ -99,16 +184,28 @@ void EditorPanel::UpdatePanel()
 			{
 				return;
 			}
-			if (Input::IsLMBDown)
+			if (Input::IsLMBDown && !Editor::DraggingPopup)
 			{
 				IsDragHorizontal = false;
-				Editor::DraggingTab = true;
-				Editor::TabDragHorizontal = false;
+				if (!IsPopup)
+				{
+					Editor::DraggingTab = true;
+					Editor::TabDragHorizontal = false;
+				}
 				IsDragged = true;
-
+				IsDraggingAll = false;
 			}
 			Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_NS;
 
+		}
+	}
+	if (IsPopup && TitleBackground->IsHovered() && !IsDragged)
+	{
+		Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_ALL;
+		if (Input::IsLMBDown)
+		{
+			IsDragged = true;
+			IsDraggingAll = true;
 		}
 	}
 	if (!IsMouseDown && Input::IsLMBDown)
@@ -121,10 +218,27 @@ void EditorPanel::UpdatePanel()
 
 	if (!IsDragged)
 	{
-
-		IsMouseDown = Input::IsLMBDown;
 		return;
 	}
+	else if (IsPopup)
+	{
+		if (IsDraggingAll)
+		{
+			Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_ALL;
+		}
+		else
+		{
+			Editor::CurrentUI->CurrentCursor = IsDragHorizontal ? EditorUI::E_RESIZE_WE : EditorUI::E_RESIZE_NS;
+		}
+	}
+
+	if (IsDraggingAll)
+	{
+		Editor::DraggingPopup = true;
+		SetPosition(InitialPosition + (ClampedMousePosition - InitialMousePosition));
+		return;
+	}
+
 	bool IsDraggingScale;
 	if (IsDragHorizontal)
 	{

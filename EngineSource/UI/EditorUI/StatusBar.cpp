@@ -3,6 +3,7 @@
 #include <UI/UIText.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/EngineProperties.h>
+#include <Engine/OS.h>
 
 StatusBar::StatusBar(Vector3* Colors) : EditorPanel(Colors, Vector2(-1, 0.95), Vector2(2, 0.05), Vector2(2, 0.05), Vector2(2, 0.05))
 {
@@ -13,14 +14,15 @@ StatusBar::StatusBar(Vector3* Colors) : EditorPanel(Colors, Vector2(-1, 0.95), V
 	TabBackground->AddChild(Texts[1]->SetPadding(0, 0.01, 0.01, 0));
 	Texts[2] = new UIText(0.4, UIColors[2] * 0.7, std::string(VERSION_STRING) + "-Editor", Editor::CurrentUI->EngineUIText);
 	TabBackground->AddChild(Texts[2]->SetPadding(0, 0.01, 0.01, 0));
-}
-
-void StatusBar::Save()
-{
-}
-
-void StatusBar::Load(std::string File)
-{
+	auto HelpButton = new UIButton(true, 0, UIColors[0] * 1.5, this, 0);
+	HelpButton->Align = UIBox::E_CENTERED;
+	TabBackground->AddChild(HelpButton
+		->SetPadding(0.01, 0.01, 0.02, 0.01)
+		->SetMinSize(0.03)
+		->SetBorder(UIBox::E_ROUNDED, 0.6)
+		->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
+		->AddChild((new UIText(0.4, UIColors[2] * 0.75, "?", Editor::CurrentUI->EngineUIText))
+			->SetPadding(0.001)));
 }
 
 void StatusBar::UpdateLayout()
@@ -38,5 +40,9 @@ void StatusBar::Tick()
 	}
 	DisplayedFPS++;
 	FPSUpdateTimer += Performance::DeltaTime;
+}
+void StatusBar::OnButtonClicked(int Index)
+{
+	OS::OpenFile("../../docs/docs/index.html");
 }
 #endif

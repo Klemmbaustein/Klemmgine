@@ -70,20 +70,13 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 		}));
 	RegisterNewButtonCategory(ButtonCategory("Project",
 		{
-			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[15], []() { Log::Print("TODO"); }),
+			/*
+			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[15], []() { Log::Print("TODO"); }),*/
 			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { new std::thread(Build::TryBuildProject, "Build/"); })
 
 		}));
 
 	GenerateButtons();
-}
-
-void Toolbar::Save()
-{
-}
-
-void Toolbar::Load(std::string File)
-{
 }
 
 void Toolbar::UpdateLayout()

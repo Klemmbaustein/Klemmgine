@@ -3,7 +3,7 @@
 #include <fstream>
 #include "Engine/FileUtility.h"
 #include <filesystem>
-#include <UI/EditorUI/EditorUI.h>
+#include <UI/EditorUI/Popups/DialogBox.h>
 
 
 namespace Importer
@@ -20,12 +20,12 @@ void Importer::Import(std::string InputFile, std::string CurrentFilePath)
 	{
 		From = InputFile;
 		To = OutputFileName;
-		//Editor::CurrentUI->ShowPopUpWindow("File already exists!", { PopUpButton("Replace", true, []()
-		//	{
-		//		std::filesystem::remove(To);
-		//		std::filesystem::copy(From, To);
-		//	}
-		//), PopUpButton("Cancel", false, nullptr) });
+		new DialogBox("File Import", 0, "File already exists!", { DialogBox::Answer("Replace", []()
+			{
+				std::filesystem::remove(To);
+				std::filesystem::copy(From, To);
+			}
+		), DialogBox::Answer("Cancel", nullptr) });
 	}
 	else
 	{

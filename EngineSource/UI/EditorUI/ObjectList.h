@@ -18,9 +18,6 @@ public:
 	void OnButtonClicked(int Index) override;
 	void UpdateLayout() override;
 
-	void Save() override;
-	void Load(std::string File) override;
-
 	void GenerateObjectListSection(std::vector<EditorUI::ObjectListItem> Section, float Depth);
 };
 #endif

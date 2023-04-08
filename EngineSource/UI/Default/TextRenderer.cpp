@@ -237,7 +237,7 @@ Vector2 TextRenderer::RenderText(ColoredText Text, Vector2 Pos, float Scale, Vec
 	}
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(FontVertex) * numVertices, fontVertexBufferData);
 	glDrawArrays(GL_TRIANGLES, 0, numVertices);
-	return (Vector2(x, y + CharacterSizeInPixels) / Vector2(1800 * Graphics::AspectRatio, 1800)) * originalScale;
+	return (Vector2(x, y + CharacterSizeInPixels) / Vector2(1800 * Graphics::AspectRatio, 1800)) * Scale;
 }
 
 DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap)

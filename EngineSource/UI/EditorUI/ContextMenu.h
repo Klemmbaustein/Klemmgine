@@ -38,8 +38,5 @@ public:
 	void Tick() override;
 	void OnButtonClicked(int Index) override;
 	void UpdateLayout() override;
-
-	void Load(std::string File) override;
-	void Save() override;
 };
 #endif

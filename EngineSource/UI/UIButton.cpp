@@ -60,6 +60,15 @@ void UIButton::MakeGLBuffers()
 
 void UIButton::Tick()
 {
+#if EDITOR
+	if (Editor::DraggingPopup || Editor::DraggingTab)
+	{
+		IsPressed = false;
+		IsHovered = false;
+		UI::NewHoveredButton = nullptr;
+		return;
+	}
+#endif
 	if (!IsVisible)
 	{
 		return;

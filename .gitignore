@@ -1,6 +1,7 @@
 # Folders not related to the engine itself
 Exports/
 Games/
+Docs/
 # VS files
 x64/
 Release/

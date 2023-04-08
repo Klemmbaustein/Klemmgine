@@ -86,13 +86,7 @@ void Viewport::ClearSelectedObjects()
 	SelectedObjects.clear();
 }
 
-void Viewport::Save()
-{
-}
 
-void Viewport::Load(std::string File)
-{
-}
 void Viewport::UpdateLayout()
 {
 	UpdateTabBar();
@@ -114,6 +108,7 @@ void Viewport::UpdateLayout()
 }
 void Viewport::Tick()
 {
+	bool TabHas3DView = !TabInstances[Tabs[SelectedTab].Index] || Tabs[SelectedTab].Index == 1 || Tabs[SelectedTab].Index == 4 || Tabs[SelectedTab].Index == 5;
 	Graphics::MainCamera->FOV = Maths::PI / 1.2;
 	UpdatePanel();
 
@@ -171,7 +166,7 @@ void Viewport::Tick()
 
 	if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation)
 		&& !Dragging
-		&& !TabInstances[Tabs[SelectedTab].Index])
+		&& TabHas3DView)
 	{
 
 		if (!Editor::CurrentUI->CurrentCursor) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor

@@ -44,8 +44,6 @@ public:
 
 	FramebufferObject* OutlineBuffer = nullptr, *ArrowsBuffer = nullptr;
 
-	void Save() override;
-	void Load(std::string File) override;
 	void UpdateLayout() override;
 	void Tick() override;
 };

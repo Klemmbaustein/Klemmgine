@@ -28,6 +28,7 @@ namespace Editor
 	extern EditorUI* CurrentUI;
 	extern bool DraggingTab;
 	extern bool TabDragHorizontal;
+	extern bool DraggingPopup;
 	extern Vector2 DragMinMax;
 	extern Vector2 NewDragMinMax;
 
@@ -55,6 +56,13 @@ namespace Editor
 		std::pair("cbm", 17),
 		std::pair("wav", 6),
 		std::pair("cpp", 0)
+	};
+
+	inline std::set<std::string> ModelFileExtensions =
+	{
+		"obj",
+		"fbx",
+		"gltf",
 	};
 }
 
@@ -88,7 +96,8 @@ public:
 		E_LOADING = 3,
 		E_RESIZE_WE = 4,
 		E_RESIZE_NS = 5,
-		E_LAST_CURSOR = 6
+		E_RESIZE_ALL = 6,
+		E_LAST_CURSOR = 7
 	};
 
 	struct DropdownItem
@@ -106,7 +115,7 @@ public:
 	std::string CurrentPath = "Content";
 
 protected:
-	SDL_Cursor* Cursors[6];
+	SDL_Cursor* Cursors[E_LAST_CURSOR];
 	std::vector<DropdownItem> CurrentDropdown;
 
 public:

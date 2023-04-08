@@ -24,6 +24,10 @@ Mesh::~Mesh()
 	delete MeshIndexBuffer;
 	for (Uniform& u : Uniforms)
 	{
+		if (!u.Content)
+		{
+			continue;
+		}
 		switch (u.Type)
 		{
 		case Type::E_INT:
@@ -39,8 +43,11 @@ Mesh::~Mesh()
 		case Type::E_GL_TEXTURE:
 			delete reinterpret_cast<unsigned int*>(u.Content);
 			break;
+		default:
+			break;
 		}
 	}
+	Uniforms.clear();
 }
 void Mesh::Render(Shader* UsedShader, bool MainFrameBuffer)
 {
@@ -49,6 +56,10 @@ void Mesh::Render(Shader* UsedShader, bool MainFrameBuffer)
 	int TexIterator = 0;
 	for (int i = 0; i < Uniforms.size(); ++i)
 	{
+		if (!Uniforms.at(i).Content)
+		{
+			continue;
+		}
 		switch (Uniforms.at(i).Type)
 		{
 		case Type::E_INT:
@@ -91,6 +102,10 @@ void Mesh::SimpleRender(Shader* UsedShader)
 		glUniform1i(glGetUniformLocation(UsedShader->GetShaderID(), "u_usetexture"), 1);
 		for (int i = 0; i < Uniforms.size(); ++i)
 		{
+			if (!Uniforms.at(i).Content)
+			{
+				continue;
+			}
 			switch (Uniforms.at(i).Type)
 			{
 			case Type::E_INT:
@@ -132,6 +147,11 @@ void Mesh::ApplyUniform(size_t Index)
 {
 	Uniform u = Uniforms.at(Index);
 	char* PreviousContent = static_cast<char*>(u.Content);
+	if (std::string(PreviousContent).empty() && u.Type != Type::E_VECTOR3)
+	{
+		Uniforms.at(Index).Content = nullptr;
+		return;
+	}
 	switch (u.Type)
 	{
 	case Type::E_INT:
@@ -149,5 +169,8 @@ void Mesh::ApplyUniform(size_t Index)
 	default:
 		break;
 	}
+
+
+
 	Uniforms[Index] = u;
 }

@@ -34,16 +34,17 @@ void MaterialTab::OnButtonClicked(int Index)
 	{
 		FetchTemplate(LoadedMaterial.Template);
 		Log::Print("Fetched Template " + LoadedMaterial.Template + " for File " + Filepath);
+		GenerateMaterialProperties();
 	}
 	else if (Index == -5)
 	{
 		LoadedMaterial.UseShadowCutout = !LoadedMaterial.UseShadowCutout;
-		CutoutText->SetText(LoadedMaterial.UseShadowCutout ? "true" : "false");
+		GenerateMaterialProperties();
 	}
 	else if (Index == -6)
 	{
 		LoadedMaterial.IsTranslucent = !LoadedMaterial.IsTranslucent;
-		TranslucencyText->SetText(LoadedMaterial.IsTranslucent ? "true" : "false");
+		GenerateMaterialProperties();
 	}
 	else if (Index >= 0)
 	{
@@ -73,63 +74,13 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int Rel
 	RowBox->AddChild(Rows[0]);
 	Rows[0]->Align = UIBox::E_REVERSE;
 
-	Rows[1] = new UIBox(false, 0);
+	Rows[1] = new UIBackground(false, 0, UIColors[1]);
 	Rows[1]->Align = UIBox::E_REVERSE;
 	RowBox->AddChild(Rows[1]);
 
 	RightRow = new UIBox(false, 0.3);
 
-	UIBox* OptionBoxes[2];
-	OptionBoxes[0] = new UIBox(true, 0);
-	OptionBoxes[1] = new UIBox(true, 0);
-	auto NewText = new UIText(0.6, 1, "Use shadow cutout:", Renderer);
-	OptionBoxes[0]->AddChild(NewText);
-	NewText->SetPadding(0);
-	auto NewButton = new UIButton(true, 0, UIColors[0] * 2, this, -5);
-	OptionBoxes[0]->AddChild(NewButton);
-	OptionBoxes[0]->SetPadding(0.01);
-	NewButton->SetPadding(0, 0, 0.01, 0);
-	CutoutText = new UIText(0.6, 1, "false", Renderer);
-	CutoutText->SetPadding(0.01);
-	NewButton->AddChild(CutoutText);
 
-
-	NewText = new UIText(0.6, 1, "Is translucent:", Renderer);
-	OptionBoxes[1]->AddChild(NewText);
-	NewText->SetPadding(0);
-
-	NewButton = new UIButton(true, 0, UIColors[0] * 2, this, -6);
-	OptionBoxes[1]->AddChild(NewButton);
-	OptionBoxes[1]->SetPadding(0.01);
-	NewButton->SetPadding(0, 0, 0.01, 0);
-
-	TranslucencyText = new UIText(0.6, 1, "false", Renderer);
-	TranslucencyText->SetPadding(0.01);
-	NewButton->AddChild(TranslucencyText);
-
-
-	auto NewBox = new UIBox(true, 0);
-	NewBox->SetPadding(0);
-	NewButton = new UIButton(true, 0, 1, this, -4);
-	NewButton->SetMinSize(Vector2(0.9, 1.6) / 30);
-	NewText = new UIText(0.6, 1, " Reload template", Renderer);
-	NewText->SetPadding(0);
-	NewButton->SetPadding(0, 0, 0.02, 0);
-	NewButton->SetUseTexture(true, ReloadTexture);
-	ShaderTexts[0] = new UIText(0.5, 0.8, "", Renderer);
-	ShaderTexts[1] = new UIText(0.5, 0.8, "", Renderer);
-	ShaderTexts[0]->SetPadding(0.02, 0, 0, 0);
-	ShaderTexts[1]->SetPadding(0);
-	RightRow->AddChild(ShaderTexts[1]);
-	RightRow->AddChild(ShaderTexts[0]);
-	NewBox->AddChild(NewText);
-	NewBox->AddChild(NewButton);
-	RightRow->AddChild(NewBox);
-	RightRow->AddChild(OptionBoxes[0]);
-	RightRow->AddChild(OptionBoxes[1]);
-	RightRow->IsVisible = TabBackground->IsVisible;
-	ShaderTexts[0]->SetText("Vertex Shader: " + LoadedMaterial.VertexShader);
-	ShaderTexts[1]->SetText("Fragment (Pixel) Shader: " + LoadedMaterial.FragmentShader);
 	GenerateUI();
 }
 void MaterialTab::Tick()
@@ -194,8 +145,8 @@ void MaterialTab::FetchTemplate(std::string Template)
 
 void MaterialTab::UpdateLayout()
 {
-	Rows[0]->SetMinSize(Vector2(0, TabBackground->GetMinSize().Y - 0.275));
-	Rows[0]->SetMaxSize(Vector2(2, TabBackground->GetMinSize().Y - 0.275));
+	Rows[0]->SetMinSize(Vector2(TabBackground->GetMinSize().X / 1.5, TabBackground->GetMinSize().Y - 0.275));
+	Rows[0]->SetMaxSize(Vector2(TabBackground->GetMinSize().X / 1.5, TabBackground->GetMinSize().Y - 0.275));
 	GenerateMaterialProperties();
 
 }
@@ -207,9 +158,7 @@ void MaterialTab::Save()
 
 void MaterialTab::GenerateUI()
 {
-
-	ShaderTexts[0]->SetText("Vertex Shader: " + LoadedMaterial.VertexShader);
-	ShaderTexts[1]->SetText("Fragment (Pixel) Shader: " + LoadedMaterial.FragmentShader);
+	GenerateMaterialProperties();
 	int ButtonIndex = 0;
 	Rows[0]->DeleteChildren();
 	TextFields.clear();
@@ -226,17 +175,17 @@ void MaterialTab::GenerateUI()
 	Rows[0]->AddChild(ParentTemplateText);
 
 	Rows[0]->AddChild(new UIText(0.675, 0.9, "Uniforms", Renderer));
-	auto ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.8, 0));
+	auto ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.725, 0));
 
-	auto ElementNameText = new UIText(0.6, 1, "Uniform name", Renderer);
+	auto ElementNameText = new UIText(0.5, 1, "Uniform name", Renderer);
 	ElementNameText->SetPadding(0.02, 0.02, 0.02, 0.01);
 	ElementNameText->SetTextWidthOverride(0.27);
 
-	auto ElementTypeText = new UIText(0.6, 1, "Type", Renderer);
+	auto ElementTypeText = new UIText(0.5, 1, "Type", Renderer);
 	ElementTypeText->SetPadding(0.02, 0.02, 0, 0.01);
 	ElementTypeText->SetTextWidthOverride(0.09);
 
-	UIText* ElementDefaultText = new UIText(0.6, 1, "Default value", Renderer);
+	UIText* ElementDefaultText = new UIText(0.5, 1, "Default value", Renderer);
 	ElementDefaultText->SetPadding(0.02, 0.02, 0, 0.01);
 	ElementDefaultText->SetTextWidthOverride(0.3);
 
@@ -246,10 +195,10 @@ void MaterialTab::GenerateUI()
 	Rows[0]->AddChild(ElementBox);
 	for (auto& i : LoadedMaterial.Uniforms)
 	{
-		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.675, 0));
+		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.725, 0));
 
 		auto ElementNameBox = new UIBox(true, 0);
-		auto ElementName = new UIText(0.6, 1, i.UniformName, Renderer);
+		auto ElementName = new UIText(0.5, 1, i.UniformName, Renderer);
 		ElementNameBox->SetMinSize(Vector2(0.3, 0.075));
 		ElementNameBox->AddChild(ElementName);
 		ElementNameBox->SetPadding(0);
@@ -257,7 +206,7 @@ void MaterialTab::GenerateUI()
 		ElementName->SetMaxSize(Vector2(0.3, 0.075));
 
 		auto ElementTypeBox = new UIBox(true, 0);
-		auto ElementType = new UIText(0.6, 1, Type::Types[i.Type], Renderer);
+		auto ElementType = new UIText(0.5, 1, Type::Types[i.Type], Renderer);
 		ElementTypeBox->SetMinSize(Vector2(0.1, 0.075));
 		ElementType->SetPadding(0, 0.02, 0, 0.01);
 		ElementTypeBox->SetPadding(0);
@@ -271,8 +220,10 @@ void MaterialTab::GenerateUI()
 			((UITextField*)ElementDefaultValue)->SetText(i.Value);
 			((UITextField*)ElementDefaultValue)->HintText = "Default value";
 			ElementDefaultValue->SetPadding(0, 0, 0, 0.01);
-			ElementDefaultValue->SetMinSize(Vector2(0.265, 0.075));
-			ElementDefaultValue->SetMaxSize(Vector2(0.265, 0.075));
+			ElementDefaultValue->SetMinSize(Vector2(0.265, 0.05));
+			ElementDefaultValue->SetMaxSize(Vector2(0.265, 0.05));
+			ElementDefaultValue->SetBorder(UIBox::E_ROUNDED, 0.5);
+			ElementDefaultValue->SetPadding(0.0125, 0.0125, 0, 0.01);
 		}
 		else
 		{
@@ -291,9 +242,78 @@ void MaterialTab::GenerateUI()
 
 void MaterialTab::GenerateMaterialProperties()
 {
-	Rows[1]->DeleteChildren();
-	Rows[1]->AddChild(new UIText(1, 1, "hi", Renderer));
 
+
+	Rows[1]->DeleteChildren();
+	Rows[1]->AddChild((new UIText(0.8, UIColors[2], "Properties", Renderer)));
+	Rows[1]->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6, TabBackground->GetMinSize().Y - 0.275));
+	Rows[1]->SetPadding(0);
+	UIBox* OptionBoxes[2];
+	OptionBoxes[0] = new UIBox(true, 0);
+	OptionBoxes[1] = new UIBox(true, 0);
+	auto NewText = new UIText(0.6, UIColors[2], "Use shadow cutout:", Renderer);
+	OptionBoxes[0]->AddChild(NewText);
+	NewText->SetPadding(0);
+	auto NewButton = new UIButton(true, 0, UIColors[0] * 2, this, -5);
+	OptionBoxes[0]->AddChild(NewButton);
+	OptionBoxes[0]->SetPadding(0, 0, 0.01, 0);
+
+	NewButton->SetPadding(0.005, 0, 0.01, 0);
+	NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
+
+	CutoutText = new UIText(0.5, UIColors[2], LoadedMaterial.UseShadowCutout ? "true " : "false", Renderer);
+	CutoutText->SetPadding(0.005);
+	NewButton->AddChild(CutoutText);
+
+
+	NewText = new UIText(0.6, UIColors[2], "Is translucent:   ", Renderer);
+	OptionBoxes[1]->AddChild(NewText);
+	NewText->SetPadding(0);
+
+	NewButton = new UIButton(true, 0, UIColors[0] * 2, this, -6);
+	OptionBoxes[1]->AddChild(NewButton);
+	OptionBoxes[1]->SetPadding(0, 0, 0.01, 0);
+	NewButton->SetPadding(0.005, 0, 0.01, 0);
+	NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
+
+	TranslucencyText = new UIText(0.5, UIColors[2], LoadedMaterial.IsTranslucent ? "true " : "false", Renderer);
+	TranslucencyText->SetPadding(0.005);
+	NewButton->AddChild(TranslucencyText);
+
+
+	auto NewBox = new UIBox(true, 0);
+	NewBox->SetPadding(0, 0.1, 0, 0);
+	NewButton = new UIButton(true, 0, 1, this, -4);
+	NewButton->SetMinSize(0.05);
+	NewButton->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+
+	NewText = new UIText(0.6, UIColors[2], " Reload template: ", Renderer);
+	NewText->SetPadding(0);
+	NewButton->SetPadding(0.01, 0, 0.02, 0);
+	NewButton->SetUseTexture(true, ReloadTexture);
+
+	NewBox->AddChild(NewText);
+	NewBox->AddChild(NewButton);
+
+	Rows[1]->AddChild(OptionBoxes[0]);
+	Rows[1]->AddChild(OptionBoxes[1]);
+	Rows[1]->AddChild(NewBox);
+
+	Rows[1]->IsVisible = TabBackground->IsVisible;
+
+	std::string TemplateTexts[] =
+	{
+		"Template properties:",
+		"Vertex Shader            : " + LoadedMaterial.VertexShader,
+		"Fragment (Pixel) Shader  : " + LoadedMaterial.FragmentShader,
+		"Number of uniforms       : " + std::to_string(LoadedMaterial.Uniforms.size())
+	};
+
+	for (auto& i : TemplateTexts)
+	{
+		Rows[1]->AddChild((new UIText(0.5, UIColors[2] * 0.8, i, Renderer))
+			->SetPadding(0, 0, 0.025, 0));
+	}
 }
 
 #endif

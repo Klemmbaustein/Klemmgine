@@ -161,22 +161,21 @@ void MeshTab::Generate()
 	for (auto& i : Options)
 	{
 		auto OptionBox = new UIBox(true, 0);
-		auto NewText = new UIText(0.7, 1, i, Renderer);
+		auto NewText = new UIText(0.5, 1, i, Renderer);
 		OptionBox->AddChild(NewText);
 		auto NewButton = new UIButton(true, 0, UIColors[0] * 2, this, Index);
 		OptionBox->AddChild(NewButton);
 		OptionBox->SetPadding(0.01);
 		NewButton->SetPadding(0, 0, 0.01, 0);
 		NewText->SetPadding(0);
-		auto ButtonText = new UIText(0.7, 1, *OptionVariables[std::abs(Index) - 1] ? "true" : "false", Renderer);
-		NewButton->SetBorder(UIBox::E_ROUNDED, 1);
+		auto ButtonText = new UIText(0.5, 1, *OptionVariables[std::abs(Index) - 1] ? "true " : "false", Renderer);
+		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
 		ButtonText->SetPadding(0.01);
-		NewButton->SetMinSize(Vector2(0.1, 0.075));
 		NewButton->AddChild(ButtonText);
 		Rows[0]->AddChild(OptionBox);
 		Index--;
 	}
-	auto Text = new UIText(0.7, 1, "Materials", Renderer);
+	auto Text = new UIText(0.6, 1, "Materials", Renderer);
 	Rows[1]->AddChild(Text);
 	MaterialTextFields.clear();
 	for (auto& i : Materials)
@@ -191,6 +190,9 @@ void MeshTab::Generate()
 	PreviewWindow = new UIBackground(true, 0, 1, 0.5);
 	Rows[0]->AddChild(PreviewWindow);
 	PreviewWindow->SetBorder(UIBox::E_ROUNDED, 1);
+	UIBox::DrawAllUIElements();
+	UIBox::RedrawUI();
+	Rows[1]->SetMinSize(Rows[0]->GetUsedSize());
 }
 
 void MeshTab::OnButtonClicked(int Index)

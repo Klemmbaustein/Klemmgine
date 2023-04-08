@@ -262,11 +262,4 @@ void ContextMenu::UpdateLayout()
 
 }
 
-void ContextMenu::Load(std::string File)
-{
-}
-
-void ContextMenu::Save()
-{
-}
 #endif

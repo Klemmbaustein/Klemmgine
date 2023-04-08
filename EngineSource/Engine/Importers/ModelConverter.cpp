@@ -6,7 +6,7 @@
 #include <assimp/scene.h>
 #include <vector>
 #include <assimp/postprocess.h>
-#include <UI/EditorUI/EditorUI.h>
+#include <UI/EditorUI/Popups/DialogBox.h>
 
 namespace fs = std::filesystem;
 uint8_t NumMaterials = 0;
@@ -94,14 +94,16 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 		{
 			Importer::From = Name;
 			Importer::To = OutputFileName;
-			//Editor::CurrentUI->ShowPopUpWindow("File already exists!", { PopUpButton("Replace", true, []()
-			//	{
-			//		std::string TargetPath = Importer::To.substr(0, Importer::To.find_last_of("/\\"));
-			//		std::filesystem::remove(Importer::To);
-			//		Log::Print(TargetPath, Log::LogColor::Blue);
-			//		Import(Importer::From, TargetPath);
-			//	}
-			//), PopUpButton("Cancel", false, nullptr) });
+			new DialogBox("Model Import", 0, "\"" + FileUtil::GetFileNameWithoutExtensionFromPath(OutputFileName) + "\" already exists!",
+			{
+				DialogBox::Answer("Replace", []()
+				{
+					std::string TargetPath = Importer::To.substr(0, Importer::To.find_last_of("/\\"));
+					std::filesystem::remove(Importer::To);
+					Import(Importer::From, TargetPath);
+				}), 
+				DialogBox::Answer("Cancel", nullptr) 
+			});
 			return "";
 		}
 		std::ofstream Output(OutputFileName, std::ios::out | std::ios::binary);

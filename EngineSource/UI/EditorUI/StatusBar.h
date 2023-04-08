@@ -11,10 +11,9 @@ class StatusBar : public EditorPanel
 public:
 	StatusBar(Vector3* Colors);
 
-	void Save() override;
-	void Load(std::string File) override;
 	void UpdateLayout() override;
 	void Tick() override;
+	void OnButtonClicked(int Index) override;
 };
 
 #endif

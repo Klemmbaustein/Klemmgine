@@ -15,6 +15,10 @@
 #include <UI/EditorUI/Viewport.h>
 #include <Objects/SoundObject.h>
 #include <Objects/ParticleObject.h>
+#include <Engine/Importers/Importer.h>
+#include <Engine/Importers/ModelConverter.h>
+#include <UI/EditorUI/Popups/RenameBox.h>
+#include <World/Assets.h>
 
 #define MAX_ITEM_NAME_LENGTH 19
 
@@ -173,16 +177,10 @@ ItemBrowser::ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edi
 	UpdateLayout();
 }
 
-void ItemBrowser::Save()
-{
-}
-
-void ItemBrowser::Load(std::string File)
-{
-}
 
 void ItemBrowser::UpdateLayout()
 {
+	Assets::ScanForAssets();
 	ContentBox->DeleteChildren();
 
 	BrowserScrollBox = new UIScrollBox(false, Scale - Vector2(0, 0.1), 25);
@@ -344,6 +342,7 @@ void ItemBrowser::Tick()
 					}),
 					EditorUI::DropdownItem("Rename", []()
 					{
+						new RenameBox(CurrentFiles[SelectedButton].Name, 0);
 					}),
 					EditorUI::DropdownItem("Delete", []()
 					{
@@ -531,7 +530,15 @@ void ItemBrowser::OnButtonClicked(int Index)
 		std::string file = OS::ShowOpenFileDialog();
 		if (std::filesystem::exists(file))
 		{
-			std::filesystem::copy(file, Editor::CurrentUI->CurrentPath + "/" + FileUtil::GetFileNameFromPath(file));
+			if (Editor::ModelFileExtensions.contains(FileUtil::GetExtension(file)))
+			{
+				ModelImporter::Import(file, Editor::CurrentUI->CurrentPath);
+			}
+			else
+			{
+				Importer::Import(file, Editor::CurrentUI->CurrentPath);
+			}
+			UpdateLayout();
 		}
 		return;
 	}
