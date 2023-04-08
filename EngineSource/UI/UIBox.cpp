@@ -6,6 +6,10 @@
 #include <Math/Math.h>
 #include <Engine/Input.h>
 
+#if EDITOR
+#include <UI/EditorUI/EditorUI.h>
+#endif
+
 class UIButton;
 
 namespace UI
@@ -106,6 +110,9 @@ void UIBox::ForceUpdateUI()
 	{
 		i->InvalidateLayout();
 	}
+#if EDITOR
+	Editor::CurrentUI->OnResized();
+#endif
 }
 
 void UIBox::InitUI()

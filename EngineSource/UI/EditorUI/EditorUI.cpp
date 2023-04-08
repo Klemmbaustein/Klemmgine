@@ -321,6 +321,14 @@ void EditorUI::OnButtonClicked(int Index)
 	}
 }
 
+void EditorUI::OnResized()
+{
+	for (auto i : UIElements)
+	{
+		i->UpdateLayout();
+	}
+}
+
 
 
 #endif

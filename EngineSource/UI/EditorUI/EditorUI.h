@@ -150,6 +150,8 @@ public:
 	};
 	std::vector<ObjectListItem> GetObjectList();
 	void OnButtonClicked(int Index);
+
+	void OnResized();
 protected:
 	friend WorldObject;
 };
