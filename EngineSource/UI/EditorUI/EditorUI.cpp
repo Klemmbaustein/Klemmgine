@@ -19,6 +19,7 @@
 #include <GL/glew.h>
 #include <Engine/Log.h>
 #include <Engine/Input.h>
+#include <UI/EditorUI/Popups/DialogBox.h>
 
 namespace Editor
 {
@@ -31,7 +32,6 @@ namespace Editor
 }
 
 bool ChangedScene = false;
-
 // Experimental
 #define UI_LIGHT_MODE 0
 
@@ -86,9 +86,25 @@ EditorUI::EditorUI()
 
 }
 
+void(*QuitFunction)();
+
 void EditorUI::OnLeave(void(*ReturnF)())
 {
-	ReturnF();
+	QuitFunction = ReturnF;
+	if (ChangedScene)
+	{
+		new DialogBox("Scene", 0,
+			"Save changes to scene before quitting?",
+			{
+				DialogBox::Answer("Yes", []() {Scene::SaveSceneAs(Scene::CurrentScene, false); QuitFunction(); }),
+				DialogBox::Answer("No", ReturnF),
+				DialogBox::Answer("Cancel", nullptr)
+			});
+	}
+	else
+	{
+		ReturnF();
+	}
 }
 
 void EditorUI::Tick()
@@ -197,6 +213,7 @@ void EditorUI::GenUITextures()
 		"EditorContent/Images/Checkbox.png",		//16 -> Checked checkbox
 		"EditorContent/Images/Cubemap.png",			//17 -> Cubemap icon
 		"EditorContent/Images/Texture.png",			//18 -> Texture icon
+		"EditorContent/Images/Particle.png",		//19 -> Particle icon
 	};
 
 	for (int i = 0; i < Textures.size(); i++)

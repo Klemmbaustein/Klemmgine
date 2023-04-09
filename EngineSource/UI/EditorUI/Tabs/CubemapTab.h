@@ -22,6 +22,7 @@ public:
 	void OnButtonClicked(int Index) override;
 	void Generate();
 	virtual ~CubemapTab();
+	void UpdateLayout() override;
 protected:
 	std::vector<std::string> DisplayNames = { "Right face", "Left face", "Upper face", "Lower face", "Front face", "Back face" };
 	std::vector<std::string> Cubenames = { "right", "left", "up", "down", "front", "back" };

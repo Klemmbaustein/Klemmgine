@@ -362,6 +362,7 @@ void PollInput()
 					TextInput::TextIndex = std::max(std::min(TextInput::TextIndex - 1, (int)TextInput::Text.size()), 0);
 				}
 				break;
+#if IS_IN_EDITOR
 			case SDLK_DELETE:
 				if (!TextInput::PollForText)
 					for (int i = 0; i < Objects::AllObjects.size(); i++)
@@ -372,15 +373,15 @@ void PollInput()
 
 						}
 					}
-#if IS_IN_EDITOR
-				//Application::EditorUserInterface->UpdateObjectList();
 				break;
 #endif
 			case SDLK_ESCAPE:
+#if IS_IN_EDITOR
 				for (int i = 0; i < Objects::AllObjects.size(); i++)
 				{
 					Objects::AllObjects.at(i)->IsSelected = false;
 				}
+#endif
 				TextInput::PollForText = false;
 				break;
 			case SDLK_RETURN:

@@ -31,11 +31,11 @@ CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UI
 	}
 	TabBackground->AddChild(TabName);
 	CubemapSidesBox = new UIBackground(false, Vector2(-0.6, -0.3), UIColors[1]);
-	CubemapSidesBox->SetMinSize(Vector2(0.4, 0.8));
+	CubemapSidesBox->SetMinSize(Vector2(0.3, 0.8));
 	CubemapSidesBox->Align = UIBox::E_REVERSE;
 	CubemapSidesBox->SetBorder(UIBox::E_ROUNDED, 1);
 	CubemapSidesBox->IsVisible = false;
-	PreviewWindow = new UIBackground(true, Vector2(-0.225, -0.3), 1, 0.8);
+	PreviewWindow = new UIBackground(true, Vector2(-0.2, -0.3), 1, 0.8);
 	PreviewWindow->SetBorder(UIBox::E_ROUNDED, 1);
 	PreviewWindow->IsVisible = false;
 
@@ -76,7 +76,6 @@ void CubemapTab::Load(std::string File)
 		delete SaveFile;
 		InitialName = File;
 		SaveFile = new SaveGame(InitialName.substr(0, InitialName.size() - 4), "cbm", false);
-
 
 		UpdatePreviewModel();
 	}
@@ -140,6 +139,11 @@ void CubemapTab::OnButtonClicked(int Index)
 
 CubemapTab::~CubemapTab()
 {
+}
+
+void CubemapTab::UpdateLayout()
+{
+	PreviewWindow->SetMinSize(Vector2(TabBackground->GetUsedSize().X * 0.5, TabBackground->GetUsedSize().X * 0.5));
 }
 
 void CubemapTab::UpdatePreviewModel()

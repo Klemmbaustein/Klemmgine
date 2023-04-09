@@ -99,6 +99,7 @@ void MaterialTemplateTab::Save()
 
 void MaterialTemplateTab::GenerateUI()
 {
+
 	std::string ShaderHints[2] =
 	{
 		"Vertex shader",
@@ -197,5 +198,10 @@ void MaterialTemplateTab::GenerateUI()
 	auto AddNewText = new UIText(0.6, 0, "Add new", Renderer);
 	AddNewButton->AddChild(AddNewText);
 	Rows[0]->AddChild(AddNewButton);
+}
+void MaterialTemplateTab::UpdateLayout()
+{
+	Rows[0]->SetMinSize(Vector2(0, TabBackground->GetMinSize().Y - 0.275));
+	Rows[0]->SetMaxSize(Vector2(2, TabBackground->GetMinSize().Y - 0.275));
 }
 #endif

@@ -17,6 +17,7 @@ public:
 	void Load(std::string File) override;
 	void Save() override;
 	void GenerateUI();
+	void UpdateLayout() override;
 private:
 	Material LoadedMaterial;
 	UITextField* ShaderTextFields[2];
