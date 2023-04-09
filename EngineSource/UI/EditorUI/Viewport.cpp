@@ -169,7 +169,7 @@ void Viewport::Tick()
 		&& TabHas3DView)
 	{
 
-		if (!Editor::CurrentUI->CurrentCursor) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
+		if (!Editor::CurrentUI->CurrentCursor && !TabInstances[Tabs[SelectedTab].Index]) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
 		{
 			Editor::CurrentUI->CurrentCursor = EditorUI::E_CROSS;
 		}
@@ -382,6 +382,8 @@ void Viewport::OnButtonClicked(int Index)
 		if (TabInstances[Tabs[SelectedTab].Index] && Index / 2 == SelectedTab)
 		{
 			TabInstances[Tabs[SelectedTab].Index]->Save();
+			TabInstances[Tabs[SelectedTab].Index]->TabBackground->IsVisible = false;
+			UIBox::RedrawUI();
 			SelectedTab--;
 		}
 		Tabs.erase(Tabs.begin() + Index / 2);
@@ -393,6 +395,9 @@ void Viewport::OnButtonClicked(int Index)
 		if (TabInstances[Tabs[SelectedTab].Index])
 		{
 			TabInstances[Tabs[SelectedTab].Index]->Save();
+			TabInstances[Tabs[SelectedTab].Index]->TabBackground->IsVisible = false;
+			TabInstances[Tabs[SelectedTab].Index]->TabBackground->Update();
+			UIBox::RedrawUI();
 		}
 		SelectedTab = Index / 2;
 		if (TabInstances[Tabs[SelectedTab].Index])

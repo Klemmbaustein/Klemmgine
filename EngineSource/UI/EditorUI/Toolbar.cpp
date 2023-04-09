@@ -61,6 +61,7 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 					Log::Print("Saving scene \"" + Scene::CurrentScene + "\"", Vector3(0.3, 0.4, 1));
 					Scene::SaveSceneAs(Scene::CurrentScene);
 				}
+				ChangedScene = false;
 				}),
 			ButtonCategory::Button("Wireframe", Editor::CurrentUI->Textures[1], []() {
 					Log::Print("Toggled wireframe", Vector3(0.3, 0.4, 1));

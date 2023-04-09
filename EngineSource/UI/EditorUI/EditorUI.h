@@ -55,7 +55,8 @@ namespace Editor
 		std::pair("png", 18),
 		std::pair("cbm", 17),
 		std::pair("wav", 6),
-		std::pair("cpp", 0)
+		std::pair("cpp", 0),
+		std::pair("jspart", 19)
 	};
 
 	inline std::set<std::string> ModelFileExtensions =

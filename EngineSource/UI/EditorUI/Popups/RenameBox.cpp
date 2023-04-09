@@ -1,3 +1,4 @@
+#if EDITOR
 #include "RenameBox.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/FileUtility.h>
@@ -74,3 +75,4 @@ void RenameBox::Tick()
 {
 	UpdatePanel();
 }
+#endif

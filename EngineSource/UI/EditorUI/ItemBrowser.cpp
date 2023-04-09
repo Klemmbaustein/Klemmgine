@@ -344,6 +344,16 @@ void ItemBrowser::Tick()
 					{
 						new RenameBox(CurrentFiles[SelectedButton].Name, 0);
 					}),
+					EditorUI::DropdownItem("Copy", []()
+					{
+						std::string NewFile = FileUtil::GetFilePathWithoutExtension(CurrentFiles[SelectedButton].Name) + "_Copy.";
+						NewFile.append(FileUtil::GetExtension(CurrentFiles[SelectedButton].Name));
+						if (!std::filesystem::exists(NewFile))
+						{
+							std::filesystem::copy(CurrentFiles[SelectedButton].Name, NewFile);
+						}
+						Editor::CurrentUI->UIElements[3]->UpdateLayout();
+					}),
 					EditorUI::DropdownItem("Delete", []()
 					{
 						std::filesystem::remove_all(CurrentFiles[SelectedButton].Name);
@@ -389,6 +399,11 @@ void ItemBrowser::Tick()
 				EditorUI::DropdownItem("Particle", []()
 				{
 					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Particle", "jspart");
+					Editor::CurrentUI->UIElements[3]->UpdateLayout();
+				}),
+				EditorUI::DropdownItem("Cubemap", []()
+				{
+					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Cubemap", "cbm");
 					Editor::CurrentUI->UIElements[3]->UpdateLayout();
 				})
 			},
@@ -443,6 +458,7 @@ void ItemBrowser::Tick()
 			}
 			if (ext == "jscn" && !IsCPPClass)
 			{
+				ChangedScene = false;
 				Scene::LoadNewScene(CurrentFiles[DraggedButton].Name);
 				Scene::Tick();
 				Editor::CurrentUI->UIElements[5]->UpdateLayout();
@@ -602,6 +618,7 @@ void ItemBrowser::OnButtonClicked(int Index)
 
 		if (Ext == "jscn")
 		{
+			ChangedScene = false;
 			Scene::LoadNewScene(CurrentFiles[Index].Name);
 			Scene::Tick();
 			Editor::CurrentUI->UIElements[5]->UpdateLayout();
@@ -610,6 +627,11 @@ void ItemBrowser::OnButtonClicked(int Index)
 		if (Ext == "png" || Ext == "jpg")
 		{
 			OS::OpenFile(CurrentFiles[Index].Name);
+		}
+		if (Ext == "wav")
+		{
+			Sound::PlaySound2D(Sound::LoadSound(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[Index].Name)));
+			Log::Print("Played sound " + FileUtil::GetFileNameFromPath(CurrentFiles[Index].Name));
 		}
 		if (Ext == "jsm")
 		{
@@ -626,6 +648,10 @@ void ItemBrowser::OnButtonClicked(int Index)
 		if (Ext == "jspart")
 		{
 			Viewport::ViewportInstance->OpenTab(4, CurrentFiles[Index].Name);
+		}
+		if (Ext == "cbm")
+		{
+			Viewport::ViewportInstance->OpenTab(5, CurrentFiles[Index].Name);
 		}
 	}
 	if (Index >= 0 && SelectedTab == 1)

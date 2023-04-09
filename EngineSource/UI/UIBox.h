@@ -96,6 +96,7 @@ protected:
 	void UpdatePosition();
 private:
 	bool ChildrenHorizontal = true;
+	bool PrevIsVisible = true;
 };
 
 namespace UI

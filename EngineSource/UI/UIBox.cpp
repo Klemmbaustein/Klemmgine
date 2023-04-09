@@ -440,6 +440,10 @@ void UIBox::DrawAllUIElements()
 {
 	for (auto elem : UI::UIElements)
 	{
+		if (elem->IsVisible != elem->PrevIsVisible)
+		{
+			UI::RequiresRedraw = true;
+		}
 		if (elem->ShouldBeTicked)
 		{
 			elem->Tick();
