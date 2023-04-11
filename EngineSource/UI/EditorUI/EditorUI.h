@@ -29,6 +29,8 @@ namespace Editor
 	extern bool DraggingTab;
 	extern bool TabDragHorizontal;
 	extern bool DraggingPopup;
+	extern bool HoveringPopup;
+	extern bool PrevHoveringPopup;
 	extern Vector2 DragMinMax;
 	extern Vector2 NewDragMinMax;
 

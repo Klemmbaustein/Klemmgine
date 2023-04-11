@@ -63,9 +63,9 @@ void LogUI::Tick()
 		for (size_t i = 0; i < Log::Messages.size(); i++)
 		{
 			std::string Text = Log::Messages[i].Text;
-			if (Log::Messages[i].Amount > 1)
+			if (Log::Messages[i].Amount >= 1)
 			{
-				Text.append(" (x" + std::to_string(Log::Messages[i].Amount) + ")");
+				Text.append(" (x" + std::to_string(Log::Messages[i].Amount + 1) + ")");
 			}
 			LogTexts.push_back((new UIText(0.4, Log::Messages[i].Color, Text, Editor::CurrentUI->EngineUIText)));
 			LogScrollBox->AddChild(LogTexts[LogTexts.size() - 1]

@@ -108,7 +108,10 @@ void Viewport::UpdateLayout()
 }
 void Viewport::Tick()
 {
-	bool TabHas3DView = !TabInstances[Tabs[SelectedTab].Index] || Tabs[SelectedTab].Index == 1 || Tabs[SelectedTab].Index == 4 || Tabs[SelectedTab].Index == 5;
+	bool TabHas3DView = (!Editor::HoveringPopup	&& !TabInstances[Tabs[SelectedTab].Index]) 
+		|| Tabs[SelectedTab].Index == 1
+		|| Tabs[SelectedTab].Index == 4
+		|| Tabs[SelectedTab].Index == 5;
 	Graphics::MainCamera->FOV = Maths::PI / 1.2;
 	UpdatePanel();
 

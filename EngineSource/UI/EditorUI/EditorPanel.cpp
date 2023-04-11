@@ -142,9 +142,9 @@ void EditorPanel::UpdatePanel()
 
 	if (IsPopup)
 	{
-		if (MainBackground->IsHovered() && Editor::CurrentUI->CurrentCursor == EditorUI::E_CROSS)
+		if (MainBackground->IsHovered())
 		{
-			Editor::CurrentUI->CurrentCursor = EditorUI::E_DEFAULT;
+			Editor::PrevHoveringPopup = true;
 		}
 	}
 

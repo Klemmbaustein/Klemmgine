@@ -27,6 +27,8 @@ namespace Editor
 	bool DraggingTab = false;
 	bool TabDragHorizontal = false;
 	bool DraggingPopup = false;
+	bool HoveringPopup = false;
+	bool PrevHoveringPopup = false;
 	Vector2 DragMinMax;
 	Vector2 NewDragMinMax = DragMinMax;
 }
@@ -109,6 +111,8 @@ void EditorUI::OnLeave(void(*ReturnF)())
 
 void EditorUI::Tick()
 {
+	Editor::HoveringPopup = Editor::PrevHoveringPopup;
+	Editor::PrevHoveringPopup = false;
 	Editor::DraggingPopup = false;
 	if (!Editor::DraggingTab)
 	{

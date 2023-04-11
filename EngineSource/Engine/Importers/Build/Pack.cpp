@@ -62,6 +62,29 @@ bool Pack::SaveToPack(std::vector<PackFile> Content, std::string Path)
 	return true;
 }
 
+void SaveFolderToPackRecursive(std::string Folder, std::vector<Pack::PackFile>& PackedFiles)
+{
+	if (std::filesystem::is_directory(Folder))
+	{
+		for (const auto& entry : std::filesystem::directory_iterator(Folder))
+		{
+			if (!entry.is_directory())
+			{
+				std::ifstream InFile = std::ifstream(entry.path(), std::ios::in | std::ios::binary);
+				std::stringstream InStream;
+				InStream << InFile.rdbuf();
+				PackedFiles.push_back(Pack::PackFile(FileUtil::GetFileNameFromPath(entry.path().string()), InStream.str()));
+				InFile.close();
+			}
+			else
+			{
+				SaveFolderToPackRecursive(Folder + "/" + FileUtil::GetFileNameFromPath(entry.path().string()),
+					PackedFiles);
+			}
+		}
+	}
+}
+
 void Pack::SaveFolderToPack(std::string Folder, std::string Outf)
 {
 	std::vector<PackFile> PackedFiles;
@@ -76,6 +99,11 @@ void Pack::SaveFolderToPack(std::string Folder, std::string Outf)
 				InStream << InFile.rdbuf();
 				PackedFiles.push_back(PackFile(FileUtil::GetFileNameFromPath(entry.path().string()), InStream.str()));
 				InFile.close();
+			}
+			else
+			{
+				SaveFolderToPackRecursive(Folder + "/" + FileUtil::GetFileNameFromPath(entry.path().string()),
+					PackedFiles);
 			}
 		}
 	}
@@ -103,5 +131,5 @@ std::string Pack::GetFile(std::string File)
 			}
 		}
 	}
-	throw "Could not find file";
+	throw ("Pack File: Could not find file: " + File).c_str();
 }
