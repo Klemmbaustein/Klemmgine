@@ -386,15 +386,16 @@ int main(int argc, char** argv)
 	UIBackground* ProgressBar = new UIBackground(true, Vector2f(-1.1, -1), Vector3f32(0.8, 0.3, 0), Vector2f(0, 0.1));
 	ProgressBar->SetBorder(UIBox::E_ROUNDED, 0.75);
 	UIText* BackgroundTaskText = new UIText(0.3, 0, "", Text);
-	BackgroundTaskText->SetPosition(Vector2f(-0.99, -0.98));
+	BackgroundTaskText->SetPosition(Vector2f(-0.99, -0.9925));
 	float TaskFinishedTimer = -1;
 
 	while (!Application::Quit)
 	{
 		ProgressBar->SetOpacity(TaskFinishedTimer == -1 ? 1 : 1 - TaskFinishedTimer);
 		BackgroundTaskText->SetOpacity(TaskFinishedTimer == -1 ? 1 : 1 - TaskFinishedTimer);
-		ProgressBar->SetMinSize(Vector2f(Background::BackgroundProgress * 2.1 + 0.1, 0.05));
+		ProgressBar->SetMinSize(Vector2f(Background::BackgroundProgress * 2.2 + 0.1, 0.05));
 		BackgroundTaskText->SetText(Background::BackgroundTask);
+
 		if (Background::BackgroundProgress == 1 && TaskFinishedTimer == -1)
 		{
 			Background::BackgroundThread->join();
