@@ -42,6 +42,7 @@ std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 			NewItem.Name = Object.Name;
 			NewItem.Object = Object;
 			CurrentParent->SubItems.push_back(NewItem);
+			continue;
 		}
 		std::vector<std::string> PathElements;
 		size_t Index = CurrentPath.find_first_of("/");
@@ -54,7 +55,6 @@ std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 			CurrentPath = CurrentPath.substr(Index + 1);
 			Index = CurrentPath.find_first_of("/");
 		}
-		PathElements.push_back(CurrentPath);
 
 		// Iterate through every 'element' we just got from the Category string
 		for (const auto& elem : PathElements)
@@ -621,6 +621,7 @@ void ItemBrowser::OnButtonClicked(int Index)
 			ChangedScene = false;
 			Scene::LoadNewScene(CurrentFiles[Index].Name);
 			Scene::Tick();
+			Viewport::ViewportInstance->SelectedObjects.clear();
 			Editor::CurrentUI->UIElements[5]->UpdateLayout();
 			Editor::CurrentUI->UIElements[6]->UpdateLayout();
 		}

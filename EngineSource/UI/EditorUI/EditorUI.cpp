@@ -288,7 +288,10 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 			CurrentPath = CurrentPath.substr(Index + 1);
 			Index = CurrentPath.find_first_of("/");
 		}
-		PathElements.push_back(CurrentPath);
+		if (!CurrentPath.empty())
+		{
+			PathElements.push_back(CurrentPath);
+		}
 
 		ObjectListItem* CurrentList = SceneList;
 		if (SceneList->IsCollapsed) continue;
