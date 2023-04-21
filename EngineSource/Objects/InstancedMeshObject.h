@@ -17,7 +17,7 @@ public:
 	virtual void Deserialize(std::string SerializedObject) override;
 protected:
 	bool Initialized = true, SoonInitialized = true;
-	int Ammount = 50;
+	int Amount = 50;
 	int Range = 1000;
 	Vector3 Scale = Vector3(1);
 	std::string Filename;

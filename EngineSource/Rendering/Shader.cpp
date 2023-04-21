@@ -7,15 +7,16 @@
 #include <Engine/Log.h>
 #include <Engine/Importers/Build/Pack.h>
 #include <GL/glew.h>
+#include <Math/Vector.h>
 #include <Rendering/Utility/ShaderPreprocessor.h>
 
 
 extern const bool IsInEditor;
 extern const bool EngineDebug;
 
-Shader::Shader(const char* VertexShaderFilename, const char* FragmentShaderFilename, const char* GeometryShader)
+Shader::Shader(std::string VertexShaderFilename, std::string FragmentShaderFilename, std::string GeometryShader)
 {
-	ShaderID = CreateShader(VertexShaderFilename, FragmentShaderFilename, GeometryShader);
+	ShaderID = CreateShader(VertexShaderFilename.c_str(), FragmentShaderFilename.c_str(), GeometryShader.empty() ? nullptr : GeometryShader.c_str());
 	VertexFileName = VertexShaderFilename;
 	FragmetFileName = FragmentShaderFilename;
 }
@@ -35,12 +36,24 @@ void Shader::Unbind()
 	glUseProgram(0);
 }
 
-
-void Shader::Recompile()
+void Shader::SetInt(std::string Field, int Value)
 {
-	throw "not implemented";
-	glDeleteProgram(ShaderID);
-	CreateShader(VertexFileName.c_str(), FragmetFileName.c_str(), nullptr);
+	glUniform1i(glGetUniformLocation(ShaderID, Field.c_str()), Value);
+}
+
+void Shader::SetFloat(std::string Field, float Value)
+{
+	glUniform1f(glGetUniformLocation(ShaderID, Field.c_str()), Value);
+}
+
+void Shader::SetVector3(std::string Field, Vector3 Value)
+{
+	glUniform3f(glGetUniformLocation(ShaderID, Field.c_str()), Value.X, Value.Y, Value.Z);
+}
+
+void Shader::SetVector2(std::string Field, Vector2 Value)
+{
+	glUniform2f(glGetUniformLocation(ShaderID, Field.c_str()), Value.X, Value.Y);
 }
 
 GLuint Shader::Compile(std::string ShaderCode, unsigned int Type)

@@ -5,6 +5,9 @@ struct Shader;
 class Camera;
 struct VertexBuffer; struct IndexBuffer;
 struct Uniform;
+struct Material;
+class ObjectRenderContext;
+
 namespace Particles
 {
 	struct ParticleElement
@@ -47,22 +50,18 @@ namespace Particles
 		std::vector<float> SpawnDelays;
 		std::vector<ParticleElement> ParticleElements;
 		std::vector<std::vector<ParticleInstance>> ParticleInstances;
-
-		void AddElement(ParticleElement NewElement);
+		void SetMaterial(unsigned int Index, Material Mat);
+		void AddElement(ParticleElement NewElement, Material Mat);
 		void RemoveElement(unsigned int Index);
 		std::vector<VertexBuffer*> ParticleVertexBuffers;
 		std::vector<IndexBuffer*> ParticleIndexBuffers;
 		unsigned int MatBuffer = -1;
 		std::vector<glm::mat4> ParticleMatrices;
-		std::vector<Shader*> ParticleShaders;
-		std::vector<std::vector<Uniform>> Uniforms;
+		std::vector<ObjectRenderContext> Contexts;
 		void UpdateParticlePositions(Camera* MainCamera);
 		void AddParticleInstance(unsigned int Element);
-		void ApplyUniforms(unsigned int Element);
-		void ApplyUniform(int Index, unsigned int Element);
 		ParticleEmitter();
 		~ParticleEmitter();
-		void SetMaterial(unsigned int Index, std::string Material, bool SupressMaterialError = false);
 		void Reset();
 		void Update(Camera* MainCamera);
 		void Draw(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass);

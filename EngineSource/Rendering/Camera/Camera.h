@@ -36,22 +36,21 @@ public:
 
 	void MoveForward(float amount)
 	{
-		Translate(glm::normalize(lookAt) * amount);
+		Translate(lookAt.Normalize() * amount);
 	}
 
 	void MoveRight(float amount)
 	{
-		Translate(glm::normalize(glm::cross(lookAt, up)) * amount);
+		Translate(Vector3::Cross(lookAt, up).Normalize() * amount);
 	}
-	void MoveUp(float Ammount)
+	void MoveUp(float Amount)
 	{
-		Translate(up * Ammount);
+		Translate(up * Amount);
 	}
 
-	virtual void Translate(glm::vec3 V)
+	virtual void Translate(Vector3 V)
 	{
 		Position += V;
-		View = glm::translate(View, V*-1.f);
 	}
 
 	glm::mat4 GetProjection()
@@ -76,18 +75,18 @@ public:
 	}
 
 	float mouseSensitivity = 0.25;
-	glm::vec3 lookAt = glm::vec3(0);
+	Vector3 lookAt = Vector3(0);
 	Vector3 Rotation = 0;
 	float yaw = 0;
 	float pitch = 0;
 	float roll = 0;
-	glm::vec3 Position = glm::vec3(0.f);
-	glm::vec3 Right = glm::vec3(0);
-	glm::vec3 Up = glm::vec3(0);
+	Vector3 Position = Vector3(0.f);
+	Vector3 Right = Vector3(0);
+	Vector3 Up = Vector3(0);
 	float FOV;
 
 protected:
-	glm::vec3 up = glm::vec3(0);
+	Vector3 up = glm::vec3(0);
 
 	glm::mat4 Projection = glm::mat4(0);
 	glm::mat4 View = glm::mat4(0);

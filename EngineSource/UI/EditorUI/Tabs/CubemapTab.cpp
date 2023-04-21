@@ -150,11 +150,13 @@ void CubemapTab::UpdatePreviewModel()
 {
 	Save();
 	ModelGenerator::ModelData m;
-	m.MakeCube(30, 0, 0);
-	m.Sphereize(150, -1);
-	m.GenerateNormals(0);
+	m.Elements.push_back(ModelGenerator::ModelData::Element());
+	auto& elem = m.Elements[m.Elements.size() - 1];
+	elem.MakeCube(30, 0);
+	elem.Sphereize(150);
+	elem.GenerateNormals();
 	m.TwoSided = false;
-	m.Materials[0] = "EditorContent/Materials/Reflective";
+	elem.ElemMaterial = "EditorContent/Materials/Reflective";
 	PreviewModel = new Model(m);
 	PreviewBuffer->ClearContent();
 	PreviewBuffer->UseWith(PreviewModel);

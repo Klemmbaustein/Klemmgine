@@ -34,7 +34,7 @@ namespace ModelGenerator
 			std::vector<int> Indices;
 			Input.read((char*)&NewNumVertices, sizeof(int));
 			Input.read((char*)&NewNumIndices, sizeof(int));
-			//read verts
+			// Read vertices
 
 			for (int i = 0; i < NewNumVertices; i++)
 			{
@@ -47,7 +47,7 @@ namespace ModelGenerator
 				Input.read((char*)&vertex.Normal.z, sizeof(float));
 				Input.read((char*)&vertex.U, sizeof(float));
 				Input.read((char*)&vertex.V, sizeof(float));
-				//Calculate Size for AABB collision box
+				// Calculate Size for AABB collision box
 				if (vertex.Position.x > CollisionBox.maxX)
 				{
 					CollisionBox.maxX = vertex.Position.x;
@@ -74,9 +74,7 @@ namespace ModelGenerator
 				}
 				Vertices.push_back(vertex);
 			}
-			//Read Indices
-
-
+			// Read Indices
 			for (int i = 0; i < NewNumIndices; i++)
 			{
 				int Index = 0;
@@ -84,10 +82,8 @@ namespace ModelGenerator
 				Indices.push_back(Index);
 			}
 
-			//read materials
+			// Read materials
 			std::string Name;
-			this->Vertices.push_back(Vertices);
-			this->Indices.push_back(Indices);
 			size_t len;
 			Input.read((char*)&len, sizeof(size_t));
 			char* temp = new char[len + 1];
@@ -95,7 +91,9 @@ namespace ModelGenerator
 			temp[len] = '\0';
 			Name = temp;
 			delete[] temp;
-			Materials.push_back(Name);
+
+			Elements.push_back(Element(Vertices, Indices, Name));
+
 		}
 		Input.read((char*)&CastShadow, sizeof(uint8_t));
 		try
@@ -114,58 +112,42 @@ namespace ModelGenerator
 		*this = ModelGenerator::ModelData();
 	}
 
-	void ModelData::GenerateNormals(int Index)
-	{
-		for (size_t i = 0; i < Indices[Index].size(); i += 3) // <- Flat shading
-		{
-			size_t A = Indices[Index][i], B = Indices[Index][i + 1], C = Indices[Index][i + 2];
-			Vector3 n = Vector3::Cross(Vertices[Index][B].Position - Vertices[Index][A].Position, Vertices[Index][C].Position - Vertices[Index][A].Position);
-			Vertices[Index][A].Normal += (glm::vec3)n;
-			Vertices[Index][B].Normal += (glm::vec3)n;
-			Vertices[Index][C].Normal += (glm::vec3)n;
-		}
-		for (auto& v : Vertices[Index])
-		{
-			v.Normal = glm::normalize(v.Normal);
-		}
-	}
-
 	void ModelData::SaveModelData(std::string Path, bool MaterialsInContent)
 	{
 		std::ofstream Output(Path, std::ios::out | std::ios::binary);
 
-		int NumMaterials = Materials.size();
-		Output.write((char*)&NumMaterials, sizeof(int));
-		for (int j = 0; j < NumMaterials; j++)
+		int NumElements = Elements.size();
+		Output.write((char*)&NumElements, sizeof(int));
+		for (int j = 0; j < NumElements; j++)
 		{
-			int NumVertices = Vertices[j].size();
-			int NumIndices = Indices[j].size();
+			int NumVertices = Elements[j].Vertices.size();
+			int NumIndices = Elements[j].Indices.size();
 
 			Output.write((char*)&NumVertices, sizeof(int));
 			Output.write((char*)&NumIndices, sizeof(int));
 
+			auto& ElemVerts = Elements[j].Vertices;
+			auto& ElemInds = Elements[j].Indices;
+
 			for (int i = 0; i < NumVertices; i++)
 			{
-				Output.write((char*)&Vertices[j][i].Position.x, sizeof(float));
-				Output.write((char*)&Vertices[j][i].Position.y, sizeof(float));
-				Output.write((char*)&Vertices[j][i].Position.z, sizeof(float));
-				Output.write((char*)&Vertices[j][i].Normal.x, sizeof(float));
-				Output.write((char*)&Vertices[j][i].Normal.y, sizeof(float));
-				Output.write((char*)&Vertices[j][i].Normal.z, sizeof(float));
-				Output.write((char*)&Vertices[j][i].U, sizeof(float));
-				Output.write((char*)&Vertices[j][i].V, sizeof(float));
+				Output.write((char*)&ElemVerts[i].Position.x, sizeof(float));
+				Output.write((char*)&ElemVerts[i].Position.y, sizeof(float));
+				Output.write((char*)&ElemVerts[i].Position.z, sizeof(float));
+				Output.write((char*)&ElemVerts[i].Normal.x, sizeof(float));
+				Output.write((char*)&ElemVerts[i].Normal.y, sizeof(float));
+				Output.write((char*)&ElemVerts[i].Normal.z, sizeof(float));
+				Output.write((char*)&ElemVerts[i].U, sizeof(float));
+				Output.write((char*)&ElemVerts[i].V, sizeof(float));
 			}
 			for (int i = 0; i < NumIndices; i++)
 			{
-				Output.write((char*)&Indices[j][i], sizeof(int));
+				Output.write((char*)&ElemInds[i], sizeof(int));
 			}
-			std::string MaterialString = MaterialsInContent ? "Content/" + Materials[j] : Materials[j];
+			std::string MaterialString = MaterialsInContent ? "Content/" + Elements[j].ElemMaterial : Elements[j].ElemMaterial;
 			size_t size = MaterialString.size();
-
 			Output.write((char*)&size, sizeof(size_t));
-			std::string OutPath = MaterialString;
-
-			Output.write(OutPath.c_str(), sizeof(char) * size);
+			Output.write(MaterialString.c_str(), sizeof(char) * size);
 		}
 		Output.write((char*)&CastShadow, sizeof(bool));
 		Output.write((char*)&HasCollision, sizeof(uint8_t));
@@ -175,115 +157,30 @@ namespace ModelGenerator
 	std::vector<Vertex> ModelData::GetMergedVertices()
 	{
 		std::vector<Vertex> MergedVertices;
-		for (size_t i = 0; i < Vertices.size(); i++)
+		for (auto& elem : Elements)
 		{
-			for (size_t j = 0; j < Vertices[i].size(); j++)
+			for (size_t i = 0; i < elem.Vertices.size(); i++)
 			{
-				MergedVertices.push_back(Vertices[i][j]);
+				MergedVertices.push_back(elem.Vertices[i]);
 			}
 		}
 		return MergedVertices;
 	}
 	std::vector<int> ModelData::GetMergedIndices()
 	{
-		std::vector<int> MergedIndics;
+		std::vector<int> MergedIndices;
 		size_t prevSize = 0;
-		for (size_t i = 0; i < Indices.size(); i++)
+		for (size_t i = 0; i < Elements.size(); i++)
 		{
-			for (size_t j = 0; j < Indices[i].size(); j++)
+			for (size_t j = 0; j < Elements[i].Indices.size(); j++)
 			{
-				MergedIndics.push_back(Indices[i][j] + prevSize);
+				MergedIndices.push_back(Elements[i].Indices[j] + prevSize);
 			}
-			prevSize += Vertices[i].size();
+			prevSize += Elements[i].Vertices.size();
 		}
-		return MergedIndics;
+		return MergedIndices;
 	}
 
-	void ModelData::Sphereize(float Distance, int Index)
-	{
-		if (Index == -1)
-		{
-			for (int i = 0; i < Vertices.size(); i++)
-			{
-				Sphereize(Distance, i);
-			}
-		}
-		else if(Index >= 0 && Index < Vertices.size())
-		{
-			for (auto& v : Vertices[Index])
-			{
-				v.Position = Vector3(v.Position).Normalize() * Distance;
-			}
-		}
-		else
-		{
-			Log::Print("Invalid mesh index passed to 'Sphereize' function", Vector3(1, 0, 0));
-		}
-	}
-	void ModelData::MakeCube(int32_t Resolution, int Index, Vector3 Offset)
-	{
-		Vector3 CubeDirections[6] =
-		{
-			Vector3( 1,  0,  0),
-			Vector3(-1,  0,  0),
-			Vector3( 0,  1,  0),
-			Vector3( 0, -1,  0),	
-			Vector3( 0,  0,  1),
-			Vector3( 0,  0, -1)
-		};
-		for (auto dir : CubeDirections)
-		{
-			AddFace(Resolution, Index, dir, Offset);
-		}
-		MakeCollisionBox();
-	}
-	void ModelData::AddFace(int32_t Resolution, int Index, Vector3 Normal, Vector3 Offset)
-	{
-		if (Index >= Vertices.size())
-		{
-			Vertices.resize(Index + 1);
-			Indices.resize(Index + 1);
-			Materials.resize(Index + 1);
-		}
-		glm::vec3 AxisA = glm::vec3(Normal.Y, Normal.Z, Normal.X);
-		glm::vec3 AxisB = glm::cross((glm::vec3)Normal, AxisA);
-		size_t InitialSize = this->Vertices[Index].size();
-		for (int32_t x = 0; x < Resolution; x++)
-		{
-			for (int32_t y = 0; y < Resolution; y++)
-			{
-				int VertexIndex = x + y * Resolution + InitialSize;
-				glm::vec2 t = glm::vec2(x, y) / (Resolution - 1.f);
-				glm::vec3 Point = (Normal + AxisA * (2 * t.x - 1) + AxisB * (2 * t.y - 1)) / glm::vec3(2);
-				glm::vec2 texcoords = glm::vec2(0);
-				if ((Normal) == glm::vec3(0, 1, 0))
-				{
-					texcoords = t;
-				}
-				else if (Normal == glm::vec3(0, -1, 0))
-				{
-					texcoords = t;
-				}
-				else
-				{
-					glm::vec3 Pos = AxisA * (2 * t.x - 1) + AxisB * (2 * t.y - 1);
-					Pos = Pos / glm::vec3(2, -2, 2);
-					Pos = Pos - glm::vec3(-0.5, -0.5, 0);
-					texcoords = glm::vec2(Pos.x + Pos.z, Pos.y);
-				}
-				Vertices[Index].push_back(Vertex((Point + Offset) * 200, texcoords.x, texcoords.y, 1, 1, 1, 1, Normal));
-				if (x != Resolution - 1 && y != Resolution - 1)
-				{
-					this->Indices[Index].push_back(VertexIndex);
-					this->Indices[Index].push_back(VertexIndex + Resolution);
-					this->Indices[Index].push_back(VertexIndex + Resolution + 1);
-					this->Indices[Index].push_back(VertexIndex);
-					this->Indices[Index].push_back(VertexIndex + Resolution + 1);
-					this->Indices[Index].push_back(VertexIndex + 1);
-				}
-			}
-		}
-	}
 	void ModelData::MakeCollisionBox()
 	{
 		for (auto& i : GetMergedVertices())
@@ -313,5 +210,90 @@ namespace ModelGenerator
 				CollisionBox.minZ = i.Position.z;
 			}
 		}
+	}
+	void ModelData::Element::GenerateNormals()
+	{
+		for (size_t i = 0; i < Indices.size(); i += 3) // <- Flat shading
+		{
+			size_t A = Indices[i], B = Indices[i + 1], C = Indices[i + 2];
+			Vector3 n = Vector3::Cross(Vertices[B].Position - Vertices[A].Position, Vertices[C].Position - Vertices[A].Position);
+			Vertices[A].Normal += (glm::vec3)n;
+			Vertices[B].Normal += (glm::vec3)n;
+			Vertices[C].Normal += (glm::vec3)n;
+		}
+		for (auto& v : Vertices)
+		{
+			v.Normal = glm::normalize(v.Normal);
+		}
+	}
+	void ModelData::Element::MakeCube(int32_t Resolution, Vector3 Offset)
+	{
+		Vector3 CubeDirections[6] =
+		{
+			Vector3(1,  0,  0),
+			Vector3(-1,  0,  0),
+			Vector3(0,  1,  0),
+			Vector3(0, -1,  0),
+			Vector3(0,  0,  1),
+			Vector3(0,  0, -1)
+		};
+		for (auto dir : CubeDirections)
+		{
+			AddFace(Resolution, dir, Offset);
+		}
+	}
+	void ModelData::Element::AddFace(int32_t Resolution, Vector3 Normal, Vector3 Offset)
+	{
+		glm::vec3 AxisA = glm::vec3(Normal.Y, Normal.Z, Normal.X);
+		glm::vec3 AxisB = glm::cross((glm::vec3)Normal, AxisA);
+		size_t InitialSize = this->Vertices.size();
+		for (int32_t x = 0; x < Resolution; x++)
+		{
+			for (int32_t y = 0; y < Resolution; y++)
+			{
+				int VertexIndex = x + y * Resolution + InitialSize;
+				glm::vec2 t = glm::vec2(x, y) / (Resolution - 1.f);
+				glm::vec3 Point = (Normal + AxisA * (2 * t.x - 1) + AxisB * (2 * t.y - 1)) / glm::vec3(2);
+				glm::vec2 texcoords = glm::vec2(0);
+				if ((Normal) == glm::vec3(0, 1, 0))
+				{
+					texcoords = t;
+				}
+				else if (Normal == glm::vec3(0, -1, 0))
+				{
+					texcoords = t;
+				}
+				else
+				{
+					glm::vec3 Pos = AxisA * (2 * t.x - 1) + AxisB * (2 * t.y - 1);
+					Pos = Pos / glm::vec3(2, -2, 2);
+					Pos = Pos - glm::vec3(-0.5, -0.5, 0);
+					texcoords = glm::vec2(Pos.x + Pos.z, Pos.y);
+				}
+				Vertices.push_back(Vertex((Point + Offset) * 200, texcoords.x, texcoords.y, 1, 1, 1, 1, Normal));
+				if (x != Resolution - 1 && y != Resolution - 1)
+				{
+					this->Indices.push_back(VertexIndex);
+					this->Indices.push_back(VertexIndex + Resolution);
+					this->Indices.push_back(VertexIndex + Resolution + 1);
+					this->Indices.push_back(VertexIndex);
+					this->Indices.push_back(VertexIndex + Resolution + 1);
+					this->Indices.push_back(VertexIndex + 1);
+				}
+			}
+		}
+	}
+	void ModelData::Element::Sphereize(float Distance)
+	{
+		for (auto& v : Vertices)
+		{
+			v.Position = Vector3(v.Position).Normalize() * Distance;
+		}
+	}
+	void ModelData::Element::Clear()
+	{
+		Vertices.clear();
+		Indices.clear();
+		ElemMaterial.clear();
 	}
 }

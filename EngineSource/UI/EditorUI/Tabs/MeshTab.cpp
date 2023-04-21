@@ -92,18 +92,14 @@ void MeshTab::Load(std::string File)
 		ModelData.LoadModelFromFile(File);
 		if (!MESHTAB_DEBUG)
 		{
-			for (std::string& m : ModelData.Materials)
+			for (auto& m : ModelData.Elements)
 			{
-				m = m.substr(8);
+				m.ElemMaterial = m.ElemMaterial.substr(8);
 			}
 		}
-		NumTotalVertices = ModelData.GetMergedVertices().size();
 		HasCollision = ModelData.HasCollision;
 		TwoSided = ModelData.TwoSided;
 		CastShadow = ModelData.CastShadow;
-		Materials = ModelData.Materials;
-		MeshVertices = ModelData.Vertices;
-		Indices = ModelData.Indices;
 		InitialName = File;
 		UpdatePreviewModel();
 	}
@@ -121,13 +117,9 @@ void MeshTab::ReloadMesh()
 	{
 		ModelData = ModelGenerator::ModelData();
 		ModelData.LoadModelFromFile(InitialName);
-		NumTotalVertices = ModelData.GetMergedVertices().size();
 		HasCollision = ModelData.HasCollision;
 		TwoSided = ModelData.TwoSided;
 		CastShadow = ModelData.CastShadow;
-		Materials = ModelData.Materials;
-		MeshVertices = ModelData.Vertices;
-		Indices = ModelData.Indices;
 	}
 	catch (std::exception& e)
 	{
@@ -141,7 +133,6 @@ void MeshTab::Save()
 {
 	try
 	{
-		ModelData.Materials = Materials;
 		ModelData.CastShadow = CastShadow;
 		ModelData.HasCollision = HasCollision;
 		ModelData.TwoSided = TwoSided;
@@ -178,11 +169,11 @@ void MeshTab::Generate()
 	auto Text = new UIText(0.6, 1, "Materials", Renderer);
 	Rows[1]->AddChild(Text);
 	MaterialTextFields.clear();
-	for (auto& i : Materials)
+	for (auto& i : ModelData.Elements)
 	{
 		auto NewTextInput = new UITextField(true, 0, UIColors[1], this, 1, Renderer);
 		NewTextInput->SetMinSize(Vector2(0.4, 0.075));
-		NewTextInput->SetText(i);
+		NewTextInput->SetText(i.ElemMaterial);
 		NewTextInput->SetBorder(UIBox::E_ROUNDED, 0.5);
 		Rows[1]->AddChild(NewTextInput);
 		MaterialTextFields.push_back(NewTextInput);
@@ -201,9 +192,9 @@ void MeshTab::OnButtonClicked(int Index)
 	switch (Index)
 	{
 	case 1:
-		for (int i = 0; i < Materials.size(); i++)
+		for (int i = 0; i < ModelData.Elements.size(); i++)
 		{
-			Materials[i] = MaterialTextFields[i]->GetText();
+			ModelData.Elements[i].ElemMaterial = MaterialTextFields[i]->GetText();
 		}
 		Generate();
 		break;

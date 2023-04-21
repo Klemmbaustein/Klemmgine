@@ -1,6 +1,39 @@
 #pragma once
 #include <Rendering/Camera/Camera.h>
 #include <Rendering/Shader.h>
+#include <Rendering/Texture/Material.h>
+
+struct ObjectRenderContext
+{
+	ObjectRenderContext(Material m);
+	ObjectRenderContext();
+	~ObjectRenderContext();
+	void Bind();
+	void BindWithShader(Shader* s);
+	struct Uniform
+	{
+		std::string Name;
+		Type::TypeEnum Type;
+		void* Content;
+		Uniform(std::string Name, Type::TypeEnum Type, void* Content)
+		{
+			this->Content = Content;
+			this->Name = Name;
+			this->Type = Type;
+		}
+	};
+
+	Shader* GetShader();
+
+	void LoadUniform(Material::Param u);
+	void Unload();
+
+protected:
+	Shader* ContextShader = nullptr;
+	std::vector<Uniform> Uniforms;
+	Material Mat;
+};
+
 class Renderable
 {
 public:

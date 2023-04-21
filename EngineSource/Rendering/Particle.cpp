@@ -10,13 +10,13 @@
 #include <Rendering/Utility/ShaderManager.h>
 #include <fstream>
 #include <filesystem>
-#include <Rendering/Mesh/Model.h>
 #include <Rendering/Texture/Material.h>
 #include <Rendering/Texture/Texture.h>
 #include <Rendering/Camera/Camera.h>
 #include <World/Assets.h>
 #include <World/Graphics.h>
 #include <Engine/Log.h>
+#include <Rendering/Renderable.h>
 
 struct Uniform
 {
@@ -31,7 +31,12 @@ struct Uniform
 	}
 };
 
-void Particles::ParticleEmitter::AddElement(ParticleElement NewElement)
+void Particles::ParticleEmitter::SetMaterial(unsigned int Index, Material Mat)
+{
+	Contexts[Index] = ObjectRenderContext(Mat);
+}
+
+void Particles::ParticleEmitter::AddElement(ParticleElement NewElement, Material Mat)
 {
 	ParticleElements.push_back(NewElement);
 	SpawnDelays.push_back(NewElement.SpawnDelay);
@@ -60,12 +65,7 @@ void Particles::ParticleEmitter::AddElement(ParticleElement NewElement)
 		1, 2, 3
 	};
 	ParticleIndexBuffers.push_back(new IndexBuffer(ParticleIndices.data(), ParticleIndices.size(), sizeof(int)));
-	ParticleShaders.push_back(nullptr);
-	Uniforms.push_back(std::vector<Uniform>());
-	if (IsInEditor || EngineDebug)
-	{
-		SetMaterial(Uniforms.size() - 1, "NONE", true);
-	}
+	Contexts.push_back(ObjectRenderContext(Mat));
 }
 
 std::vector<Particles::ParticleElement> Particles::ParticleEmitter::LoadParticleFile(std::string File, std::vector<std::string>& Materials)
@@ -193,39 +193,6 @@ void Particles::ParticleEmitter::AddParticleInstance(unsigned int Element)
 	}
 }
 
-void Particles::ParticleEmitter::ApplyUniforms(unsigned int Element)
-{
-	for (size_t i = 0; i < Uniforms[Element].size(); i++)
-	{
-		ApplyUniform(i, Element);
-	}
-}
-
-void Particles::ParticleEmitter::ApplyUniform(int Index, unsigned int Element)
-{
-	{
-		Uniform u = Uniforms[Element][Index];
-		switch (u.Type)
-		{
-		case Type::E_INT:
-			u.Content = new int(std::stoi(static_cast<char*>(u.Content)));
-			break;
-		case Type::E_FLOAT:
-			u.Content = new float(std::stof(static_cast<char*>(u.Content)));
-			break;
-		case Type::E_VECTOR3:
-			u.Content = new Vector3(Vector3::stov(static_cast<char*>(u.Content)));
-			break;
-		case Type::E_GL_TEXTURE:
-			u.Content = (void*)new unsigned int(Texture::LoadTexture(std::string(static_cast<char*>(u.Content))));
-			break;
-		default:
-			break;
-		}
-		Uniforms[Element][Index] = u;
-	}
-}
-
 Particles::ParticleEmitter::ParticleEmitter()
 {
 }
@@ -243,8 +210,8 @@ void Particles::ParticleEmitter::RemoveElement(unsigned int Index)
 	REMOVE_ARRAY_IND(ParticleVertexBuffers, Index);
 	REMOVE_ARRAY_IND(ParticleIndexBuffers, Index);
 
-	REMOVE_ARRAY_IND(ParticleShaders, Index);
-	REMOVE_ARRAY_IND(Uniforms, Index);
+	Contexts[Index].Unload();
+	REMOVE_ARRAY_IND(Contexts, Index);
 }
 
 Particles::ParticleEmitter::~ParticleEmitter()
@@ -257,74 +224,6 @@ Particles::ParticleEmitter::~ParticleEmitter()
 	{
 		delete buf;
 	}
-}
-
-void Particles::ParticleEmitter::SetMaterial(unsigned int Index, std::string NewMaterial, bool SupressMaterialError)
-{
-	if (!(Index < Uniforms.size()))
-	{
-		return;
-	}
-	if (!std::filesystem::exists(NewMaterial))
-	{
-		std::string MaterialAsset = Assets::GetAsset(NewMaterial + ".jsmat");
-
-		if (std::filesystem::exists(MaterialAsset))
-		{
-			NewMaterial = MaterialAsset;
-		}
-		if (!std::filesystem::exists(NewMaterial))
-		{
-			if (IsInEditor || EngineDebug)
-			{
-				if(!SupressMaterialError)
-					Log::Print("Material given by the mesh does not exist. Falling back to default phong material - " + NewMaterial, Vector3(1, 1, 0));
-			}
-			else
-			{
-				Log::Print("Material " + NewMaterial + " does not exist. Fallback material only avaliable with editor.");
-				throw "Material does not exist!";
-			}
-			NewMaterial = "EditorContent/Materials/EngineDefaultPhong.jsmat";
-		}
-	}
-	Material mat;
-	try
-	{
-		if (!std::filesystem::exists(NewMaterial))
-		{
-			return;
-		}
-
-		mat = Material::LoadMaterialFile(NewMaterial, false);
-		ParticleShaders[Index] = ReferenceShader("Shaders/" + mat.VertexShader, "Shaders/" + mat.FragmentShader);
-		if (ParticleShaders[Index] == nullptr)
-		{
-			ParticleShaders[Index] = ReferenceShader("Shaders/basic.vert", "Shaders/basic.frag");
-			Log::Print("Invalid Shader");
-		}
-
-	}
-	catch (std::exception& e)
-	{
-		Log::Print(e.what(), Vector3(0.8f, 0.f, 0.f));
-	}
-	try
-	{
-		Uniforms[Index].clear();
-		for (int i = 0; i < mat.Uniforms.size(); i++)
-		{
-			Uniforms[Index].push_back(Uniform("", 0, nullptr));
-			Uniforms[Index].at(i).Name = mat.Uniforms.at(i).UniformName;
-			Uniforms[Index].at(i).Type = mat.Uniforms.at(i).Type;
-			Uniforms[Index].at(i).Content = (void*)mat.Uniforms.at(i).Value.c_str();
-		}
-	}
-	catch (std::exception& e)
-	{
-		Log::Print(e.what());
-	}
-	ApplyUniforms(Index);
 }
 
 void Particles::ParticleEmitter::Reset()
@@ -398,36 +297,11 @@ void Particles::ParticleEmitter::Draw(Camera* MainCamera , bool MainFrameBuffer,
 	glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
 	for (unsigned int Elem = 0; Elem < ParticleElements.size(); Elem++)
 	{
-		ParticleShaders[Elem]->Bind();
-		glUniformMatrix4fv(glGetUniformLocation(ParticleShaders[Elem]->GetShaderID(), "u_projection"), 1, GL_FALSE, &MainCamera->GetProjection()[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(ParticleShaders[Elem]->GetShaderID(), "u_viewpro"), 1, GL_FALSE, &MainCamera->getViewProj()[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(ParticleShaders[Elem]->GetShaderID(), "u_view"), 1, GL_FALSE, &MainCamera->getView()[0][0]); uint8_t TexIterator = 0;
-		for (int i = 0; i < Uniforms[Elem].size(); ++i)
-		{
-			switch (Uniforms[Elem][i].Type)
-			{
-			case Type::E_INT:
-				glUniform1iv(glGetUniformLocation(ParticleShaders[Elem]->GetShaderID(), Uniforms[Elem][i].Name.c_str()), 1, static_cast<int*>(Uniforms[Elem][i].Content));
-				break;
-			case Type::E_FLOAT:
-				glUniform1fv(glGetUniformLocation(ParticleShaders[Elem]->GetShaderID(), Uniforms[Elem][i].Name.c_str()), 1, (float*)Uniforms[Elem][i].Content);
-				break;
-			case Type::E_VECTOR3:
-				glUniform3f(glGetUniformLocation(ParticleShaders[Elem]->GetShaderID(), Uniforms[Elem][i].Name.c_str()),
-					static_cast<Vector3*>((Uniforms[Elem][i].Content))->X,
-					static_cast<Vector3*>((Uniforms[Elem][i].Content))->Y,
-					static_cast<Vector3*>((Uniforms[Elem][i].Content))->Z);
-				break;
-			case Type::E_GL_TEXTURE:
-				glActiveTexture(GL_TEXTURE7 + TexIterator);
-				glBindTexture(GL_TEXTURE_2D, *(unsigned int*)Uniforms[Elem][i].Content);
-				glUniform1i(glGetUniformLocation(ParticleShaders[Elem]->GetShaderID(), Uniforms[Elem][i].Name.c_str()), 7 + TexIterator);
-				TexIterator++;
-				break;
-			default:
-				break;
-			}
-		}
+		unsigned int ElemShader = Contexts[Elem].GetShader()->GetShaderID();
+		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_projection"), 1, GL_FALSE, &MainCamera->GetProjection()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_viewpro"), 1, GL_FALSE, &MainCamera->getViewProj()[0][0]);
+		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_view"), 1, GL_FALSE, &MainCamera->getView()[0][0]); uint8_t TexIterator = 0;
+		Contexts[Elem].Bind();
 		ParticleVertexBuffers[Elem]->Bind();
 		ParticleIndexBuffers[Elem]->Bind();
 		if (MainFrameBuffer)

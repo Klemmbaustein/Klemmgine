@@ -18,46 +18,27 @@
 const extern bool IsInEditor;
 const extern bool EngineDebug;
 
-class ModelException : public std::exception
-{
-public:
-	ModelException(std::string ErrorType)
-	{
-		Exception = "Model loading error thrown: " + ErrorType;
-	}
-
-	virtual const char* what() const throw()
-	{
-		return Exception.c_str();
-	}
-
-	std::string Exception;
-};
 
 Model::Model(std::string Filename)
 {
-
-	uint64_t NumMeshes = 0;
-
 	if (std::filesystem::exists(Filename))
 	{
 		ModelMeshData.LoadModelFromFile(Filename);
 		CastShadow = ModelMeshData.CastShadow;
 		TwoSided = ModelMeshData.TwoSided;
-		for (size_t i = 0; i < ModelMeshData.Vertices.size(); i++)
+		for (size_t i = 0; i < ModelMeshData.Elements.size(); i++)
 		{
-			Mesh* NewMesh = new Mesh(ModelMeshData.Vertices[i], ModelMeshData.Indices[i]);
+			Mesh* NewMesh = new Mesh(ModelMeshData.Elements[i].Vertices, ModelMeshData.Elements[i].Indices, 
+				Material::LoadMaterialFile(ModelMeshData.Elements[i].ElemMaterial, false));
 			Meshes.push_back(NewMesh);
 		}
-		Materials = ModelMeshData.Materials;
 		HasCollision = ModelMeshData.HasCollision;
 		NonScaledSize = ModelMeshData.CollisionBox.GetLength();
-		LoadMaterials(Materials);
 		ConfigureVAO();
 	}
 	else
 	{
-		Log::Print("Model does not exist!");
+		Log::Print("Model does not exist: " + Filename);
 	}
 }
 
@@ -66,15 +47,14 @@ Model::Model(ModelGenerator::ModelData Data)
 	ModelMeshData = Data;
 	CastShadow = Data.CastShadow;
 	TwoSided = Data.TwoSided;
-	for (size_t i = 0; i < Data.Vertices.size(); i++)
+	for (auto& i : Data.Elements)
 	{
-		Mesh* NewMesh = new Mesh(Data.Vertices.at(i), Data.Indices.at(i));
+		Material mat = Material::LoadMaterialFile(i.ElemMaterial, false);
+		Mesh* NewMesh = new Mesh(i.Vertices, i.Indices, mat);
 		Meshes.push_back(NewMesh);
 	}
-	Materials = Data.Materials;
 	HasCollision = Data.HasCollision;
 	NonScaledSize = Data.CollisionBox.GetLength();
-	LoadMaterials(Materials);
 	ConfigureVAO();
 }
 
@@ -83,7 +63,6 @@ Model::~Model()
 {
 	for (Mesh* m : Meshes)
 	{
-		DereferenceShader("Shaders/" + m->MeshMaterial.VertexShader, "Shaders/" + m->MeshMaterial.FragmentShader);
 		delete m;
 	}
 	glDeleteBuffers(1, &MatBuffer);
@@ -122,7 +101,7 @@ void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyP
 		for (int i = 0; i < Meshes.size(); i++)
 		{
 			if (Meshes[i]->MeshMaterial.IsTranslucent != TransparencyPass) continue;
-			Shader* CurrentShader = ((!Graphics::IsRenderingShadows || Meshes[i]->MeshMaterial.UseShadowCutout) ? Meshes.at(i)->MeshShader : Graphics::ShadowShader);
+			Shader* CurrentShader = Meshes[i]->RenderContext.GetShader();
 			CurrentShader->Bind();
 			glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_projection"), 1, GL_FALSE, &WorldCamera->GetProjection()[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_invmodelview"), 1, GL_FALSE, &InvModelView[0][0]);
@@ -131,84 +110,6 @@ void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyP
 				glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_view"), 1, GL_FALSE, &WorldCamera->getView()[0][0]);
 			Meshes.at(i)->Render(CurrentShader, MainFrameBuffer);
 			Performance::DrawCalls++;
-		}
-	}
-}
-
-void Model::LoadMaterials(std::vector<std::string> Materials)
-{
-	Materials.resize(Meshes.size());
-	for (int j = 0; j < Meshes.size(); j++)
-	{
-		std::string m;
-		if (!Materials.at(j).empty())
-		{
-			m = Assets::GetAsset((Materials.at(j) + ".jsmat").substr(8));
-			if (!std::filesystem::exists(m))
-			{
-				m = Assets::GetAsset((Materials.at(j) + ".jsmat"));
-#if EDITOR || DEBUG
-				if (!std::filesystem::exists(m))
-				{
-					m = Materials[j] + ".jsmat";
-				}
-#endif
-				if (!std::filesystem::exists(m))
-				{
-					Log::Print("Material given by the mesh does not exist. Falling back to default phong material - " + Materials[j], Vector3(1, 1, 0));
-					m = "EditorContent/Materials/EngineDefaultPhong.jsmat";
-#ifdef RELEASE
-					throw ModelException("Model has invalid material assigned: \"" + Materials[j] + "\". Cannot fall back to default material");
-#endif
-				}
-			}
-			if (std::filesystem::is_empty(m))
-			{
-				Log::Print("Material given by the mesh is empty. Falling back to default phong material - " + Materials[j], Vector3(1, 1, 0));
-				m = "EditorContent/Materials/EngineDefaultPhong.jsmat";
-			}
-		}
-		else
-		{
-			Log::Print("Material given by the mesh does not exist. Falling back to default phong material - " + Materials[j], Vector3(1, 1, 0));
-			m = "EditorContent/Materials/EngineDefaultPhong.jsmat";
-		}
-		try
-		{
-			if (!std::filesystem::exists(m))
-			{
-				return;
-			}
-
-			Material mat = Material::LoadMaterialFile(m, false);
-			Meshes.at(j)->MeshMaterial = mat;
-			Meshes.at(j)->MeshShader = ReferenceShader("Shaders/" + mat.VertexShader, "Shaders/" + mat.FragmentShader);
-			if (Meshes.at(j)->MeshShader == nullptr)
-			{
-				Meshes.at(j)->MeshShader = ReferenceShader("Shaders/basic.vert", "Shaders/basic.frag");
-				Log::Print("Invalid Shader");
-			}
-			
-		}
-		catch (std::exception& e)
-		{
-			Log::Print(e.what(), Vector3(0.8f, 0.f, 0.f));
-		}
-		try
-		{
-			Meshes.at(j)->Uniforms.clear();
-			for (int i = 0; i < Meshes.at(j)->MeshMaterial.Uniforms.size(); i++)
-			{
-				Meshes.at(j)->Uniforms.push_back(Uniform("", 0, nullptr));
-				Meshes.at(j)->Uniforms.at(i).Name = Meshes.at(j)->MeshMaterial.Uniforms.at(i).UniformName;
-				Meshes.at(j)->Uniforms.at(i).Type = Meshes.at(j)->MeshMaterial.Uniforms.at(i).Type;
-				Meshes.at(j)->Uniforms.at(i).Content = (void*)Meshes.at(j)->MeshMaterial.Uniforms.at(i).Value.c_str();
-			}
-			Meshes.at(j)->ApplyUniforms();
-		}
-		catch (std::exception& e)
-		{
-			Log::Print(e.what());
 		}
 	}
 }
@@ -269,19 +170,5 @@ void Model::SimpleRender(Shader* UsedShader)
 
 void Model::SetUniform(Material::Param NewUniform, uint8_t MeshIndex)
 {
-	size_t i = 0;
-	for (auto& Uniform : Meshes[MeshIndex]->Uniforms)
-	{
-		if (Uniform.Name == NewUniform.UniformName)
-		{
-			Uniform.Type = NewUniform.Type;
-			delete Uniform.Content;
-			Uniform.Content = (void*)NewUniform.Value.c_str();
-			Meshes[MeshIndex]->ApplyUniform(i);
-			return;
-		}
-		i++;
-	}
-	Meshes[MeshIndex]->Uniforms.push_back(Uniform(NewUniform.UniformName, NewUniform.Type, (void*)NewUniform.Value.c_str()));
-	Meshes[MeshIndex]->ApplyUniform(Meshes[MeshIndex]->Uniforms.size() - 1);
+	Meshes[MeshIndex]->SetUniform(NewUniform);
 }

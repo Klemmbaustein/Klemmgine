@@ -5,6 +5,23 @@
 #include <sstream>
 #include <map>
 #include <filesystem>
+#include <Engine/FileUtility.h>
+
+class MaterialException : public std::exception
+{
+public:
+	MaterialException(std::string ErrorType)
+	{
+		Exception = "Material loading error thrown: " + ErrorType;
+	}
+
+	virtual const char* what() const throw()
+	{
+		return Exception.c_str();
+	}
+
+	std::string Exception;
+};
 
 void Material::SetPredefinedMaterialValue(std::string Value, char* ptr, std::string Name)
 {
@@ -28,14 +45,38 @@ void Material::SetPredefinedMaterialValue(std::string Value, char* ptr, std::str
 Material Material::LoadMaterialFile(std::string Name, bool IsTemplate)
 {
 	std::string File;
-	if (!std::filesystem::exists(Name))
+	std::string Ext;
+	if (FileUtil::GetExtension(Name).empty())
 	{
-		File = Assets::GetAsset(Name + (IsTemplate ? ".jsmtmp" : ".jsmat"));
+		Ext = (IsTemplate ? ".jsmtmp" : ".jsmat");
 	}
-	else
+
+	if (!std::filesystem::exists(Name + Ext))
 	{
-		File = Name;
+		File = Assets::GetAsset(Name + Ext);
+	}	
+	if (Name.substr(0, 8) == "Content/" && !std::filesystem::exists(File))
+	{
+		File = Assets::GetAsset(Name.substr(8) + Ext);
+		if (!std::filesystem::exists(File))
+		{
+			File = Name + Ext;
+		}
 	}
+	else if (!std::filesystem::exists(File))
+	{
+		File = Name + Ext;
+	}
+	if (!std::filesystem::exists(File))
+	{
+
+		Log::Print("Material given by the mesh does not exist. Falling back to default phong material - " + Name + Ext, Vector3(1, 0.5, 0));
+		File = "EditorContent/Materials/EngineDefaultPhong.jsmat";
+#ifdef RELEASE
+		throw MaterialException("Model has invalid material assigned: \"" + Name + "\". Cannot fall back to default material");
+#endif
+	}
+
 	if (!std::filesystem::exists(File))
 	{
 		Log::Print("Error while loading material: " + Name + " does not exist!");

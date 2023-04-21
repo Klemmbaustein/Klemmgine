@@ -358,7 +358,7 @@ void Viewport::UpdateTabBar()
 	TabBox->DeleteChildren();
 	for (size_t i = 0; i < Tabs.size(); i++)
 	{
-		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 2 : 1.5), this, i * 2))
+		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 3 : 1.5), this, i * 2))
 			->SetBorder(UIBox::E_ROUNDED, 0.4)
 			->SetPadding(0, 0, 0, 0.02)
 			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01, 0.05)))

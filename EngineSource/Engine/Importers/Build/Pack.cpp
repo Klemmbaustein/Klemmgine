@@ -10,10 +10,10 @@ std::vector<Pack::PackFile> Pack::GetPackContents(std::string Pack)
 	if (std::filesystem::exists(Pack))
 	{
 		std::ifstream In = std::ifstream(Pack, std::ios::in | std::ios::binary);
-		size_t AmmountOfFiles;
-		In.read((char*)&AmmountOfFiles, sizeof(size_t));
+		size_t AmountOfFiles;
+		In.read((char*)&AmountOfFiles, sizeof(size_t));
 
-		for(uint32_t i = 0; i < AmmountOfFiles; i++)
+		for(uint32_t i = 0; i < AmountOfFiles; i++)
 		{
 			std::string inName;
 			size_t stringlen;
@@ -44,8 +44,8 @@ std::vector<Pack::PackFile> Pack::GetPackContents(std::string Pack)
 bool Pack::SaveToPack(std::vector<PackFile> Content, std::string Path)
 {
 	std::ofstream Out = std::ofstream(Path, std::ios::binary | std::ios::out);
-	size_t AmmountOfFiles = Content.size();
-	Out.write((char*)&AmmountOfFiles, sizeof(size_t));
+	size_t AmountOfFiles = Content.size();
+	Out.write((char*)&AmountOfFiles, sizeof(size_t));
 	for (PackFile& p : Content)
 	{
 		size_t FileNameSize = p.FileName.size();

@@ -4,42 +4,181 @@
 #include <World/Graphics.h>
 #include <World/Stats.h>
 #include <Rendering/Utility/Framebuffer.h>
-
+#include <Rendering/Texture/Texture.h>
+#include "Utility/ShaderManager.h"
 
 void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
 {
 	ShaderToApply->Bind();
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, CSM::ShadowMaps);
-	glUniform1i(glGetUniformLocation(ShaderToApply->GetShaderID(), "farPlane"), CSM::cameraFarPlane);
-	glUniform1i(glGetUniformLocation(ShaderToApply->GetShaderID(), "cascadeCount"), CSM::shadowCascadeLevels.size());
-	glUniform1i(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_textureres"), Graphics::ShadowResolution);
-	glUniform1i(glGetUniformLocation(ShaderToApply->GetShaderID(), "shadowMap"), 1);
-	glUniform1i(glGetUniformLocation(ShaderToApply->GetShaderID(), "Skybox"), 2);
-	glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_biasmodifier"), (Vector3::Dot(
+	ShaderToApply->SetFloat("farPlane", CSM::cameraFarPlane);
+	ShaderToApply->SetInt("cascadeCount", CSM::shadowCascadeLevels.size());
+	ShaderToApply->SetInt("u_textureres", Graphics::ShadowResolution);
+	ShaderToApply->SetInt("shadowMap", 1);
+	ShaderToApply->SetInt("Skybox", 2);
+	ShaderToApply->SetFloat("u_biasmodifier", Vector3::Dot(
 		Vector3::GetForwardVector(Graphics::MainCamera->Rotation),
-		Graphics::WorldSun.Direction.Normalize())));
-	Vector3 CameraForward = Vector3::GetForwardVector(Graphics::MainCamera->Rotation);
-	glUniform3fv(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_cameraforward"), 1, &CameraForward.X);
-	glUniform3fv(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_cameraposition"), 1, &Graphics::MainFramebuffer->FramebufferCamera->Position.x);
-	glUniform1i(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_shadowQuality"), Graphics::PCFQuality);
-	glUniform1i(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_shadows"), Graphics::RenderShadows);
-	glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(), "FogFalloff"), Graphics::WorldFog.Falloff);
-	glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(), "FogDistance"), Graphics::WorldFog.Distance);
-	glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(), "FogMaxDensity"), Graphics::WorldFog.MaxDensity);
-	glUniform3fv(glGetUniformLocation(ShaderToApply->GetShaderID(), "FogColor"), 1, &Graphics::WorldFog.FogColor.X);
+		Graphics::WorldSun.Direction.Normalize()));
+	ShaderToApply->SetVector3("u_cameraforward", Vector3::GetForwardVector(Graphics::MainCamera->Rotation));
+	ShaderToApply->SetVector3("u_cameraposition", Graphics::MainFramebuffer->FramebufferCamera->Position);
+	ShaderToApply->SetInt("u_shadowQuality", Graphics::PCFQuality);
+	ShaderToApply->SetInt("u_shadows", Graphics::RenderShadows);
+	ShaderToApply->SetFloat("FogFalloff", Graphics::WorldFog.Falloff);
+	ShaderToApply->SetFloat("FogDistance", Graphics::WorldFog.Distance);
+	ShaderToApply->SetFloat("FogMaxDensity", Graphics::WorldFog.MaxDensity);
+	ShaderToApply->SetVector3("FogColor", Graphics::WorldFog.FogColor);
 
-	glUniform3fv(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_directionallight.Direction"), 1, &Graphics::WorldSun.Direction.X);
-	glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_directionallight.Intensity"), Graphics::WorldSun.Intensity);
-	glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_directionallight.AmbientIntensity"), Graphics::WorldSun.AmbientIntensity);
-	glUniform3fv(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_directionallight.SunColor"), 1, &Graphics::WorldSun.SunColor.X);
-	glUniform3fv(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_directionallight.AmbientColor"), 1, &Graphics::WorldSun.AmbientColor.X);
+	ShaderToApply->SetVector3("u_directionallight.Direction", Graphics::WorldSun.Direction);
+	ShaderToApply->SetFloat("u_directionallight.Intensity", Graphics::WorldSun.Intensity);
+	ShaderToApply->SetFloat("u_directionallight.AmbientIntensity", Graphics::WorldSun.AmbientIntensity);
+	ShaderToApply->SetVector3("u_directionallight.SunColor", Graphics::WorldSun.SunColor);
+	ShaderToApply->SetVector3("u_directionallight.AmbientColor", Graphics::WorldSun.AmbientColor);
 
-	glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(), "u_time"), Stats::Time);
+	ShaderToApply->SetFloat("u_time", Stats::Time);
 
 	for (size_t i = 0; i < CSM::shadowCascadeLevels.size(); ++i)
 	{
 		glUniform1fv(glGetUniformLocation(ShaderToApply->GetShaderID(),
 			((std::string("cascadePlaneDistances[") + std::to_string(i)) + "]").c_str()), 1, &CSM::shadowCascadeLevels[i]);
 	}
+}
+
+ObjectRenderContext::ObjectRenderContext(Material m)
+{
+	this->Mat = m;
+	ContextShader = ReferenceShader("Shaders/" + m.VertexShader, "Shaders/" + m.FragmentShader);
+	if (!ContextShader)
+	{
+		throw "Loaded invalid shader";
+	}
+	for (auto& i : m.Uniforms)
+	{
+		LoadUniform(i);
+	}
+}
+
+ObjectRenderContext::ObjectRenderContext()
+{
+}
+
+ObjectRenderContext::~ObjectRenderContext()
+{
+
+}
+
+void ObjectRenderContext::Bind()
+{
+	BindWithShader(ContextShader);
+}
+
+void ObjectRenderContext::BindWithShader(Shader* s)
+{
+	s->Bind();
+	size_t TexIterator = 0;
+	for (int i = 0; i < Uniforms.size(); ++i)
+	{
+		if (!Uniforms.at(i).Content)
+		{
+			continue;
+		}
+		switch (Uniforms.at(i).Type)
+		{
+		case Type::E_INT:
+			s->SetInt(Uniforms.at(i).Name.c_str(), *static_cast<int*>(Uniforms.at(i).Content));
+			break;
+		case Type::E_FLOAT:
+			s->SetFloat(Uniforms.at(i).Name.c_str(), *static_cast<float*>(Uniforms.at(i).Content));
+			break;
+		case Type::E_VECTOR3:
+			s->SetVector3(Uniforms.at(i).Name.c_str(), *static_cast<Vector3*>(Uniforms.at(i).Content));
+			break;
+		case Type::E_GL_TEXTURE:
+			glActiveTexture(GL_TEXTURE7 + TexIterator);
+			glBindTexture(GL_TEXTURE_2D, *(unsigned int*)Uniforms.at(i).Content);
+			glUniform1i(glGetUniformLocation(s->GetShaderID(), Uniforms.at(i).Name.c_str()), 7 + TexIterator);
+			TexIterator++;
+			break;
+		default:
+			break;
+		}
+	}
+}
+
+Shader* ObjectRenderContext::GetShader()
+{
+	return ContextShader;
+}
+
+void ObjectRenderContext::LoadUniform(Material::Param u)
+{
+	size_t UniformIndex = SIZE_MAX;
+	for (size_t i = 0; i < Uniforms.size(); i++)
+	{
+		if (Uniforms[i].Type == u.Type && Uniforms[i].Name == u.UniformName)
+		{
+			UniformIndex = i;
+			return;
+		}
+	}
+
+	if (UniformIndex == SIZE_MAX)
+	{
+		Uniforms.push_back(Uniform(u.UniformName, u.Type, nullptr));
+		UniformIndex = Uniforms.size() - 1;
+	}
+
+	if (u.Value.empty() && u.Type != Type::E_VECTOR3)
+	{
+		return;
+	}
+	switch (u.Type)
+	{
+	case Type::E_INT:
+		Uniforms[UniformIndex].Content = new int(std::stoi(u.Value));
+		break;
+	case Type::E_FLOAT:
+		Uniforms[UniformIndex].Content = new float(std::stof(u.Value));
+		break;
+	case Type::E_VECTOR3:
+		Uniforms[UniformIndex].Content = new Vector3(Vector3::stov(u.Value));
+		break;
+	case Type::E_GL_TEXTURE:
+		Uniforms[UniformIndex].Content = (void*)new unsigned int(Texture::LoadTexture(u.Value));
+		break;
+	default:
+		break;
+	}
+}
+
+void ObjectRenderContext::Unload()
+{
+	for (Uniform& u : Uniforms)
+	{
+		if (!u.Content)
+		{
+			continue;
+		}
+		switch (u.Type)
+		{
+		case Type::E_INT:
+			delete reinterpret_cast<int*>(u.Content);
+			break;
+		case Type::E_FLOAT:
+			delete reinterpret_cast<float*>(u.Content);
+			break;
+		case Type::E_VECTOR3:
+		case Type::E_VECTOR3_COLOR:
+			delete reinterpret_cast<Vector3*>(u.Content);
+			break;
+		case Type::E_GL_TEXTURE:
+			delete reinterpret_cast<unsigned int*>(u.Content);
+			break;
+		default:
+			break;
+		}
+	}
+	Uniforms.clear();
+	DereferenceShader("Shaders/" + Mat.VertexShader, "Shaders/" + Mat.FragmentShader);
+	ContextShader = nullptr;
 }

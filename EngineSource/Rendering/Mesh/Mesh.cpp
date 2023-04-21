@@ -8,13 +8,13 @@
 #include <Rendering/Texture/Texture.h>
 #include <GL/glew.h>
 
-Mesh::Mesh(std::vector<Vertex> Vertices, std::vector<int> Indices)
+Mesh::Mesh(std::vector<Vertex> Vertices, std::vector<int> Indices, Material Mat)
 {
 	NumVertices = Vertices.size();
 	NumIndices = Indices.size();
 	MeshIndexBuffer = new IndexBuffer(Indices.data(), NumIndices, sizeof(Indices[0]));
 	MeshVertexBuffer = new VertexBuffer(Vertices.data(), NumVertices);
-
+	RenderContext = ObjectRenderContext(Mat);
 }
 
 
@@ -22,65 +22,13 @@ Mesh::~Mesh()
 {
 	delete MeshVertexBuffer;
 	delete MeshIndexBuffer;
-	for (Uniform& u : Uniforms)
-	{
-		if (!u.Content)
-		{
-			continue;
-		}
-		switch (u.Type)
-		{
-		case Type::E_INT:
-			delete reinterpret_cast<int*>(u.Content);
-			break;
-		case Type::E_FLOAT:
-			delete reinterpret_cast<float*>(u.Content);
-			break;
-		case Type::E_VECTOR3:
-		case Type::E_VECTOR3_COLOR:
-			delete reinterpret_cast<Vector3*>(u.Content);
-			break;
-		case Type::E_GL_TEXTURE:
-			delete reinterpret_cast<unsigned int*>(u.Content);
-			break;
-		default:
-			break;
-		}
-	}
-	Uniforms.clear();
+	RenderContext.Unload();
 }
 void Mesh::Render(Shader* UsedShader, bool MainFrameBuffer)
 {
 	MeshVertexBuffer->Bind();
 	MeshIndexBuffer->Bind();
-	int TexIterator = 0;
-	for (int i = 0; i < Uniforms.size(); ++i)
-	{
-		if (!Uniforms.at(i).Content)
-		{
-			continue;
-		}
-		switch (Uniforms.at(i).Type)
-		{
-		case Type::E_INT:
-			glUniform1iv(glGetUniformLocation(UsedShader->GetShaderID(), Uniforms.at(i).Name.c_str()), 1, static_cast<int*>(Uniforms.at(i).Content));
-			break;
-		case Type::E_FLOAT:
-			glUniform1fv(glGetUniformLocation(UsedShader->GetShaderID(), Uniforms.at(i).Name.c_str()), 1, (float*)Uniforms[i].Content);
-			break;
-		case Type::E_VECTOR3:
-			glUniform3f(glGetUniformLocation(UsedShader->GetShaderID(), Uniforms.at(i).Name.c_str()), static_cast<Vector3*>((Uniforms.at(i).Content))->X, static_cast<Vector3*>((Uniforms.at(i).Content))->Y, static_cast<Vector3*>((Uniforms.at(i).Content))->Z);
-			break;
-		case Type::E_GL_TEXTURE:
-			glActiveTexture(GL_TEXTURE7 + TexIterator);
-			glBindTexture(GL_TEXTURE_2D, *(unsigned int*)Uniforms.at(i).Content);
-			glUniform1i(glGetUniformLocation(UsedShader->GetShaderID(), Uniforms.at(i).Name.c_str()), 7 + TexIterator);
-			TexIterator++;
-			break;
-		default:
-			break;
-		}
-	}
+	RenderContext.Bind();
 	if (MainFrameBuffer)
 	{
 		unsigned int attachements[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
@@ -97,37 +45,15 @@ void Mesh::Render(Shader* UsedShader, bool MainFrameBuffer)
 }
 void Mesh::SimpleRender(Shader* UsedShader)
 {
+	UsedShader->Bind();
 	if (MeshMaterial.UseShadowCutout)
 	{
-		glUniform1i(glGetUniformLocation(UsedShader->GetShaderID(), "u_usetexture"), 1);
-		for (int i = 0; i < Uniforms.size(); ++i)
-		{
-			if (!Uniforms.at(i).Content)
-			{
-				continue;
-			}
-			switch (Uniforms.at(i).Type)
-			{
-			case Type::E_INT:
-				glUniform1iv(glGetUniformLocation(UsedShader->GetShaderID(), Uniforms.at(i).Name.c_str()), 1, static_cast<int*>(Uniforms.at(i).Content));
-				break;
-			case Type::E_FLOAT:
-				glUniform1fv(glGetUniformLocation(UsedShader->GetShaderID(), Uniforms.at(i).Name.c_str()), 1, static_cast<float*>(Uniforms.at(i).Content));
-				break;
-			case Type::E_VECTOR3:
-				glUniform3f(glGetUniformLocation(UsedShader->GetShaderID(), Uniforms.at(i).Name.c_str()), static_cast<Vector3*>((Uniforms.at(i).Content))->X, static_cast<Vector3*>((Uniforms.at(i).Content))->Y, static_cast<Vector3*>((Uniforms.at(i).Content))->Z);
-				break;
-			case Type::E_GL_TEXTURE:
-				glActiveTexture(GL_TEXTURE7);
-				glBindTexture(GL_TEXTURE_2D, *(unsigned int*)Uniforms.at(i).Content);
-				glUniform1i(glGetUniformLocation(UsedShader->GetShaderID(), Uniforms.at(i).Name.c_str()), 7);
-				break;
-			default:
-				break;
-			}
-		}
+		RenderContext.BindWithShader(UsedShader);
 	}
-	else glUniform1i(glGetUniformLocation(UsedShader->GetShaderID(), "u_usetexture"), 0);
+	else
+	{
+		UsedShader->SetInt("u_usetexture", 0);
+	}
 	MeshVertexBuffer->Bind();
 	MeshIndexBuffer->Bind();
 	glDrawElements(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0);
@@ -135,42 +61,7 @@ void Mesh::SimpleRender(Shader* UsedShader)
 	MeshIndexBuffer->Unbind();
 }
 
-void Mesh::ApplyUniforms()
+void Mesh::SetUniform(Material::Param NewUniform)
 {
-	for (size_t i = 0; i < Uniforms.size(); i++)
-	{
-		ApplyUniform(i);
-	}
-}
-
-void Mesh::ApplyUniform(size_t Index)
-{
-	Uniform u = Uniforms.at(Index);
-	char* PreviousContent = static_cast<char*>(u.Content);
-	if (std::string(PreviousContent).empty() && u.Type != Type::E_VECTOR3)
-	{
-		Uniforms.at(Index).Content = nullptr;
-		return;
-	}
-	switch (u.Type)
-	{
-	case Type::E_INT:
-		u.Content = new int(std::stoi(static_cast<char*>(u.Content)));
-		break;
-	case Type::E_FLOAT:
-		u.Content = new float(std::stof(static_cast<char*>(u.Content)));
-		break;
-	case Type::E_VECTOR3:
-		u.Content = new Vector3(Vector3::stov(static_cast<char*>(u.Content)));
-		break;
-	case Type::E_GL_TEXTURE:
-		u.Content = (void*)new unsigned int(Texture::LoadTexture(std::string(static_cast<char*>(u.Content))));
-		break;
-	default:
-		break;
-	}
-
-
-
-	Uniforms[Index] = u;
+	RenderContext.LoadUniform(NewUniform);
 }

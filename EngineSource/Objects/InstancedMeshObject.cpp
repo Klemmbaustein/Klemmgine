@@ -10,7 +10,7 @@ void InstancedMeshObject::Tick()
 {
 	if (!Initialized)
 	{
-		for (int i = 0; i < Ammount; i++)
+		for (int i = 0; i < Amount; i++)
 		{
 			Vector3 Loc = Vector3(Random::GetRandomFloat(-Range, Range),
 				0, Random::GetRandomFloat(-Range, Range));
@@ -50,7 +50,7 @@ void InstancedMeshObject::Tick()
 void InstancedMeshObject::Begin()
 {
 	Properties.push_back(Objects::Property("Mesh", Type::E_STRING, &Filename));
-	Properties.push_back(Objects::Property("NumInstances", Type::E_INT, &Ammount));
+	Properties.push_back(Objects::Property("NumInstances", Type::E_INT, &Amount));
 	Properties.push_back(Objects::Property("Range", Type::E_INT, &Range));
 	Properties.push_back(Objects::Property("Component Name", Type::E_STRING, &ComponentName));
 	Properties.push_back(Objects::Property("Scale", Type::E_VECTOR3, &Scale));

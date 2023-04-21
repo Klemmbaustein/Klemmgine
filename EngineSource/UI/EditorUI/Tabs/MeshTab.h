@@ -27,20 +27,14 @@ protected:
 	FramebufferObject* PreviewBuffer = nullptr;
 	Model* PreviewModel = nullptr;
 	ModelGenerator::ModelData ModelData;
-	std::vector<std::vector<Vertex>> MeshVertices;
-	std::vector<std::vector<int>> Indices;
-	bool CastShadow;
+	bool CastShadow = false;
 	bool HasCollision = true;
 	bool TwoSided = true;
-	int NumTotalVertices;
 	std::string MeshPath;
 
 	UIText* TabName = nullptr;
 	TextRenderer* Renderer;
 	UIScrollBox* Rows[2];
-	int NumVertices;
-	int MaterialSlots;
-	std::vector<std::string> Materials;
 	std::vector<UITextField*> MaterialTextFields;
 	std::string Filepath;
 	std::string InitialName;

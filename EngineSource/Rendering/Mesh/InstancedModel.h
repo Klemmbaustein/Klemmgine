@@ -19,9 +19,9 @@ public:
 	void LoadMaterials(std::vector<std::string> Materials);
 	std::vector<Transform> Instances;
 protected:
+	ModelGenerator::ModelData ModelData;
 	unsigned int MatBuffer = -1;
 	std::vector<InstancedMesh*> Meshes;
 	glm::mat4 ModelViewProjection = glm::mat4();
-	std::vector<std::string> Materials;
 	Collision::Box NonScaledSize;
 };

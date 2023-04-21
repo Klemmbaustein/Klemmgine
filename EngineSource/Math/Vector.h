@@ -45,12 +45,6 @@ struct Vector3
 	float Y = 0;
 	float Z = 0;
 
-	/// <summary>
-	/// Constructor initalizing the X, Y and Z values of the Vector indivitually.
-	/// </summary>
-	/// <param name="x">The new X value</param>
-	/// <param name="y">The new Y value</param>
-	/// <param name="z">The new Z value</param>
 	Vector3(float x, float y, float z)
 	{
 		X = x;
@@ -58,16 +52,8 @@ struct Vector3
 		Z = z;
 	}
 
-	/// <summary>
-	/// Constructs an emtpy Vector3.
-	/// X, Y and Z will be 0.
-	/// </summary>
 	Vector3() {}
 
-	/// <summary>
-	/// Constructor initalizing X, Y and Z to a single Value.
-	/// </summary>
-	/// <param name="xyz">The value for X, Y and Z.</param>
 	Vector3(float xyz)
 	{
 		X = xyz;
@@ -75,11 +61,6 @@ struct Vector3
 		Z = xyz;
 	}
 
-	/// <summary>
-	/// Construct a Vector3 from a Vector2 for XY and a float representing Z.
-	/// </summary>
-	/// <param name="xy">The Vector2 containing the X and Y coordinate</param>
-	/// <param name="z">The float for the Z coordinate</param>
 	Vector3(Vector2 xy, float z)
 	{
 		X = xy.X;
@@ -87,13 +68,8 @@ struct Vector3
 		Z = z;
 	}
 
-	/// <summary>
-	/// Copies a glm::vec3 to a Vector3.
-	/// </summary>
-	/// <param name="xyz">The glm::vec3</param>
 	Vector3(glm::vec3 xyz);
 
-	//
 	operator glm::vec3()
 	{
 		return glm::vec3(X, Y, Z);
@@ -104,36 +80,23 @@ struct Vector3
 		return at(in);
 	}
 
-	Vector3 Normalize();
-	float Length();
+	Vector3 Normalize() const;
+	float Length() const;
 
 	Vector3& operator+=(Vector3 a);
 	Vector3& operator-=(Vector3 a);
 	
 	Vector3 operator-();
 
-	Vector3 RadiantsToDegrees();
-	Vector3 DegreesToRadiants();
-	std::string ToString();
+	Vector3 RadiantsToDegrees() const;
+	Vector3 DegreesToRadiants() const;
+	std::string ToString() const;
 
 	operator std::string() const
 	{
 		return std::to_string(X).append(" ").append(std::to_string(Y)).append(" ").append(std::to_string(Z));
 	}
-	float& at(int Index)
-	{
-		switch (Index)
-		{
-		case 0:
-			return X;
-		case 1:
-			return Y;
-		case 2:
-			return Z;
-		default:
-			throw "Invalid Vector3 index!";
-		}
-	}
+	float& at(unsigned int Index);
 
 	static Vector3 Vec3ToVector(glm::vec3 In);
 	static Vector3 GetForwardVector(Vector3 In);

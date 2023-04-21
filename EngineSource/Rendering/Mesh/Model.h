@@ -85,6 +85,5 @@ public:
 	ModelGenerator::ModelData ModelMeshData;
 protected:
 	glm::mat4 ModelViewProjection = glm::mat4();
-	std::vector<std::string> Materials;
 	float NonScaledSize = 1;
 };

@@ -7,19 +7,19 @@ namespace FrustumCulling
 	extern bool Active;
 	struct Plan
 	{
-		glm::vec3 normal = { 0.f, 1.f, 0.f }; // unit vector
+		Vector3 normal = { 0.f, 1.f, 0.f }; // unit vector
 		float     distance = 0.f;        // Distance with origin
 
 		Plan() = default;
 
-		Plan(const glm::vec3& p1, const glm::vec3& norm)
-			: normal(glm::normalize(norm)),
-			distance(glm::dot(normal, p1))
+		Plan(const Vector3& p1, const Vector3& norm)
+			: normal(norm.Normalize()),
+			distance(Vector3::Dot(normal, p1))
 		{}
 
-		float getSignedDistanceToPlan(const glm::vec3& point) const
+		float getSignedDistanceToPlan(const Vector3& point) const
 		{
-			return glm::dot(normal, point) - distance;
+			return Vector3::Dot(normal, point) - distance;
 		}
 	};
 
@@ -65,8 +65,8 @@ namespace FrustumCulling
 		bool isOnOrForwardPlan(const Plan& plan) const
 		{
 			// Compute the projection interval radius of b onto L(t) = b.c + t * p.n
-			const float r = extents.x * std::abs(plan.normal.x) +
-				extents.y * std::abs(plan.normal.y) + extents.z * std::abs(plan.normal.z);
+			const float r = extents.x * std::abs(plan.normal.X) +
+				extents.y * std::abs(plan.normal.Y) + extents.z * std::abs(plan.normal.Z);
 
 			return -r <= plan.getSignedDistanceToPlan(center);
 		}

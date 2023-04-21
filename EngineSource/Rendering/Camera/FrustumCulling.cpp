@@ -17,11 +17,11 @@ namespace FrustumCulling
 		const glm::vec3 frontMultFar = zFar * cam.lookAt;
 
 		frustum.nearFace = { cam.Position + zNear * cam.lookAt, cam.lookAt };
-		frustum.farFace = { cam.Position + frontMultFar, -cam.lookAt };
-		frustum.rightFace = { cam.Position, glm::cross(cam.Up, frontMultFar + cam.Right * halfHSide) };
-		frustum.leftFace = { cam.Position, glm::cross(frontMultFar - cam.Right * halfHSide, cam.Up) };
-		frustum.topFace = { cam.Position, glm::cross(cam.Right, frontMultFar - cam.Up * halfVSide) };
-		frustum.bottomFace = { cam.Position, glm::cross(frontMultFar + cam.Up * halfVSide, cam.Right) };
+		frustum.farFace = { cam.Position + frontMultFar, Vector3() - cam.lookAt};
+		frustum.rightFace = { cam.Position, Vector3::Cross(cam.Up, frontMultFar + cam.Right * halfHSide) };
+		frustum.leftFace = { cam.Position, Vector3::Cross(frontMultFar - cam.Right * halfHSide, cam.Up) };
+		frustum.topFace = { cam.Position, Vector3::Cross(cam.Right, frontMultFar - cam.Up * halfVSide) };
+		frustum.bottomFace = { cam.Position, Vector3::Cross(frontMultFar + cam.Up * halfVSide, cam.Right) };
 		return frustum;
 	}
 	Frustum CurrentCameraFrustum;

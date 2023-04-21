@@ -108,7 +108,7 @@ Transform operator+(Transform a, Transform b)
 }
 
 
-Vector3 Vector3::Normalize()
+Vector3 Vector3::Normalize() const
 {
 	float Len = sqrt(X * X + Y * Y + Z * Z);
 	if (Len > 0)
@@ -130,7 +130,7 @@ Vector2 Vector2::Clamp(Vector2 Min, Vector2 Max)
 	return Vector2(NewX, NewY);
 }
 
-float Vector3::Length()
+float Vector3::Length() const
 {
 	return sqrt(X * X + Y * Y + Z * Z);
 }
@@ -151,7 +151,7 @@ Vector3& Vector3::operator-=(Vector3 a)
 	return *this;
 }
 
-Vector3 Vector3::RadiantsToDegrees()
+Vector3 Vector3::RadiantsToDegrees() const
 {
 	return Vector3(glm::degrees(X), glm::degrees(Y), glm::degrees(Z));
 }
@@ -160,12 +160,12 @@ Vector3 Vector3::operator-()
 	return Vector3() - *this;
 }
 
-Vector3 Vector3::DegreesToRadiants()
+Vector3 Vector3::DegreesToRadiants() const
 {
 	return Vector3(glm::radians(X), glm::radians(Y), glm::radians(Z));
 }
 
-std::string Vector3::ToString()
+std::string Vector3::ToString() const
 {
 	return std::string(std::to_string(X) + " " + std::to_string(Y) + " " + std::to_string(Z));
 }
@@ -180,6 +180,13 @@ Vector3::Vector3(glm::vec3 xyz)
 	X = xyz.x;
 	Y = xyz.y;
 	Z = xyz.z;
+}
+
+float& Vector3::at(unsigned int Index)
+{
+	if (Index > 2)
+		throw "Invalid vector index";
+	return *((float*)this + Index);
 }
 
 Vector3 Vector3::Vec3ToVector(glm::vec3 In)
@@ -207,13 +214,16 @@ Vector3 Vector3::SnapToGrid(Vector3 In, float GridSize)
 
 Vector3 Vector3::Cross(Vector3 a, Vector3 b)
 {
-	return Vector3::Vec3ToVector(glm::normalize(glm::cross((glm::vec3)a, (glm::vec3)b)));
+	return Vector3(a.Y * b.Z - a.Z * b.Y,
+		a.Z * b.X - a.X * b.Z,
+		a.X * b.Y - a.Y * b.X);
 }
 float Vector3::Dot(Vector3 a, Vector3 b)
 {
-	std::vector<float> A = {a.X, a.Y, a.Z};
-	std::vector<float> B = {b.X, b.Y, b.Z};
-	return std::inner_product(std::begin(A), std::end(A), std::begin(B), 0.f);
+	float result = 0.0;
+	for (int i = 0; i < 3; i++)
+		result += a[i] * b[i];
+	return result;
 }
 Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 {

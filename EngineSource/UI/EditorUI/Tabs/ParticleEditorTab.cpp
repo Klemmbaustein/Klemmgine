@@ -30,7 +30,6 @@ ParticleEditorTab::ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsi
 	
 	this->RemoveTexture = RemoveTexture;
 	Particle = new Particles::ParticleEmitter();
-	Particle->SetMaterial(0, "NONE");
 	ParticleViewport = new UIBackground(true, Vector2(-0.7, -0.6), 1, Vector2(0.4));
 	ParticleFramebufferObject->ParticleEmitters.push_back(Particle);
 	ParticleFramebufferObject->ReInit();
@@ -92,9 +91,8 @@ void ParticleEditorTab::Load(std::string File)
 	Particle->ParticleVertexBuffers.clear();
 	Particle->ParticleIndexBuffers.clear();
 	Particle->SpawnDelays.clear();
-	Particle->ParticleShaders.clear();
 	Particle->ParticleInstances.clear();
-	Particle->Uniforms.clear();
+	Particle->Contexts.clear();
 	Particle->ParticleMatrices.clear();
 	Particle->ParticleElements.clear();
 
@@ -105,8 +103,7 @@ void ParticleEditorTab::Load(std::string File)
 			auto ParticleData = Particles::ParticleEmitter::LoadParticleFile(File, ElementMaterials);
 			for (unsigned int i = 0; i < ParticleData.size(); i++)
 			{
-				Particle->AddElement(ParticleData[i]);
-				Particle->SetMaterial(i, ElementMaterials[i]);
+				Particle->AddElement(ParticleData[i], Material::LoadMaterialFile(ElementMaterials[i], false));
 			}
 		}
 	}
@@ -302,8 +299,7 @@ void ParticleEditorTab::OnButtonClicked(int Index)
 	{
 		if (Index == 0)
 		{
-			ElementMaterials.push_back("NONE");
-			Particle->AddElement(Particles::ParticleElement());
+			Particle->AddElement(Particles::ParticleElement(), Material::LoadMaterialFile("NONE", false));
 			Generate();
 			return;
 		}
@@ -357,7 +353,7 @@ void ParticleEditorTab::OnButtonClicked(int Index)
 		}
 		if (Index == 106)
 		{
-			Particle->SetMaterial(SelectedElement, ((UITextField*)SettingsButtons[Index - 100])->GetText());
+			Particle->SetMaterial(SelectedElement, Material::LoadMaterialFile(((UITextField*)SettingsButtons[Index - 100])->GetText(), false));
 			ElementMaterials[SelectedElement] = ((UITextField*)SettingsButtons[Index - 100])->GetText();
 			Generate();
 			return;

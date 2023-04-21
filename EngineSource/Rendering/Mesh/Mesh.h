@@ -4,38 +4,20 @@
 #include "Rendering/VertexBuffer.h"
 #include <vector>
 #include "Rendering/Utility/IndexBuffer.h"
-#include <Rendering/Texture/Material.h>
-
-struct Uniform
-{
-	std::string Name;
-	int Type;
-	void* Content;
-	Uniform(std::string Name, int Type, void* Content)
-	{
-		this->Content = Content;
-		this->Name = Name;
-		this->Type = Type;
-	}
-};
-
+#include <Rendering/Renderable.h>
 
 class Mesh
 {
 public:
-	Mesh(std::vector<Vertex> Vertices, std::vector<int> Indices);
-
-	void Render(Shader* UsedShader, bool MainFrameBuffer);
-
-
-	void SimpleRender(Shader* UsedShader);
-
+	Mesh(std::vector<Vertex> Vertices, std::vector<int> Indices, Material Mat);
 	~Mesh();
 
-	void ApplyUniforms();
-	void ApplyUniform(size_t Index);
-	std::vector<Uniform> Uniforms;
-	Shader* MeshShader = nullptr;
+	void Render(Shader* UsedShader, bool MainFrameBuffer);
+	void SimpleRender(Shader* UsedShader);
+
+	void SetUniform(Material::Param NewUniform);
+
+	ObjectRenderContext RenderContext;
 	VertexBuffer* MeshVertexBuffer = nullptr;
 	Material MeshMaterial;
 protected:

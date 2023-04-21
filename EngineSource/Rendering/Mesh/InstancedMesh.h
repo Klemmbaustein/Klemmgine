@@ -5,24 +5,23 @@
 #include <vector>
 #include "Rendering/Utility/IndexBuffer.h"
 #include <Rendering/Mesh/Mesh.h>
+
 class InstancedMesh
 {
 public:
-	InstancedMesh(std::vector<Vertex> Vertices, std::vector<int> Indices);
-
-	void Render(Shader* UsedShader);
-
-	void SimpleRender(Shader* UsedShader);
-
+	InstancedMesh(std::vector<Vertex> Vertices, std::vector<int> Indices, Material Mat);
 	~InstancedMesh();
 
-	void ApplyUniforms();
+	void Render(Shader* UsedShader);
+	void SimpleRender(Shader* UsedShader);
 
-	std::vector<Uniform> Uniforms;
+	void SetUniform(Material::Param NewUniform);
+
 	Material MeshMaterial;
 	Shader* MeshShader = nullptr;
 	void SetInstances(std::vector<Transform> T);
 	VertexBuffer* MeshVertexBuffer = nullptr;
+	ObjectRenderContext RenderContext;
 
 protected:
 private:

@@ -244,16 +244,16 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 			std::string CurrentLight = "u_lights[" + std::to_string(i) + "]";
 			if (i < Graphics::Lights.size())
 			{
-				glUniform3fv(glGetUniformLocation(s.second.UsedShader->GetShaderID(), (CurrentLight + ".Position").c_str()), 1, &Graphics::Lights[i].Position.X);
-				glUniform3fv(glGetUniformLocation(s.second.UsedShader->GetShaderID(), (CurrentLight + ".Color").c_str()), 1, &Graphics::Lights[i].Color.X);
-				glUniform1f(glGetUniformLocation(s.second.UsedShader->GetShaderID(), (CurrentLight + ".Falloff").c_str()), Graphics::Lights[i].Falloff);
-				glUniform1f(glGetUniformLocation(s.second.UsedShader->GetShaderID(), (CurrentLight + ".Intensity").c_str()), Graphics::Lights[i].Intensity);
+				Application::PostProcessShader->SetVector3(CurrentLight + ".Position", Graphics::Lights[i].Position);
+				Application::PostProcessShader->SetVector3(CurrentLight + ".Color", Graphics::Lights[i].Color);
+				Application::PostProcessShader->SetFloat(CurrentLight + ".Falloff", Graphics::Lights[i].Falloff);
+				Application::PostProcessShader->SetFloat(CurrentLight + ".Intensity", Graphics::Lights[i].Intensity);
 
-				glUniform1i(glGetUniformLocation(s.second.UsedShader->GetShaderID(), (CurrentLight + ".Active").c_str()), 1);
+				Application::PostProcessShader->SetInt(CurrentLight + ".Active", 1);
 			}
 			else
 			{
-				glUniform1i(glGetUniformLocation(s.second.UsedShader->GetShaderID(), (CurrentLight + ".Active").c_str()), 0);
+				Application::PostProcessShader->SetInt(CurrentLight + ".Active", 0);
 			}
 		}
 	}
@@ -329,8 +329,6 @@ void PollInput()
 		}
 		else if (Event.type == SDL_KEYDOWN)
 		{
-			std::vector<int> Indices;
-
 			if (Event.key.keysym.sym < 128)
 				Input::Keys[Event.key.keysym.sym] = true;
 			else
@@ -488,9 +486,9 @@ void DrawPostProcessing()
 	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0));
 #if EDITOR
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, dynamic_cast<Viewport*>(Application::EditorUserInterface->UIElements[4])->OutlineBuffer->GetBuffer()->GetTextureID(1));
+	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->OutlineBuffer->GetBuffer()->GetTextureID(1));
 	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, dynamic_cast<Viewport*>(Application::EditorUserInterface->UIElements[4])->ArrowsBuffer->GetBuffer()->GetTextureID(0));
+	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->ArrowsBuffer->GetBuffer()->GetTextureID(0));
 #endif
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, BloomTexture);
@@ -501,7 +499,7 @@ void DrawPostProcessing()
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, UIBox::GetUIFramebuffer());
 	Application::PostProcessShader->Bind();
-	glUniform1f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_gamma"), Graphics::Gamma);
+	Application::PostProcessShader->SetFloat("u_gamma", Graphics::Gamma);
 #if EDITOR
 	auto ViewportTab = Application::EditorUserInterface->UIElements[4];
 	Vector2 ViewportPos = (ViewportTab->Position + ViewportTab->Scale * 0.5);
@@ -509,17 +507,17 @@ void DrawPostProcessing()
 	Vector2 ViewportScale = ViewportTab->Scale;
 	glUniform2f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "Scale"), ViewportScale.X, ViewportScale.Y);
 #endif
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_texture"), 1);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_outlines"), 2);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_enginearrows"), 3);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_ssaotexture"), 5);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_depth"), 6);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_ui"), 7);
-	glUniform1f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_time"), Stats::Time);
-	glUniform1f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_vignette"), Graphics::Vignette);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_fxaa"), Graphics::FXAA);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_bloom"), Graphics::Bloom);
-	glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_ssao"), Graphics::SSAO);
+	Application::PostProcessShader->SetInt("u_texture", 1);
+	Application::PostProcessShader->SetInt("u_outlines", 2);
+	Application::PostProcessShader->SetInt("u_enginearrows", 3);
+	Application::PostProcessShader->SetInt("u_ssaotexture", 5);
+	Application::PostProcessShader->SetInt("u_depth", 6);
+	Application::PostProcessShader->SetInt("u_ui", 7);
+	Application::PostProcessShader->SetFloat("u_time", Stats::Time);
+	Application::PostProcessShader->SetFloat("u_vignette", Graphics::Vignette);
+	Application::PostProcessShader->SetInt("u_fxaa", Graphics::FXAA);
+	Application::PostProcessShader->SetInt("u_bloom", Graphics::Bloom);
+	Application::PostProcessShader->SetInt("u_ssao", Graphics::SSAO);
 	if (Graphics::Bloom)
 	{
 		glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_bloomtexture"), 4);

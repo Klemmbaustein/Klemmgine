@@ -353,6 +353,4 @@ void EditorUI::OnResized()
 	}
 }
 
-
-
 #endif

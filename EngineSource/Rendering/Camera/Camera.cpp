@@ -32,20 +32,20 @@ void Camera::UpdateRotation()
 
 	Vector3 EffectiveRotation = Vector3(pitch, yaw, 0) + CameraShake::CameraShakeTranslation;
 
-	glm::vec3 front;
-	front.x = cos(glm::radians(EffectiveRotation.X)) * cos(glm::radians(EffectiveRotation.Y));
-	front.y = sin(glm::radians(EffectiveRotation.X));
-	front.z = cos(glm::radians(EffectiveRotation.X)) * sin(glm::radians(EffectiveRotation.Y));
+	Vector3 front;
+	front.X = cos(glm::radians(EffectiveRotation.X)) * cos(glm::radians(EffectiveRotation.Y));
+	front.Y = sin(glm::radians(EffectiveRotation.X));
+	front.Z = cos(glm::radians(EffectiveRotation.X)) * sin(glm::radians(EffectiveRotation.Y));
 
-	lookAt = glm::normalize(front);
-	Right = glm::normalize(glm::cross(front, up));
-	Up = glm::normalize(glm::cross(Right, front));
+	lookAt = front.Normalize();
+	Right = Vector3::Cross(front, up).Normalize();
+	Up = Vector3::Cross(Right, front).Normalize();
 }
 
 void Camera::Update()
 {
-	View = glm::lookAt(Position, Position + lookAt, up);
-	glm::mat4 View = glm::rotate(View, glm::radians(roll), Position + up);
+	View = glm::lookAt((glm::vec3)Position, (glm::vec3)Position + (glm::vec3)lookAt, (glm::vec3)up);
+	glm::mat4 View = glm::rotate(View, glm::radians(roll), (glm::vec3)Position + (glm::vec3)up);
 
 	ViewProj = Projection * View;
 	Rotation = Vector3(pitch, yaw, roll);
@@ -64,10 +64,10 @@ Vector3 Camera::ForwardVectorFromScreenPosition(float x, float y)
 	glm::vec4 ray_eye = glm::inverse(Projection) * ray_clip;
 	ray_eye = glm::vec4(ray_eye.x, ray_eye.y, -1.f, 1.f);
 
-	glm::vec3 ray_wor = (glm::inverse(View) * ray_eye);
+	Vector3 ray_wor = glm::vec3(glm::inverse(View) * ray_eye);
 
 	ray_wor -= Position;
-	return Vector3(ray_wor.x, ray_wor.y, ray_wor.z).Normalize();
+	return ray_wor.Normalize();
 }
 
 void Camera::ReInit(float FOV, float Width, float Heigth, bool Ortho)

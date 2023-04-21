@@ -29,7 +29,7 @@ void MeshObject::LoadFromFile(std::string Filename)
 	if (MeshCollision) Detach(MeshCollision);
 	ModelGenerator::ModelData m;
 	m.LoadModelFromFile(Filename);
-	for (size_t i = 0; i < m.Materials.size(); i++)
+	for (size_t i = 0; i < m.Elements.size(); i++)
 	{
 		if (i >= MaterialNames.size() || MaterialNames[i] == "")
 		{
@@ -37,11 +37,11 @@ void MeshObject::LoadFromFile(std::string Filename)
 		}
 		if (MaterialNames[i].substr(0, 8) != "Content/")
 		{
-			m.Materials.at(i) = "Content/" + MaterialNames.at(i);
+			m.Elements.at(i).ElemMaterial = "Content/" + MaterialNames.at(i);
 		}
 		else
 		{
-			m.Materials.at(i) = MaterialNames.at(i);
+			m.Elements.at(i).ElemMaterial = MaterialNames.at(i);
 		}
 	}
 
@@ -72,10 +72,10 @@ void MeshObject::OnPropertySet()
 	Properties.clear();
 	GenerateDefaultCategories();
 	MaterialNames.clear();
-	MaterialNames.resize(Mesh->GetModel()->ModelMeshData.Materials.size());
-	for (size_t i = 0; i < Mesh->GetModel()->ModelMeshData.Materials.size(); i++)
+	MaterialNames.resize(Mesh->GetModel()->ModelMeshData.Elements.size());
+	for (size_t i = 0; i < Mesh->GetModel()->ModelMeshData.Elements.size(); i++)
 	{
-		MaterialNames[i] = Mesh->GetModel()->ModelMeshData.Materials[i];
+		MaterialNames[i] = Mesh->GetModel()->ModelMeshData.Elements[i].ElemMaterial;
 		if (MaterialNames[i].substr(0, 8) == "Content/")
 		{
 			MaterialNames[i] = MaterialNames[i].substr(8);
@@ -85,7 +85,8 @@ void MeshObject::OnPropertySet()
 }
 
 void MeshObject::GenerateDefaultCategories()
-{	// Categories are sorted alphabetically. The text renderer doesn't render newlines, so the categories have \n first so they will be sorted first.
+{	
+	// Categories are sorted alphabetically. The text renderer doesn't render newlines, so the categories have \n first so they will be sorted first.
 	Properties.push_back(Objects::Property("\nMesh:Mesh file", Type::E_STRING, &Filename));
 	Properties.push_back(Objects::Property("\nMesh:Cast Shadow", Type::E_BOOL, &MeshCastShadow));
 }

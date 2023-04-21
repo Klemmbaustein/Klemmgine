@@ -12,90 +12,26 @@
 
 InstancedModel::InstancedModel(std::string Filename)
 {
-	int NumVertecies = 0;
-	int NumIndices = 0;
-
-	uint64_t NumMeshes = 0;
-
 	if (std::filesystem::exists(Filename))
 	{
-		ModelGenerator::ModelData ModelData; ModelData.LoadModelFromFile(Filename);
+		ModelData.LoadModelFromFile(Filename);
 		CastShadow = ModelData.CastShadow;
 		TwoSided = ModelData.TwoSided;
-		for (size_t i = 0; i < ModelData.Vertices.size(); i++)
+		for (size_t i = 0; i < ModelData.Elements.size(); i++)
 		{
-			InstancedMesh* NewMesh = new InstancedMesh(ModelData.Vertices[i], ModelData.Indices[i]);
+			InstancedMesh* NewMesh = new InstancedMesh(ModelData.Elements[i].Vertices, ModelData.Elements[i].Indices,
+				Material::LoadMaterialFile(ModelData.Elements[i].ElemMaterial, false));
 			Meshes.push_back(NewMesh);
 		}
-		Materials = ModelData.Materials;
-		if (ModelData.HasCollision)
-		{
-			NonScaledSize = ModelData.CollisionBox;
-		}
-		LoadMaterials(Materials);
-
+		NonScaledSize = ModelData.CollisionBox;
 		ConfigureVAO();
 	}
-}
-
-void InstancedModel::LoadMaterials(std::vector<std::string> Materials)
-{
-	Materials.resize(Meshes.size());
-	for (int j = 0; j < Meshes.size(); j++)
+	else
 	{
-		std::string m = Assets::GetAsset((Materials.at(j) + ".jsmat").substr(8));
-		if (!std::filesystem::exists(m))
-		{
-			if (EngineDebug || IsInEditor)
-				m = (Materials.at(j) + ".jsmat");
-			else
-				m = ("Assets/" + Materials.at(j) + ".jsmat");
-			if (!std::filesystem::exists(m))
-			{
-				if (IsInEditor)
-					Log::Print("Material given by the mesh does not exist. Falling back to default phong material - " + Materials[j], Vector3(1, 1, 0));
-				m = "EditorContent/Materials/EngineDefaultPhong.jsmat";
-			}
-		}
-		try
-		{
-			if (!std::filesystem::exists(m))
-			{
-				return;
-			}
-
-			Meshes.at(j)->MeshMaterial = Material::LoadMaterialFile(m, false);
-			Meshes.at(j)->MeshShader = ReferenceShader("Shaders/" + Meshes.at(j)->MeshMaterial.VertexShader,
-				"Shaders/" + Meshes.at(j)->MeshMaterial.FragmentShader);
-			if (Meshes.at(j)->MeshShader == nullptr)
-			{
-				Meshes.at(j)->MeshShader = ReferenceShader("Shaders/basic.vert", "Shaders/basic.frag");
-				Log::Print("Invalid Shader");
-			}
-
-		}
-		catch (std::exception& e)
-		{
-			Log::Print(e.what(), Vector3(0.8f, 0.f, 0.f));
-		}
-		try
-		{
-			Meshes.at(j)->Uniforms.clear();
-			for (int i = 0; i < Meshes[j]->MeshMaterial.Uniforms.size(); i++)
-			{
-				Meshes.at(j)->Uniforms.push_back(Uniform("", 0, nullptr));
-				Meshes.at(j)->Uniforms.at(i).Name = Meshes[j]->MeshMaterial.Uniforms.at(i).UniformName;
-				Meshes.at(j)->Uniforms.at(i).Type = Meshes[j]->MeshMaterial.Uniforms.at(i).Type;
-				Meshes.at(j)->Uniforms.at(i).Content = (void*)Meshes[j]->MeshMaterial.Uniforms.at(i).Value.c_str();
-			}
-			Meshes.at(j)->ApplyUniforms();
-		}
-		catch (std::exception& e)
-		{
-			Log::Print(e.what());
-		}
+		Log::Print("Model does not exist: " + Filename);
 	}
 }
+
 
 InstancedModel::~InstancedModel()
 {
