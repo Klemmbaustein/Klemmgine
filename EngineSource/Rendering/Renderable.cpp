@@ -85,13 +85,13 @@ void ObjectRenderContext::BindWithShader(Shader* s)
 		switch (Uniforms.at(i).Type)
 		{
 		case Type::E_INT:
-			s->SetInt(Uniforms.at(i).Name.c_str(), *static_cast<int*>(Uniforms.at(i).Content));
+			s->SetInt(Uniforms.at(i).Name, *static_cast<int*>(Uniforms.at(i).Content));
 			break;
 		case Type::E_FLOAT:
-			s->SetFloat(Uniforms.at(i).Name.c_str(), *static_cast<float*>(Uniforms.at(i).Content));
+			s->SetFloat(Uniforms.at(i).Name, *static_cast<float*>(Uniforms.at(i).Content));
 			break;
 		case Type::E_VECTOR3:
-			s->SetVector3(Uniforms.at(i).Name.c_str(), *static_cast<Vector3*>(Uniforms.at(i).Content));
+			s->SetVector3(Uniforms.at(i).Name, *static_cast<Vector3*>(Uniforms.at(i).Content));
 			break;
 		case Type::E_GL_TEXTURE:
 			glActiveTexture(GL_TEXTURE7 + TexIterator);
@@ -181,4 +181,5 @@ void ObjectRenderContext::Unload()
 	Uniforms.clear();
 	DereferenceShader("Shaders/" + Mat.VertexShader, "Shaders/" + Mat.FragmentShader);
 	ContextShader = nullptr;
+	Mat = Material();
 }

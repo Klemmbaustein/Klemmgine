@@ -100,14 +100,13 @@ void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyP
 		glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
 		for (int i = 0; i < Meshes.size(); i++)
 		{
-			if (Meshes[i]->MeshMaterial.IsTranslucent != TransparencyPass) continue;
+			if (Meshes[i]->RenderContext.Mat.IsTranslucent != TransparencyPass) continue;
 			Shader* CurrentShader = Meshes[i]->RenderContext.GetShader();
 			CurrentShader->Bind();
 			glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_projection"), 1, GL_FALSE, &WorldCamera->GetProjection()[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_invmodelview"), 1, GL_FALSE, &InvModelView[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_viewpro"), 1, GL_FALSE, &WorldCamera->getViewProj()[0][0]);
-			if (!Graphics::IsRenderingShadows)
-				glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_view"), 1, GL_FALSE, &WorldCamera->getView()[0][0]);
+			glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_view"), 1, GL_FALSE, &WorldCamera->getView()[0][0]);
 			Meshes.at(i)->Render(CurrentShader, MainFrameBuffer);
 			Performance::DrawCalls++;
 		}

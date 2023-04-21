@@ -45,16 +45,14 @@ std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 			continue;
 		}
 		std::vector<std::string> PathElements;
-		size_t Index = CurrentPath.find_first_of("/");
+		size_t Index = std::string::npos;
 
-
-		while (Index != std::string::npos)
+		do
 		{
 			Index = CurrentPath.find_first_of("/");
 			PathElements.push_back(CurrentPath.substr(0, Index));
 			CurrentPath = CurrentPath.substr(Index + 1);
-			Index = CurrentPath.find_first_of("/");
-		}
+		} while (Index != std::string::npos);
 
 		// Iterate through every 'element' we just got from the Category string
 		for (const auto& elem : PathElements)

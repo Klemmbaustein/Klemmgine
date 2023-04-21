@@ -24,6 +24,7 @@ struct ObjectRenderContext
 	};
 
 	Shader* GetShader();
+	Material Mat;
 
 	void LoadUniform(Material::Param u);
 	void Unload();
@@ -31,7 +32,6 @@ struct ObjectRenderContext
 protected:
 	Shader* ContextShader = nullptr;
 	std::vector<Uniform> Uniforms;
-	Material Mat;
 };
 
 class Renderable

@@ -46,9 +46,10 @@ void Mesh::Render(Shader* UsedShader, bool MainFrameBuffer)
 void Mesh::SimpleRender(Shader* UsedShader)
 {
 	UsedShader->Bind();
-	if (MeshMaterial.UseShadowCutout)
+	if (RenderContext.Mat.UseShadowCutout)
 	{
 		RenderContext.BindWithShader(UsedShader);
+		UsedShader->SetInt("u_usetexture", 1);
 	}
 	else
 	{

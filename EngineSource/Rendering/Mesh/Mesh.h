@@ -19,7 +19,6 @@ public:
 
 	ObjectRenderContext RenderContext;
 	VertexBuffer* MeshVertexBuffer = nullptr;
-	Material MeshMaterial;
 protected:
 private:
 	IndexBuffer* MeshIndexBuffer;

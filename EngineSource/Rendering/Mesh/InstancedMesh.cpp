@@ -37,14 +37,15 @@ void InstancedMesh::Render(Shader* UsedShader)
 }
 void InstancedMesh::SimpleRender(Shader* UsedShader)
 {
-	if (MeshMaterial.UseShadowCutout)
+	/*if (RenderContext.Mat.UseShadowCutout)
 	{
-		RenderContext.Bind();
+		RenderContext.BindWithShader(UsedShader);
+		UsedShader->SetInt("u_usetexture", 1);
 	}
 	else
 	{
-		RenderContext.GetShader()->SetInt("u_usetexture", 0);
-	}
+		UsedShader->SetInt("u_usetexture", 0);
+	}*/
 	MeshVertexBuffer->Bind();
 	MeshIndexBuffer->Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0, Instances.size());

@@ -17,8 +17,6 @@ public:
 
 	void SetUniform(Material::Param NewUniform);
 
-	Material MeshMaterial;
-	Shader* MeshShader = nullptr;
 	void SetInstances(std::vector<Transform> T);
 	VertexBuffer* MeshVertexBuffer = nullptr;
 	ObjectRenderContext RenderContext;

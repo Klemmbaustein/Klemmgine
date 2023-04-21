@@ -3,6 +3,7 @@
 #include <vector>
 #include <Rendering/Vertex.h>
 #include <Math/Collision/CollisionBox.h>
+
 namespace ModelGenerator
 {
 	struct ModelData
@@ -24,6 +25,9 @@ namespace ModelGenerator
 		};
 		std::vector<Element> Elements;
 		Collision::Box CollisionBox;
+
+		Element& AddElement();
+
 		bool CastShadow = true, TwoSided = false, HasCollision = false;
 		//Load a .jsm file, add it to the geometry of the model
 		void LoadModelFromFile(std::string File);

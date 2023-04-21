@@ -298,10 +298,10 @@ void Particles::ParticleEmitter::Draw(Camera* MainCamera , bool MainFrameBuffer,
 	for (unsigned int Elem = 0; Elem < ParticleElements.size(); Elem++)
 	{
 		unsigned int ElemShader = Contexts[Elem].GetShader()->GetShaderID();
+		Contexts[Elem].Bind();
 		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_projection"), 1, GL_FALSE, &MainCamera->GetProjection()[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_viewpro"), 1, GL_FALSE, &MainCamera->getViewProj()[0][0]);
-		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_view"), 1, GL_FALSE, &MainCamera->getView()[0][0]); uint8_t TexIterator = 0;
-		Contexts[Elem].Bind();
+		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_view"), 1, GL_FALSE, &MainCamera->getView()[0][0]);
 		ParticleVertexBuffers[Elem]->Bind();
 		ParticleIndexBuffers[Elem]->Bind();
 		if (MainFrameBuffer)

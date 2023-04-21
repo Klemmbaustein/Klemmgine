@@ -227,10 +227,10 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 		Graphics::IsRenderingShadows = false;
 	}
 
-	Debugging::EngineStatus = "Rendering (Framebuffer: Main pass)";
 	FrustumCulling::Active = true;
 	FrustumCulling::CurrentCameraFrustum = FrustumCulling::createFrustumFromCamera(*Buffer->FramebufferCamera);
 	Buffer->GetBuffer()->Bind();
+	Debugging::EngineStatus = "Rendering (Framebuffer: Main pass)";
 	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

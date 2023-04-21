@@ -7,9 +7,13 @@
 #include <glm/ext/vector_float2.hpp>
 #include <glm/geometric.hpp>
 
-
 namespace ModelGenerator
 {
+	ModelData::Element& ModelData::AddElement()
+	{
+		Elements.push_back(Element());
+		return Elements[Elements.size() - 1];
+	}
 	void ModelData::LoadModelFromFile(std::string Path)
 	{
 		if (!std::filesystem::exists(Path))

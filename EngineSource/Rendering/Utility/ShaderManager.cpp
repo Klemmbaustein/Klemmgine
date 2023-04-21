@@ -60,7 +60,7 @@ void DereferenceShader(std::string VertexShader, std::string FragmentShader)
 	auto FoundShader = Shaders.find(ShaderToFind);
 	if (!Shaders.count(ShaderToFind))
 	{
-		Log::Print("Error: Could not dereference Shader" + VertexShader + FragmentShader, Vector3(1, 0, 0));
+		//Log::Print("Error: Could not dereference Shader: " + VertexShader + " - " + FragmentShader, Vector3(1, 0, 0));
 	}
 	else
 	{

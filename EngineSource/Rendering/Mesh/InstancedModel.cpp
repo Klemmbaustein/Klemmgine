@@ -29,6 +29,7 @@ InstancedModel::InstancedModel(std::string Filename)
 	else
 	{
 		Log::Print("Model does not exist: " + Filename);
+		throw 0;
 	}
 }
 
@@ -37,7 +38,7 @@ InstancedModel::~InstancedModel()
 {
 	for (InstancedMesh* m : Meshes)
 	{
-		DereferenceShader("Shaders/" + m->MeshMaterial.VertexShader, "Shaders/" + m->MeshMaterial.FragmentShader);
+		DereferenceShader("Shaders/" + m->RenderContext.Mat.VertexShader, "Shaders/" + m->RenderContext.Mat.FragmentShader);
 		delete m;
 	}
 	Meshes.clear();
@@ -69,8 +70,8 @@ void InstancedModel::Render(Camera* WorldCamera, bool MainFrameBuffer, bool Tran
 	glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
 	for (int i = 0; i < Meshes.size(); i++)
 	{
-		if (Meshes[i]->MeshMaterial.IsTranslucent != TransparencyPass) continue;
-		Shader* CurrentShader = ((!Graphics::IsRenderingShadows || Meshes[i]->MeshMaterial.UseShadowCutout) ? Meshes.at(i)->MeshShader : Graphics::ShadowShader);
+		if (Meshes[i]->RenderContext.Mat.IsTranslucent != TransparencyPass) continue;
+		Shader* CurrentShader = Meshes[i]->RenderContext.GetShader();
 		CurrentShader->Bind();
 		glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_projection"), 1, GL_FALSE, &WorldCamera->GetProjection()[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_invmodelview"), 1, GL_FALSE, &InvModelView[0][0]);

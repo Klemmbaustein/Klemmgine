@@ -55,9 +55,7 @@ void InstancedMeshObject::Begin()
 	Properties.push_back(Objects::Property("Component Name", Type::E_STRING, &ComponentName));
 	Properties.push_back(Objects::Property("Scale", Type::E_VECTOR3, &Scale));
 
-	IMComponent = new InstancedMeshComponent("");
-	Attach(IMComponent);
-	IMComponent->UpdateInstances();
+	IMComponent = nullptr;
 
 }
 
@@ -67,7 +65,10 @@ void InstancedMeshObject::LoadFromFile(std::string Filename)
 
 void InstancedMeshObject::OnPropertySet()
 {
-	Detach(IMComponent);
+	if (IMComponent)
+	{
+		Detach(IMComponent);
+	}
 	IMComponent = new InstancedMeshComponent(Filename);
 	Attach(IMComponent);
 	SoonInitialized = false;
