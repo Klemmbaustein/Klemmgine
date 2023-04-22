@@ -189,6 +189,11 @@ float& Vector3::at(unsigned int Index)
 	return *((float*)this + Index);
 }
 
+Vector3 Vector3::Abs()
+{
+	return Vector3(abs(X), abs(Y), abs(Z));
+}
+
 Vector3 Vector3::Vec3ToVector(glm::vec3 In)
 {
 	return Vector3(In.x, In.y, In.z);

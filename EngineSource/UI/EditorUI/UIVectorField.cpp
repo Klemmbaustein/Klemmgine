@@ -8,11 +8,19 @@
 #include <sstream>
 #include <Engine/Log.h>
 #include <Engine/Application.h>
+#include <UI/EditorUI/Popups/ColorPicker.h>
 
-void UIVectorField::SetValueType(EFieldValueType Type)
+void UIVectorField::SendNotifyEvent()
+{
+	if (ParentUI)
+		Application::ButtonEvents.insert(ButtonEvent(nullptr, ParentUI, this->Index));
+}
+
+UIVectorField* UIVectorField::SetValueType(EFieldValueType Type)
 {
 	this->Type = Type;
 	Generate();
+	return this;
 }
 
 Vector3 UIVectorField::GetValue()
@@ -45,6 +53,13 @@ UIVectorField::UIVectorField(Vector2 Position, Vector3 StartValue, UICanvas* Par
 
 UIVectorField::~UIVectorField()
 {
+	for (auto i : Graphics::UIToRender)
+	{
+		if (dynamic_cast<ColorPicker*>(i) && dynamic_cast<ColorPicker*>(i)->ColorPtr == this)
+		{
+			delete i;
+		}
+	}
 }
 
 void UIVectorField::Update()
@@ -63,6 +78,7 @@ void UIVectorField::UpdateValues()
 	if (ColorDisplay)
 	{
 		ColorDisplay->SetColor(Value.Length() > 1 ? Value.Normalize() : Value);
+		ColorText->SetColor(std::max(Value.Length(), 0.0f) < 0.2 ? 1 : 0);
 	}
 }
 
@@ -94,7 +110,11 @@ void UIVectorField::Generate()
 	//TODO: add color picker to editor UI in some way
 	if (Type == E_RGB)
 	{
-		ColorDisplay = new UIBackground(true, 0, Value);
+		ColorDisplay = new UIButton(true, 0, Value, nullptr, 3);
+		ColorDisplay->ParentOverride = this;
+		ColorDisplay->Align = UIBox::E_CENTERED;
+		ColorText = new UIText(0.35, std::max(Value.Length(), 0.0f) < 0.2 ? 1 : 0, "Color picker", Renderer);
+		ColorDisplay->AddChild(ColorText->SetPadding(0));
 		AddChild(ColorDisplay);
 		ColorDisplay->SetTryFill(true);
 		ColorDisplay->SetMinSize(Vector2(0.2675, 0.03));
@@ -136,13 +156,13 @@ void UIVectorField::OnChildClicked(int Index)
 	{
 		if (Index == 3)
 		{
-			Log::Print("Todo: do something");
+			new ColorPicker(this);
 			return;
 		}
 		if (Value[Index] != std::stof(TextFields[Index]->GetText()))
 		{
 			Value[Index] = std::stof(TextFields[Index]->GetText());
-			if (ParentUI) Application::ButtonEvents.insert(ButtonEvent(nullptr, ParentUI, this->Index));
+			SendNotifyEvent();
 		}
 		UpdateValues();
 

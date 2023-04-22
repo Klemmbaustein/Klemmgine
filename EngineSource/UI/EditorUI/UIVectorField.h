@@ -1,10 +1,8 @@
 #pragma once
 #include <UI/UIBox.h>
+#include <UI/UIfwd.h>
 
 class UICanvas;
-class UITextField;
-class UIBackground;
-class TextRenderer;
 
 class UIVectorField : public UIBox
 {
@@ -16,7 +14,7 @@ public:
 	};
 protected:
 	UITextField* TextFields[3];
-	UIBackground* ColorDisplay = nullptr;
+	UIButton* ColorDisplay = nullptr;
 	void UpdateValues();
 	Vector3 Value;
 	void Generate();
@@ -25,8 +23,10 @@ protected:
 	int Index;
 	EFieldValueType Type = E_XYZ;
 	UIBox* FieldBox = nullptr;
+	UIText* ColorText = nullptr;
 public:
-	void SetValueType(EFieldValueType Type);
+	void SendNotifyEvent();
+	UIVectorField* SetValueType(EFieldValueType Type);
 	Vector3 GetValue();
 	void SetValue(Vector3 NewValue);
 	UIVectorField(Vector2 Position, Vector3 StartValue, UICanvas* ParentUI, int Index, TextRenderer* Renderer);

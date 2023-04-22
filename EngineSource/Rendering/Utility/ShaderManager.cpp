@@ -15,6 +15,7 @@ Shader* ReferenceShader(std::string VertexShader, std::string FragmentShader)
 {
 	if ((!std::filesystem::exists(VertexShader) || !std::filesystem::exists(FragmentShader)) && (EngineDebug || IsInEditor))
 	{
+		Log::Print("Could not find shader: " + VertexShader + " - " + FragmentShader);
 		return nullptr;
 	}
 	ShaderDescription ShaderToFind;

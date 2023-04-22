@@ -195,7 +195,7 @@ void MaterialTab::GenerateUI()
 	Rows[0]->AddChild(ElementBox);
 	for (auto& i : LoadedMaterial.Uniforms)
 	{
-		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.725, 0));
+		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.725, 0.09));
 
 		auto ElementNameBox = new UIBox(true, 0);
 		auto ElementName = new UIText(0.5, 1, i.UniformName, Renderer);
@@ -220,14 +220,14 @@ void MaterialTab::GenerateUI()
 			((UITextField*)ElementDefaultValue)->SetText(i.Value);
 			((UITextField*)ElementDefaultValue)->HintText = "Default value";
 			ElementDefaultValue->SetPadding(0, 0, 0, 0.01);
-			ElementDefaultValue->SetMinSize(Vector2(0.265, 0.05));
-			ElementDefaultValue->SetMaxSize(Vector2(0.265, 0.05));
+			ElementDefaultValue->SetMinSize(Vector2(0.265, 0.075));
+			ElementDefaultValue->SetMaxSize(Vector2(0.265, 0.075));
 			ElementDefaultValue->SetBorder(UIBox::E_ROUNDED, 0.5);
 			ElementDefaultValue->SetPadding(0.0125, 0.0125, 0, 0.01);
 		}
 		else
 		{
-			ElementDefaultValue = new UIVectorField(0, Vector3::stov(i.Value), this, ButtonIndex, Renderer);
+			ElementDefaultValue = (new UIVectorField(0, Vector3::stov(i.Value), this, ButtonIndex, Renderer))->SetValueType(UIVectorField::E_RGB);
 			ElementDefaultValue->SetPadding(0, 0.01, 0, 0.01);
 		}
 

@@ -4,3 +4,4 @@ class UIBackground;
 class UIButton;
 class UITextField;
 class UIText;
+class TextRenderer;

@@ -98,6 +98,8 @@ struct Vector3
 	}
 	float& at(unsigned int Index);
 
+	Vector3 Abs();
+
 	static Vector3 Vec3ToVector(glm::vec3 In);
 	static Vector3 GetForwardVector(Vector3 In);
 	static Vector3 GetRightVector(Vector3 In);

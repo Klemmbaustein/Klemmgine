@@ -31,8 +31,8 @@ public:
 	size_t GetNearestLetterAtLocation(Vector2 Location, Vector2& LetterOutLocation);
 	Vector2 GetLetterLocation(size_t Index);
 
-	void SetText(std::string NewText);
 	void SetText(ColoredText NewText);
+	void SetText(std::string NewText);
 	std::string GetText();
 	UIText(float Scale, Vector3 Color, std::string Text, TextRenderer* Renderer);
 	UIText(float Scale, ColoredText Text, TextRenderer* Renderer);

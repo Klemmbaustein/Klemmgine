@@ -102,8 +102,11 @@ void Pack::SaveFolderToPack(std::string Folder, std::string Outf)
 			}
 			else
 			{
-				SaveFolderToPackRecursive(Folder + "/" + FileUtil::GetFileNameFromPath(entry.path().string()),
-					PackedFiles);
+				if (FileUtil::GetFileNameFromPath(entry.path().string()) != "Editor")
+				{
+					SaveFolderToPackRecursive(Folder + "/" + FileUtil::GetFileNameFromPath(entry.path().string()),
+						PackedFiles);
+				}
 			}
 		}
 	}
