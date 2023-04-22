@@ -191,6 +191,7 @@ void ColorPicker::Tick()
 {
 	if (DeleteSoon)
 	{
+
 		ColorPtr->SetValue(SelectedColor);
 		ColorPtr->SendNotifyEvent();
 		delete this;

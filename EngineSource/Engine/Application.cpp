@@ -235,7 +235,7 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	auto Matrices = CSM::getLightSpaceMatrices();
-	for (const auto& s : Shaders)
+	for (auto& s : Shaders)
 	{
 		Renderable::ApplyDefaultUniformsToShader(s.second.UsedShader);
 		CSM::BindLightSpaceMatricesToShader(Matrices, s.second.UsedShader);
@@ -244,16 +244,16 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 			std::string CurrentLight = "u_lights[" + std::to_string(i) + "]";
 			if (i < Graphics::Lights.size())
 			{
-				Application::PostProcessShader->SetVector3(CurrentLight + ".Position", Graphics::Lights[i].Position);
-				Application::PostProcessShader->SetVector3(CurrentLight + ".Color", Graphics::Lights[i].Color);
-				Application::PostProcessShader->SetFloat(CurrentLight + ".Falloff", Graphics::Lights[i].Falloff);
-				Application::PostProcessShader->SetFloat(CurrentLight + ".Intensity", Graphics::Lights[i].Intensity);
+				s.second.UsedShader->SetVector3(CurrentLight + ".Position", Graphics::Lights[i].Position);
+				s.second.UsedShader->SetVector3(CurrentLight + ".Color", Graphics::Lights[i].Color);
+				s.second.UsedShader->SetFloat(CurrentLight + ".Falloff", Graphics::Lights[i].Falloff);
+				s.second.UsedShader->SetFloat(CurrentLight + ".Intensity", Graphics::Lights[i].Intensity);
 
-				Application::PostProcessShader->SetInt(CurrentLight + ".Active", 1);
+				s.second.UsedShader->SetInt(CurrentLight + ".Active", 1);
 			}
 			else
 			{
-				Application::PostProcessShader->SetInt(CurrentLight + ".Active", 0);
+				s.second.UsedShader->SetInt(CurrentLight + ".Active", 0);
 			}
 		}
 	}
