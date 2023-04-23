@@ -134,36 +134,43 @@ void ContextMenu::OnButtonClicked(int Index)
 	{
 		for (size_t i = 0; i < ContextButtons.size(); i++)
 		{
-			switch (ContextSettings[i].Type)
+			try
 			{
-			case Type::E_VECTOR3_COLOR:
-			case Type::E_VECTOR3:
-				if (ContextSettings[i].Normalized) *(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
-				else
-					*(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue();
-				break;
-			case Type::E_FLOAT:
-				*(float*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
-				break;
-			case Type::E_INT:
-				*(int*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
-				break;
-			case Type::E_STRING:
-				*(std::string*)(ContextSettings[i].Variable) = ((UITextField*)ContextButtons[i])->GetText();
-				if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-					&& ContextSettings[i].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
+				switch (ContextSettings[i].Type)
 				{
-					Editor::CurrentUI->UIElements[5]->UpdateLayout();
+				case Type::E_VECTOR3_COLOR:
+				case Type::E_VECTOR3:
+					if (ContextSettings[i].Normalized) *(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
+					else
+						*(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue();
+					break;
+				case Type::E_FLOAT:
+					*(float*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
+					break;
+				case Type::E_INT:
+					*(int*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
+					break;
+				case Type::E_STRING:
+					*(std::string*)(ContextSettings[i].Variable) = ((UITextField*)ContextButtons[i])->GetText();
+					if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
+						&& ContextSettings[i].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
+					{
+						Editor::CurrentUI->UIElements[5]->UpdateLayout();
+					}
+					break;
+				case Type::E_BOOL:
+					if (((UIButton*)ContextButtons[i])->GetIsHovered())
+					{
+						*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
+					}
+					break;
+				default:
+					break;
 				}
-				break;
-			case Type::E_BOOL:
-				if (((UIButton*)ContextButtons[i])->GetIsHovered())
-				{
-					*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
-				}
-				break;
-			default:
-				break;
+			}
+			catch (std::exception& e)
+			{
+
 			}
 		}
 		if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
