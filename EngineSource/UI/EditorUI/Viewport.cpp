@@ -183,6 +183,31 @@ void Viewport::Tick()
 			InitialMousePosition = Input::MouseLocation;
 		}
 	}
+
+	if (!ViewportLock && Input::IsKeyDown(SDLK_LCTRL) && Input::IsKeyDown(SDLK_d))
+	{
+		if (!IsCopying)
+		{
+			IsCopying = true;
+			std::vector<WorldObject*> CopiedObjects;
+			for (WorldObject* i : SelectedObjects)
+			{
+				WorldObject* o = Objects::SpawnObjectFromID(i->GetObjectDescription().ID, i->GetTransform());
+				o->SetName(i->GetName());
+				o->Deserialize(i->Serialize());
+				o->LoadProperties(i->GetPropertiesAsString());
+				o->OnPropertySet();
+				o->IsSelected = true;
+				CopiedObjects.push_back(o);
+			}
+			ClearSelectedObjects();
+			SelectedObjects = CopiedObjects;
+		}
+	}
+	else
+	{
+		IsCopying = false;
+	}
 	if (ViewportLock && !Input::IsRMBDown)
 	{
 		Application::SetCursorPosition(InitialMousePosition);

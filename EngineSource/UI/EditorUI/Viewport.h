@@ -27,6 +27,7 @@ class Viewport : public EditorPanel
 		bool CanBeClosed;
 		std::string Type;
 	};
+	bool IsCopying = false;
 	std::vector<Tab> Tabs = { Tab(0, "Viewport", false, "jscn")};
 	std::vector<EditorTab*> TabInstances;
 public:
