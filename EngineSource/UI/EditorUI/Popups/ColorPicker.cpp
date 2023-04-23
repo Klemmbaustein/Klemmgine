@@ -124,7 +124,7 @@ ColorPicker::ColorPicker(UIVectorField* Color) : EditorPanel(Editor::CurrentUI->
 	SelectedColor = Color->GetValue();
 	ColorPtr = Color;
 
-	if (SelectedColor.X >= 1 || SelectedColor.Y >= 1 || SelectedColor.Z >= 1)
+	if (SelectedColor.X > 1 || SelectedColor.Y > 1 || SelectedColor.Z > 1)
 	{
 		SelectedColor = SelectedColor / SelectedColor.Length();
 	}
