@@ -416,13 +416,13 @@ Vector2 Vector2::operator*(Vector2 b)
 
 glm::mat4 Transform::ToMatrix()
 {
-	glm::mat4 MatModel = glm::mat4(1.f);
+	glm::mat4 Matrix = glm::mat4(1);
 
-	MatModel = glm::translate(MatModel, (glm::vec3)Location);
-	MatModel = glm::rotate(MatModel, Rotation.Y, glm::vec3(0, 1, 0));
-	MatModel = glm::rotate(MatModel, Rotation.Z, glm::vec3(0, 0, 1));
-	MatModel = glm::rotate(MatModel, Rotation.X, glm::vec3(1, 0, 0));
+	Matrix = glm::translate(Matrix, (glm::vec3)Location);
+	Matrix = glm::rotate(Matrix, Rotation.Y, glm::vec3(0, 1, 0));
+	Matrix = glm::rotate(Matrix, Rotation.Z, glm::vec3(0, 0, 1));
+	Matrix = glm::rotate(Matrix, Rotation.X, glm::vec3(1, 0, 0));
+	Matrix = glm::scale(Matrix, (glm::vec3)Scale);
 
-	MatModel = glm::scale(MatModel, (glm::vec3)Scale);
-	return MatModel;
+	return Matrix;
 }

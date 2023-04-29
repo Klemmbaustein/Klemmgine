@@ -32,66 +32,82 @@ struct Object
 	std::string Path;
 };
 
+void WriteToFile(std::string str, std::string File)
+{
+	// Check if the new file is different from the old one. If it is, don't write the new content into it.
+	// VS won't rebuild everything once the BuildTool runs once if only the files that really needed to change have changed.
+	if (std::filesystem::exists(File))
+	{
+		std::ifstream CurrentFile = std::ifstream(File);
+		std::stringstream s;
+		s << CurrentFile.rdbuf();
+		CurrentFile.close();
+		if (str == s.str())
+		{
+			Log::Print("Do not need to write: " + File + ". File has not changed.");
+			return;
+		}
+	}
+	Log::Print("Written: " + File + ".");
+	std::ofstream out = std::ofstream(File);
+	out << str;
+	out.close();
+}
+
 void WriteObjectList(std::vector<Object> Objects, std::string TargetFolder)
 {
-	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_ListOfObjects.h", std::ios::out);
-	Log::Print("Written: " + TargetFolder + "/GENERATED_ListOfObjects.h");
+	std::string OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
 		uint32_t ID = hash_str_uint32(Objects[i].Name);
-		OutStream << "ObjectDescription(\"" << Objects[i].Name << "\", " << ID << ")," << std::endl;
+		OutStream.append("ObjectDescription(\"" + Objects[i].Name + " + " + std::to_string(ID) + " + \n");
 	}
-	OutStream.close();
+	WriteToFile(OutStream, TargetFolder + "/GENERATED_ListOfObjects.h");
 }
 
 void WriteIncludeList(std::vector<Object> Objects, std::string TargetFolder)
 {
-	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_ObjectIncludes.h", std::ios::out);
-	Log::Print("Written: " + TargetFolder + "/GENERATED_ObjectIncludes.h");
+	std::stringstream OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
 		OutStream << "#include <Objects" + Objects[i].Path + "/" + Objects[i].Name + ".h>" << std::endl;
 	}
-	OutStream.close();
+	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_ObjectIncludes.h");
 }
 
 void WriteSpawnList(std::vector<Object> Objects, std::string TargetFolder)
 {
-	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_Spawnlist.h", std::ios::out);
-	Log::Print("Written: " + TargetFolder + "/GENERATED_Spawnlist.h");
+	std::stringstream OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
 		uint32_t ID = hash_str_uint32(Objects[i].Name);
 		OutStream << "case " + std::to_string(ID) + ": return (WorldObject*)SpawnObject<" + Objects[i].Name + ">(ObjectTransform); " << std::endl;
 	}
-	OutStream.close();
+	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_Spawnlist.h");
 }
 
 void WriteCategoryList(std::vector<Object> Objects, std::string TargetFolder)
 {
-	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_Categories.h", std::ios::out);
-	Log::Print("Written: " + TargetFolder + "/GENERATED_Categories.h");
+	std::stringstream OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
 		uint32_t ID = hash_str_uint32(Objects[i].Name);
 		OutStream << "case " + std::to_string(ID) + ": return " + Objects[i].Name + "::GetCategory();" << std::endl;
 	}
-	OutStream.close();
+	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_Categories.h");
 }
 
 void WriteHeaderForObject(std::string TargetFolder, Object Object)
 {
-	Log::Print("Written: " + TargetFolder + "/GENERATED_" + Object.Name + ".h");
 	unsigned int ID = hash_str_uint32(Object.Name);
-	std::ofstream OutStream = std::ofstream(TargetFolder + "/GENERATED_" + Object.Name + ".h", std::ios::out);
-	OutStream << "#pragma once" << std::endl;
+	std::stringstream OutStream;
 	std::string UppercaseName = Object.Name;
 	std::transform(Object.Name.begin(), Object.Name.end(), UppercaseName.begin(), ::toupper);
 	OutStream << "#define " << UppercaseName << "_GENERATED(Category) "
 		<< Object.Name << "() : WorldObject(ObjectDescription(\"" << Object.Name << "\", " << std::to_string(ID) << ")) {}\\\n"
 		<< "static std::string GetCategory() { return Category; }\\\n";
 	OutStream << "static uint32_t GetID() { return " << std::to_string(ID) << ";}";
-	OutStream.close();
+	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_" + Object.Name + ".h");
 }
 
 void RecursiveSearch(std::string InLoc, std::vector<Object>& Objects, std::string RelativePath = "")
