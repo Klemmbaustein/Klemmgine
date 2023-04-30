@@ -200,6 +200,7 @@ void Console::InitializeConsole()
 		return;
 	}
 	ConsoleLog("Unknown info topic: " + CommandArgs()[0], E_ERROR);
+	ConsoleLog("Topics are: version, graphics, sound.", E_ERROR);
 		}, { Command::Argument("info_type", Type::E_STRING, true) }));
 
 

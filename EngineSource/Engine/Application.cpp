@@ -6,7 +6,6 @@
 #include <Engine/Log.h>
 #include <Engine/Scene.h>
 #include <Engine/Console.h>
-#include <Engine/Script.h>
 
 #include <Sound/Sound.h>
 
@@ -724,8 +723,6 @@ int Initialize(int argc, char** argv)
 #if EDITOR
 	// Initialize EditorUI
 	Application::EditorUserInterface = new EditorUI();
-
-	Config::LoadConfigs();
 #endif
 	Log::Print(std::string("Finished loading. (").append(std::to_string(StartupTimer.TimeSinceCreation()).append(" seconds)")), Vector3(1.f, 0.75, 0.f));
 	Console::ExecuteConsoleCommand("info");
