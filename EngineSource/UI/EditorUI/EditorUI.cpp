@@ -98,7 +98,19 @@ void EditorUI::OnLeave(void(*ReturnF)())
 		new DialogBox("Scene", 0,
 			"Save changes to scene before quitting?",
 			{
-				DialogBox::Answer("Yes", []() {Scene::SaveSceneAs(Scene::CurrentScene, false); QuitFunction(); }),
+				DialogBox::Answer("Yes", []() {
+				if (Scene::CurrentScene.empty())
+				{
+					Log::Print("Saving scene \"Untitled\"", Vector3(0.3, 0.4, 1));
+					Scene::SaveSceneAs("Content/Untitled");
+				}
+				else
+				{
+					Log::Print("Saving scene \"" + Scene::CurrentScene + "\"", Vector3(0.3, 0.4, 1));
+					Scene::SaveSceneAs(Scene::CurrentScene);
+				}
+				ChangedScene = false;
+				QuitFunction(); }),
 				DialogBox::Answer("No", ReturnF),
 				DialogBox::Answer("Cancel", nullptr)
 			});

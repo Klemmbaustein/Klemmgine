@@ -230,6 +230,12 @@ void ItemBrowser::UpdateLayout()
 	const int ITEMS_PER_SLICE = Scale.X / 0.17 * Graphics::AspectRatio;
 	std::vector<UIBox*> HorizontalSlices;
 
+	// if the bar isnt large enough to fit a single row of items, do nothing.
+	if (ITEMS_PER_SLICE == 0)
+	{
+		return;
+	}
+
 	std::vector<FileEntry> DisplayedFiles;
 
 	if (SelectedTab == 0)
@@ -453,6 +459,7 @@ void ItemBrowser::Tick()
 				newObject->LoadFromFile(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[DraggedButton].Name));
 				newObject->SetName(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[DraggedButton].Name));
 				newObject->IsSelected = true;
+				ChangedScene = true;
 			}
 			if (ext == "jscn" && !IsCPPClass)
 			{
@@ -467,18 +474,21 @@ void ItemBrowser::Tick()
 				auto newObject = Objects::SpawnObject<SoundObject>(Transform(TargetSpawnLocation, 0, 1));
 				newObject->LoadSound(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[DraggedButton].Name));
 				newObject->IsSelected = true;
+				ChangedScene = true;
 			}
 			if (ext == "jspart" && !IsCPPClass)
 			{
 				auto newObject = Objects::SpawnObject<ParticleObject>(Transform(TargetSpawnLocation, 0, 1));
 				newObject->LoadParticle(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[DraggedButton].Name));
 				newObject->IsSelected = true;
+				ChangedScene = true;
 			}
 
 			if (IsCPPClass)
 			{
 				auto newObject = Objects::SpawnObjectFromID(GetContentsOfCurrentCPPFolder()[DraggedButton].Object.ID, Transform(TargetSpawnLocation, 0, 1));
 				newObject->IsSelected = true;
+				ChangedScene = true;
 			}
 			for (auto i : Buttons)
 			{

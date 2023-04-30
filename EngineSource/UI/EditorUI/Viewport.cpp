@@ -202,6 +202,7 @@ void Viewport::Tick()
 			}
 			ClearSelectedObjects();
 			SelectedObjects = CopiedObjects;
+			ChangedScene = true;
 		}
 	}
 	else
