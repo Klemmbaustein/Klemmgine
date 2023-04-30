@@ -103,7 +103,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			}
 #else
 			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
-			Log::Print("Pleasse recompile the program manually with IS_IN_EDITOR and ENGINE_DEBUG as false.", Vector3(1, 0, 0));
+			Log::Print("Pleasse recompile the program manually with the RELASE preprocessor definition (Release config).", Vector3(1, 0, 0));
 #endif
 			Log::Print("Build: Complete", Vector3(0, 1, 0));
 			return "Sucess";
