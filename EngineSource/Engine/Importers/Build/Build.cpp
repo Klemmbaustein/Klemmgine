@@ -88,8 +88,10 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			}
 			Log::Print("Build: Found .sln file: " + SolutionName, Vector3(0.5, 1, 0.5));
 
-			Log::Print("Build: Running command: " + VSInstallPath + " " + std::string(SolutionName) + ".sln /Build Release (This can take a while)", Vector3(0.5));
-			int CompileResult = system((VSInstallPath + " " + std::string(SolutionName) + ".sln /Build Release").c_str());
+			std::string Command = "\"" + VSInstallPath + "\" " + std::string(SolutionName) + ".sln /Build Release";
+
+			Log::Print("Build: Running command: " + Command + " (This can take a while)", Vector3(0.5));
+			int CompileResult = system(Command.c_str());
 			if(!CompileResult)
 			{
 				std::filesystem::copy("x64/Release/" + SolutionName + ".exe", TargetFolder + ProjectName + std::string(".exe"));

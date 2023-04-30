@@ -107,6 +107,9 @@ namespace Scene
 
 			if (std::filesystem::is_empty(FilePath))
 			{
+				Graphics::WorldSun = Graphics::Sun();
+				Graphics::WorldFog = Graphics::Fog();
+
 				Log::Print("Loaded Scene (Scene File is empty)");
 				return;
 			}
