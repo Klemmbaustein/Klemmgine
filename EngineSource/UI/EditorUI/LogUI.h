@@ -8,6 +8,8 @@ class UIText;
 class LogUI : public EditorPanel
 {
 	std::vector<UIText*> LogTexts;
+
+	void UpdateLogBoxSize();
 public:
 	LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale);
 	void UpdateLayout() override;

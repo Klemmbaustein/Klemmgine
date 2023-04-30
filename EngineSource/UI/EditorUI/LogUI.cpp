@@ -9,6 +9,14 @@
 #include <Engine/Input.h>
 #include <UI/UIText.h>
 
+void LogUI::UpdateLogBoxSize()
+{
+	LogPromt->SetTryFill(true);
+	LogScrollBox->SetMinSize((Scale - Vector2(0.2, 0.1)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)));
+	LogScrollBox->SetMaxSize((Scale - Vector2(0.2, 0.1)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)));
+
+}
+
 LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(UIColors, Position, Scale, Vector2(0.8, 0.35), Vector2(2, 0.6))
 {
 	LogScrollBox = new UIScrollBox(false, 0, 0);
@@ -23,16 +31,20 @@ LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(U
 			->SetTryFill(true))
 		->AddChild(LogScrollBox
 			->SetScrollSpeed(4)
-			->SetPadding(0.01, 0, 0.01, 0.01)
-			->SetMinSize((Scale * Vector2(0.68, 0.65)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)))
-			->SetMaxSize((Scale * Vector2(0.68, 0.65)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)))));
+			->SetPadding(0.01, 0, 0.01, 0.01)));
+
+	UpdateLogBoxSize();
 }
 
 void LogUI::UpdateLayout()
 {
-	LogPromt->SetTryFill(true);
-	LogScrollBox->SetMinSize((Scale * Vector2(0.68, 0.65)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)));
-	LogScrollBox->SetMaxSize((Scale * Vector2(0.68, 0.65)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)));
+	UpdateLogBoxSize();
+	if (LogTexts.size())
+	{
+		float TextDifference = LogScrollBox->GetPosition().Y - LogTexts[LogTexts.size() - 1]->GetPosition().Y;
+		LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.025, 0.0);
+		LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025, 0.0) * 10);
+	}
 }
 
 void LogUI::OnButtonClicked(int Index)

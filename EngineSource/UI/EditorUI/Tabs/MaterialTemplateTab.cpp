@@ -152,16 +152,16 @@ void MaterialTemplateTab::GenerateUI()
 		auto ElementName = new UITextField(true, 0, UIColors[1], this, ButtonIndex, Renderer);
 		ElementName->SetText(i.UniformName);
 		ElementName->HintText = "Uniform name";
-		ElementName->SetMinSize(Vector2(0.2, 0.075));
+		ElementName->SetMinSize(Vector2(0.2, 0.08));
 		ElementName->SetPadding(0, 0, 0, 0.01);
-		ElementName->SetMaxSize(Vector2(0.3, 0.075));
+		ElementName->SetMaxSize(Vector2(0.3, 0.08));
 
 		auto ElementType = new UITextField(true, 0, UIColors[1], this, ButtonIndex, Renderer);
 		ElementType->SetText(Type::Types[i.Type]);
 		ElementType->HintText = "Type";
-		ElementType->SetMinSize(Vector2(0.1, 0.075));
+		ElementType->SetMinSize(Vector2(0.1, 0.08));
 		ElementType->SetPadding(0, 0, 0, 0.01);
-		ElementType->SetMaxSize(Vector2(0.3, 0.075));
+		ElementType->SetMaxSize(Vector2(0.3, 0.08));
 
 		
 		UIBox* ElementDefaultValue = nullptr;
@@ -171,13 +171,14 @@ void MaterialTemplateTab::GenerateUI()
 			((UITextField*)ElementDefaultValue)->SetText(i.Value);
 			((UITextField*)ElementDefaultValue)->HintText = "Default value";
 			ElementDefaultValue->SetPadding(0, 0, 0, 0.01);
-			ElementDefaultValue->SetMinSize(Vector2(0.265, 0.075));
-			ElementDefaultValue->SetMaxSize(Vector2(0.265, 0.075));
+			ElementDefaultValue->SetMinSize(Vector2(0.265, 0.08));
+			ElementDefaultValue->SetMaxSize(Vector2(0.265, 0.08));
 		}
 		else
 		{
 			ElementDefaultValue = new UIVectorField(0, Vector3::stov(i.Value), this, ButtonIndex, Renderer);
-			ElementDefaultValue->SetPadding(0, 0.01, 0, 0.01);
+			((UIVectorField*)ElementDefaultValue)->SetValueType(UIVectorField::E_RGB);
+			ElementDefaultValue->SetPadding(0, 0, 0, 0.01);
 		}
 
 		UIButton* DeleteButton = new UIButton(true, 0, 1, this, ButtonIndex - 100);
