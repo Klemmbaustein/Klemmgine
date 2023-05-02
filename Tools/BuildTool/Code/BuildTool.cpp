@@ -60,7 +60,7 @@ void WriteObjectList(std::vector<Object> Objects, std::string TargetFolder)
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
 		uint32_t ID = hash_str_uint32(Objects[i].Name);
-		OutStream.append("ObjectDescription(\"" + Objects[i].Name + " + " + std::to_string(ID) + " + \n");
+		OutStream.append("ObjectDescription(\"" + Objects[i].Name + "\", " + std::to_string(ID) + "),\n");
 	}
 	WriteToFile(OutStream, TargetFolder + "/GENERATED_ListOfObjects.h");
 }
