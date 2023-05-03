@@ -24,6 +24,6 @@ Now the engine binaries need to be built. In Visual Studio, click `Build`, then 
 
 After the binaries are built, open the launcher again. You can now create a new project or import an existing project.
 
-## CMake
+## GNU make
 
 > TODO
