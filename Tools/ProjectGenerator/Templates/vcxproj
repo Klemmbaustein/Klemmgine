@@ -103,6 +103,9 @@
     <Lib>
       <OutputFile>$(SolutionDir)Components\lib\$(TargetName)_Debug.lib</OutputFile>
     </Lib>
+    <PreBuildEvent>
+      <Command>FindObjects.bat</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
