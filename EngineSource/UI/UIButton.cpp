@@ -155,6 +155,11 @@ void UIButton::Tick()
 }
 
 
+bool UIButton::GetUseTexture()
+{
+	return UseTexture;
+}
+
 UIButton* UIButton::SetOpacity(float NewOpacity)
 {
 	if (NewOpacity != Opacity)
@@ -211,7 +216,7 @@ UIButton* UIButton::SetColor(Vector3 NewColor)
 {
 	if (NewColor != Color)
 	{
-		Color = NewColor;
+		Color = Vector3::Clamp(NewColor, 0, 1);
 		RedrawUI();
 	}
 	return this;
@@ -227,7 +232,7 @@ UIButton::UIButton(bool Horizontal, Vector2 Position, Vector3 Color, UICanvas* U
 	this->ButtonShader = ButtonShader;
 	this->ButtonIndex = ButtonIndex;
 	this->ParentUI = UI;
-	this->Color = Color;
+	this->Color = Vector3::Clamp(Color, 0, 1);
 	MakeGLBuffers();
 }
 

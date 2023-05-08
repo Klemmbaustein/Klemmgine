@@ -7,6 +7,11 @@ class DialogBox : public EditorPanel
 public:
 	struct Answer
 	{
+		Answer(std::string Name, void (*OnPressed)())
+		{
+			this->Name = Name;
+			this->OnPressed = OnPressed;
+		}
 		std::string Name;
 		void (*OnPressed)();
 	};

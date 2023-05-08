@@ -28,10 +28,11 @@ class Viewport : public EditorPanel
 		std::string Type;
 	};
 	bool IsCopying = false;
+	std::vector<UIText*> TabTexts;
 	std::vector<Tab> Tabs = { Tab(0, "Viewport", false, "jscn")};
-	std::vector<EditorTab*> TabInstances;
 public:
 
+	std::vector<EditorTab*> TabInstances;
 	static Viewport* ViewportInstance;
 	WorldObject* PreviousSelectedObject = nullptr;
 	std::vector<WorldObject*> SelectedObjects;

@@ -52,7 +52,7 @@ SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolde
 
 				std::string Type;
 				CurrentLineStream >> Type;
-				for (unsigned int i = 0; i < 5; i++)
+				for (unsigned int i = 0; i < 8; i++)
 				{
 					if (Type::Types[i] == Type)
 					{

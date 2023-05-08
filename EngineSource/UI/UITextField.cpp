@@ -143,8 +143,34 @@ void UITextField::Tick()
 	{
 		RendererdText.at(TextInput::TextIndex) = '|';
 	}
-	TextObject->SetColor(EnteredText.empty() && !IsEdited ? Vector3(0.75) : Vector3(1));
+	TextObject->SetColor(EnteredText.empty() && !IsEdited ? TextColor * Vector3(0.75) : TextColor);
 	TextObject->SetText(EnteredText.empty() && !IsEdited ? HintText : (IsEdited ? RendererdText : EnteredText));
+}
+
+Vector3 UITextField::GetColor()
+{
+	return Color;
+}
+
+UITextField* UITextField::SetColor(Vector3 NewColor)
+{
+	if (NewColor != Color)
+	{
+		Color = NewColor;
+		RedrawUI();
+	}
+	return this;
+}
+
+UITextField* UITextField::SetTextColor(Vector3 NewColor)
+{
+	TextColor = NewColor;
+	return this;
+}
+
+Vector3 UITextField::GetTextColor()
+{
+	return TextColor;
 }
 
 UITextField* UITextField::SetText(std::string NewText)

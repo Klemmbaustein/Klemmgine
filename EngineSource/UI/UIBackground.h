@@ -21,6 +21,7 @@ public:
 	float GetOpacity();
 	void SetColor(Vector3 NewColor);
 	Vector3 GetColor();
+	bool GetUseTexture();
 	void SetInvertTextureCoordinates(bool Invert);
 	UIBackground* SetUseTexture(bool UseTexture, unsigned int TextureID = 0);
 	UIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale = Vector2(0), Shader* UsedShader = Graphics::UIShader);

@@ -190,12 +190,13 @@ void ItemBrowser::UpdateLayout()
 
 	ContentBox->AddChild((new UIBackground(true, 0, UIColors[1], Vector2(Scale.X, 0.1)))
 		->SetPadding(0)
-		->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
+		->AddChild((new UIButton(true, 0, 1, this, -2))
 			->SetUseTexture(true, Editor::CurrentUI->Textures[8])
 			->SetMinSize(Vector2(0.06))
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
 			->SetPadding(0.01))
 		->AddChild((new UITextField(true, 0, UIColors[0], this, -3, Editor::CurrentUI->EngineUIText))
+			->SetTextColor(UIColors[2])
 			->SetText(SelectedTab == 0 ? Editor::CurrentUI->CurrentPath + "/" : GetCurrentCPPPathString())
 			->SetTextSize(0.4)
 			->SetMinSize(Vector2(Scale.X / 1.2 - 0.12 / Graphics::AspectRatio, 0.08))
@@ -463,11 +464,8 @@ void ItemBrowser::Tick()
 			}
 			if (ext == "jscn" && !IsCPPClass)
 			{
-				ChangedScene = false;
-				Scene::LoadNewScene(CurrentFiles[DraggedButton].Name);
-				Scene::Tick();
-				Editor::CurrentUI->UIElements[5]->UpdateLayout();
-				Editor::CurrentUI->UIElements[6]->UpdateLayout();
+				EditorUI::OpenScene(CurrentFiles[DraggedButton].Name);
+				return;
 			}
 			if (ext == "wav" && !IsCPPClass)
 			{
@@ -626,12 +624,8 @@ void ItemBrowser::OnButtonClicked(int Index)
 
 		if (Ext == "jscn")
 		{
-			ChangedScene = false;
-			Scene::LoadNewScene(CurrentFiles[Index].Name);
-			Scene::Tick();
-			Viewport::ViewportInstance->SelectedObjects.clear();
-			Editor::CurrentUI->UIElements[5]->UpdateLayout();
-			Editor::CurrentUI->UIElements[6]->UpdateLayout();
+			EditorUI::OpenScene(CurrentFiles[Index].Name);
+			return;
 		}
 		if (Ext == "png" || Ext == "jpg")
 		{

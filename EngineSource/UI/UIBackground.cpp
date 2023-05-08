@@ -84,6 +84,11 @@ Vector3 UIBackground::GetColor()
 	return Color;
 }
 
+bool UIBackground::GetUseTexture()
+{
+	return UseTexture;
+}
+
 void UIBackground::SetInvertTextureCoordinates(bool Invert)
 {
 	MakeGLBuffers(Invert);

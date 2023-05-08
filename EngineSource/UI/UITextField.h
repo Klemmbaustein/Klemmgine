@@ -13,6 +13,7 @@ class UITextField : public UIBox
 	bool IsHovered = false;
 	bool IsPressed = false;
 	Vector3 Color = Vector3(0.5);
+	Vector3 TextColor = 1;
 	Shader* ButtonShader = nullptr;
 	UICanvas* ParentUI;
 	UIText* TextObject = nullptr;
@@ -25,6 +26,10 @@ class UITextField : public UIBox
 	void Tick() override;
 	float ButtonColorMultiplier = 1;
 public:
+	Vector3 GetColor();
+	UITextField* SetColor(Vector3 NewColor);
+	UITextField* SetTextColor(Vector3 NewColor);
+	Vector3 GetTextColor();
 	UIBox* ParentOverride = nullptr;
 	bool GetIsEdited() { return IsEdited; }
 	UITextField* SetText(std::string NewText);

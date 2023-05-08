@@ -72,6 +72,11 @@ namespace Editor
 class EditorUI : public UICanvas
 {
 public:
+	static void SaveCurrentScene();
+	static void OpenScene(std::string NewScene);
+
+	void SetUseLightMode(bool NewLightMode);
+
 	static void CreateFile(std::string Path, std::string Name, std::string Ext);
 	EditorUI();
 	void OnLeave(void(*ReturnF)());
@@ -80,14 +85,15 @@ public:
 
 	UIBox* DraggedItem = nullptr;
 	UIBox* Dropdown = nullptr;
-	Vector3 UIColors[3] =
+
+	static inline constexpr uint32_t NumUIColors = 4;
+
+	Vector3 UIColors[NumUIColors] =
 	{
 		Vector3(0.125, 0.125, 0.13),//Default background
 		Vector3(0.08f),				//Dark background
-		Vector3(1)					//Highlight color
-		//Vector3(0.9, 0.9, 0.9),	//Default background
-		//Vector3(0.5f),			//Dark background
-		//Vector3(0.1)				//Highlight color};
+		Vector3(1),					//Highlight color
+		Vector3(0.2),		//Brighter background
 	};
 	TextRenderer* EngineUIText = new TextRenderer("Font.ttf", 90);
 

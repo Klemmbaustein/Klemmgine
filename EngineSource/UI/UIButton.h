@@ -26,6 +26,7 @@ class UIButton : public UIBox
 	void MakeGLBuffers();
 	void Tick() override;
 public:
+	bool GetUseTexture();
 	UIButton* SetOpacity(float NewOpacity);
 	float GetOpacity();
 	void SetCanBeDragged(bool NewCanBeDragged);

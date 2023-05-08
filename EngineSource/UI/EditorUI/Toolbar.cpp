@@ -5,6 +5,7 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Scene.h>
 #include <thread>
+#include <UI/EditorUI/Viewport.h>
 #include <Engine/Importers/Build/Build.h>
 
 #define MAX_CATEGORY_BUTTONS 16
@@ -29,12 +30,12 @@ void Toolbar::GenerateButtons()
 		size_t j = 0;
 		for (auto& btn : Buttons[i].Buttons)
 		{
-			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[0] * 1.5, Vector2(0.1)))
+			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[3], Vector2(0.1)))
 				->SetBorder(UIBox::E_ROUNDED, 0.5)
 				->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
 				->AddChild((new UIText(0.35, UIColors[2], btn.Name, Editor::CurrentUI->EngineUIText))
 					->SetPadding(0.005))
-				->AddChild((new UIButton(true, 0, UIColors[2], this, i * MAX_CATEGORY_BUTTONS + j))
+				->AddChild((new UIButton(true, 0, 1, this, i * MAX_CATEGORY_BUTTONS + j))
 					->SetUseTexture(true, btn.Texture)
 					->SetMinSize(0.075)
 					->SetPadding(0.015)
@@ -51,17 +52,7 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 	RegisterNewButtonCategory(ButtonCategory("Scene", 
 		{
 			ButtonCategory::Button("Save", Editor::CurrentUI->Textures[2], []() {
-				if (Scene::CurrentScene.empty()) 
-				{
-					Log::Print("Saving scene \"Untitled\"", Vector3(0.3, 0.4, 1));
-					Scene::SaveSceneAs("Content/Untitled");
-				}
-				else
-				{
-					Log::Print("Saving scene \"" + Scene::CurrentScene + "\"", Vector3(0.3, 0.4, 1));
-					Scene::SaveSceneAs(Scene::CurrentScene);
-				}
-				ChangedScene = false;
+					EditorUI::SaveCurrentScene();
 				}),
 			ButtonCategory::Button("Wireframe", Editor::CurrentUI->Textures[1], []() {
 					Log::Print("Toggled wireframe", Vector3(0.3, 0.4, 1));
@@ -71,8 +62,8 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 		}));
 	RegisterNewButtonCategory(ButtonCategory("Project",
 		{
-			/*
-			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[15], []() { Log::Print("TODO"); }),*/
+			
+			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[15], []() { Viewport::ViewportInstance->OpenTab(6, "Settings"); }),
 			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { new std::thread(Build::TryBuildProject, "Build/"); })
 
 		}));

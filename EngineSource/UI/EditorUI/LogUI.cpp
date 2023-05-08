@@ -11,6 +11,7 @@
 
 void LogUI::UpdateLogBoxSize()
 {
+	LogPromt->SetColor(UIColors[1] * 0.5);
 	LogPromt->SetTryFill(true);
 	LogScrollBox->SetMinSize((Scale - Vector2(0.2, 0.1)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)));
 	LogScrollBox->SetMaxSize((Scale - Vector2(0.2, 0.1)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)));

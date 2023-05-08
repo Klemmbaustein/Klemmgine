@@ -33,12 +33,20 @@ namespace LaunchArgs
 		Graphics::IsWireframe = true;
 	}
 
+	void GetVersion(std::vector<std::string> AdditionalArgs)
+	{
+		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -version", Vector3(1, 1, 0));
+		Console::ExecuteConsoleCommand("version");
+		exit(0);
+	}
+
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands = 
 	{
 		std::pair("neverhideconsole", NeverHideConsole),
 		std::pair("loadscene", LoadScene),
 		std::pair("novsync", NoVSync),
-		std::pair("wireframe", Wireframe)
+		std::pair("wireframe", Wireframe),
+		std::pair("version", GetVersion)
 	};
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments)
 	{

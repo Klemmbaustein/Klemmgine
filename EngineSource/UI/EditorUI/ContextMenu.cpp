@@ -61,7 +61,7 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 	for (const auto& i : Section)
 	{
 		UIBox* NewElement = nullptr;
-		UIText* NewElementText = new UIText(0.45, 1, i.Name, Editor::CurrentUI->EngineUIText);
+		UIText* NewElementText = new UIText(0.45, UIColors[2], i.Name, Editor::CurrentUI->EngineUIText);
 		NewElementText->SetPadding(0.005, 0.005, 0.02, 0.005);
 		BackgroundBox->AddChild(NewElementText);
 		switch (i.Type)
@@ -198,7 +198,7 @@ void ContextMenu::UpdateLayout()
 	{
 		Properties.clear();
 		WorldObject* SelectedObject = ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0];
-		BackgroundBox->AddChild((new UIText(0.6, 1, "Object: " + SelectedObject->GetName(), Editor::CurrentUI->EngineUIText))->SetPadding(0.01));
+		BackgroundBox->AddChild((new UIText(0.6, UIColors[2], "Object: " + SelectedObject->GetName(), Editor::CurrentUI->EngineUIText))->SetPadding(0.01));
 		GenerateSection(
 			{
 				ContextMenuSection(&SelectedObject->GetTransform().Location, Type::E_VECTOR3, "Location"),
@@ -237,7 +237,7 @@ void ContextMenu::UpdateLayout()
 	}
 	else
 	{
-		BackgroundBox->AddChild((new UIText(0.6, 1, "Scene: " + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), Editor::CurrentUI->EngineUIText))
+		BackgroundBox->AddChild((new UIText(0.6, UIColors[2], "Scene: " + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), Editor::CurrentUI->EngineUIText))
 			->SetPadding(0.01));
 		GenerateSection(
 			{

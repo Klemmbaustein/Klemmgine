@@ -724,6 +724,7 @@ int Initialize(int argc, char** argv)
 	// Initialize EditorUI
 	Application::EditorUserInterface = new EditorUI();
 #endif
+
 	Log::Print(std::string("Finished loading. (").append(std::to_string(StartupTimer.TimeSinceCreation()).append(" seconds)")), Vector3(1.f, 0.75, 0.f));
 	Console::ExecuteConsoleCommand("info");
 	if (!ENGINE_DEBUG && !IS_IN_EDITOR)

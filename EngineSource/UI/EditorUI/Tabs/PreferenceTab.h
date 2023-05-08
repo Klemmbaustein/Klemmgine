@@ -1,9 +1,9 @@
-#if 0
+#if EDITOR
 #pragma once
 #include <UI/EditorUI/EditorUI.h>
-#include <UI/EditorUI/EditorPanel.h>
+#include <UI/EditorUI/Tabs/EditorTab.h>
 
-class PreferenceTab : public EditorPanel
+class PreferenceTab : public EditorTab
 {
 	struct SettingsCategory
 	{
@@ -14,6 +14,7 @@ class PreferenceTab : public EditorPanel
 			std::string Name;
 			Type::TypeEnum Type;
 			std::string Value;
+			void (*OnChanged)(std::string NewValue);
 		};
 
 		std::vector<Setting> Settings;
@@ -23,13 +24,18 @@ class PreferenceTab : public EditorPanel
 	TextRenderer* Renderer;
 	std::vector<SettingsCategory> Preferences =
 	{
-		SettingsCategory("Editor", {SettingsCategory::Setting("testcategory:testsetting", Type::E_VECTOR3_COLOR, "0 0 0")}),
-		SettingsCategory("Graphics")
+		SettingsCategory("Editor", {SettingsCategory::Setting("UI:Light mode [Experimental]", Type::E_BOOL, "0", [](std::string NewValue)
+			{
+				Editor::CurrentUI->SetUseLightMode(std::stoi(NewValue));
+			})}),
 	};
 
 	void GenerateUI();
+	void GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value);
 public:
 	void OpenSettingsPage(std::string Name);
+
+	void UpdateLayout() override;
 
 	void OnButtonClicked(int Index) override;
 	PreferenceTab(Vector3* UIColors, TextRenderer* Renderer);

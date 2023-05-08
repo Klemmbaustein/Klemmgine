@@ -31,11 +31,117 @@ namespace Editor
 	bool PrevHoveringPopup = false;
 	Vector2 DragMinMax;
 	Vector2 NewDragMinMax = DragMinMax;
+
+	Vector3 NewUIColors[EditorUI::NumUIColors] =
+	{
+		Vector3(0.85, 0.85, 0.85),	//Default background
+		Vector3(0.4),				//Dark background
+		Vector3(0),					//Highlight color,
+		Vector3(1)
+	};
+
+	bool LightMode = false;
+
+	Vector3 ReplaceWithNewUIColor(Vector3 PrevColor)
+	{
+		for (uint8_t i = 0; i < EditorUI::NumUIColors; i++)
+		{
+			if (Editor::CurrentUI->UIColors[i] == PrevColor)
+			{
+				return Editor::NewUIColors[i];
+			}
+		}
+
+		return PrevColor;
+	}
+}
+
+namespace UI
+{
+	extern std::vector<UIBox*> UIElements;
 }
 
 bool ChangedScene = false;
 // Experimental
 #define UI_LIGHT_MODE 0
+
+
+
+void EditorUI::SaveCurrentScene()
+{
+	if (Scene::CurrentScene.empty())
+	{
+		Log::Print("Saving scene \"Untitled\"", Vector3(0.3, 0.4, 1));
+		Scene::SaveSceneAs("Content/Untitled");
+	}
+	else
+	{
+		Log::Print("Saving scene \"" + Scene::CurrentScene + "\"", Vector3(0.3, 0.4, 1));
+		Scene::SaveSceneAs(Scene::CurrentScene);
+	}
+	ChangedScene = false;
+}
+
+std::string EditorSceneToOpen;
+void EditorUI::OpenScene(std::string NewScene)
+{
+	if (ChangedScene)
+	{
+		EditorSceneToOpen = NewScene;
+		new DialogBox(Scene::CurrentScene, 0, "Scene has unsaved changes. Save?",
+			{
+				DialogBox::Answer("Yes", []() {SaveCurrentScene(); ChangedScene = false; Scene::LoadNewScene(EditorSceneToOpen);
+				Scene::Tick();
+				Editor::CurrentUI->UIElements[5]->UpdateLayout();
+				Editor::CurrentUI->UIElements[6]->UpdateLayout(); }),
+
+				DialogBox::Answer("No", []() {ChangedScene = false; Scene::LoadNewScene(EditorSceneToOpen);			
+				Scene::Tick();
+				Editor::CurrentUI->UIElements[5]->UpdateLayout();
+				Editor::CurrentUI->UIElements[6]->UpdateLayout(); }),
+
+				DialogBox::Answer("Cancel", nullptr)
+			});
+		return;
+	}
+
+	ChangedScene = false; 
+	Scene::LoadNewScene(NewScene);
+	Scene::Tick();
+	Editor::CurrentUI->UIElements[5]->UpdateLayout();
+	Editor::CurrentUI->UIElements[6]->UpdateLayout();
+}
+
+void EditorUI::SetUseLightMode(bool NewLightMode)
+{
+	if (NewLightMode != Editor::LightMode)
+	{
+		for (auto i : UI::UIElements)
+		{
+			if (dynamic_cast<UIText*>(i))
+			{
+				dynamic_cast<UIText*>(i)->SetColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UIText*>(i)->GetColor()));
+			}
+			if (dynamic_cast<UIButton*>(i))
+			{
+				dynamic_cast<UIButton*>(i)->SetColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UIButton*>(i)->GetColor()));
+			}
+			if (dynamic_cast<UIBackground*>(i))
+			{
+				dynamic_cast<UIBackground*>(i)->SetColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UIBackground*>(i)->GetColor()));
+			}
+			if (dynamic_cast<UITextField*>(i))
+			{
+				dynamic_cast<UITextField*>(i)->SetColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UITextField*>(i)->GetTextColor()));
+				dynamic_cast<UITextField*>(i)->SetTextColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UITextField*>(i)->GetTextColor()));
+			}
+		}
+		std::swap(Editor::CurrentUI->UIColors, Editor::NewUIColors);
+		Editor::LightMode = NewLightMode;
+		Log::Print("Toggled light mode", Log::LogColor::Yellow);
+	}
+	UIBox::ForceUpdateUI();
+}
 
 void EditorUI::CreateFile(std::string Path, std::string Name, std::string Ext)
 {
@@ -86,6 +192,8 @@ EditorUI::EditorUI()
 	UIElements[5] = new ObjectList(UIColors, Vector2(0.7, -0.2), Vector2(0.3, 1.15));
 	UIElements[6] = new ContextMenu(UIColors, Vector2(0.7, -1), Vector2(0.3, 0.8));
 
+	// Load preferences from the preference tab after the UI is finished setting up
+	Viewport::ViewportInstance->TabInstances[6]->Load("");
 }
 
 void(*QuitFunction)();
@@ -99,17 +207,7 @@ void EditorUI::OnLeave(void(*ReturnF)())
 			"Save changes to scene before quitting?",
 			{
 				DialogBox::Answer("Yes", []() {
-				if (Scene::CurrentScene.empty())
-				{
-					Log::Print("Saving scene \"Untitled\"", Vector3(0.3, 0.4, 1));
-					Scene::SaveSceneAs("Content/Untitled");
-				}
-				else
-				{
-					Log::Print("Saving scene \"" + Scene::CurrentScene + "\"", Vector3(0.3, 0.4, 1));
-					Scene::SaveSceneAs(Scene::CurrentScene);
-				}
-				ChangedScene = false;
+				SaveCurrentScene();
 				QuitFunction(); }),
 				DialogBox::Answer("No", ReturnF),
 				DialogBox::Answer("Cancel", nullptr)
@@ -156,6 +254,11 @@ void EditorUI::Tick()
 			delete DraggedItem;
 			DraggedItem = nullptr;
 		}
+	}
+
+	if (Input::IsKeyDown(SDLK_LCTRL) && Input::IsKeyDown(SDLK_s) && ChangedScene)
+	{
+		SaveCurrentScene();
 	}
 }
 

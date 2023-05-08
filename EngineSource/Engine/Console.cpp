@@ -148,6 +148,10 @@ void Console::InitializeConsole()
 			Console::ConsoleLog(CommandArgs()[0]);
 		}, { Console::Command::Argument("msg", Type::E_STRING) }));
 
+	RegisterCommand(Command("version",
+		[]() {
+			Console::ConsoleLog(std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(ProjectName) + ")");
+		}, {}));
 
 	RegisterCommand(Command("info",
 		[]() {

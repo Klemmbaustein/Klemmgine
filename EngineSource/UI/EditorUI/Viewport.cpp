@@ -16,6 +16,7 @@
 #include <UI/EditorUI/Tabs/MaterialTemplateTab.h>
 #include <UI/EditorUI/Tabs/ParticleEditorTab.h>
 #include <UI/EditorUI/Tabs/CubemapTab.h>
+#include <UI/EditorUI/Tabs/PreferenceTab.h>
 #include <Engine/FileUtility.h>
 
 
@@ -63,14 +64,22 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 	ArrowsBuffer->Renderables.push_back(ArrowsModel);
 	TabBackground->IsVisible = false;
 
-	TabInstances = 
+	TabInstances =
 	{
+		// 00
 		nullptr,
+		// 01
 		new MeshTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
+		// 02
 		new MaterialTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[12]),
+		// 03
 		new MaterialTemplateTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4]),
+		// 04
 		new ParticleEditorTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4], Editor::CurrentUI->Textures[12]),
-		new CubemapTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText)
+		// 05
+		new CubemapTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
+		// 06
+		new PreferenceTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText)
 	};
 
 	TabBox = new UIBackground(true, Position + Vector2(0, Scale.Y - 0.05), UIColors[1], Vector2(Scale.X, 0.05));
@@ -114,6 +123,8 @@ void Viewport::Tick()
 		|| Tabs[SelectedTab].Index == 5;
 	Graphics::MainCamera->FOV = Maths::PI / 1.2;
 	UpdatePanel();
+
+	TabTexts[0]->SetText(ChangedScene ? "*Viewport " : " Viewport ");
 
 	OutlineBuffer->Renderables.clear();
 	OutlineBuffer->FramebufferCamera = Graphics::MainCamera;
@@ -381,20 +392,23 @@ void Viewport::UpdateTabBar()
 	TabBox->SetPosition(Position + Vector2(0, Scale.Y - 0.05));
 	TabBox->SetMinSize(Vector2(Scale.X, 0.05));
 	TabBox->SetMaxSize(Vector2(Scale.X, 0.05));
+	TabTexts.clear();
 	TabBox->DeleteChildren();
 	for (size_t i = 0; i < Tabs.size(); i++)
 	{
+		auto NewText = new UIText(0.45, UIColors[2], FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText);
+		TabTexts.push_back(NewText);
 		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 3 : 1.5), this, i * 2))
 			->SetBorder(UIBox::E_ROUNDED, 0.4)
 			->SetPadding(0, 0, 0, 0.02)
 			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01, 0.05)))
 				->SetPadding(0))
-			->AddChild((new UIText(0.45, 1, FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText))
+			->AddChild(NewText
 				->SetPadding(0.005, 0.005, 0.005, 0.005));
 		elem->SetTryFill(true);
 		if (Tabs[i].CanBeClosed)
 		{
-			elem->AddChild((new UIButton(true, 0, 1, this, i * 2 + 1))
+			elem->AddChild((new UIButton(true, 0, UIColors[2], this, i * 2 + 1))
 				->SetUseTexture(true, Editor::CurrentUI->Textures[4])
 				->SetMinSize(0.04)
 				->SetPadding(0.005)

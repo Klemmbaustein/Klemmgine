@@ -65,7 +65,7 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int Rel
 	this->ReloadTexture = ReloadTexture;
 
 	TabBackground->Align = UIBox::E_REVERSE;
-	TabName = new UIText(1, 1, "Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
+	TabName = new UIText(1, UIColors[2], "Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
 	TabName->SetPadding(0.1, 0.05, 0.05, 0);
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
@@ -166,7 +166,7 @@ void MaterialTab::GenerateUI()
 	TranslucencyText->SetText(LoadedMaterial.IsTranslucent ? "true" : "false");
 	CutoutText->SetText(LoadedMaterial.UseShadowCutout ? "true" : "false");
 
-	Rows[0]->AddChild(new UIText(0.8, 0.9, "Parent template", Renderer));
+	Rows[0]->AddChild(new UIText(0.8, UIColors[2], "Parent template", Renderer));
 	ParentTemplateText = new UITextField(true, 0, UIColors[1], this, -2, Renderer);
 	ParentTemplateText->HintText = "Parent Template";
 	ParentTemplateText->SetMinSize(Vector2(0.3, 0.075));
@@ -174,18 +174,18 @@ void MaterialTab::GenerateUI()
 	ParentTemplateText->SetText(LoadedMaterial.Template);
 	Rows[0]->AddChild(ParentTemplateText);
 
-	Rows[0]->AddChild(new UIText(0.675, 0.9, "Uniforms", Renderer));
+	Rows[0]->AddChild(new UIText(0.675, UIColors[2], "Uniforms", Renderer));
 	auto ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.725, 0));
 
-	auto ElementNameText = new UIText(0.5, 1, "Uniform name", Renderer);
+	auto ElementNameText = new UIText(0.5, UIColors[2], "Uniform name", Renderer);
 	ElementNameText->SetPadding(0.02, 0.02, 0.02, 0.01);
 	ElementNameText->SetTextWidthOverride(0.27);
 
-	auto ElementTypeText = new UIText(0.5, 1, "Type", Renderer);
+	auto ElementTypeText = new UIText(0.5, UIColors[2], "Type", Renderer);
 	ElementTypeText->SetPadding(0.02, 0.02, 0, 0.01);
 	ElementTypeText->SetTextWidthOverride(0.09);
 
-	UIText* ElementDefaultText = new UIText(0.5, 1, "Default value", Renderer);
+	UIText* ElementDefaultText = new UIText(0.5, UIColors[2], "Default value", Renderer);
 	ElementDefaultText->SetPadding(0.02, 0.02, 0, 0.01);
 	ElementDefaultText->SetTextWidthOverride(0.3);
 
@@ -198,7 +198,7 @@ void MaterialTab::GenerateUI()
 		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.725, 0.09));
 
 		auto ElementNameBox = new UIBox(true, 0);
-		auto ElementName = new UIText(0.5, 1, i.UniformName, Renderer);
+		auto ElementName = new UIText(0.5, UIColors[2], i.UniformName, Renderer);
 		ElementNameBox->SetMinSize(Vector2(0.3, 0.075));
 		ElementNameBox->AddChild(ElementName);
 		ElementNameBox->SetPadding(0);
@@ -206,7 +206,7 @@ void MaterialTab::GenerateUI()
 		ElementName->SetMaxSize(Vector2(0.3, 0.075));
 
 		auto ElementTypeBox = new UIBox(true, 0);
-		auto ElementType = new UIText(0.5, 1, Type::Types[i.Type], Renderer);
+		auto ElementType = new UIText(0.5, UIColors[2], Type::Types[i.Type], Renderer);
 		ElementTypeBox->SetMinSize(Vector2(0.1, 0.075));
 		ElementType->SetPadding(0, 0.02, 0, 0.01);
 		ElementTypeBox->SetPadding(0);
