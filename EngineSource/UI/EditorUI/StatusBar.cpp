@@ -32,6 +32,9 @@ void StatusBar::UpdateLayout()
 void StatusBar::Tick()
 {
 	UpdatePanel();
+
+	// Measure FPS like this instead of calculating it from the DeltaTime
+	// so we don't have to redraw the FPS counter every time the frame time changes.
 	if (FPSUpdateTimer >= 1)
 	{
 		Texts[0]->SetText("FPS: " + std::to_string(DisplayedFPS));

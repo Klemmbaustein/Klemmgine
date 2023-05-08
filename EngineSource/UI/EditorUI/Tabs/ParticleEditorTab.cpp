@@ -30,13 +30,13 @@ ParticleEditorTab::ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsi
 	
 	this->RemoveTexture = RemoveTexture;
 	Particle = new Particles::ParticleEmitter();
-	ParticleViewport = new UIBackground(true, Vector2(-0.7, -0.6), 1, Vector2(0.4));
+	ParticleViewport = new UIBackground(true, Vector2(-0.7, -0.6), 0.9999, Vector2(0.4));
 	ParticleFramebufferObject->ParticleEmitters.push_back(Particle);
 	ParticleFramebufferObject->ReInit();
 	ParticleViewport->IsVisible = false;
 	ParticleViewportText = new UIText(0.4, Vector3(0, 0.5, 1), "Particle", Text);
 	ParticleViewportText->SetPadding(0.01);
-	SelectedElementText = new UIText(0.7, Vector3(1), "Particle has no elements", Text);
+	SelectedElementText = new UIText(0.8, UIColors[2], "Particle has no elements", Text);
 	SelectedElementText->IsVisible = false;
 	SelectedElementText->SetPosition(Vector2(TabBackground->GetPosition() + TabBackground->GetUsedSize() * Vector2(0.5, 0.9)));
 	ParticleViewport->AddChild(ParticleViewportText);
@@ -126,29 +126,30 @@ void ParticleEditorTab::Generate()
 	{
 		delete elem;
 	}
+	SettingsButtons.clear();
 	for (auto* elem : GeneratedUI)
 	{
 		delete elem;
 	}
 	GeneratedUI.clear();
-	SelectedElementText->SetPosition(Vector2(TabBackground->GetPosition() + TabBackground->GetUsedSize() * Vector2(0.5, 1) - Vector2(0.1, 0.2)));
+	SelectedElementText->SetPosition(Vector2(TabBackground->GetPosition() + TabBackground->GetUsedSize() * Vector2(0.5, 1) - Vector2(0.1, 0.15)));
 	for (unsigned int i = 0; i < Particle->ParticleElements.size(); i++)
 	{
-		Vector3 Color = i == SelectedElement ? Vector3(0.3f) : Vector3(0.15f);
+		Vector3 Color = i == SelectedElement ? UIColors[1] * 3 : UIColors[1];
 		auto ButtonBox = new UIBox(true, TabBackground->GetPosition() + Vector2(0.05, TabBackground->GetUsedSize().Y - 0.2 - (i / 10.f)));
 		auto NewButton = new UIButton(true, 0, Color, this, 200 + i);
 		NewButton->SetMinSize(Vector2(0.2, 0));
 		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
 		ButtonBox->AddChild(NewButton);
 		NewButton->SetPadding(0, 0, 0, 0.01);
-		auto RemoveButton = new UIButton(true, 0, 1, this, 300 + i);
+		auto RemoveButton = new UIButton(true, 0, UIColors[2], this, 300 + i);
 		RemoveButton->SetMinSize(Vector2(0.09, 0.16) / 2.2);
 		RemoveButton->SetUseTexture(true, RemoveTexture);
 		RemoveButton->SetPadding(0);
 		ButtonBox->AddChild(RemoveButton);
 		GeneratedUI.push_back(NewButton);
 		GeneratedUI.push_back(RemoveButton);
-		NewButton->AddChild(new UIText(0.5, 1, "Element " + std::to_string(i), TabText));
+		NewButton->AddChild(new UIText(0.5, UIColors[2], "Element " + std::to_string(i), TabText));
 	}
 	if (Particle->ParticleElements.size())
 	{
@@ -159,11 +160,11 @@ void ParticleEditorTab::Generate()
 		SelectedElementText->SetText("Particle has no elements");
 	}
 	{
-		auto NewButton = new UIButton(true, TabBackground->GetPosition() + Vector2(0.05, TabBackground->GetUsedSize().Y - 0.2 - (Particle->ParticleElements.size() / 10.f)), 1, this, 0);
+		auto NewButton = new UIButton(true, TabBackground->GetPosition() + Vector2(0.05, TabBackground->GetUsedSize().Y - 0.2 - (Particle->ParticleElements.size() / 10.f)), UIColors[2], this, 0);
 		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
 		GeneratedUI.push_back(NewButton);
 		NewButton->SetMinSize(Vector2(0.2, 0));
-		NewButton->AddChild(new UIText(0.5, 0, "Add element", TabText));
+		NewButton->AddChild(new UIText(0.5, 1 - UIColors[2], "Add element", TabText));
 	}
 	SettingsButtons.clear();
 	if (ParticleSettingsScrollBox) delete ParticleSettingsScrollBox;
@@ -185,19 +186,19 @@ void ParticleEditorTab::Generate()
 	if (SelectedElement < Particle->ParticleElements.size())
 	{
 		auto& SelectedParticle = Particle->ParticleElements[SelectedElement];
-		auto NewText = (new UIText(0.7, 1, "Velocity", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		auto NewText = (new UIText(0.7, UIColors[2], "Velocity", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[0]->AddChild(NewText);
 		UIVectorField* NewVecField = new UIVectorField(0, SelectedParticle.Direction, this, 100, TabText);
 		ScrollBoxes[0]->AddChild(NewVecField);
 		SettingsButtons.push_back(NewVecField);
 
-		NewText = (new UIText(0.7, 1, "Velocity random", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Velocity random", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[0]->AddChild(NewText);
 		NewVecField = new UIVectorField(0, SelectedParticle.DirectionRandom, this, 101, TabText);
 		ScrollBoxes[0]->AddChild(NewVecField);
 		SettingsButtons.push_back(NewVecField);
 
-		NewText = (new UIText(0.7, 1, "Size", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Size", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[0]->AddChild(NewText);
 		UITextField* NewTextField = new UITextField(true, Vector2(-0.1f, 0.1f), 0.2, this, 102, TabText);
 		ScrollBoxes[0]->AddChild(NewTextField);
@@ -208,7 +209,7 @@ void ParticleEditorTab::Generate()
 		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5);
 		SettingsButtons.push_back(NewTextField);
 
-		NewText = (new UIText(0.7, 1, "Lifetime", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Lifetime", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[0]->AddChild(NewText);
 		NewTextField = new UITextField(true, Vector2(-0.1f, 0.05f), 0.2, this, 103, TabText);
 		ScrollBoxes[0]->AddChild(NewTextField);
@@ -219,7 +220,7 @@ void ParticleEditorTab::Generate()
 		NewTextField->SetMinSize(Vector2(0.265, 0.05));
 		SettingsButtons.push_back(NewTextField);
 
-		NewText = (new UIText(0.7, 1, "Spawn delay", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Spawn delay", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[0]->AddChild(NewText);
 		NewTextField = new UITextField(true, Vector2(-0.1f, -0.2f), 0.2, this, 104, TabText);
 		ScrollBoxes[0]->AddChild(NewTextField);
@@ -230,7 +231,7 @@ void ParticleEditorTab::Generate()
 		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5);
 		SettingsButtons.push_back(NewTextField);
 
-		NewText = (new UIText(0.7, 1, "Spawn loops", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Spawn loops", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[1]->AddChild(NewText);
 		NewTextField = new UITextField(true, Vector2(-0.1f, -0.35f), 0.2, this, 105, TabText);
 		ScrollBoxes[1]->AddChild(NewTextField);
@@ -239,7 +240,7 @@ void ParticleEditorTab::Generate()
 		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5);
 		SettingsButtons.push_back(NewTextField);
 
-		NewText = (new UIText(0.7, 1, "Material", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Material", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[1]->AddChild(NewText);
 		NewTextField = new UITextField(true, Vector2(-0.1f, -0.5f), 0.2, this, 106, TabText);
 		ScrollBoxes[1]->AddChild(NewTextField);
@@ -248,19 +249,19 @@ void ParticleEditorTab::Generate()
 		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5);
 		SettingsButtons.push_back(NewTextField);
 		
-		NewText = (new UIText(0.7, 1, "Position Random", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Position Random", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[1]->AddChild(NewText);
 		NewVecField = new UIVectorField(0, SelectedParticle.PositionRandom, this, 107, TabText);
 		ScrollBoxes[1]->AddChild(NewVecField);
 		SettingsButtons.push_back(NewVecField);
 
-		NewText = (new UIText(0.7, 1, "Force", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Force", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[1]->AddChild(NewText);
 		NewVecField = new UIVectorField(0, SelectedParticle.Force, this, 108, TabText);
 		ScrollBoxes[1]->AddChild(NewVecField);
 		SettingsButtons.push_back(NewVecField);
 
-		NewText = (new UIText(0.7, 1, "Start scale", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
+		NewText = (new UIText(0.7, UIColors[2], "Start scale", TabText))->SetPadding(0.01, 0.01, 0.01, 0.01);
 		ScrollBoxes[1]->AddChild(NewText);
 		NewTextField = new UITextField(true, 0, 0.2, this, 109, TabText);
 		stream = std::stringstream();
@@ -271,7 +272,7 @@ void ParticleEditorTab::Generate()
 		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5);
 		SettingsButtons.push_back(NewTextField);
 
-		NewText = new UIText(0.7, 1, "End scale", TabText);
+		NewText = new UIText(0.7, UIColors[2], "End scale", TabText);
 		ScrollBoxes[1]->AddChild(NewText);
 		NewTextField = new UITextField(true, 0, 0.2, this, 110, TabText);
 		stream = std::stringstream();
@@ -300,12 +301,14 @@ void ParticleEditorTab::OnButtonClicked(int Index)
 		if (Index == 0)
 		{
 			Particle->AddElement(Particles::ParticleElement(), Material::LoadMaterialFile("NONE", false));
+			ElementMaterials.push_back("");
 			Generate();
 			return;
 		}
 		if (Index >= 300 && Index < 400)
 		{
 			Particle->RemoveElement(Index - 300);
+			ElementMaterials.erase(ElementMaterials.begin() + (Index - 300));
 			Generate();
 			return;
 		}

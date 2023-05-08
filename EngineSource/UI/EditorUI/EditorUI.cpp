@@ -20,6 +20,7 @@
 #include <Engine/Log.h>
 #include <Engine/Input.h>
 #include <UI/EditorUI/Popups/DialogBox.h>
+#include <Engine/Console.h>
 
 namespace Editor
 {
@@ -35,7 +36,7 @@ namespace Editor
 	Vector3 NewUIColors[EditorUI::NumUIColors] =
 	{
 		Vector3(0.85, 0.85, 0.85),	//Default background
-		Vector3(0.4),				//Dark background
+		Vector3(0.6),				//Dark background
 		Vector3(0),					//Highlight color,
 		Vector3(1)
 	};
@@ -91,11 +92,13 @@ void EditorUI::OpenScene(std::string NewScene)
 		new DialogBox(Scene::CurrentScene, 0, "Scene has unsaved changes. Save?",
 			{
 				DialogBox::Answer("Yes", []() {SaveCurrentScene(); ChangedScene = false; Scene::LoadNewScene(EditorSceneToOpen);
+				Viewport::ViewportInstance->ClearSelectedObjects();
 				Scene::Tick();
 				Editor::CurrentUI->UIElements[5]->UpdateLayout();
 				Editor::CurrentUI->UIElements[6]->UpdateLayout(); }),
 
-				DialogBox::Answer("No", []() {ChangedScene = false; Scene::LoadNewScene(EditorSceneToOpen);			
+				DialogBox::Answer("No", []() {ChangedScene = false; Scene::LoadNewScene(EditorSceneToOpen);
+				Viewport::ViewportInstance->ClearSelectedObjects();
 				Scene::Tick();
 				Editor::CurrentUI->UIElements[5]->UpdateLayout();
 				Editor::CurrentUI->UIElements[6]->UpdateLayout(); }),
@@ -104,12 +107,17 @@ void EditorUI::OpenScene(std::string NewScene)
 			});
 		return;
 	}
-
+	Viewport::ViewportInstance->ClearSelectedObjects();
 	ChangedScene = false; 
 	Scene::LoadNewScene(NewScene);
 	Scene::Tick();
 	Editor::CurrentUI->UIElements[5]->UpdateLayout();
 	Editor::CurrentUI->UIElements[6]->UpdateLayout();
+}
+
+bool EditorUI::GetUseLightMode()
+{
+	return Editor::LightMode;
 }
 
 void EditorUI::SetUseLightMode(bool NewLightMode)
@@ -194,6 +202,9 @@ EditorUI::EditorUI()
 
 	// Load preferences from the preference tab after the UI is finished setting up
 	Viewport::ViewportInstance->TabInstances[6]->Load("");
+
+	Console::RegisterCommand(Console::Command("build", []() {new std::thread(Build::TryBuildProject, "Build/"); }, {}));
+	Console::RegisterCommand(Console::Command("save", EditorUI::SaveCurrentScene, {}));
 }
 
 void(*QuitFunction)();

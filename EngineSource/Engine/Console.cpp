@@ -451,6 +451,7 @@ void Console::PrintArguments(std::vector<Command::Argument> args, ConsoleLogType
 	if (!args.size())
 	{
 		ConsoleLog("Arguments are: none.", Severity);
+		return;
 	}
 	std::string PrintArgs = "Arguments are: ";
 	for (auto& i : args)

@@ -18,7 +18,7 @@ void PreferenceTab::GenerateUI()
 		SettingsCategoryBox->AddChild(
 			(new UIButton(true, 0, UIColors[1] + (float)(i == SelectedSetting) / 8.f, this, i))->
 			SetPadding(0.005, 0.005, 0.01, 0.01)->SetBorder(UIBox::E_ROUNDED, 0.5)->
-			AddChild((new UIText(0.5, 1, Preferences[i].Name, Renderer))->SetTextWidthOverride(0.2)->SetPadding(0.01)));
+			AddChild((new UIText(0.5, UIColors[2], Preferences[i].Name, Renderer))->SetTextWidthOverride(0.2)->SetPadding(0.01)));
 	}
 
 	auto SettingsBox = new UIBox(false, 0);
@@ -61,7 +61,7 @@ void PreferenceTab::GenerateUI()
 			(new UIButton(true, 0, UIColors[1], this, -400 + CurentCategory))
 				->SetPadding(0.01, 0.01, 0, 0)
 				->SetMinSize(Vector2(SegmentSize, 0))
-				->AddChild((new UIText(0.7, 1, "> " + cat.first, Renderer))
+				->AddChild((new UIText(0.7, UIColors[2], "> " + cat.first, Renderer))
 					->SetPadding(0.01)));
 
 		for (size_t i = 0; i < cat.second.size(); i++)
@@ -81,7 +81,7 @@ void PreferenceTab::GenerateUI()
 
 void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value)
 {
-	Parent->AddChild((new UIText(0.7, UIColors[2], Name, Renderer))->SetPadding(0.05, 0.02, 0.05, 0.02));
+	Parent->AddChild((new UIText(0.7, UIColors[2], Name, Renderer))->SetPadding(0.01, 0.01, 0.05, 0.02));
 	switch (SectionType)
 	{
 	case Type::E_FLOAT:
@@ -136,14 +136,15 @@ void PreferenceTab::OnButtonClicked(int Index)
 	}
 	else if (Index >= -200)
 	{
-		switch (Preferences[0].Settings[Index + 200].Type)
+		Index += 200;
+		switch (Preferences[0].Settings[Index].Type)
 		{
 		case Type::E_BOOL:
-			Preferences[0].Settings[Index + 200].Value = std::to_string(!((bool)std::stoi(Preferences[0].Settings[Index + 200].Value)));
+			Preferences[0].Settings[Index].Value = std::to_string(!((bool)std::stoi(Preferences[0].Settings[Index].Value)));
 		default:
 			break;
 		}
-		Preferences[0].Settings[Index + 200].OnChanged(Preferences[0].Settings[Index + 200].Value);
+		Preferences[0].Settings[Index].OnChanged(Preferences[0].Settings[Index].Value);
 	}
 }
 
@@ -171,10 +172,8 @@ void PreferenceTab::Load(std::string File)
 				}
 				NameCopy[Space] = '_';
 			}
-			Log::Print(NameCopy);
 			if (Pref.GetPropterty(NameCopy).Type != Type::E_NULL)
 			{
-				Log::Print(NameCopy);
 				i.Value = Pref.GetPropterty(NameCopy).Value;
 				i.OnChanged(i.Value);
 			}

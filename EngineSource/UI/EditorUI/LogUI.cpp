@@ -24,7 +24,7 @@ LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(U
 	LogScrollBox->Align = UIBox::E_REVERSE;
 	LogPromt = new UITextField(true, 0, UIColors[1] * 0.5, this, 0, Editor::CurrentUI->EngineUIText);
 	LogPromt->HintText = "Enter command here";
-	TabBackground->AddChild((new UIBackground(false, 0, UIColors[1], 0))
+	TabBackground->AddChild((new UIBackground(false, 0, UIColors[1] * 0.99, 0))
 		->SetBorder(UIBox::E_ROUNDED, 0.5)
 		->AddChild(LogPromt
 			->SetTextSize(0.45)

@@ -24,10 +24,23 @@ class PreferenceTab : public EditorTab
 	TextRenderer* Renderer;
 	std::vector<SettingsCategory> Preferences =
 	{
-		SettingsCategory("Editor", {SettingsCategory::Setting("UI:Light mode [Experimental]", Type::E_BOOL, "0", [](std::string NewValue)
+		SettingsCategory("Editor", 
+			{
+			SettingsCategory::Setting("UI:Light mode [Experimental]", Type::E_BOOL, "0", [](std::string NewValue)
 			{
 				Editor::CurrentUI->SetUseLightMode(std::stoi(NewValue));
-			})}),
+			}),
+			SettingsCategory::Setting("Toolbar:Show Save Button", Type::E_BOOL, "0", [](std::string NewValue)
+			{
+			}),
+			SettingsCategory::Setting("Toolbar:Show Wireframe Button", Type::E_BOOL, "0", [](std::string NewValue)
+			{
+			}),
+			SettingsCategory::Setting("Toolbar:Show Build Button", Type::E_BOOL, "0", [](std::string NewValue)
+			{
+			})
+			}
+		),
 	};
 
 	void GenerateUI();

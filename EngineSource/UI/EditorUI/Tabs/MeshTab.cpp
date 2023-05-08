@@ -33,7 +33,7 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 	this->Renderer = Renderer;
 
 	TabBackground->Align = UIBox::E_REVERSE;
-	TabName = new UIText(1, 1, "Model: ", Renderer);
+	TabName = new UIText(1, UIColors[2], "Model: ", Renderer);
 	TabName->SetPadding(0.1, 0.05, 0.05, 0);
 	if (!PreviewBuffer)
 	{
@@ -152,21 +152,21 @@ void MeshTab::Generate()
 	for (auto& i : Options)
 	{
 		auto OptionBox = new UIBox(true, 0);
-		auto NewText = new UIText(0.5, 1, i, Renderer);
+		auto NewText = new UIText(0.5, UIColors[2], i, Renderer);
 		OptionBox->AddChild(NewText);
 		auto NewButton = new UIButton(true, 0, UIColors[0] * 2, this, Index);
 		OptionBox->AddChild(NewButton);
 		OptionBox->SetPadding(0.01);
 		NewButton->SetPadding(0, 0, 0.01, 0);
 		NewText->SetPadding(0);
-		auto ButtonText = new UIText(0.5, 1, *OptionVariables[std::abs(Index) - 1] ? "true " : "false", Renderer);
+		auto ButtonText = new UIText(0.5, UIColors[2], *OptionVariables[std::abs(Index) - 1] ? "true " : "false", Renderer);
 		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
 		ButtonText->SetPadding(0.01);
 		NewButton->AddChild(ButtonText);
 		Rows[0]->AddChild(OptionBox);
 		Index--;
 	}
-	auto Text = new UIText(0.6, 1, "Materials", Renderer);
+	auto Text = new UIText(0.6, UIColors[2], "Materials", Renderer);
 	Rows[1]->AddChild(Text);
 	MaterialTextFields.clear();
 	for (auto& i : ModelData.Elements)

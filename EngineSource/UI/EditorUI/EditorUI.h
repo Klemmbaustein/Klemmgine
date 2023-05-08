@@ -74,8 +74,8 @@ class EditorUI : public UICanvas
 public:
 	static void SaveCurrentScene();
 	static void OpenScene(std::string NewScene);
-
-	void SetUseLightMode(bool NewLightMode);
+	static bool GetUseLightMode();
+	static void SetUseLightMode(bool NewLightMode);
 
 	static void CreateFile(std::string Path, std::string Name, std::string Ext);
 	EditorUI();

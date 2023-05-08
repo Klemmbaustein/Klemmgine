@@ -59,7 +59,7 @@ MaterialTemplateTab::MaterialTemplateTab(Vector3* UIColors, TextRenderer* Text, 
 	this->Renderer = Renderer;
 
 	TabBackground->Align = UIBox::E_REVERSE;
-	TabName = new UIText(1, 1, "Material Template: ", Renderer);
+	TabName = new UIText(1, UIColors[2], "Material Template: ", Renderer);
 	TabName->SetPadding(0.1, 0.05, 0.05, 0);
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
@@ -116,7 +116,7 @@ void MaterialTemplateTab::GenerateUI()
 	int it = 0;
 	for (auto& i : ShaderTextFields)
 	{
-		Rows[0]->AddChild(new UIText(0.6, 0.8, ShaderHints[it], Renderer));
+		Rows[0]->AddChild(new UIText(0.6, UIColors[2], ShaderHints[it], Renderer));
 		i = new UITextField(true, 0, UIColors[1], this, -2, Renderer);
 		i->HintText = ShaderHints[it] + " here";
 		i->SetMinSize(Vector2(0.3, 0.075));
@@ -125,18 +125,18 @@ void MaterialTemplateTab::GenerateUI()
 		Rows[0] ->AddChild(i);
 		it++;
 	}
-	Rows[0]->AddChild(new UIText(0.6, 0.8, "Uniforms", Renderer));
+	Rows[0]->AddChild(new UIText(0.6, UIColors[2], "Uniforms", Renderer));
 	auto ElementBox = new UIBox(true, 0);
 
-	auto ElementNameText = new UIText(0.5, 1, "Uniform Name", Renderer);
+	auto ElementNameText = new UIText(0.5, UIColors[2], "Uniform Name", Renderer);
 	ElementNameText->SetPadding(0, 0, 0, 0.01);
 	ElementNameText->SetTextWidthOverride(0.2);
 
-	auto ElementTypeText = new UIText(0.5, 1, "Type", Renderer);
+	auto ElementTypeText = new UIText(0.5, UIColors[2], "Type", Renderer);
 	ElementTypeText->SetPadding(0, 0, 0, 0.01);
 	ElementTypeText->SetTextWidthOverride(0.1);
 
-	UIText* ElementDefaultText = new UIText(0.5, 1, "Default Value", Renderer);
+	UIText* ElementDefaultText = new UIText(0.5, UIColors[2], "Default Value", Renderer);
 	ElementDefaultText->SetPadding(0, 0, 0, 0.01);
 	ElementDefaultText->SetTextWidthOverride(0.3);
 

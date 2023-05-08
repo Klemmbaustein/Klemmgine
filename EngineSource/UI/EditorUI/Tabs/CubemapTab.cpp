@@ -18,7 +18,7 @@ CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UI
 	this->Renderer = Renderer;
 
 	TabBackground->Align = UIBox::E_REVERSE;
-	TabName = new UIText(1, 1, "Model: ", Renderer);
+	TabName = new UIText(1, UIColors[2], "Model: ", Renderer);
 	TabName->SetPadding(0.1, 0.05, 0.05, 0);
 	if (!PreviewBuffer)
 	{
@@ -35,7 +35,7 @@ CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UI
 	CubemapSidesBox->Align = UIBox::E_REVERSE;
 	CubemapSidesBox->SetBorder(UIBox::E_ROUNDED, 1);
 	CubemapSidesBox->IsVisible = false;
-	PreviewWindow = new UIBackground(true, Vector2(-0.2, -0.3), 1, 0.8);
+	PreviewWindow = new UIBackground(true, Vector2(-0.2, -0.3), 0.999, 0.8);
 	PreviewWindow->SetBorder(UIBox::E_ROUNDED, 1);
 	PreviewWindow->IsVisible = false;
 
@@ -114,7 +114,7 @@ void CubemapTab::Generate()
 		SideFields.push_back(text);
 		CubemapSidesBox->AddChild((new UIBox(false, 0))
 			->AddChild(text)
-			->AddChild((new UIText(0.5, 1, DisplayNames[i], Renderer))
+			->AddChild((new UIText(0.5, UIColors[2], DisplayNames[i], Renderer))
 				->SetPadding(0, 0.01, 0, 0)));
 	}
 }
