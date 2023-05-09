@@ -18,7 +18,7 @@ Tools/BuildTool/Release/
 *.exe
 *.dll
 *.lib
-Components/
+./Components/
 # Generated engine files
 paths.txt
 cppinfo.txt
