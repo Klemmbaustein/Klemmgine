@@ -18,7 +18,7 @@ DialogBox::DialogBox(std::string Title, Vector2 Position, std::string Message, s
 			(new UIButton(true, 0, UIColors[2], this, i))
 			->SetPadding(0.01)
 			->SetBorder(UIBox::E_ROUNDED, 0.2)
-			->AddChild((new UIText(0.45, UIColors[1], Answers[i].Name, Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.45, 1 - UIColors[2], Answers[i].Name, Editor::CurrentUI->EngineUIText))
 				->SetPadding(0.005)));
 	}
 	TabBackground->AddChild(new UIText(0.5, UIColors[2], Message, Editor::CurrentUI->EngineUIText));

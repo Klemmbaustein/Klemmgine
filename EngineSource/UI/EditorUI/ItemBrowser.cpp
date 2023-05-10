@@ -327,7 +327,7 @@ void ItemBrowser::UpdateLayout()
 
 void ItemBrowser::Tick()
 {
-	if (Input::IsRMBDown && !RMBDown && !Editor::DraggingTab && TabBackground->IsHovered())
+	if (Input::IsRMBDown && !RMBDown && !Editor::DraggingTab && TabBackground->IsHovered() && !SelectedTab)
 	{
 		bool ButtonHovered = false;
 		RMBDown = true;

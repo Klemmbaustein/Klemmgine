@@ -89,13 +89,16 @@ void UIButton::Tick()
 		Offset.Y = CurrentScrollObject->Percentage;
 	}
 
+	if (UI::HoveredButton == this)
+	{
+		ButtonColorMultiplier = 0.8f;
+	}
 
 	if (Maths::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation) // If the mouse is on top of the button
 		&& (!CurrentScrollObject || // Check if we have a scroll object
 			Maths::IsPointIn2DBox(CurrentScrollObject->Position - CurrentScrollObject->Scale, CurrentScrollObject->Position, Input::MouseLocation))) // do some very questionable math to check if the mouse is inside the scroll area
 	{
 		UI::NewHoveredButton = this;
-		ButtonColorMultiplier = 0.8f;
 	}
 	else if (IsPressed && UI::HoveredButton != this)
 	{

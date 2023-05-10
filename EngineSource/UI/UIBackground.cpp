@@ -74,7 +74,7 @@ void UIBackground::SetColor(Vector3 NewColor)
 {
 	if (NewColor != Color)
 	{
-		Color = NewColor;
+		Color = Vector3::Clamp(NewColor, 0, 1);
 		RedrawUI();
 	}
 }
@@ -109,7 +109,7 @@ UIBackground* UIBackground::SetUseTexture(bool UseTexture, unsigned int TextureI
 UIBackground::UIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale, Shader* UsedShader) : UIBox(Horizontal, Position)
 {
 	SetMinSize(MinScale);
-	this->Color = Color;
+	this->Color = Vector3::Clamp(Color, 0, 1);
 	this->BackgroundShader = UsedShader;
 	MakeGLBuffers();
 }

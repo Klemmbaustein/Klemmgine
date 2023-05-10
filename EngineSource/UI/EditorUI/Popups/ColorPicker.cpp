@@ -118,7 +118,7 @@ ColorPicker::ColorPicker(UIVectorField* Color) : EditorPanel(Editor::CurrentUI->
 			(new UIButton(true, 0, UIColors[2], this, i))
 			->SetPadding(0.01)
 			->SetBorder(UIBox::E_ROUNDED, 0.2)
-			->AddChild((new UIText(0.45, UIColors[1], Answers[i], Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.45, 1 - UIColors[2], Answers[i], Editor::CurrentUI->EngineUIText))
 				->SetPadding(0.005)));
 	}
 	SelectedColor = Color->GetValue();

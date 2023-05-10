@@ -302,7 +302,7 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 		NewElement->SetBorder(UIBox::E_ROUNDED, 0.4);
 		NewElement->SetMinSize(Vector2(0.16, 0));
 		NewElement->SetPadding(0);
-		NewElement->AddChild((new UIText(0.4, UIColors[2], Menu[i].Title, EngineUIText))
+		NewElement->AddChild((new UIText(0.45, UIColors[2], Menu[i].Title, EngineUIText))
 			->SetPadding(0));
 		Dropdown->AddChild(NewElement);
 	}

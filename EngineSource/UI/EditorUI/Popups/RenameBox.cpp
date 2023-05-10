@@ -19,12 +19,12 @@ RenameBox::RenameBox(std::string FileToRename, Vector2 Position)
 	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
 		->SetPadding(0.01)
 		->SetBorder(UIBox::E_ROUNDED, 0.2)
-		->AddChild((new UIText(0.45, UIColors[1], "Confirm", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.45, 1 - UIColors[2], "Confirm", Editor::CurrentUI->EngineUIText))
 			->SetPadding(0.005)))
 	->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
 		->SetPadding(0.01)
 		->SetBorder(UIBox::E_ROUNDED, 0.2)
-		->AddChild((new UIText(0.45, UIColors[1], "Cancel", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.45, 1 - UIColors[2], "Cancel", Editor::CurrentUI->EngineUIText))
 			->SetPadding(0.005)));
 
 	InputField = new UITextField(true, 0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
