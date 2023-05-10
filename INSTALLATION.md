@@ -17,6 +17,8 @@ Alternatively, all libraries can be downloaded from a single package [here](http
 The paths to both the include paths and library paths to these libraries
 must be supplied to the ProjectGenerator.
 
+If you have downloaded the library package, click on "Open library package" and navigate to the extracted package folder.
+
 <img src="Git/Installation.png" width="640" height="480">
 
 Once this is done, Visual Studio project files for the engine can be generated. Press the green "Generate" button.
