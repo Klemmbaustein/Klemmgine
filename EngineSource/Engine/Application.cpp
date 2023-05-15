@@ -296,9 +296,9 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 void InitializeShaders()
 {
 	std::cout << "Initializing Shaders";
-	Graphics::TextShader = new Shader("Shaders/text.vert", "Shaders/text.frag");
+	Graphics::TextShader = new Shader("Shaders/UI/text.vert", "Shaders/UI/text.frag");
 	std::cout << ".";
-	Graphics::UIShader = new Shader("Shaders/uishader.vert", "Shaders/uishader.frag");
+	Graphics::UIShader = new Shader("Shaders/UI/uishader.vert", "Shaders/UI/uishader.frag");
 	std::cout << ".";
 	Application::PostProcessShader = new Shader("Shaders/postprocess.vert", "Shaders/postprocess.frag");
 	std::cout << ".";

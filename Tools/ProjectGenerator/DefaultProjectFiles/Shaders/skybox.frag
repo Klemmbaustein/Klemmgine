@@ -6,7 +6,7 @@ void main()
 {
 	vec3 normal = normalize(-v_position);
 	vec3 color = mix(u_horizoncolor, u_skycolor, abs(dot(vec3(normalize(normal)), vec3(0, 1, 0))));
-	if (max(pow(dot(normalize(-normal), normalize(u_directionallight.Direction)) - 0.999, 1.1) * 25, 0) > 0.0)
+	if (max(pow(dot(normalize(-normal), normalize(u_directionallight.Direction)), 100), 0) > 0.9)
 	{
 		color = u_directionallight.SunColor * 2;
 	}

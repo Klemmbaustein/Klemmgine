@@ -267,7 +267,7 @@ void EditorUI::Tick()
 		}
 	}
 
-	if (Input::IsKeyDown(SDLK_LCTRL) && Input::IsKeyDown(SDLK_s) && ChangedScene)
+	if (Input::IsKeyDown(SDLK_LCTRL) && Input::IsKeyDown(SDLK_s) && !Input::IsRMBDown && ChangedScene)
 	{
 		SaveCurrentScene();
 	}

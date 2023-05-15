@@ -132,22 +132,45 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 	{
 		return;
 	}
-	switch (u.Type)
+	try
 	{
-	case Type::E_INT:
-		Uniforms[UniformIndex].Content = new int(std::stoi(u.Value));
-		break;
-	case Type::E_FLOAT:
-		Uniforms[UniformIndex].Content = new float(std::stof(u.Value));
-		break;
-	case Type::E_VECTOR3:
-		Uniforms[UniformIndex].Content = new Vector3(Vector3::stov(u.Value));
-		break;
-	case Type::E_GL_TEXTURE:
-		Uniforms[UniformIndex].Content = (void*)new unsigned int(Texture::LoadTexture(u.Value));
-		break;
-	default:
-		break;
+		switch (u.Type)
+		{
+		case Type::E_INT:
+			Uniforms[UniformIndex].Content = new int(std::stoi(u.Value));
+			break;
+		case Type::E_FLOAT:
+			Uniforms[UniformIndex].Content = new float(std::stof(u.Value));
+			break;
+		case Type::E_VECTOR3:
+			Uniforms[UniformIndex].Content = new Vector3(Vector3::stov(u.Value));
+			break;
+		case Type::E_GL_TEXTURE:
+			Uniforms[UniformIndex].Content = (void*)new unsigned int(Texture::LoadTexture(u.Value));
+			break;
+		default:
+			break;
+		}
+	}
+	catch (std::exception& e)
+	{
+		switch (u.Type)
+		{
+		case Type::E_INT:
+			Uniforms[UniformIndex].Content = new int(0);
+			break;
+		case Type::E_FLOAT:
+			Uniforms[UniformIndex].Content = new float(0);
+			break;
+		case Type::E_VECTOR3:
+			Uniforms[UniformIndex].Content = new Vector3();
+			break;
+		case Type::E_GL_TEXTURE:
+			Uniforms[UniformIndex].Content = new unsigned int(0);
+			break;
+		default:
+			break;
+		}
 	}
 }
 

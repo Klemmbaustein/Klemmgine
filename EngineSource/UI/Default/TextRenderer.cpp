@@ -14,7 +14,6 @@
 
 namespace _TextRenderer
 {
-	static Shader* TextShader = nullptr;
 	std::vector<TextRenderer*> Renderers;
 }
 
@@ -22,14 +21,6 @@ namespace _TextRenderer
 //{
 //	_TextRenderer::projection = glm::ortho(-450 * Graphics::AspectRatio, 450 * Graphics::AspectRatio, 450.0f, -450.f);
 //}
-
-void TextRenderer::CheckForTextShader()
-{
-	if (!_TextRenderer::TextShader)
-	{
-		_TextRenderer::TextShader = new Shader("Shaders/text.vert", "Shaders/text.frag");
-	}
-}
 
 size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale, Vector2& LetterOutLocation)
 {
@@ -167,7 +158,6 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 
 Vector2 TextRenderer::RenderText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap, ScrollObject* CurrentScrollObject)
 {
-	CheckForTextShader();
 	float originalScale = Scale;
 	Scale /= 2.f;
 	Scale /= CharacterSizeInPixels;
@@ -175,7 +165,7 @@ Vector2 TextRenderer::RenderText(ColoredText Text, Vector2 Pos, float Scale, Vec
 	Pos.X = Pos.X * 450 * Graphics::AspectRatio;
 	LengthBeforeWrap *= 2400;
 	Pos.Y = Pos.Y * -450;
-	_TextRenderer::TextShader->Bind();
+	Graphics::TextShader->Bind();
 	stbtt_bakedchar* cdata = (stbtt_bakedchar*)cdatapointer;
 	glBindVertexArray(fontVao);
 	glBindBuffer(GL_ARRAY_BUFFER, fontVertexBufferId);
@@ -188,18 +178,18 @@ Vector2 TextRenderer::RenderText(ColoredText Text, Vector2 Pos, float Scale, Vec
 	}
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, fontTexture);
-	glUniform1i(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_texture"), 0);
-	glUniform3f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "textColor"), Color.X, Color.Y, Color.Z);
-	glUniform1f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
-	glUniform3f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "transform"), (float)Pos.X, (float)Pos.Y, Scale);
-	glUniform1f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_opacity"), opacity);
+	glUniform1i(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_texture"), 0);
+	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "textColor"), Color.X, Color.Y, Color.Z);
+	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
+	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "transform"), (float)Pos.X, (float)Pos.Y, Scale);
+	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_opacity"), opacity);
 	if (CurrentScrollObject != nullptr)
 	{
-		glUniform3f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_offset"),
+		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"),
 			-CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
 	}
 	else
-		glUniform3f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
+		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
 	float MaxHeight = 0.0f;
 	float x = 0.f, y = 0.f;
 	FontVertex* vData = fontVertexBufferData;
@@ -396,25 +386,25 @@ DrawableText::DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumV
 
 void DrawableText::Draw(ScrollObject* CurrentScrollObject)
 {
-	TextRenderer::CheckForTextShader();
 	glBindVertexArray(VAO);
-	_TextRenderer::TextShader->Bind();
+	Graphics::TextShader->Bind();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture);
-	glUniform1i(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_texture"), 0);
-	glUniform3f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "textColor"), Color.X, Color.Y, Color.Z);
-	glUniform1f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
-	glUniform3f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "transform"), (float)Position.X, (float)Position.Y, Scale);
-	glUniform1f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_opacity"), Opacity);
+	glUniform1i(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_texture"), 0);
+	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "textColor"), Color.X, Color.Y, Color.Z);
+	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
+	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "transform"), (float)Position.X, (float)Position.Y, Scale);
+	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_opacity"), Opacity);
 	if (CurrentScrollObject != nullptr)
 	{
-		glUniform3f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_offset"),
+		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"),
 			-CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
 	}
 	else
-		glUniform3f(glGetUniformLocation(_TextRenderer::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
+		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
 	glDrawArrays(GL_TRIANGLES, 0, NumVerts);
 }
+
 
 DrawableText::~DrawableText()
 {

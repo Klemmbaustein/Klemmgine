@@ -11,15 +11,11 @@
 #include <Engine/Log.h>
 #include <Engine/Scene.h>
 #include <filesystem>
+#include <Engine/Application.h>
 
 #include <World/Graphics.h>
 #include <World/Stats.h>
 #include <World/Assets.h>
-
-namespace Application
-{
-	void Quit();
-}
 
 struct ForceQuitException : std::exception
 {
@@ -271,10 +267,14 @@ void Console::InitializeConsole()
 		}, { Command::Argument("command", Type::E_STRING) }));
 
 	RegisterCommand(Command("getcommands", []() {
-		for (auto i : Commands)
+		for (auto& i : Commands)
 		{
 			ConsoleLog(i.first); PrintArguments(i.second.Arguments);
 		}
+		}, {}));
+
+	RegisterCommand(Command("exit", []() {
+			Application::Quit();
 		}, {}));
 
 	RegisterConVar(Variable("vignette", Type::E_FLOAT, &Graphics::Vignette, nullptr));

@@ -34,7 +34,6 @@ class TextRenderer
 {
 	friend class DrawableText;
 private:
-	static void CheckForTextShader();
 	void* cdatapointer;
 	unsigned int fontTexture;
 	unsigned int fontVao;
