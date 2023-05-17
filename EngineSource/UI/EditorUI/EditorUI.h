@@ -66,6 +66,7 @@ namespace Editor
 		"obj",
 		"fbx",
 		"gltf",
+		"glb",
 	};
 }
 

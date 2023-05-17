@@ -129,10 +129,10 @@ ColorPicker::ColorPicker(UIVectorField* Color) : EditorPanel(Editor::CurrentUI->
 		SelectedColor = SelectedColor / SelectedColor.Length();
 	}
 	UIBox* PickerBackground = new UIBox(true, 0);
-	ColorPickerShaders[0] = new Shader("Shaders/uishader.vert", "Shaders/Editor/color_picker.frag");
+	ColorPickerShaders[0] = new Shader("Shaders/UI/uishader.vert", "Shaders/Editor/color_picker.frag");
 	ColorPickerShaders[0]->Bind();
 
-	ColorPickerShaders[1] = new Shader("Shaders/uishader.vert", "Shaders/Editor/color_picker.frag");
+	ColorPickerShaders[1] = new Shader("Shaders/UI/uishader.vert", "Shaders/Editor/color_picker.frag");
 	ColorPickerShaders[1]->Bind();
 
 	ColorPickerBackgrounds[0] = new UIBackground(true, 0, 1, 0.3, ColorPickerShaders[0]);

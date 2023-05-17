@@ -110,6 +110,8 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 		int iNumMaterials = NumMaterials;
 		Output.write((char*)&iNumMaterials, sizeof(int));
 
+		float Scale = FileUtil::GetExtension(Name) == "fbx" ? 1 : 100;
+
 		for (int j = 0; j < NumMaterials; j++)
 		{
 			ImportMesh CurrentMesh = Meshes.at(j);
@@ -118,6 +120,11 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 
 			Output.write((char*)&NumVertices, sizeof(int));
 			Output.write((char*)&NumIndices, sizeof(int));
+
+			for (auto& i : CurrentMesh.Positions)
+			{
+				i = i * Scale;
+			}
 
 
 			for (int i = 0; i < NumVertices; i++)

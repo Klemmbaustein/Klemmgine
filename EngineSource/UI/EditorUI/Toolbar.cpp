@@ -10,11 +10,25 @@
 
 #define MAX_CATEGORY_BUTTONS 16
 
+Toolbar* Toolbar::ToolbarInstance = nullptr;
+
 void Toolbar::GenerateButtons()
 {
 	TabBackground->DeleteChildren();
 	for (size_t i = 0; i < Buttons.size(); i++)
 	{
+		bool IsVisible = false;
+		for (auto& btn : Buttons[i].Buttons)
+		{
+			if (btn.IsVisible)
+			{
+				IsVisible = true;
+			}
+		}
+		if (!IsVisible)
+		{
+			continue;
+		}
 		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5, Vector2(0.001, 0.2)))
 			->SetPadding(0.01, 0.01, 0.02, 0.01));
 		auto Elem = new UIBox(false, 0);
@@ -30,6 +44,10 @@ void Toolbar::GenerateButtons()
 		size_t j = 0;
 		for (auto& btn : Buttons[i].Buttons)
 		{
+			if (!btn.IsVisible)
+			{
+				continue;
+			}
 			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[3], Vector2(0.1)))
 				->SetBorder(UIBox::E_ROUNDED, 0.5)
 				->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
@@ -47,8 +65,44 @@ void Toolbar::GenerateButtons()
 		->SetPadding(0.01, 0.01, 0.02, 0.01));
 }
 
+void Toolbar::RemoveButton(std::string Name)
+{
+	for (auto& cat : Buttons)
+	{
+		for (size_t i = 0; i < cat.Buttons.size(); i++)
+		{
+			if (cat.Buttons[i].Name == Name)
+			{
+				cat.Buttons.erase(cat.Buttons.begin() + i);
+				GenerateButtons();
+				return;
+			}
+		}
+	}
+}
+
+void Toolbar::SetButtonVisibility(std::string Name, bool IsVisible)
+{
+	for (auto& cat : Buttons)
+	{
+		for (size_t i = 0; i < cat.Buttons.size(); i++)
+		{
+			if (cat.Buttons[i].Name == Name)
+			{
+				if (cat.Buttons[i].IsVisible != IsVisible)
+				{
+					cat.Buttons[i].IsVisible = IsVisible;
+					GenerateButtons();
+				}
+				return;
+			}
+		}
+	}
+}
+
 Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.8, 0.22), Vector2(2, 0.45))
 {
+	ToolbarInstance = this;
 	RegisterNewButtonCategory(ButtonCategory("Scene", 
 		{
 			ButtonCategory::Button("Save", Editor::CurrentUI->Textures[2], []() {

@@ -34,9 +34,12 @@ void PreferenceTab::GenerateUI()
 	std::map<std::string, std::vector<SettingsCategory::Setting>> Categories;
 
 	// Copy the array so it can be modifed.
+
+	size_t iter = 0;
 	auto SettingsArray = Preferences[SelectedSetting].Settings;
 	for (auto& i : SettingsArray)
 	{
+		i.entry = iter++;
 		auto Colon = i.Name.find_last_of(":");
 		std::string CategoryName = "No category";
 		if (Colon != std::string::npos)
@@ -53,8 +56,9 @@ void PreferenceTab::GenerateUI()
 			Categories[CategoryName].push_back(i);
 		}
 	}
-
+	LoadedSettings.clear();
 	size_t CurentCategory = 0;
+	size_t CurrentSettingIndex = 0;
 	for (auto& cat : Categories)
 	{
 		SettingsBox->AddChild(
@@ -68,12 +72,14 @@ void PreferenceTab::GenerateUI()
 		{
 			try
 			{
-				GenerateSection(SettingsBox, cat.second[i].Name, -200 + i, cat.second[i].Type, cat.second[i].Value);
+				GenerateSection(SettingsBox, cat.second[i].Name, -200 + CurrentSettingIndex, cat.second[i].Type, cat.second[i].Value);
 			}
 			catch (std::exception& e)
 			{
 				cat.second[i].Value = "0";
 			}
+			LoadedSettings.push_back(cat.second[i]); 
+			CurrentSettingIndex++;
 		}
 		CurentCategory++;
 	}
@@ -137,14 +143,17 @@ void PreferenceTab::OnButtonClicked(int Index)
 	else if (Index >= -200)
 	{
 		Index += 200;
-		switch (Preferences[0].Settings[Index].Type)
+		auto& Setting = Preferences[LoadedSettings.at(Index).cat].Settings[LoadedSettings.at(Index).entry];
+		switch (Setting.Type)
 		{
 		case Type::E_BOOL:
-			Preferences[0].Settings[Index].Value = std::to_string(!((bool)std::stoi(Preferences[0].Settings[Index].Value)));
+			Setting.Value = std::to_string(!std::stoi(Setting.Value));
 		default:
 			break;
 		}
-		Preferences[0].Settings[Index].OnChanged(Preferences[0].Settings[Index].Value);
+		Setting.OnChanged(Setting.Value);
+
+		UpdateLayout();
 	}
 }
 

@@ -273,10 +273,15 @@ void Console::InitializeConsole()
 		}
 		}, {}));
 
-	RegisterCommand(Command("exit", []() {
-			Application::Quit();
+	RegisterCommand(Command("exit", Application::Quit, {}));
+
+	RegisterCommand(Command("stats", []()
+		{
+			ConsoleLog("FPS: " + std::to_string(1.f / Performance::DeltaTime) + ", Delta: " + std::to_string(Performance::DeltaTime));
+			ConsoleLog("Drawcalls: " + std::to_string(Performance::DrawCalls));
 		}, {}));
 
+	RegisterConVar(Variable("wireframe", Type::E_BOOL, &Graphics::IsWireframe, nullptr));
 	RegisterConVar(Variable("vignette", Type::E_FLOAT, &Graphics::Vignette, nullptr));
 	RegisterConVar(Variable("vsync", Type::E_BOOL, &Graphics::VSync, nullptr));
 }
@@ -290,6 +295,33 @@ bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
 {
 	std::vector<std::string> CommandVec = SeperateToStringArray(Command);
 	if (!CommandVec.size()) return false;
+
+	if (CommandVec.size() == 1 && ConVars.contains(CommandVec[0]))
+	{
+		std::string ValueString;
+		auto FoundVar = ConVars[CommandVec[0]];
+		switch (FoundVar.Type)
+		{
+		case Type::E_FLOAT:
+			ValueString = std::to_string(*(float*)FoundVar.Var);
+			break;
+		case Type::E_INT:
+			ValueString = std::to_string(*(int*)FoundVar.Var);
+			break;
+		case Type::E_BYTE:
+			ValueString = std::to_string(*(char*)FoundVar.Var);
+			break;
+		case Type::E_BOOL:
+			ValueString = std::to_string(*(bool*)FoundVar.Var);
+			break;
+		case Type::E_STRING:
+			ValueString = *(std::string*)FoundVar.Var;
+			break;
+		default:
+			return false;
+		}
+		ConsoleLog(FoundVar.Name + " = " + ValueString);
+	}
 
 	// Check if we are assigning a ConVar by checking if [0] is a ConVar and [1] is '='
 	// shadow_resolution = 2048
@@ -321,7 +353,7 @@ bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
 				SafePtrAssign<int>(FoundVar.Var, std::stoi(CommandVec[2]));
 				break;
 			case Type::E_BYTE:
-				SafePtrAssign<int>(FoundVar.Var, std::stoi(CommandVec[2]));
+				SafePtrAssign<char>(FoundVar.Var, std::stoi(CommandVec[2]));
 				break;
 			case Type::E_BOOL:
 				SafePtrAssign<bool>(FoundVar.Var, std::stoi(CommandVec[2]));

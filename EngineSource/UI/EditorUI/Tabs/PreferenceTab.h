@@ -2,6 +2,7 @@
 #pragma once
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Tabs/EditorTab.h>
+#include <UI/EditorUI/Toolbar.h>
 
 class PreferenceTab : public EditorTab
 {
@@ -15,6 +16,7 @@ class PreferenceTab : public EditorTab
 			Type::TypeEnum Type;
 			std::string Value;
 			void (*OnChanged)(std::string NewValue);
+			size_t cat = 0, entry = 0;
 		};
 
 		std::vector<Setting> Settings;
@@ -22,6 +24,9 @@ class PreferenceTab : public EditorTab
 
 	size_t SelectedSetting = 0;
 	TextRenderer* Renderer;
+
+	std::vector<SettingsCategory::Setting> LoadedSettings;
+
 	std::vector<SettingsCategory> Preferences =
 	{
 		SettingsCategory("Editor", 
@@ -30,14 +35,17 @@ class PreferenceTab : public EditorTab
 			{
 				Editor::CurrentUI->SetUseLightMode(std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Save Button", Type::E_BOOL, "0", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Save Button", Type::E_BOOL, "1", [](std::string NewValue)
 			{
+				Toolbar::ToolbarInstance->SetButtonVisibility("Save", std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Wireframe Button", Type::E_BOOL, "0", [](std::string NewValue)
-			{
+			SettingsCategory::Setting("Toolbar:Show Wireframe Button", Type::E_BOOL, "1", [](std::string NewValue)
+			{	
+				Toolbar::ToolbarInstance->SetButtonVisibility("Wireframe", std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Build Button", Type::E_BOOL, "0", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Build Button", Type::E_BOOL, "1", [](std::string NewValue)
 			{
+				Toolbar::ToolbarInstance->SetButtonVisibility("Build", std::stoi(NewValue));
 			})
 			}
 		),
