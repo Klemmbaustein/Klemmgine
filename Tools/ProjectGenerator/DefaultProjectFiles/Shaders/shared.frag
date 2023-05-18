@@ -132,8 +132,8 @@ float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal)
 	bias *= max((abs(u_biasmodifier * 1.25)), 0.5f) / 15.f;
 	if (u_biasmodifier < -0.95)
 		bias *= 1.5;
-	bias *= 0.08;
-	bias *= max(4096 / textureSize(shadowMap, 0).x*1.5f, 1);
+	bias *= 0.12;
+	bias *= max(4096 / (textureSize(shadowMap, 0).x * 1.0f), 1);
 
 	// PCF
 	float shadow = 0.f;

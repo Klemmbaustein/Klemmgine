@@ -212,8 +212,8 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	const auto LightSpaceMatrices = CSM::getLightSpaceMatrices();
 
 	CSM::UpdateMatricesUBO();
-	if (Graphics::RenderShadows)
-	{	
+	if (Graphics::RenderShadows && Graphics::ShadowResolution > 0)
+	{
 		Graphics::IsRenderingShadows = true;
 		glBindFramebuffer(GL_FRAMEBUFFER, CSM::LightFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);

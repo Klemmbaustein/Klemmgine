@@ -58,6 +58,10 @@ namespace CSM
 
 	void UpdateMatricesUBO()
 	{
+		if (!Graphics::RenderShadows || Graphics::ShadowResolution <= 0)
+		{
+			return;
+		}
 		const auto LightSpaceMatrices = CSM::getLightSpaceMatrices();
 
 		glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
@@ -69,6 +73,10 @@ namespace CSM
 
 	void BindLightSpaceMatricesToShader(const std::vector<glm::mat4>& Matrices, Shader* ShaderToBind)
 	{
+		if (!Graphics::RenderShadows || Graphics::ShadowResolution <= 0)
+		{
+			return;
+		}
 		ShaderToBind->Bind();
 		for (size_t i = 0; i < Matrices.size(); ++i)
 		{
@@ -128,17 +136,25 @@ namespace CSM
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 		Console::RegisterConVar(Console::Variable("shadow_resolution", Type::E_INT, &Graphics::ShadowResolution, CSM::ReInit));
-		Console::RegisterConVar(Console::Variable("shadows", Type::E_BOOL, &Graphics::RenderShadows, nullptr));
+		Console::RegisterConVar(Console::Variable("shadows", Type::E_BOOL, &Graphics::RenderShadows, CSM::ReInit));
 	}
 
 	void CSM::ReInit()
 	{
-		if (Initialized)
+		if (!Initialized)
+		{
+			return;
+		}
+		if (ShadowMaps)
 		{
 			glDeleteTextures(1, &ShadowMaps);
 			glDeleteFramebuffers(1, &LightFBO);
 			glGenFramebuffers(1, &LightFBO);
-
+			ShadowMaps = 0;
+		}
+		
+		if (Graphics::RenderShadows && Graphics::ShadowResolution > 0)
+		{
 			glGenTextures(1, &ShadowMaps);
 			glBindTexture(GL_TEXTURE_2D_ARRAY, ShadowMaps);
 			glTexImage3D(
