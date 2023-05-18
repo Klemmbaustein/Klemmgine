@@ -32,6 +32,7 @@ namespace Editor
 	bool PrevHoveringPopup = false;
 	Vector2 DragMinMax;
 	Vector2 NewDragMinMax = DragMinMax;
+	bool IsSavingScene = false;
 
 	Vector3 NewUIColors[EditorUI::NumUIColors] =
 	{
@@ -267,9 +268,17 @@ void EditorUI::Tick()
 		}
 	}
 
-	if (Input::IsKeyDown(SDLK_LCTRL) && Input::IsKeyDown(SDLK_s) && !Input::IsRMBDown && ChangedScene)
+	if (Input::IsKeyDown(SDLK_LCTRL) && Input::IsKeyDown(SDLK_s))
 	{
-		SaveCurrentScene();
+		if (!Input::IsRMBDown && ChangedScene && !Editor::IsSavingScene)
+		{
+			SaveCurrentScene();
+		}
+		Editor::IsSavingScene = true;
+	}
+	else
+	{
+		Editor::IsSavingScene = false;
 	}
 }
 
