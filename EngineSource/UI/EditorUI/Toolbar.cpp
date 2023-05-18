@@ -117,7 +117,7 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 	RegisterNewButtonCategory(ButtonCategory("Project",
 		{
 			
-			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[15], []() { Viewport::ViewportInstance->OpenTab(6, "Settings"); }),
+			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[20], []() { Viewport::ViewportInstance->OpenTab(6, "Settings"); }),
 			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { new std::thread(Build::TryBuildProject, "Build/"); })
 
 		}));

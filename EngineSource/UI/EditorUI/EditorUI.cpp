@@ -330,7 +330,7 @@ std::string EditorUI::ToShortString(float val)
 
 void EditorUI::GenUITextures()
 {
-	const int ImageSize = 20;
+	const int ImageSize = 21;
 	std::string Images[ImageSize]
 	{												//Texture Indices
 		"EditorContent/Images/CPPClass.png",		//00 -> C++ class icon
@@ -353,6 +353,7 @@ void EditorUI::GenUITextures()
 		"EditorContent/Images/Cubemap.png",			//17 -> Cubemap icon
 		"EditorContent/Images/Texture.png",			//18 -> Texture icon
 		"EditorContent/Images/Particle.png",		//19 -> Particle icon
+		"EditorContent/Images/Settings.png",		//20 -> Settings icon
 	};
 
 	for (int i = 0; i < Textures.size(); i++)
