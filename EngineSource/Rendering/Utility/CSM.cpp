@@ -10,9 +10,9 @@
 namespace CSM
 {
 	const float cameraFarPlane = 400.f;
-	std::vector<float> shadowCascadeLevels{ cameraFarPlane / 15.f, cameraFarPlane / 3.f, cameraFarPlane / 1.f };
+	std::vector<float> shadowCascadeLevels{ cameraFarPlane / 12.f, cameraFarPlane / 3.f, cameraFarPlane / 1.5f, cameraFarPlane / 1.f };
 	GLuint LightFBO;
-	int Cascades = 3;
+	int Cascades = 4;
 	GLuint ShadowMaps;
 	unsigned int matricesUBO;
 	bool Initialized = false;
