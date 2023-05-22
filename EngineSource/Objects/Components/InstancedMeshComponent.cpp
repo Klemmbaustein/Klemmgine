@@ -42,13 +42,11 @@ void InstancedMeshComponent::Destroy()
 			if (Mesh == f->Renderables[i])
 			{
 				f->Renderables.erase(f->Renderables.begin() + i);
-				delete Mesh;
-				break;
 			}
 		}
 	}				
 
-	//delete Mesh;
+	delete Mesh;
 }
 
 size_t InstancedMeshComponent::AddInstance(Transform T)

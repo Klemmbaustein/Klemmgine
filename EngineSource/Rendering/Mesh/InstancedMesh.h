@@ -12,7 +12,7 @@ public:
 	InstancedMesh(std::vector<Vertex> Vertices, std::vector<int> Indices, Material Mat);
 	~InstancedMesh();
 
-	void Render(Shader* UsedShader);
+	void Render(Shader* UsedShader, bool MainFrameBuffer);
 	void SimpleRender(Shader* UsedShader);
 
 	void SetUniform(Material::Param NewUniform);

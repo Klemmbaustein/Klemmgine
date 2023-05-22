@@ -24,17 +24,26 @@ InstancedMesh::~InstancedMesh()
 	delete MeshIndexBuffer;
 	RenderContext.Unload();
 }
-void InstancedMesh::Render(Shader* UsedShader)
+void InstancedMesh::Render(Shader* UsedShader, bool MainFramebuffer)
 {
-	RenderContext.Bind();
 	MeshVertexBuffer->Bind();
 	MeshIndexBuffer->Bind();
-	unsigned int attachements[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
-	glDrawBuffers(3, attachements);
+	RenderContext.Bind();
+	if (MainFramebuffer)
+	{
+		unsigned int attachements[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
+		glDrawBuffers(3, attachements);
+	}
+	else
+	{
+		unsigned int attachements[] = { GL_COLOR_ATTACHMENT0 };
+		glDrawBuffers(1, attachements);
+	}
 	glDrawElementsInstanced(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0, Instances.size());
 	MeshVertexBuffer->Unbind();
 	MeshIndexBuffer->Unbind();
 }
+
 void InstancedMesh::SimpleRender(Shader* UsedShader)
 {
 	/*if (RenderContext.Mat.UseShadowCutout)
