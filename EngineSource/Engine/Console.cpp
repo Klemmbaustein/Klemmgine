@@ -204,7 +204,7 @@ void Console::InitializeConsole()
 		}, { Command::Argument("info_type", Type::E_STRING, true) }));
 
 
-	RegisterCommand(Command("list_pack",
+	RegisterCommand(Command("listpack",
 		[]() {
 			std::string Pack = CommandArgs()[0];
 	auto Result = Pack::GetPackContents(Pack);
@@ -231,7 +231,7 @@ void Console::InitializeConsole()
 		}, { Command::Argument("pack_file", Type::E_STRING) }));
 
 
-	RegisterCommand(Command("find_file",
+	RegisterCommand(Command("find",
 		[]() {
 			std::string File = Assets::GetAsset(CommandArgs()[0]);
 	if (File.empty())
@@ -243,7 +243,7 @@ void Console::InitializeConsole()
 
 		}, { Command::Argument("file", Type::E_STRING) }));
 
-	RegisterCommand(Command("loadscene", []() {
+	RegisterCommand(Command("open", []() {
 		if (std::filesystem::exists(Assets::GetAsset(CommandArgs()[0] + +".jscn")))
 		{
 			Scene::LoadNewScene(Assets::GetAsset(CommandArgs()[0] + ".jscn"));

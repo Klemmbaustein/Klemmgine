@@ -30,8 +30,8 @@ DebugUI::DebugUI()
 
 	LogPrompt = new UITextField(true, -1, 0.1, this, 0, Text);
 	LogPrompt->SetMinSize(Vector2(2, 0.06));
-	LogPrompt->SetTextSize(0.7);
-	LogBackground = new UIBackground(false, Vector2(-1, -0.94), 0.05, Vector2(2, 0.75));
+	LogPrompt->SetTextSize(0.6);
+	LogBackground = new UIBackground(false, Vector2(-1, -0.94), 0.05, Vector2(2, 0.8));
 	LogBackground->SetOpacity(0.9);
 }
 
