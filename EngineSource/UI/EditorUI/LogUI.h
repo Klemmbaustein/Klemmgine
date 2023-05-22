@@ -14,7 +14,7 @@ public:
 	LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale);
 	void UpdateLayout() override;
 
-	UITextField* LogPromt = nullptr;
+	UITextField* LogPrompt = nullptr;
 	UIScrollBox* LogScrollBox;
 	size_t PrevLogLength = 0;
 	size_t PrevAmount = 0;

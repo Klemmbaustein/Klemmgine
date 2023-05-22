@@ -2,6 +2,7 @@
 
 void UICanvas::Tick()
 {
+
 }
 
 void UICanvas::OnButtonClicked(int Index)

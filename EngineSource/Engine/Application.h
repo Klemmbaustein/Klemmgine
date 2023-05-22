@@ -12,6 +12,7 @@ struct ButtonEvent;
 
 namespace Application
 {
+	extern float LogicTime, RenderTime, SyncTime;
 	extern SDL_Window* Window;
 	void Quit();
 	void SetFullScreen(bool NewFullScreen);

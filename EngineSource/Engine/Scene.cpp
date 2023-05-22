@@ -14,6 +14,8 @@
 #include <Math/Collision/Collision.h>
 #include <Rendering/Camera/CameraShake.h>
 #include <Rendering/Camera/Camera.h>
+#include <UI/Debug/DebugUI.h>
+#include <Engine/EngineProperties.h>
 
 // Old maps do not save the fog and sun properties
 #define SAVE_FOG_AND_SUN 1
@@ -65,7 +67,7 @@ namespace Scene
 				}
 				Graphics::UIToRender.clear();
 				UIBox::ClearUI();
-			}	
+			}
 			Sound::StopAllSounds();
 			for (int i = 0; i < Objects::AllObjects.size(); i++)
 			{
@@ -132,6 +134,7 @@ namespace Scene
 			Graphics::WorldFog.Distance = FogProperties[1].Y;
 			Graphics::WorldFog.MaxDensity = FogProperties[1].Z;
 #endif
+
 #if SAVE_CUBEMAP_FILE
 			Graphics::MainFramebuffer->ReflectionCubemapName = ReadBinaryStringFromFile(Input);
 #endif

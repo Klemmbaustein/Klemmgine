@@ -31,6 +31,7 @@ public:
 	UITextField* SetTextColor(Vector3 NewColor);
 	Vector3 GetTextColor();
 	UIBox* ParentOverride = nullptr;
+	void Edit();
 	bool GetIsEdited() { return IsEdited; }
 	UITextField* SetText(std::string NewText);
 	UITextField* SetTextSize(float NewTextSize);

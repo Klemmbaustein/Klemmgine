@@ -11,8 +11,8 @@
 
 void LogUI::UpdateLogBoxSize()
 {
-	LogPromt->SetColor(UIColors[1] * 0.5);
-	LogPromt->SetTryFill(true);
+	LogPrompt->SetColor(UIColors[1] * 0.5);
+	LogPrompt->SetTryFill(true);
 	LogScrollBox->SetMinSize((Scale - Vector2(0.2, 0.1)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)));
 	LogScrollBox->SetMaxSize((Scale - Vector2(0.2, 0.1)).Clamp(Vector2(0.7, 0.1), Vector2(1.4, 1)));
 
@@ -22,11 +22,11 @@ LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(U
 {
 	LogScrollBox = new UIScrollBox(false, 0, 0);
 	LogScrollBox->Align = UIBox::E_REVERSE;
-	LogPromt = new UITextField(true, 0, UIColors[1] * 0.5, this, 0, Editor::CurrentUI->EngineUIText);
-	LogPromt->HintText = "Enter command here";
+	LogPrompt = new UITextField(true, 0, UIColors[1] * 0.5, this, 0, Editor::CurrentUI->EngineUIText);
+	LogPrompt->HintText = "Enter command here";
 	TabBackground->AddChild((new UIBackground(false, 0, UIColors[1] * 0.99, 0))
 		->SetBorder(UIBox::E_ROUNDED, 0.5)
-		->AddChild(LogPromt
+		->AddChild(LogPrompt
 			->SetTextSize(0.45)
 			->SetPadding(0)
 			->SetTryFill(true))
@@ -54,10 +54,10 @@ void LogUI::OnButtonClicked(int Index)
 	{
 		if (Input::IsKeyDown(SDLK_RETURN))
 		{
-			Log::Print("> " + LogPromt->GetText(), Vector3(0.3, 0.6, 1));
-			Console::ExecuteConsoleCommand(LogPromt->GetText());
+			Log::Print("> " + LogPrompt->GetText(), Vector3(0.3, 0.6, 1));
+			Console::ExecuteConsoleCommand(LogPrompt->GetText());
 		}
-		LogPromt->SetText("");
+		LogPrompt->SetText("");
 	}
 }
 

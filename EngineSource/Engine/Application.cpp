@@ -14,6 +14,7 @@
 #include <UI/Default/TextRenderer.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Viewport.h>
+#include <UI/Debug/DebugUI.h>
 
 #include <Rendering/Renderable.h>
 #include <Rendering/Shader.h>
@@ -65,7 +66,6 @@ namespace Application
 	std::set<ButtonEvent> ButtonEvents;
 	Shader* PostProcessShader = nullptr;
 	Shader* ShadowShader = nullptr;
-	TextRenderer* DebugTextRenderer = nullptr;
 	bool IsWindowFullscreen = false;
 #if EDITOR
 	EditorUI* EditorUserInterface = nullptr;
@@ -445,6 +445,10 @@ void PollInput()
 			{
 				if (Event.text.text[0] >= 32 && Event.text.text[0] <= 128)
 				{
+					if (TextInput::Text.size() < TextInput::TextIndex)
+					{
+						TextInput::TextIndex = TextInput::Text.size();
+					}
 					TextInput::Text.insert(TextInput::TextIndex, std::string(Event.text.text));
 					TextInput::TextIndex += strlen(Event.text.text);
 				}
@@ -558,25 +562,11 @@ void ApplicationLoop()
 	glDisable(GL_DEPTH_TEST);
 	DrawPostProcessing();
 	float RenderTime = RenderTimer.TimeSinceCreation();
-#if !IS_IN_EDITOR && ENGINE_DEBUG
-	Debugging::EngineStatus = "Rendering (Debug Text)";
-
-	Application::DebugTextRenderer->RenderText({ TextSegment("FPS: " + std::to_string((int)Performance::FPS), Vector3(1, 1, 0)) }, Vector2(-0.95, 0.9),
-		2, Vector3(1, 1, 0), 1, 999, nullptr);
-	std::string DeltaString = "Delta: " + std::to_string((int)(Performance::DeltaTime * 1000)) + "ms";
-
-	Application::DebugTextRenderer->RenderText({ TextSegment(DeltaString, Vector3(1, 1, 0)) },
-		Vector2(-0.95, 0.85), 2, 1, 1, 999, nullptr);
-	DeltaString.clear();
-	DeltaString.append(std::to_string((int)(Application::LogicTime / Performance::DeltaTime * 100.f)) + "% Log ");
-	DeltaString.append(std::to_string((int)(Application::RenderTime / Performance::DeltaTime * 100.f)) + "% Rend ");
-	DeltaString.append(std::to_string((int)(Application::SyncTime / Performance::DeltaTime * 100.f)) + "% Buf");
-	Application::DebugTextRenderer->RenderText({ TextSegment(DeltaString, Vector3(1, 1, 0)) },
-		Vector2(-0.95, 0.8), 2, 1, 1, 999, nullptr);
-	Application::DebugTextRenderer->RenderText({ TextSegment("DrawCalls: " + std::to_string(Performance::DrawCalls), Vector3(1, 1, 0)) },
-		Vector2(-0.95, 0.75), 2, 1, 1, 999, nullptr);
-	Application::DebugTextRenderer->RenderText({ TextSegment("CollisonMeshes: " + std::to_string(Collision::CollisionBoxes.size()), Vector3(1, 1, 0)) },
-		Vector2(-0.95, 0.7), 2, Vector3(1, 1, 0), 1, 999, nullptr);
+#if !EDITOR && !RELEASE
+	if (!DebugUI::CurrentDebugUI)
+	{
+		new DebugUI();
+	}
 #endif
 	Debugging::EngineStatus = "Ticking (UI)";
 	for (int i = 0; i < Graphics::UIToRender.size(); i++)
@@ -707,7 +697,6 @@ int Initialize(int argc, char** argv)
 	InitializeShaders();
 
 	UIBox::InitUI();
-	Application::DebugTextRenderer = new TextRenderer("Font.ttf", 60);
 
 	if (argc > 1)
 	{

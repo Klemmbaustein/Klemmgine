@@ -61,7 +61,7 @@ vec4 sampleUI()
 		{
 			vec4 newtex = texture(u_ui, v_uitexcoords + vec2(texSize.x * x, texSize.y * y));
 			UIsample.w += newtex.w;
-			if (newtex.w != 0)
+			if (newtex.w > 0.0)
 			{
 				UIsample.xyz += newtex.xyz;
 				++divs;
@@ -71,8 +71,9 @@ vec4 sampleUI()
 	if (divs != 0)
 	{
 		UIsample.xyz /= divs;
+		UIsample.w /= 4;
 	}
-	UIsample.w /= 4;
+	UIsample.w = clamp(UIsample.w, 0, 1);
 	return UIsample;
 }
 

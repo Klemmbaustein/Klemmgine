@@ -62,6 +62,7 @@ void UITextField::MakeGLBuffers()
 
 void UITextField::Tick()
 {
+	if (!IsVisible) return;
 	TextObject->WrapDistance = std::max(std::max(Size.X * 1.3f, GetMinSize().X), 0.1f);
 
 	ButtonColorMultiplier = 1.f;
@@ -135,8 +136,12 @@ void UITextField::Tick()
 		}
 	}
 	std::string RendererdText = EnteredText;
-	if ((TextInput::TextIndex == TextInput::Text.size()) && fmod(Stats::Time, 1) < 0.5f && IsEdited)
+	if ((TextInput::TextIndex == TextInput::Text.size() || TextInput::Text.size() == 0) && fmod(Stats::Time, 1) < 0.5f && IsEdited)
 	{
+		if (TextInput::Text.size() == 0)
+		{
+			TextInput::TextIndex = 0;
+		}
 		RendererdText.append("_");
 	}
 	else if (fmod(Stats::Time, 1) < 0.5f && IsEdited)
@@ -171,6 +176,16 @@ UITextField* UITextField::SetTextColor(Vector3 NewColor)
 Vector3 UITextField::GetTextColor()
 {
 	return TextColor;
+}
+
+void UITextField::Edit()
+{
+	IsEdited = true;
+	TextInput::PollForText = true;
+	TextInput::Text = EnteredText;
+	IsPressed = false;
+	TextInput::TextIndex = TextInput::Text.size();
+	RedrawUI();
 }
 
 UITextField* UITextField::SetText(std::string NewText)
