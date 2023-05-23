@@ -2,6 +2,7 @@
 #include <World/Stats.h>
 #include <filesystem>
 #include <Engine/Log.h>
+#include <World/Assets.h>
 
 void MeshObject::Destroy()
 {
@@ -21,6 +22,7 @@ void MeshObject::Begin()
 		MaterialNames[i] = "";
 		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::E_STRING, &MaterialNames[i]));
 	}
+	OnPropertySet();
 }
 
 void MeshObject::LoadFromFile(std::string Filename)
@@ -56,10 +58,28 @@ void MeshObject::LoadFromFile(std::string Filename)
 		Attach(MeshCollision);
 		MeshCollision->Init(Mesh->GetModelData().GetMergedVertices(), Mesh->GetModelData().GetMergedIndices(), Transform(Vector3(), Vector3(), Vector3(1)));
 	}
+
+	Properties.clear();
+	GenerateDefaultCategories();
+	MaterialNames.clear();
+	MaterialNames.resize(Mesh->GetModel()->ModelMeshData.Elements.size());
+	for (size_t i = 0; i < Mesh->GetModel()->ModelMeshData.Elements.size(); i++)
+	{
+		MaterialNames[i] = Mesh->GetModel()->ModelMeshData.Elements[i].ElemMaterial;
+		if (MaterialNames[i].substr(0, 8) == "Content/")
+		{
+			MaterialNames[i] = MaterialNames[i].substr(8);
+		}
+		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::E_STRING, &MaterialNames[i]));
+	}
 }
 
 void MeshObject::OnPropertySet()
 {
+	if (!std::filesystem::exists(Assets::GetAsset(Filename + ".jsm")))
+	{
+		return;
+	}
 	if (Filename != PreviousFilename)
 	{
 		if (!PreviousFilename.empty())
