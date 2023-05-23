@@ -12,7 +12,7 @@ public:
 
 	void SetTransform(Transform NewTransform);
 	Transform& GetTransform();
-	void SetFOV(float FOVinRadiants);
+	void SetFOV(float FOV);
 	CameraComponent();
 
 	// Will only work in-game. In the editor, this does nothing.

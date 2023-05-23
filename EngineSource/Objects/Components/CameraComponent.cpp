@@ -44,9 +44,9 @@ Transform& CameraComponent::GetTransform()
 	return RelativeTransform;
 }
 
-void CameraComponent::SetFOV(float FOVinRadiants)
+void CameraComponent::SetFOV(float FOV)
 {
-	ComponentCamera.ReInit(FOVinRadiants, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
+	ComponentCamera.ReInit((FOV / 180) * 3.14159, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
 }
 
 CameraComponent::CameraComponent()
