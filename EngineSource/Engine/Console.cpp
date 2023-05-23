@@ -284,6 +284,7 @@ void Console::InitializeConsole()
 	RegisterConVar(Variable("wireframe", Type::E_BOOL, &Graphics::IsWireframe, nullptr));
 	RegisterConVar(Variable("vignette", Type::E_FLOAT, &Graphics::Vignette, nullptr));
 	RegisterConVar(Variable("vsync", Type::E_BOOL, &Graphics::VSync, nullptr));
+	RegisterConVar(Variable("timescale", Type::E_FLOAT, &Performance::TimeMultiplier, nullptr));
 }
 
 void Console::ConsoleLog(std::string Message, ConsoleLogType Severity)
