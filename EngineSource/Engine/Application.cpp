@@ -491,6 +491,7 @@ void DrawPostProcessing()
 	unsigned int SSAOTexture = SSAO::Render(
 		Graphics::MainFramebuffer->GetBuffer()->GetTextureID(2),
 		Graphics::MainFramebuffer->GetBuffer()->GetTextureID(3));
+
 	Vector2 ActualRes = Application::GetWindowSize();
 	glViewport(0, 0, ActualRes.X, ActualRes.Y);
 
