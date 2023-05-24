@@ -20,7 +20,6 @@ void CameraComponent::Tick()
 	ParentRotation = Vector3(ParentRotation.X, ParentRotation.Y, 0);
 	ComponentCamera.SetRotation(ParentRotation);
 	ComponentCamera.Update();
-	//ComponentCamera.Update();
 }
 
 void CameraComponent::Destroy()
@@ -46,7 +45,7 @@ Transform& CameraComponent::GetTransform()
 
 void CameraComponent::SetFOV(float FOV)
 {
-	ComponentCamera.ReInit((FOV / 180) * 3.14159, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
+	ComponentCamera.ReInit((FOV / 180) * 3.14159 * 2, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
 }
 
 CameraComponent::CameraComponent()

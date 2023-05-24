@@ -22,6 +22,7 @@ namespace Engine
 }
 namespace Graphics
 {
+	float ResolutionScale = 1.0f;
 	bool RenderShadows = true;
 	bool SSAO = true;
 	bool VSync = true;
@@ -47,13 +48,13 @@ namespace Graphics
 		{
 			if (o->UseMainWindowResolution)
 			{
-				o->GetBuffer()->ReInit(NewResolution.X, NewResolution.Y);
+				o->GetBuffer()->ReInit(NewResolution.X * ResolutionScale, NewResolution.Y * ResolutionScale);
 			}
 		}
 		Graphics::MainCamera->ReInit(Graphics::MainCamera->FOV, NewResolution.X, NewResolution.Y, false);
 		AspectRatio = NewResolution.X / NewResolution.Y;
-		WindowResolution = NewResolution;
-		SSAO::ResizeBuffer(NewResolution.X, NewResolution.Y);
+		WindowResolution = NewResolution * ResolutionScale;
+		SSAO::ResizeBuffer(NewResolution.X * ResolutionScale, NewResolution.Y * ResolutionScale);
 		Bloom::OnResized();
 		UIBox::ForceUpdateUI();
 	}

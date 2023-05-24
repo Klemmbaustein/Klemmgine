@@ -10,6 +10,7 @@ class FramebufferObject;
 
 namespace Graphics
 {
+	extern float ResolutionScale;
 	extern bool RenderShadows;
 	extern bool SSAO;
 	extern bool VSync;

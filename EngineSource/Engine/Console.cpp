@@ -285,6 +285,7 @@ void Console::InitializeConsole()
 	RegisterConVar(Variable("vignette", Type::E_FLOAT, &Graphics::Vignette, nullptr));
 	RegisterConVar(Variable("vsync", Type::E_BOOL, &Graphics::VSync, nullptr));
 	RegisterConVar(Variable("timescale", Type::E_FLOAT, &Performance::TimeMultiplier, nullptr));
+	RegisterConVar(Variable("resolution_scale", Type::E_FLOAT, &Graphics::ResolutionScale, []() {Graphics::SetWindowResolution(Application::GetWindowSize()); }));
 }
 
 void Console::ConsoleLog(std::string Message, ConsoleLogType Severity)

@@ -19,6 +19,7 @@ namespace Application
 	bool GetFullScreen();
 	void SetCursorPosition(Vector2 NewPos);
 	Vector2 GetCursorPosition();
+	Vector2 GetWindowSize();
 #if EDITOR
 	extern EditorUI* EditorUserInterface;
 #endif

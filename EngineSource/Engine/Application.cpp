@@ -121,6 +121,12 @@ namespace Application
 	{
 		return GetMousePosition();
 	}
+	Vector2 GetWindowSize()
+	{
+		int w, h;
+		SDL_GetWindowSize(Application::Window, &w, &h);
+		return Vector2(w, h);
+	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
 	std::thread ConsoleThread;
 }
@@ -230,7 +236,9 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	FrustumCulling::CurrentCameraFrustum = FrustumCulling::createFrustumFromCamera(*Buffer->FramebufferCamera);
 	Buffer->GetBuffer()->Bind();
 	Debugging::EngineStatus = "Rendering (Framebuffer: Main pass)";
-	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+
+	Vector2 BufferResolution = Buffer->UseMainWindowResolution ? Graphics::WindowResolution : Buffer->CustomFramebufferResolution;
+	glViewport(0, 0, BufferResolution.X, BufferResolution.Y);
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	auto Matrices = CSM::getLightSpaceMatrices();
@@ -291,6 +299,8 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
 }
 
 void InitializeShaders()
@@ -481,9 +491,10 @@ void DrawPostProcessing()
 	unsigned int SSAOTexture = SSAO::Render(
 		Graphics::MainFramebuffer->GetBuffer()->GetTextureID(2),
 		Graphics::MainFramebuffer->GetBuffer()->GetTextureID(3));
+	Vector2 ActualRes = Application::GetWindowSize();
+	glViewport(0, 0, ActualRes.X, ActualRes.Y);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
 	Debugging::EngineStatus = "Rendering (Post process: Main)";
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0));
@@ -528,6 +539,7 @@ void DrawPostProcessing()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	Application::PostProcessShader->Unbind();
+	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
 }
 
 void ApplicationLoop()
