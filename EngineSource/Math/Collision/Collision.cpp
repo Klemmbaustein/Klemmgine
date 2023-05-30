@@ -280,24 +280,32 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstMesh(CollisionMesh*
 		{
 			for (int32_t j = 0; j < b->Indices.size(); j += 3)
 			{
-				float* a1[3], * b1[3], * c1[3], * a2[3], * b2[3], * c2[3];
+				auto& Tri2A = b->Vertices[b->Indices[j]].Position;
+				auto& Tri2B = b->Vertices[b->Indices[j + 1]].Position;
+				auto& Tri2C = b->Vertices[b->Indices[j + 2]].Position;
 
-				float Tri2Length = glm::length((b->Vertices[b->Indices[j]].Position - b->Vertices[b->Indices[j + 1]].Position.x)
-					+ (b->Vertices[b->Indices[j]].Position - b->Vertices[b->Indices[j + 2]].Position.x));
+				float Tri2Length = glm::length((Tri2A - Tri2B)
+					+ (Tri2A - Tri2C));
 
-				if (!SpheresOverlapping(WorldPosition, SphereCollisionSize, b->Vertices[b->Indices[j]].Position, Tri2Length))
+				if (!SpheresOverlapping(WorldPosition, SphereCollisionSize, Tri2A, Tri2Length))
 				{
 					continue;
 				}
 
+				float* a1[3], *b1[3], *c1[3], *a2[3], *b2[3], *c2[3];
+
+				auto& Tri1A = Vertices[Indices[i]].Position;
+				auto& Tri1B = Vertices[Indices[i + 1]].Position;
+				auto& Tri1C = Vertices[Indices[i + 2]].Position;
+
 				//Tri 1
-				a1[0] = &Vertices[Indices[i]].Position.x; a1[1] = &Vertices[Indices[i]].Position.y; a1[2] = &Vertices[Indices[i]].Position.z;
-				b1[0] = &Vertices[Indices[i + 1]].Position.x; b1[1] = &Vertices[Indices[i + 1]].Position.y; b1[2] = &Vertices[Indices[i + 1]].Position.z;
-				c1[0] = &Vertices[Indices[i + 2]].Position.x; c1[1] = &Vertices[Indices[i + 2]].Position.y; c1[2] = &Vertices[Indices[i + 2]].Position.z;
+				a1[0] = &Tri1A.x; a1[1] = &Tri1A.y; a1[2] = &Tri1A.z;
+				b1[0] = &Tri1B.x; b1[1] = &Tri1B.y; b1[2] = &Tri1B.z;
+				c1[0] = &Tri1C.x; c1[1] = &Tri1C.y; c1[2] = &Tri1C.z;
 				//Tri 2
-				a2[0] = &b->Vertices[b->Indices[j]].Position.x; a2[1] = &b->Vertices[b->Indices[j]].Position.y; a2[2] = &b->Vertices[b->Indices[j]].Position.z;
-				b2[0] = &b->Vertices[b->Indices[j + 1]].Position.x; b2[1] = &b->Vertices[b->Indices[j + 1]].Position.y; b2[2] = &b->Vertices[b->Indices[j + 1]].Position.z;
-				c2[0] = &b->Vertices[b->Indices[j + 2]].Position.x; c2[1] = &b->Vertices[b->Indices[j + 2]].Position.y; c2[2] = &b->Vertices[b->Indices[j + 2]].Position.z;
+				a2[0] = &Tri2A.x; a2[1] = &Tri2A.y; a2[2] = &Tri2A.z;
+				b2[0] = &Tri2B.x; b2[1] = &Tri2B.y; b2[2] = &Tri2B.z;
+				c2[0] = &Tri2C.x; c2[1] = &Tri2C.y; c2[2] = &Tri2C.z;
 				if (tri_tri_overlap_test_3d(a1, b1, c1, a2, b2, c2))
 				{
 					r.Hit = true;
