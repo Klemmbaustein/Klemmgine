@@ -20,7 +20,7 @@ unsigned int ssaoFBO = 0;
 unsigned int ssaoColorBuffer;
 unsigned int ssaoBlurFBO, ssaoColorBufferBlur;
 float ResolutionDivider = 1.5;
-unsigned int Samples = 24;
+unsigned int Samples = 16;
 unsigned int SSAOTexture;
 void SSAO::Init()
 {

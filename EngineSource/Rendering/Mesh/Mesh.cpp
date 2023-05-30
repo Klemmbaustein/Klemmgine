@@ -7,6 +7,7 @@
 #include <fstream>
 #include <Rendering/Texture/Texture.h>
 #include <GL/glew.h>
+#include <Engine/Log.h>
 
 Mesh::Mesh(std::vector<Vertex> Vertices, std::vector<int> Indices, Material Mat)
 {

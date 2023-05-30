@@ -46,12 +46,12 @@ Collision::HitResponse Collision::BoxOverlapCheck(Collision::Box a, Vector3 Offs
 	for (int i = 0; i < Collision::CollisionBoxes.size(); i++)
 	{
 		if (SpheresOverlapping(a.GetCenter(), a.GetExtent().Length(),
-			Collision::CollisionBoxes[i]->CollMesh.WorldPosition, Collision::CollisionBoxes[i]->CollMesh.SphereCollisionSize))
+			Collision::CollisionBoxes[i]->CollMesh->WorldPosition, Collision::CollisionBoxes[i]->CollMesh->SphereCollisionSize))
 		{
-			CollisionMesh& m = Collision::CollisionBoxes[i]->CollMesh;
-			for (size_t i = 0; i < m.Indices.size(); i += 3)
+			CollisionMesh* m = Collision::CollisionBoxes[i]->CollMesh;
+			for (size_t i = 0; i < m->Indices.size(); i += 3)
 			{
-				Vector3 v0 = m.Vertices[m.Indices[i]].Position, v1 = m.Vertices[m.Indices[i + 1]].Position, v2 = m.Vertices[m.Indices[i + 2]].Position;
+				Vector3 v0 = m->Vertices[m->Indices[i]].Position, v1 = m->Vertices[m->Indices[i + 1]].Position, v2 = m->Vertices[m->Indices[i + 2]].Position;
 				bool NewCollision = TriangleAABBCollision(v0, v1, v2, a);
 				if (NewCollision)
 				{
@@ -118,7 +118,7 @@ Collision::HitResponse Collision::LineTrace(Vector3 RayStart, Vector3 RayEnd, st
 		if (MeshesToIgnore.find(Collision::CollisionBoxes[i]) == MeshesToIgnore.end()
 			&& ObjectsToIgnore.find(Collision::CollisionBoxes[i]->GetParent()) == ObjectsToIgnore.end())
 		{
-			HitResponse NewCollision = Collision::CollisionBoxes.at(i)->CollMesh.CheckAgainstLine(RayStart, RayEnd);
+			HitResponse NewCollision = Collision::CollisionBoxes.at(i)->CollMesh->CheckAgainstLine(RayStart, RayEnd);
 			if (NewCollision.t < CollTMin && NewCollision.Hit)
 			{
 				CollTMin = NewCollision.t;
@@ -216,7 +216,6 @@ Collision::HitResponse testRayThruTriangle(glm::vec3 orig, glm::vec3 end, glm::v
 
 Collision::CollisionMesh::CollisionMesh(std::vector<Vertex> Verts, std::vector<int> Indices, Transform T)
 {
-	//T.Scale = T.Scale * 2.5f;
 	RawVertices = Verts;
 	this->Indices = Indices;
 	ModelMatrix = T.ToMatrix();
@@ -228,6 +227,9 @@ Collision::CollisionMesh::CollisionMesh(std::vector<Vertex> Verts, std::vector<i
 
 Collision::CollisionMesh::~CollisionMesh()
 {
+	Vertices.clear();
+	RawVertices.clear();
+	Indices.clear();
 }
 
 glm::mat4 Collision::CollisionMesh::GetMatrix()
@@ -237,7 +239,6 @@ glm::mat4 Collision::CollisionMesh::GetMatrix()
 
 void Collision::CollisionMesh::SetTransform(Transform T)
 {
-	//T.Scale = T.Scale * 2.5f;
 	glm::mat4 newM = T.ToMatrix();
 	if (newM != ModelMatrix)
 	{
@@ -250,6 +251,7 @@ void Collision::CollisionMesh::SetTransform(Transform T)
 
 void Collision::CollisionMesh::ApplyMatrix()
 {
+	Vertices.clear();
 	Vertices.resize(RawVertices.size());
 	for (unsigned int i = 0; i < RawVertices.size(); i++)
 	{
@@ -357,9 +359,9 @@ Collision::HitResponse Collision::CollisionMesh::OverlapCheck(std::set<Collision
 	{
 		if (MeshesToIgnore.find(c) == MeshesToIgnore.end())
 		{
-			if (&c->CollMesh != this)
+			if (c->CollMesh != this)
 			{
-				Collision::HitResponse newR = this->CheckAgainstMesh(&c->CollMesh);
+				Collision::HitResponse newR = this->CheckAgainstMesh(c->CollMesh);
 				if (newR.Hit)
 				{
 					newR.HitObject = c->GetParent();

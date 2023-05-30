@@ -48,7 +48,8 @@ namespace Collision
 		Vector3 WorldPosition;
 		Vector3 SpherePosition;
 		HitResponse OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore = {});
-		std::vector<Vertex> Vertices, RawVertices; std::vector<int> Indices;
+		std::vector<Vertex> Vertices;
+		std::vector<Vertex>	RawVertices; std::vector<int> Indices;
 	protected:
 		float WorldScale = 1;
 		void ApplyMatrix();

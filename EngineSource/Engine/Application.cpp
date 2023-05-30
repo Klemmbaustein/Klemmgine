@@ -52,7 +52,8 @@ Vector2 GetMousePosition()
 	int x;
 	int y;
 	SDL_GetMouseState(&x, &y);
-	return Vector2((x / Graphics::WindowResolution.X - 0.5f) * 2, 1 - (y / Graphics::WindowResolution.Y * 2));
+	Vector2 Size = Application::GetWindowSize();
+	return Vector2((x / Size.X - 0.5f) * 2, 1 - (y / Size.Y * 2));
 }
 
 namespace Application
@@ -113,8 +114,9 @@ namespace Application
 	}
 	void SetCursorPosition(Vector2 NewPos)
 	{
-		Vector2 TranslatedPos = Vector2(((NewPos.X + 1) / 2) * Graphics::WindowResolution.X, (((NewPos.Y) + 1) / 2) * Graphics::WindowResolution.Y);
-		TranslatedPos.Y = Graphics::WindowResolution.Y - TranslatedPos.Y;
+		Vector2 Size = GetWindowSize();
+		Vector2 TranslatedPos = Vector2(((NewPos.X + 1) / 2) * Size.X, (((NewPos.Y) + 1) / 2) * Size.Y);
+		TranslatedPos.Y = Size.Y - TranslatedPos.Y;
 		SDL_WarpMouseInWindow(Window, TranslatedPos.X, TranslatedPos.Y);
 	}
 	Vector2 GetCursorPosition()
@@ -184,6 +186,14 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 		Buffer->FramebufferCamera->Update();
 	}
 	else return;
+
+	if (!Buffer->Renderables.size() && !Buffer->ParticleEmitters.size())
+	{
+		Buffer->GetBuffer()->Bind();
+		glClearColor(0.f, 0.f, 0.f, 1.f);
+		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+		return;
+	}
 
 	if (Buffer->PreviousReflectionCubemapName != Buffer->ReflectionCubemapName)
 	{

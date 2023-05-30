@@ -12,7 +12,7 @@ public:
 	virtual void Destroy() override;
 	void Tick() override;
 	void Init(std::vector<Vertex> Vertices, std::vector<int> Indices, Transform RelativeTransform = Transform());
-	Collision::CollisionMesh CollMesh;
+	Collision::CollisionMesh* CollMesh;
 	Transform LastParentTransform;
 	Transform LastRelativeTransform;
 };
