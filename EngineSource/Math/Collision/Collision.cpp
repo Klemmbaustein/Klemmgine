@@ -282,6 +282,14 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstMesh(CollisionMesh*
 			{
 				float* a1[3], * b1[3], * c1[3], * a2[3], * b2[3], * c2[3];
 
+				float Tri2Length = glm::length((b->Vertices[b->Indices[j]].Position - b->Vertices[b->Indices[j + 1]].Position.x)
+					+ (b->Vertices[b->Indices[j]].Position - b->Vertices[b->Indices[j + 2]].Position.x));
+
+				if (!SpheresOverlapping(WorldPosition, SphereCollisionSize, b->Vertices[b->Indices[j]].Position, Tri2Length))
+				{
+					continue;
+				}
+
 				//Tri 1
 				a1[0] = &Vertices[Indices[i]].Position.x; a1[1] = &Vertices[Indices[i]].Position.y; a1[2] = &Vertices[Indices[i]].Position.z;
 				b1[0] = &Vertices[Indices[i + 1]].Position.x; b1[1] = &Vertices[Indices[i + 1]].Position.y; b1[2] = &Vertices[Indices[i + 1]].Position.z;
