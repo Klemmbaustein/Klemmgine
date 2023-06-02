@@ -9,6 +9,7 @@ public:
 
 	void AttachFramebuffer(unsigned int Buffer, unsigned int Attachement = 0x8CE3);
 
+	Framebuffer();
 	~Framebuffer();
 
 	void Bind();

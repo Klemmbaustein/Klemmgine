@@ -115,7 +115,7 @@ void InstancedModel::ConfigureVAO()
 	glBufferData(GL_ARRAY_BUFFER, MatModel.size() * sizeof(glm::mat4), &MatModel[0], GL_STATIC_DRAW);
 	for (int i = 0; i < Meshes.size(); i++)
 	{
-		unsigned int VAO = Meshes[i]->MeshVertexBuffer->GetVAO();
+		unsigned int VAO = Meshes[i]->MeshVertexBuffer->VAO;
 		glBindVertexArray(VAO);
 		// vertex attributes
 		std::size_t vec4Size = sizeof(glm::vec4);

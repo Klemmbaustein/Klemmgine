@@ -214,7 +214,7 @@ Collision::HitResponse testRayThruTriangle(glm::vec3 orig, glm::vec3 end, glm::v
 	else return Collision::HitResponse();
 }
 
-Collision::CollisionMesh::CollisionMesh(std::vector<Vertex> Verts, std::vector<int> Indices, Transform T)
+Collision::CollisionMesh::CollisionMesh(std::vector<Vertex> Verts, std::vector<unsigned int> Indices, Transform T)
 {
 	RawVertices = Verts;
 	this->Indices = Indices;

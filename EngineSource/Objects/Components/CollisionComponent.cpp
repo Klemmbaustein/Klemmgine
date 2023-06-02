@@ -38,7 +38,7 @@ void CollisionComponent::Tick()
 	}
 }
 
-void CollisionComponent::Init(std::vector<Vertex> Vertices, std::vector<int> Indices, Transform RelativeTransform)
+void CollisionComponent::Init(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Transform RelativeTransform)
 {
 	
 	this->RelativeTransform = RelativeTransform;

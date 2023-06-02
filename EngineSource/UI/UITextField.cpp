@@ -30,34 +30,30 @@ void UITextField::MakeGLBuffers()
 	vertex1.Position.x = 0;
 	vertex1.Position.y = 0;
 	vertex1.Position.z = 0;
-	vertex1.U = 1;
-	vertex1.V = 0;
+	vertex1.TexCoord = glm::vec2(0, 0);
 	Vertices.push_back(vertex1);
 
 	Vertex vertex2;
 	vertex2.Position.x = 1;
 	vertex2.Position.y = 0;
 	vertex2.Position.z = 0;
-	vertex2.U = 0;
-	vertex2.V = 0;
+	vertex2.TexCoord = glm::vec2(1, 0);
 	Vertices.push_back(vertex2);
 
 	Vertex vertex3;
 	vertex3.Position.x = 0;
 	vertex3.Position.y = 1;
 	vertex3.Position.z = 0;
-	vertex3.U = 1;
-	vertex3.V = 1;
+	vertex3.TexCoord = glm::vec2(0, 1);
 	Vertices.push_back(vertex3);
 
 	Vertex vertex4;
 	vertex4.Position.x = 1;
 	vertex4.Position.y = 1;
 	vertex4.Position.z = 0;
-	vertex4.U = 0;
-	vertex4.V = 1;
+	vertex4.TexCoord = glm::vec2(1, 1);
 	Vertices.push_back(vertex4);
-	ButtonVertexBuffer = new VertexBuffer(Vertices.data(), Vertices.size());
+	ButtonVertexBuffer = new VertexBuffer(Vertices, { 0, 1, 2, 1, 2, 3 });
 }
 
 void UITextField::Tick()

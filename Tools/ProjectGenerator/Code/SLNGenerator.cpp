@@ -155,7 +155,7 @@ void sln::GenerateVCProj(std::string path, std::string name,
 	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, IsStaticLibrary ? "" : IncludeDirsString);
 	FilesRegex = std::regex("\\$PREBUILDEVENT");
 	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, IsStaticLibrary ? "" : "<PreBuildEvent>\n\
-	<Command>FindObjects.bat</Command>n\
+	<Command>FindObjects.bat</Command>\n\
 </PreBuildEvent>");
 	if (!IsStaticLibrary)
 	{

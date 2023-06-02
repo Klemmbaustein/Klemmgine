@@ -74,6 +74,10 @@ void Framebuffer::AttachFramebuffer(unsigned int Buffer, unsigned int Attachemen
 	Unbind();
 }
 
+Framebuffer::Framebuffer()
+{
+}
+
 Framebuffer::~Framebuffer()
 {
 	glDeleteFramebuffers(1, &FBO);

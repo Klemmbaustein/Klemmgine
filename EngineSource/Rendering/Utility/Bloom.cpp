@@ -31,7 +31,7 @@ unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 			glUniform1i(glGetUniformLocation(BloomShader->GetShaderID(), "horizontal"), horizontal);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(
-				GL_TEXTURE_2D, first_iteration ? Graphics::MainFramebuffer->GetTextureID() : pingpongBuffer[!horizontal]
+				GL_TEXTURE_2D, first_iteration ? buf : pingpongBuffer[!horizontal]
 			);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 			horizontal = !horizontal;

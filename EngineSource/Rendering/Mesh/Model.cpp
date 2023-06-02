@@ -66,7 +66,6 @@ Model::~Model()
 		delete m;
 	}
 	glDeleteBuffers(1, &MatBuffer);
-	Meshes.clear();
 }
 namespace CSM
 {
@@ -98,6 +97,7 @@ void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyP
 		}
 		glm::mat4 InvModelView = glm::transpose(glm::inverse(ModelView));
 		glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
+
 		for (int i = 0; i < Meshes.size(); i++)
 		{
 			if (Meshes[i]->RenderContext.Mat.IsTranslucent != TransparencyPass) continue;
@@ -122,7 +122,7 @@ void Model::ConfigureVAO()
 	glBufferData(GL_ARRAY_BUFFER, 1 * sizeof(glm::mat4), &MatModel, GL_STATIC_DRAW);
 	for (int i = 0; i < Meshes.size(); i++)
 	{
-		unsigned int VAO = Meshes[i]->MeshVertexBuffer->GetVAO();
+		unsigned int VAO = Meshes[i]->MeshVertexBuffer->VAO;
 		glBindVertexArray(VAO);
 		// vertex attributes
 		std::size_t vec4Size = sizeof(glm::vec4);

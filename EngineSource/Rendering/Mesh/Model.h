@@ -25,8 +25,6 @@ public:
 
 	~Model();
 
-	//Render
-
 	virtual void Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass) override;
 
 	void LoadMaterials(std::vector<std::string> Materials);
@@ -37,16 +35,12 @@ public:
 
 		Vector3 Scale = NonScaledSize * ModelTransform.Scale;
 		Size = FrustumCulling::AABB(ModelTransform.Location, Scale.X, Scale.Y, Scale.Z);
-		MatModel = glm::translate(MatModel, (glm::vec3)ModelTransform.Location);
-		MatModel = glm::rotate(MatModel, ModelTransform.Rotation.Y, glm::vec3(0, 1, 0));
-		MatModel = glm::rotate(MatModel, ModelTransform.Rotation.Z, glm::vec3(0, 0, 1));
-		MatModel = glm::rotate(MatModel, ModelTransform.Rotation.X, glm::vec3(1, 0, 0));
-
-		MatModel = glm::scale(MatModel, (glm::vec3)ModelTransform.Scale * 0.025f);
+		
+		ModelTransform.Scale = ModelTransform.Scale * 0.025;
+		MatModel = ModelTransform.ToMatrix();
+		ModelTransform.Scale = ModelTransform.Scale / 0.025;
 		ConfigureVAO();
 	}
-
-	//Basic Translation
 
 	void MultiplyScale(Vector3 Multiplier)
 	{
@@ -84,6 +78,6 @@ public:
 	std::vector<Mesh*> Meshes;
 	ModelGenerator::ModelData ModelMeshData;
 protected:
-	glm::mat4 ModelViewProjection = glm::mat4();
+	glm::mat4 ModelViewProjection = glm::mat4(1);
 	float NonScaledSize = 1;
 };

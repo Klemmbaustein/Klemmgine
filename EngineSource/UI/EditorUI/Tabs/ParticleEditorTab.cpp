@@ -86,10 +86,8 @@ void ParticleEditorTab::Load(std::string File)
 	for (unsigned int i = 0; i < Particle->ParticleVertexBuffers.size(); i++)
 	{
 		delete Particle->ParticleVertexBuffers[i];
-		delete Particle->ParticleIndexBuffers[i];
 	}
 	Particle->ParticleVertexBuffers.clear();
-	Particle->ParticleIndexBuffers.clear();
 	Particle->SpawnDelays.clear();
 	Particle->ParticleInstances.clear();
 	Particle->Contexts.clear();

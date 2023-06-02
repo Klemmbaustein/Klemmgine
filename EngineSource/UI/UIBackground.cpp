@@ -25,34 +25,30 @@ void UIBackground::MakeGLBuffers(bool InvertTextureCoordinates)
 	vertex1.Position.x = 0;
 	vertex1.Position.y = 0;
 	vertex1.Position.z = 0;
-	vertex1.U = InvertTextureCoordinates;
-	vertex1.V = 0;
+	vertex1.TexCoord = glm::vec2(InvertTextureCoordinates, 0);
 	Vertices.push_back(vertex1);
 
 	Vertex vertex2;
 	vertex2.Position.x = 1;
 	vertex2.Position.y = 0;
 	vertex2.Position.z = 0;
-	vertex2.U = !InvertTextureCoordinates;
-	vertex2.V = 0;
+	vertex2.TexCoord = glm::vec2(!InvertTextureCoordinates, 0);
 	Vertices.push_back(vertex2);
 
 	Vertex vertex3;
 	vertex3.Position.x = 0;
 	vertex3.Position.y = 1;
 	vertex3.Position.z = 0;
-	vertex3.U = InvertTextureCoordinates;
-	vertex3.V = 1;
+	vertex3.TexCoord = glm::vec2(InvertTextureCoordinates, 1);
 	Vertices.push_back(vertex3);
 
 	Vertex vertex4;
 	vertex4.Position.x = 1;
 	vertex4.Position.y = 1;
 	vertex4.Position.z = 0;
-	vertex4.U = !InvertTextureCoordinates;
-	vertex4.V = 1;
+	vertex4.TexCoord = glm::vec2(!InvertTextureCoordinates, 1);
 	Vertices.push_back(vertex4);
-	BoxVertexBuffer = new VertexBuffer(Vertices.data(), Vertices.size());
+	BoxVertexBuffer = new VertexBuffer(Vertices, {0, 1, 2, 1, 2, 3});
 }
 
 UIBackground* UIBackground::SetOpacity(float NewOpacity)

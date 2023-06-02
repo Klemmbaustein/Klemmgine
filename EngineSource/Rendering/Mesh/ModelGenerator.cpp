@@ -35,7 +35,7 @@ namespace ModelGenerator
 		for (int j = 0; j < NumMeshes; j++)
 		{
 			std::vector<Vertex> Vertices;
-			std::vector<int> Indices;
+			std::vector<unsigned int> Indices;
 			Input.read((char*)&NewNumVertices, sizeof(int));
 			Input.read((char*)&NewNumIndices, sizeof(int));
 			// Read vertices
@@ -49,8 +49,8 @@ namespace ModelGenerator
 				Input.read((char*)&vertex.Normal.x, sizeof(float));
 				Input.read((char*)&vertex.Normal.y, sizeof(float));
 				Input.read((char*)&vertex.Normal.z, sizeof(float));
-				Input.read((char*)&vertex.U, sizeof(float));
-				Input.read((char*)&vertex.V, sizeof(float));
+				Input.read((char*)&vertex.TexCoord.x, sizeof(float));
+				Input.read((char*)&vertex.TexCoord.y, sizeof(float));
 				// Calculate Size for AABB collision box
 				if (vertex.Position.x > CollisionBox.maxX)
 				{
@@ -141,8 +141,8 @@ namespace ModelGenerator
 				Output.write((char*)&ElemVerts[i].Normal.x, sizeof(float));
 				Output.write((char*)&ElemVerts[i].Normal.y, sizeof(float));
 				Output.write((char*)&ElemVerts[i].Normal.z, sizeof(float));
-				Output.write((char*)&ElemVerts[i].U, sizeof(float));
-				Output.write((char*)&ElemVerts[i].V, sizeof(float));
+				Output.write((char*)&ElemVerts[i].TexCoord.x, sizeof(float));
+				Output.write((char*)&ElemVerts[i].TexCoord.y, sizeof(float));
 			}
 			for (int i = 0; i < NumIndices; i++)
 			{
@@ -170,9 +170,9 @@ namespace ModelGenerator
 		}
 		return MergedVertices;
 	}
-	std::vector<int> ModelData::GetMergedIndices()
+	std::vector<unsigned int> ModelData::GetMergedIndices()
 	{
-		std::vector<int> MergedIndices;
+		std::vector<unsigned int> MergedIndices;
 		size_t prevSize = 0;
 		for (size_t i = 0; i < Elements.size(); i++)
 		{
@@ -274,7 +274,7 @@ namespace ModelGenerator
 					Pos = Pos - glm::vec3(-0.5, -0.5, 0);
 					texcoords = glm::vec2(Pos.x + Pos.z, Pos.y);
 				}
-				Vertices.push_back(Vertex((Point + Offset) * 200, texcoords.x, texcoords.y, 1, 1, 1, 1, Normal));
+				Vertices.push_back(Vertex((Point + Offset) * 200, glm::vec2(texcoords.x, texcoords.y), glm::vec4(1, 1, 1, 1), Normal));
 				if (x != Resolution - 1 && y != Resolution - 1)
 				{
 					this->Indices.push_back(VertexIndex);

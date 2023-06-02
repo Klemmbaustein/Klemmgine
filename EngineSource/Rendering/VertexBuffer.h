@@ -1,25 +1,19 @@
 #pragma once
 
-#include <iostream>
+#include <vector>
 #include "Vertex.h"
 
 struct VertexBuffer
 {
-	VertexBuffer(void* data, int NumVertices);
+	unsigned int VAO = 0u, VBO = 0u, EBO = 0u, IndicesSize = 0u;
+	std::vector<Vertex> Vertices; std::vector<unsigned int> Indices;
+public:
+	static VertexBuffer* MakeSquare();
 
-	VertexBuffer() {}
-
-	unsigned int GetVAO();
-
-	void SetData(void* data, int NumVertices);
-
-	virtual ~VertexBuffer();
-
+	VertexBuffer(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices);
+	~VertexBuffer();
 	void Bind();
-
 	void Unbind();
 
-	unsigned int BufferID = 0;
-private:
-	unsigned int VAO = 0;
+	void Draw();
 };

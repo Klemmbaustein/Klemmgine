@@ -3,7 +3,7 @@
 
 struct Shader;
 class Camera;
-struct VertexBuffer; struct IndexBuffer;
+struct VertexBuffer;
 struct Uniform;
 struct Material;
 class ObjectRenderContext;
@@ -54,7 +54,6 @@ namespace Particles
 		void AddElement(ParticleElement NewElement, Material Mat);
 		void RemoveElement(unsigned int Index);
 		std::vector<VertexBuffer*> ParticleVertexBuffers;
-		std::vector<IndexBuffer*> ParticleIndexBuffers;
 		unsigned int MatBuffer = -1;
 		std::vector<glm::mat4> ParticleMatrices;
 		std::vector<ObjectRenderContext> Contexts;

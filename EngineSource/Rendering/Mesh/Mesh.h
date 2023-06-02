@@ -3,13 +3,12 @@
 #include "Rendering/Shader.h"
 #include "Rendering/VertexBuffer.h"
 #include <vector>
-#include "Rendering/Utility/IndexBuffer.h"
 #include <Rendering/Renderable.h>
 
 class Mesh
 {
 public:
-	Mesh(std::vector<Vertex> Vertices, std::vector<int> Indices, Material Mat);
+	Mesh(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Material Mat);
 	~Mesh();
 
 	void Render(Shader* UsedShader, bool MainFrameBuffer);
@@ -21,7 +20,6 @@ public:
 	VertexBuffer* MeshVertexBuffer = nullptr;
 protected:
 private:
-	IndexBuffer* MeshIndexBuffer;
 	int NumIndices;
 	int NumVertices;
 };

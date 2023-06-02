@@ -40,10 +40,8 @@ void ParticleComponent::LoadParticle(std::string Name)
 	for (unsigned int i = 0; i < Emitter->ParticleVertexBuffers.size(); i++)
 	{
 		delete Emitter->ParticleVertexBuffers[i];
-		delete Emitter->ParticleIndexBuffers[i];
 	}
 	Emitter->ParticleVertexBuffers.clear();
-	Emitter->ParticleIndexBuffers.clear();
 	Emitter->SpawnDelays.clear();
 	Emitter->Contexts.clear();
 	Emitter->ParticleInstances.clear();

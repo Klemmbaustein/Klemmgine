@@ -1,7 +1,6 @@
 #include "Particle.h"
 #include <Rendering/VertexBuffer.h>
 #include <GL/glew.h>
-#include <Rendering/Utility/IndexBuffer.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <Rendering/Shader.h>
 #include <World/Stats.h>
@@ -44,27 +43,21 @@ void Particles::ParticleEmitter::AddElement(ParticleElement NewElement, Material
 	std::vector<Vertex> ParticleVertices;
 	Vertex Vert = Vertex();
 	Vert.Position = glm::vec3(0.5, 0, -0.5);
-	Vert.U = 0; Vert.V = 0;
+	Vert.TexCoord = glm::vec2(0, 0);
 	ParticleVertices.push_back(Vert);
 
 	Vert.Position = glm::vec3(0.5, 0, 0.5);
-	Vert.U = 1; Vert.V = 0;
+	Vert.TexCoord = glm::vec2(1, 0);
 	ParticleVertices.push_back(Vert);
 
 	Vert.Position = glm::vec3(-0.5, 0, -0.5);
-	Vert.U = 0; Vert.V = 1;
+	Vert.TexCoord = glm::vec2(0, 1);
 	ParticleVertices.push_back(Vert);
 
 	Vert.Position = glm::vec3(-0.5, 0, 0.5);
-	Vert.U = 1; Vert.V = 1;
+	Vert.TexCoord = glm::vec2(1, 1);
 	ParticleVertices.push_back(Vert);
-	ParticleVertexBuffers.push_back(new VertexBuffer(ParticleVertices.data(), ParticleVertices.size()));
-	std::vector<int> ParticleIndices =
-	{
-		0, 2, 1,
-		1, 2, 3
-	};
-	ParticleIndexBuffers.push_back(new IndexBuffer(ParticleIndices.data(), ParticleIndices.size(), sizeof(int)));
+	ParticleVertexBuffers.push_back(new VertexBuffer(ParticleVertices, {0, 2, 1, 1, 2, 3}));
 	Contexts.push_back(ObjectRenderContext(Mat));
 }
 
@@ -142,8 +135,8 @@ void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 			glDeleteBuffers(1, &MatBuffer);
 		glGenBuffers(1, &MatBuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
-		glBufferData(GL_ARRAY_BUFFER, ParticleMatrices.size() * sizeof(glm::mat4), &ParticleMatrices[i], GL_DYNAMIC_DRAW);
-		unsigned int VAO = ParticleVertexBuffers[i]->GetVAO();
+		glBufferData(GL_ARRAY_BUFFER, ParticleMatrices.size() * sizeof(glm::mat4), &ParticleMatrices[i], GL_STATIC_DRAW);
+		unsigned int VAO = ParticleVertexBuffers[i]->VAO;
 		glBindVertexArray(VAO);
 		// vertex attributes
 		std::size_t vec4Size = sizeof(glm::vec4);
@@ -205,10 +198,8 @@ void Particles::ParticleEmitter::RemoveElement(unsigned int Index)
 	ParticleInstances.push_back(std::vector<ParticleInstance>());
 
 	delete ParticleVertexBuffers[Index];
-	delete ParticleIndexBuffers[Index];
 	
 	REMOVE_ARRAY_IND(ParticleVertexBuffers, Index);
-	REMOVE_ARRAY_IND(ParticleIndexBuffers, Index);
 
 	Contexts[Index].Unload();
 	REMOVE_ARRAY_IND(Contexts, Index);
@@ -217,10 +208,6 @@ void Particles::ParticleEmitter::RemoveElement(unsigned int Index)
 Particles::ParticleEmitter::~ParticleEmitter()
 {
 	for (auto* buf : ParticleVertexBuffers)
-	{
-		delete buf;
-	}
-	for (auto* buf : ParticleIndexBuffers)
 	{
 		delete buf;
 	}
@@ -303,7 +290,6 @@ void Particles::ParticleEmitter::Draw(Camera* MainCamera , bool MainFrameBuffer,
 		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_viewpro"), 1, GL_FALSE, &MainCamera->getViewProj()[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(ElemShader, "u_view"), 1, GL_FALSE, &MainCamera->getView()[0][0]);
 		ParticleVertexBuffers[Elem]->Bind();
-		ParticleIndexBuffers[Elem]->Bind();
 		if (MainFrameBuffer)
 		{
 			unsigned int attachements[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
@@ -316,6 +302,5 @@ void Particles::ParticleEmitter::Draw(Camera* MainCamera , bool MainFrameBuffer,
 		}
 		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, ParticleInstances[Elem].size());
 		ParticleVertexBuffers[Elem]->Unbind();
-		ParticleIndexBuffers[Elem]->Unbind();
 	}
 }

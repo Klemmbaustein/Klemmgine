@@ -35,7 +35,7 @@ namespace Collision
 	};
 	struct CollisionMesh
 	{
-		CollisionMesh(std::vector<Vertex> Verts, std::vector<int> Indices, Transform T);
+		CollisionMesh(std::vector<Vertex> Verts, std::vector<unsigned int> Indices, Transform T);
 		CollisionMesh() { ModelMatrix = glm::mat4(1); }
 		~CollisionMesh();
 		glm::mat4 GetMatrix();
@@ -49,7 +49,7 @@ namespace Collision
 		Vector3 SpherePosition;
 		HitResponse OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore = {});
 		std::vector<Vertex> Vertices;
-		std::vector<Vertex>	RawVertices; std::vector<int> Indices;
+		std::vector<Vertex>	RawVertices; std::vector<unsigned int> Indices;
 	protected:
 		float WorldScale = 1;
 		void ApplyMatrix();

@@ -2,18 +2,16 @@
 #include "Math/Vector.h"
 #include "Rendering/Shader.h"
 #include "Rendering/VertexBuffer.h"
-#include "Rendering/Utility/IndexBuffer.h"
 #include <vector>
 #include <fstream>
 #include <Rendering/Texture/Texture.h>
 #include <GL/glew.h>
 
-InstancedMesh::InstancedMesh(std::vector<Vertex> Vertices, std::vector<int> Indices, Material Mat)
+InstancedMesh::InstancedMesh(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Material Mat)
 {
 	NumVertices = Vertices.size();
 	NumIndices = Indices.size();
-	MeshIndexBuffer = new IndexBuffer(Indices.data(), NumIndices, sizeof(Indices[0]));
-	MeshVertexBuffer = new VertexBuffer(Vertices.data(), NumVertices);
+	MeshVertexBuffer = new VertexBuffer(Vertices, Indices);
 	RenderContext = ObjectRenderContext(Mat);
 }
 
@@ -21,13 +19,11 @@ InstancedMesh::InstancedMesh(std::vector<Vertex> Vertices, std::vector<int> Indi
 InstancedMesh::~InstancedMesh()
 {
 	delete MeshVertexBuffer;
-	delete MeshIndexBuffer;
 	RenderContext.Unload();
 }
 void InstancedMesh::Render(Shader* UsedShader, bool MainFramebuffer)
 {
 	MeshVertexBuffer->Bind();
-	MeshIndexBuffer->Bind();
 	RenderContext.Bind();
 	if (MainFramebuffer)
 	{
@@ -41,12 +37,11 @@ void InstancedMesh::Render(Shader* UsedShader, bool MainFramebuffer)
 	}
 	glDrawElementsInstanced(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0, Instances.size());
 	MeshVertexBuffer->Unbind();
-	MeshIndexBuffer->Unbind();
 }
 
 void InstancedMesh::SimpleRender(Shader* UsedShader)
 {
-	/*if (RenderContext.Mat.UseShadowCutout)
+	if (RenderContext.Mat.UseShadowCutout)
 	{
 		RenderContext.BindWithShader(UsedShader);
 		UsedShader->SetInt("u_usetexture", 1);
@@ -54,12 +49,10 @@ void InstancedMesh::SimpleRender(Shader* UsedShader)
 	else
 	{
 		UsedShader->SetInt("u_usetexture", 0);
-	}*/
+	}
 	MeshVertexBuffer->Bind();
-	MeshIndexBuffer->Bind();
 	glDrawElementsInstanced(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0, Instances.size());
 	MeshVertexBuffer->Unbind();
-	MeshIndexBuffer->Unbind();
 }
 
 void InstancedMesh::SetUniform(Material::Param NewUniform)

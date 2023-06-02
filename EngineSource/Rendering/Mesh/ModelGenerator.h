@@ -11,7 +11,7 @@ namespace ModelGenerator
 		struct Element
 		{
 			std::vector<Vertex> Vertices;
-			std::vector<int> Indices;
+			std::vector<unsigned int> Indices;
 			std::string ElemMaterial;
 			void GenerateNormals();
 			void MakeCube(int32_t Resolution, Vector3 Offset);
@@ -41,6 +41,6 @@ namespace ModelGenerator
 
 		//Combine all meshes of the model to a single mesh
 		std::vector<Vertex> GetMergedVertices();
-		std::vector<int> GetMergedIndices();
+		std::vector<unsigned int> GetMergedIndices();
 	};
 }

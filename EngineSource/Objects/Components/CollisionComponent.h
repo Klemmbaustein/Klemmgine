@@ -11,7 +11,7 @@ public:
 	Transform RelativeTransform;
 	virtual void Destroy() override;
 	void Tick() override;
-	void Init(std::vector<Vertex> Vertices, std::vector<int> Indices, Transform RelativeTransform = Transform());
+	void Init(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Transform RelativeTransform = Transform());
 	Collision::CollisionMesh* CollMesh;
 	Transform LastParentTransform;
 	Transform LastRelativeTransform;
