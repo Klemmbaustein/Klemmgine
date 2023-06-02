@@ -47,7 +47,7 @@ unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 
 void Bloom::Init()
 {
-	BloomShader = new Shader("Shaders/postprocess.vert", "Shaders/bloom.frag");
+	BloomShader = new Shader("Shaders/Internal/postprocess.vert", "Shaders/Internal/bloom.frag");
 	glGenFramebuffers(2, pingpongFBO);
 	glGenTextures(2, pingpongBuffer);
 	for (unsigned int i = 0; i < 2; i++)

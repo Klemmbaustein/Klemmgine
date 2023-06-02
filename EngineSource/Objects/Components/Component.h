@@ -6,6 +6,9 @@ class ComponentSetter;
 class Component
 {
 public:
+	Component() {}
+	virtual ~Component() {}
+
 	virtual void Begin();
 	virtual void Tick();
 	virtual void Destroy();

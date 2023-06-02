@@ -4,10 +4,12 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Math/Math.h>
 #include <Engine/Application.h>
+#include <Objects/Components/BillboardComponent.h>
 #include <Objects/Components/MeshComponent.h>
 #include <Objects/Components/InstancedMeshComponent.h>
 #include <Rendering/Mesh/Model.h>
 #include <Rendering/Mesh/InstancedModel.h>
+#include <Rendering/BillboardSprite.h>
 #include <Math/Collision/Collision.h>
 #include <Engine/Log.h>
 #include <Rendering/Mesh/Model.h>
@@ -153,6 +155,14 @@ void Viewport::Tick()
 			if (dynamic_cast<InstancedMeshComponent*>(j))
 			{
 				OutlineBuffer->Renderables.push_back(dynamic_cast<InstancedMeshComponent*>(j)->GetInstancedModel());
+			}
+			if (dynamic_cast<InstancedMeshComponent*>(j))
+			{
+				OutlineBuffer->Renderables.push_back(dynamic_cast<InstancedMeshComponent*>(j)->GetInstancedModel());
+			}
+			if (dynamic_cast<BillboardComponent*>(j))
+			{
+				OutlineBuffer->Renderables.push_back(dynamic_cast<BillboardComponent*>(j)->GetSprite());
 			}
 		}
 	}

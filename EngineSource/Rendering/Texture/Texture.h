@@ -1,6 +1,5 @@
 #pragma once
-#include <vector>
-#include <string>
+#include <Math/Vector.h>
 
 namespace Texture
 {
@@ -20,9 +19,16 @@ namespace Texture
 		}
 	};
 
+	struct TextureData
+	{
+		std::vector<Vector3> Pixels;
+		unsigned int ResolutionX = 0, ResolutionY = 0;
+	};
+
 	extern std::vector<Texture> Textures;
 
 	unsigned int LoadTexture(std::string File);
+	unsigned int CreateTexture(TextureData T);
 
 	unsigned int LoadCubemapTexture(std::vector<std::string> Files);
 

@@ -28,11 +28,19 @@ namespace Texture
 		}
 		try
 		{
+			std::string TextureFile = File;
+			if (!std::filesystem::exists(TextureFile))
+			{
+				TextureFile = Assets::GetAsset(File + ".png");
+			}
+
+
+
 			int TextureWidth = 0;
 			int TextureHeigth = 0;
 			int BitsPerPixel = 0;
 			stbi_set_flip_vertically_on_load(true);
-			auto TextureBuffer = stbi_load((Assets::GetAsset(File + ".png")).c_str(), &TextureWidth, &TextureHeigth, &BitsPerPixel, 4);
+			auto TextureBuffer = stbi_load(TextureFile.c_str(), &TextureWidth, &TextureHeigth, &BitsPerPixel, 4);
 			GLuint TextureID;
 			glGenTextures(1, &TextureID);
 			glBindTexture(GL_TEXTURE_2D, TextureID);
@@ -55,6 +63,21 @@ namespace Texture
 			Log::Print(std::string("Error loading Texture: ") + e.what(), Vector3(0.7f, 0.f, 0.f));
 			return 0;
 		}
+	}
+
+	unsigned int CreateTexture(TextureData T)
+	{
+		unsigned int TextureID;
+		glGenTextures(1, &TextureID);
+		glBindTexture(GL_TEXTURE_2D, TextureID);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, T.ResolutionX, T.ResolutionY, 0, GL_RGBA, GL_FLOAT, (void*)T.Pixels.data());
+
+		return TextureID;
 	}
 
 	unsigned int LoadCubemapTexture(std::vector<std::string> Files)
@@ -139,6 +162,6 @@ namespace Texture
 				return;
 			}
 		}
-		Log::Print("Error unloading texture: " + std::to_string(TextureID) + ", (Texture not loaded)", Vector3(0.7f, 0.f, 0.f));
+		glDeleteTextures(1, &TextureID);
 	}
 }

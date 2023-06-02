@@ -46,6 +46,8 @@
 #include <iostream>
 #include <thread>
 
+#include <Rendering/BillboardSprite.h>
+#include <Rendering/Texture/Texture.h>
 
 Vector2 GetMousePosition()
 {
@@ -320,9 +322,9 @@ void InitializeShaders()
 	std::cout << ".";
 	Graphics::UIShader = new Shader("Shaders/UI/uishader.vert", "Shaders/UI/uishader.frag");
 	std::cout << ".";
-	Application::PostProcessShader = new Shader("Shaders/postprocess.vert", "Shaders/postprocess.frag");
+	Application::PostProcessShader = new Shader("Shaders/Internal/postprocess.vert", "Shaders/Internal/postprocess.frag");
 	std::cout << ".";
-	Application::ShadowShader = new Shader("Shaders/shadow.vert", "Shaders/shadow.frag", "Shaders/shadow.geom");
+	Application::ShadowShader = new Shader("Shaders/Internal/shadow.vert", "Shaders/Internal/shadow.frag", "Shaders/Internal/shadow.geom");
 	Graphics::ShadowShader = Application::ShadowShader;
 	std::cout << "." << std::endl;
 }
@@ -704,7 +706,6 @@ int Initialize(int argc, char** argv)
 
 	std::cout << "GLEW started (No error)\n";
 
-	glEnable(GL_MULTISAMPLE);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	Sound::Init();
 

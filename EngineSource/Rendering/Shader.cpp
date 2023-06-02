@@ -9,6 +9,7 @@
 #include <GL/glew.h>
 #include <Math/Vector.h>
 #include <Rendering/Utility/ShaderPreprocessor.h>
+#include <glm/mat4x4.hpp>
 
 
 extern const bool IsInEditor;
@@ -46,6 +47,11 @@ void Shader::SetFloat(std::string Field, float Value)
 	glUniform1f(glGetUniformLocation(ShaderID, Field.c_str()), Value);
 }
 
+void Shader::SetVector4(std::string Field, Vector4 Value)
+{
+	glUniform4f(glGetUniformLocation(ShaderID, Field.c_str()), Value.X, Value.Y, Value.Z, Value.W);
+}
+
 void Shader::SetVector3(std::string Field, Vector3 Value)
 {
 	glUniform3f(glGetUniformLocation(ShaderID, Field.c_str()), Value.X, Value.Y, Value.Z);
@@ -54,6 +60,11 @@ void Shader::SetVector3(std::string Field, Vector3 Value)
 void Shader::SetVector2(std::string Field, Vector2 Value)
 {
 	glUniform2f(glGetUniformLocation(ShaderID, Field.c_str()), Value.X, Value.Y);
+}
+
+void Shader::SetMat4(std::string Field, glm::mat4 Value)
+{
+	glUniformMatrix4fv(glGetUniformLocation(ShaderID, Field.c_str()), 1, GL_FALSE, &Value[0][0]);
 }
 
 GLuint Shader::Compile(std::string ShaderCode, unsigned int Type)
