@@ -9,6 +9,7 @@
 
 namespace CSM
 {
+	float CSMDistance = 1;
 	const float cameraFarPlane = 400.f;
 	std::vector<float> shadowCascadeLevels{ cameraFarPlane / 12.f, cameraFarPlane / 3.f, cameraFarPlane / 1.5f, cameraFarPlane / 1.f };
 	GLuint LightFBO;
@@ -137,6 +138,7 @@ namespace CSM
 
 		Console::RegisterConVar(Console::Variable("shadow_resolution", Type::E_INT, &Graphics::ShadowResolution, CSM::ReInit));
 		Console::RegisterConVar(Console::Variable("shadows", Type::E_BOOL, &Graphics::RenderShadows, CSM::ReInit));
+		Console::RegisterConVar(Console::Variable("shadow_distance", Type::E_FLOAT, &CSMDistance, nullptr));
 	}
 
 	void CSM::ReInit()
@@ -198,6 +200,7 @@ namespace CSM
 		const auto proj = glm::perspective(
 			2.f, (float)Graphics::WindowResolution.X / (float)Graphics::WindowResolution.Y, nearPlane,
 			farPlane);
+
 		const auto corners = getFrustumCornersWorldSpace(proj, Graphics::MainCamera->getView());
 
 		glm::vec3 center = glm::vec3(0, 0, 0);
@@ -268,15 +271,15 @@ namespace CSM
 		{
 			if (i == 0)
 			{
-				ret.push_back(getLightSpaceMatrix(0.1f, shadowCascadeLevels[i]));
+				ret.push_back(getLightSpaceMatrix(0.1f * CSMDistance, shadowCascadeLevels[i] * CSMDistance));
 			}
 			else if (i < shadowCascadeLevels.size())
 			{
-				ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], shadowCascadeLevels[i]));
+				ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, shadowCascadeLevels[i] * CSMDistance));
 			}
 			else
 			{
-				ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1], cameraFarPlane));
+				ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, cameraFarPlane * CSMDistance));
 			}
 		}
 		return ret;

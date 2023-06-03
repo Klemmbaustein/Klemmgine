@@ -9,7 +9,7 @@
 
 namespace CSM
 {
-
+	extern float CSMDistance;
 	struct CSMInitExeption : std::exception
 	{
 		CSMInitExeption(std::string ErrorMessage)

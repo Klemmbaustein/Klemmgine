@@ -39,8 +39,8 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
 
 	for (size_t i = 0; i < CSM::shadowCascadeLevels.size(); ++i)
 	{
-		glUniform1fv(glGetUniformLocation(ShaderToApply->GetShaderID(),
-			((std::string("cascadePlaneDistances[") + std::to_string(i)) + "]").c_str()), 1, &CSM::shadowCascadeLevels[i]);
+		glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(),
+			((std::string("cascadePlaneDistances[") + std::to_string(i)) + "]").c_str()), CSM::shadowCascadeLevels[i] * CSM::CSMDistance);
 	}
 }
 
