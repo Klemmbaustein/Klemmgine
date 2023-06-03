@@ -10,5 +10,5 @@
 #define ENGINE_DEBUG true
 #endif
 extern char ProjectName[];
-#define VERSION_STRING "1.2.0-Alpha"
+#define VERSION_STRING "1.2.1-Alpha"
 #define OPENGL_MIN_REQUIRED_VERSION "GL_VERSION_4_3"
