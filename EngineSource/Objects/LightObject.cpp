@@ -13,9 +13,9 @@ void LightObject::Begin()
 	OnPropertySet();
 
 #if EDITOR
-	auto EditorBillboard = new BillboardComponent();
-	Attach(EditorBillboard);
-	EditorBillboard->Load("EditorContent/Images/Light.png");
+	Billboard = new BillboardComponent();
+	Attach(Billboard);
+	Billboard->Load("EditorContent/Images/Light.png");
 	ModelGenerator::ModelData m;
 	m.AddElement().MakeCube(2, 0);
 
@@ -31,4 +31,10 @@ void LightObject::OnPropertySet()
 	Light->SetColor(Color);
 	Light->SetFalloff(Falloff);
 	Light->SetIntensity(Intensity);
+#if EDITOR
+	if (Billboard)
+	{
+		Billboard->Color = Color;
+	}
+#endif
 }

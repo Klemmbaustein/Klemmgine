@@ -41,4 +41,5 @@ void BillboardComponent::Tick()
 	if (!GetParent()) return;
 	Sprite->Position = GetParent()->GetTransform().Location + RelativePosition;
 	Sprite->Rotation = Rotation;
+	Sprite->Color = Color;
 }

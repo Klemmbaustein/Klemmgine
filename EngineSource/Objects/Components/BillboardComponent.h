@@ -17,6 +17,7 @@ public:
 	void Tick() override;
 
 	float Rotation = 0;
+	Vector3 Color = 1;
 	Vector3 RelativePosition;
 protected:
 	unsigned int LoadedTexture = 0;

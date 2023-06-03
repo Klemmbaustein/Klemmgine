@@ -3,6 +3,7 @@
 #include <GENERATED/GENERATED_LightObject.h>
 
 class PointLightComponent;
+class BillboardComponent;
 
 class LightObject : public WorldObject
 {
@@ -15,4 +16,7 @@ public:
 	Vector3 Color = Vector3(1);
 	float Intensity = 2.0;
 	float Falloff = 1.0;
+#if EDITOR
+	BillboardComponent* Billboard = nullptr;
+#endif
 };
