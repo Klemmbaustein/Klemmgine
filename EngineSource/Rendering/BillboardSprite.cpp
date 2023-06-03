@@ -49,6 +49,11 @@ BillboardSprite::~BillboardSprite()
 
 void BillboardSprite::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass)
 {
+	if (!TransparencyPass)
+	{
+		return;
+	}
+
 	Vector3 rot = WorldCamera->Rotation;
 
 	rot.Y = -rot.Y - 90;
