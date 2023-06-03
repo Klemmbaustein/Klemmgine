@@ -22,6 +22,7 @@ void LightObject::Begin()
 	auto EditorCollision = new CollisionComponent();
 	Attach(EditorCollision);
 	EditorCollision->Init(m.GetMergedVertices(), m.GetMergedIndices());
+	EditorCollision->RelativeTransform.Scale = 0.25;
 #endif
 }
 

@@ -13,6 +13,7 @@ public:
 	void Tick() override;
 	void Init(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Transform RelativeTransform = Transform());
 	Collision::CollisionMesh* CollMesh;
+protected:
 	Transform LastParentTransform;
 	Transform LastRelativeTransform;
 };
