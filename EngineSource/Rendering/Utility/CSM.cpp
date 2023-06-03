@@ -17,7 +17,7 @@ namespace CSM
 	GLuint ShadowMaps;
 	unsigned int matricesUBO;
 	bool Initialized = false;
-	std::vector<glm::vec4> CSM::getFrustumCornersWorldSpace(const glm::mat4& projview)
+	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview)
 	{
 		const auto inv = glm::inverse(projview);
 
@@ -37,7 +37,7 @@ namespace CSM
 		return frustumCorners;
 	}
 
-	std::string CSM::ErrorMessageFromGLStatus(int Status)
+	std::string ErrorMessageFromGLStatus(int Status)
 	{
 		//https://neslib.github.io/Ooogles.Net/html/0e1349ae-da69-6e5e-edd6-edd8523101f8.htm
 
@@ -86,12 +86,12 @@ namespace CSM
 		}
 	}
 
-	std::vector<glm::vec4> CSM::getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
+	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
 	{
 		return getFrustumCornersWorldSpace(proj * view);
 	}
 
-	void CSM::Init()
+	void Init()
 	{
 		Initialized = true;
 		glGenFramebuffers(1, &LightFBO);
@@ -141,7 +141,7 @@ namespace CSM
 		Console::RegisterConVar(Console::Variable("shadow_distance", Type::E_FLOAT, &CSMDistance, nullptr));
 	}
 
-	void CSM::ReInit()
+	void ReInit()
 	{
 		if (!Initialized)
 		{
@@ -195,7 +195,7 @@ namespace CSM
 		}
 	}
 
-	glm::mat4 CSM::getLightSpaceMatrix(const float nearPlane, const float farPlane)
+	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane)
 	{
 		const auto proj = glm::perspective(
 			2.f, (float)Graphics::WindowResolution.X / (float)Graphics::WindowResolution.Y, nearPlane,
@@ -264,7 +264,7 @@ namespace CSM
 		return lightProjection * lightView;
 	}
 
-	std::vector<glm::mat4> CSM::getLightSpaceMatrices()
+	std::vector<glm::mat4> getLightSpaceMatrices()
 	{
 		std::vector<glm::mat4> ret;
 		for (size_t i = 0; i < shadowCascadeLevels.size() + 1; ++i)
