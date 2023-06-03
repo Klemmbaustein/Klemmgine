@@ -60,12 +60,12 @@ void MoveComponent::Begin()
 	ModelGenerator::ModelData CollisionModel;
 	Vector3 CubeDirections[6] =
 	{
-		Vector3(1,  0,  0),
+		Vector3( 1,  0,  0),
 		Vector3(-1,  0,  0),
-		Vector3(0,  1,  0),
-		Vector3(0, -1,  0),
-		Vector3(0,  0,  1),
-		Vector3(0,  0, -1)
+		Vector3( 0,  1,  0),
+		Vector3( 0, -1,  0),
+		Vector3( 0,  0,  1),
+		Vector3( 0,  0, -1)
 	};
 	CollisionModel.Elements.push_back(ModelGenerator::ModelData::Element());
 	for (auto dir : CubeDirections)
