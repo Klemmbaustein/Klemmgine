@@ -17,7 +17,7 @@ namespace Console
 	{
 		std::string Name;
 		// If OnSet == nullptr/NULL, OnSet will be ignored.
-		void(*OnSet)();
+		void(*OnSet)() = nullptr;
 		void* Var = nullptr;
 		Type::TypeEnum Type = Type::E_INT;
 		Variable(std::string Name, Type::TypeEnum Type, void* Var, void (*OnSet)());

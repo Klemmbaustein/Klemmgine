@@ -147,8 +147,7 @@ namespace LaunchArgs
 
 std::string GetStartupScene();
 
-void GLAPIENTRY
-MessageCallback(
+void GLAPIENTRY MessageCallback(
 	GLenum source,
 	GLenum type,
 	GLuint id,
