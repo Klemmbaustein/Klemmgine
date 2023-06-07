@@ -316,7 +316,7 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 
 void InitializeShaders()
 {
-	std::cout << "Initializing Shaders";
+	std::cout << "- Initializing Shaders";
 	Graphics::TextShader = new Shader("Shaders/UI/text.vert", "Shaders/UI/text.frag");
 	std::cout << ".";
 	Graphics::UIShader = new Shader("Shaders/UI/uishader.vert", "Shaders/UI/uishader.frag");
@@ -645,7 +645,7 @@ int Initialize(int argc, char** argv)
 	}
 
 	std::cout << "Starting..." << std::endl;
-	std::cout << "*Starting SDL2 - ";
+	std::cout << "- Starting SDL2 - ";
 	int SDLReturnValue = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 	Application::Timer StartupTimer;
 	if (SDLReturnValue != 0)
@@ -680,7 +680,7 @@ int Initialize(int argc, char** argv)
 	SDL_GL_CreateContext(Application::Window);
 	SDL_SetWindowResizable(Application::Window, SDL_TRUE);
 
-	std::cout << "*Starting GLEW - ";
+	std::cout << "- Starting GLEW - ";
 	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "GLEW Init Error:\n" << glewGetErrorString(glewInit());

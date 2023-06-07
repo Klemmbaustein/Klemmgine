@@ -82,6 +82,7 @@
     <Lib>
       <OutputFile>$(SolutionDir)Components\lib\$(TargetName)_Editor.lib</OutputFile>
     </Lib>
+    $PREBUILDEVENT
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -125,6 +126,7 @@
     <Lib>
       <OutputFile>$(SolutionDir)Components\lib\$(TargetName)_Release.lib</OutputFile>
     </Lib>
+    $PREBUILDEVENT
   </ItemDefinitionGroup>
   <ItemGroup>
 $FILES
