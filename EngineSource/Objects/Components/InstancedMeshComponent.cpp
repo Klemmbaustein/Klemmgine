@@ -37,15 +37,14 @@ void InstancedMeshComponent::Destroy()
 	}
 	for (auto* f : Graphics::AllFramebuffers)
 	{
-		for (int i = 0; i < f->Renderables.size(); i++)
+		for (size_t i = 0; i < f->Renderables.size(); i++)
 		{
 			if (Mesh == f->Renderables[i])
 			{
 				f->Renderables.erase(f->Renderables.begin() + i);
 			}
 		}
-	}				
-
+	}
 	delete Mesh;
 }
 

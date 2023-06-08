@@ -154,11 +154,10 @@ void Viewport::Tick()
 			}
 			if (dynamic_cast<InstancedMeshComponent*>(j))
 			{
-				OutlineBuffer->Renderables.push_back(dynamic_cast<InstancedMeshComponent*>(j)->GetInstancedModel());
-			}
-			if (dynamic_cast<InstancedMeshComponent*>(j))
-			{
-				OutlineBuffer->Renderables.push_back(dynamic_cast<InstancedMeshComponent*>(j)->GetInstancedModel());
+				if (dynamic_cast<InstancedMeshComponent*>(j)->GetInstancedModel())
+				{
+					OutlineBuffer->Renderables.push_back(dynamic_cast<InstancedMeshComponent*>(j)->GetInstancedModel());
+				}
 			}
 			if (dynamic_cast<BillboardComponent*>(j))
 			{
