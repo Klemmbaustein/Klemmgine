@@ -36,9 +36,6 @@ struct Vector2
 	Vector2 Clamp(Vector2 Min, Vector2 Max);
 };
 
-/// <summary>
-/// A struct holding X, Y and Z floats.
-/// </summary>
 struct Vector3
 {
 	float X = 0;

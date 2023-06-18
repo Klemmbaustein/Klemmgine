@@ -8,6 +8,7 @@
 * program to run on other OS's.
 */
 
+
 namespace OS
 {
 	enum EConsoleColor

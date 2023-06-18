@@ -8,7 +8,6 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Viewport.h>
 
-
 ObjectList::ObjectList(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2, 0.5), Vector2(0.8, 1.25))
 {
 	TabBackground->SetHorizontal(false);
@@ -130,7 +129,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 		}
 		ListEntryText->SetPadding(0.005, 0.005, 0.01, 0.01);
 		ListEntryText->Wrap = true;
-		ListEntryText->WrapDistance = 0.3;
+		ListEntryText->WrapDistance = 0.6;
 		TextBox->AddChild(ListEntryText);
 		ListEntryText = new UIText(0.4, 1, Object.Name, Editor::CurrentUI->EngineUIText);
 		ListEntryText->SetPadding(0.0, 0, 0.01, 0.01);

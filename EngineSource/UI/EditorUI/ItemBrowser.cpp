@@ -316,7 +316,7 @@ void ItemBrowser::UpdateLayout()
 
 		auto ItemText = new UIText(0.3666, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
 		ItemText->Wrap = true;
-		ItemText->WrapDistance = 0.1;
+		ItemText->WrapDistance = 0.2;
 		ItemText->SetTextWidthOverride(0.0);
 		NewBackground->AddChild(ItemText
 			->SetPadding(0.0025));

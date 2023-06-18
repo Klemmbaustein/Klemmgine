@@ -1,7 +1,7 @@
 #if EDITOR
 #include "Build.h"
 #include <filesystem>
-#include <Engine/Importers/Build/Pack.h>
+#include <Engine/Build/Pack.h>
 #include <Engine/Log.h>
 #include <Engine/EngineProperties.h>
 #include <fstream>
@@ -34,6 +34,24 @@ namespace Build
 		return test;
 	}
 }
+
+#define NOMINMAX
+#include <Windows.h>
+
+LONG GetStringRegKey(HKEY hKey, const std::wstring& strValueName, std::wstring& strValue, const std::wstring& strDefaultValue)
+{
+	strValue = strDefaultValue;
+	WCHAR szBuffer[512];
+	DWORD dwBufferSize = sizeof(szBuffer);
+	ULONG nError;
+	nError = RegQueryValueExW(hKey, strValueName.c_str(), 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
+	if (ERROR_SUCCESS == nError)
+	{
+		strValue = szBuffer;
+	}
+	return nError;
+}
+
 #endif
 
 std::string Build::TryBuildProject(std::string TargetFolder)
@@ -73,7 +91,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 
 			std::string VSInstallPath = GetVSLocation() + "\\Common7\\IDE\\devenv.exe";
 			std::string SolutionName;
-			for (auto i : std::filesystem::directory_iterator("."))
+			for (auto& i : std::filesystem::directory_iterator("."))
 			{
 				std::string SolutionString = i.path().string();
 				if (SolutionString.substr(SolutionString.find_last_of(".")) == ".sln")

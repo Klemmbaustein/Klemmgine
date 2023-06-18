@@ -5,7 +5,7 @@
 #include <Utility/stb_image.h>
 #include <sstream>
 #include <Engine/Log.h>
-#include <Engine/Importers/Build/Pack.h>
+#include <Engine/Build/Pack.h>
 #include <GL/glew.h>
 #include <Math/Vector.h>
 #include <Rendering/Utility/ShaderPreprocessor.h>

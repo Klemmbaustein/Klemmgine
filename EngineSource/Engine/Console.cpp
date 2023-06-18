@@ -1,7 +1,7 @@
 #include "Console.h"
 #include <Sound/Sound.h>
 #include <Engine/EngineProperties.h>
-#include <Engine/Importers/Build/Pack.h>
+#include <Engine/Build/Pack.h>
 #include <Engine/OS.h>
 #include <Rendering/Utility/ShaderManager.h>
 #include <set>
@@ -151,7 +151,7 @@ void Console::InitializeConsole()
 
 	RegisterCommand(Command("info",
 		[]() {
-			void (*InfoPrintTypes[3])() =
+			void (*InfoPrintTypes[4])() =
 		{
 			[]() {
 				ConsoleLog("Version: " + std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(ProjectName) + ")");
@@ -167,6 +167,13 @@ void Console::InitializeConsole()
 			[]() {
 				ConsoleLog("OpenAL version: " + Sound::GetVersionString());
 				ConsoleLog("Sounds: " + std::to_string(Sound::GetSounds().size()) + "/255");
+			},
+			[]() {
+#if ENGINE_CSHARP
+				ConsoleLog("With C#: Yes");
+#else
+				ConsoleLog("With C#: No");
+#endif
 			}
 		};
 	if (!CommandArgs().size())
@@ -175,6 +182,7 @@ void Console::InitializeConsole()
 		InfoPrintTypes[0]();
 		InfoPrintTypes[1]();
 		InfoPrintTypes[2]();
+		InfoPrintTypes[3]();
 		ConsoleLog("------------------------------------------------------------------------------");
 		return;
 	}
@@ -196,6 +204,13 @@ void Console::InitializeConsole()
 	{
 		ConsoleLog("-----------------------------------[Info]-------------------------------------");
 		InfoPrintTypes[2]();
+		ConsoleLog("------------------------------------------------------------------------------");
+		return;
+	}
+	if (CommandArgs()[0] == "csharp")
+	{
+		ConsoleLog("-----------------------------------[Info]-------------------------------------");
+		InfoPrintTypes[3]();
 		ConsoleLog("------------------------------------------------------------------------------");
 		return;
 	}

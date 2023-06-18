@@ -40,6 +40,7 @@ void PreferenceTab::GenerateUI()
 	for (auto& i : SettingsArray)
 	{
 		i.entry = iter++;
+		i.cat = SelectedSetting;
 		auto Colon = i.Name.find_last_of(":");
 		std::string CategoryName = "No category";
 		if (Colon != std::string::npos)

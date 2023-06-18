@@ -122,7 +122,7 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 	float originalScale = Scale;
 	Scale /= CharacterSizeInPixels;
 	Scale *= 60.0f;
-	LengthBeforeWrap *= 1350 * Graphics::AspectRatio;
+	LengthBeforeWrap *= 1350;
 	stbtt_bakedchar* cdata = (stbtt_bakedchar*)cdatapointer;
 	std::string TextString = TextSegment::CombineToString(Text);
 	float MaxHeight = 0.0f;
@@ -251,7 +251,7 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(FontVertex), (const void*)offsetof(FontVertex, color));
 	glBindVertexArray(0);
 
-	LengthBeforeWrap *= 1350 * Graphics::AspectRatio;
+	LengthBeforeWrap *= 1350;
 	float originalScale = Scale;
 	Scale /= 2.f;
 	Scale /= CharacterSizeInPixels;
