@@ -6,6 +6,7 @@
 #include <Engine/Log.h>
 #include <Engine/Console.h>
 #include <GL/glew.h>
+#include <Engine/EngineError.h>
 
 namespace CSM
 {
@@ -127,7 +128,6 @@ namespace CSM
 		if (status != GL_FRAMEBUFFER_COMPLETE)
 		{
 			std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
-			throw 0;
 		}
 		glGenBuffers(1, &matricesUBO);
 		glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
@@ -185,11 +185,7 @@ namespace CSM
 			glReadBuffer(GL_NONE);
 
 			int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			if (status != GL_FRAMEBUFFER_COMPLETE)
-			{
-				std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!";
-				throw 0;
-			}
+			ENGINE_ASSERT(status != GL_FRAMEBUFFER_COMPLETE, "Framebuffer should be complete.");
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}

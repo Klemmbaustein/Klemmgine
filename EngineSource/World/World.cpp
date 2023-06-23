@@ -128,9 +128,28 @@ namespace Log
 		OS::SetConsoleColor(NearestColor);
 		std::cout << Text << "\n";
 		OS::SetConsoleColor(OS::E_GRAY);
-#if EDITOR
-		UIBox::RedrawUI();
-#endif
+	}
+
+
+	void PrintMultiLine(std::string Text, Vector3 Color, std::string Prefix)
+	{
+		std::string CurrentLine;
+		for (auto& i : Text)
+		{
+			if (i == '\n')
+			{
+				Log::Print(Prefix + CurrentLine, Color);
+				CurrentLine.clear();
+			}
+			else
+			{
+				CurrentLine.append({i});
+			}
+		}
+		if (CurrentLine.size())
+		{
+			Log::Print(Prefix + CurrentLine, Color);
+		}
 	}
 }
 

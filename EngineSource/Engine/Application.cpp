@@ -6,6 +6,7 @@
 #include <Engine/Log.h>
 #include <Engine/Scene.h>
 #include <Engine/Console.h>
+#include <Engine/EngineError.h>
 
 #include <Sound/Sound.h>
 
@@ -29,6 +30,8 @@
 #include <Rendering/Camera/FrustumCulling.h>
 
 #include <Math/Collision/Collision.h>
+
+#include <CSharp/CSharpInterop.h>
 
 
 // World includes
@@ -62,6 +65,10 @@ namespace Application
 {
 	SDL_Window* Window = nullptr;
 	bool ShouldClose = false;
+	bool WindowHasFocus()
+	{
+		return SDL_GetKeyboardFocus() == Window;
+	}
 	void Quit()
 	{
 		ShouldClose = true;
@@ -170,6 +177,9 @@ void TickObjects()
 		Objects::AllObjects.at(i)->Tick();
 		Objects::AllObjects.at(i)->TickComponents();
 	}
+#ifdef ENGINE_CSHARP
+	CSharp::RunPerFrameLogic();
+#endif
 }
 
 std::string GetConsoleInput()
@@ -182,11 +192,18 @@ std::string GetConsoleInput()
 
 void DrawFramebuffer(FramebufferObject* Buffer)
 {
-	if (Buffer->FramebufferCamera)
+	ENGINE_ASSERT(Buffer->FramebufferCamera != nullptr, "Camera of framebuffer is valid.");
+
+#if EDITOR
+
+	if (!Application::WindowHasFocus())
 	{
-		Buffer->FramebufferCamera->Update();
+		//return;
 	}
-	else return;
+
+#endif
+
+	Buffer->FramebufferCamera->Update();
 
 	if (!Buffer->Renderables.size() && !Buffer->ParticleEmitters.size())
 	{
@@ -497,6 +514,12 @@ void PollInput()
 
 void DrawPostProcessing()
 {
+#if EDITOR
+	if (!Application::WindowHasFocus())
+	{
+		return;
+	}
+#endif
 	unsigned int BloomTexture = Bloom::BlurFramebuffer(Graphics::MainFramebuffer->GetTextureID());
 
 	unsigned int SSAOTexture = SSAO::Render(
@@ -505,7 +528,6 @@ void DrawPostProcessing()
 
 	Vector2 ActualRes = Application::GetWindowSize();
 	glViewport(0, 0, ActualRes.X, ActualRes.Y);
-
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	Debugging::EngineStatus = "Rendering (Post process: Main)";
 	glActiveTexture(GL_TEXTURE1);
@@ -548,7 +570,6 @@ void DrawPostProcessing()
 	{
 		glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_bloomtexture"), 4);
 	}
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	Application::PostProcessShader->Unbind();
 	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
@@ -577,10 +598,12 @@ void ApplicationLoop()
 	}
 
 	Debugging::EngineStatus = "Rendering (UI)";
-	UI::NewHoveredButton = nullptr;
-	UIBox::DrawAllUIElements();
-	UI::HoveredButton = UI::NewHoveredButton;
-
+	if (Application::WindowHasFocus() || !IS_IN_EDITOR)
+	{
+		UI::NewHoveredButton = nullptr;
+		UIBox::DrawAllUIElements();
+		UI::HoveredButton = UI::NewHoveredButton;
+	}
 	glEnable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
@@ -671,6 +694,9 @@ int Initialize(int argc, char** argv)
 
 	std::string ApplicationTitle = ProjectName;
 	if (IsInEditor) ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
+#if ENGINE_CSHARP && !RELEASE
+	ApplicationTitle.append(" (C#-.net)");
+#endif
 	if (EngineDebug && !IsInEditor) ApplicationTitle.append(" (Debug)");
 	Application::Window = SDL_CreateWindow(ApplicationTitle.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -712,6 +738,9 @@ int Initialize(int argc, char** argv)
 	Graphics::MainFramebuffer = new FramebufferObject();
 	Graphics::MainFramebuffer->FramebufferCamera = Graphics::MainCamera;
 
+#if ENGINE_CSHARP
+	CSharp::Init();
+#endif
 	CSM::Init();
 	Bloom::Init();
 	SSAO::Init();

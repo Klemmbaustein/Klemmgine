@@ -2,6 +2,7 @@
 #include <Engine/Log.h>
 #include <filesystem>
 #include <World/Stats.h>
+#include <Engine/EngineError.h>
 
 std::map<ShaderDescription, ShaderElement> Shaders;
 
@@ -88,5 +89,5 @@ void DereferenceShader(Shader* UsedShader)
 			}
 		}
 	}
-	throw "Could not dereference shader";
+	ENGINE_ASSERT(true, "Could not dereference a shader - It was never referenced!");
 }

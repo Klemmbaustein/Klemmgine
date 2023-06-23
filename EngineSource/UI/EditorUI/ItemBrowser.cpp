@@ -314,12 +314,12 @@ void ItemBrowser::UpdateLayout()
 			ItemName = ItemName.substr(0, MAX_ITEM_NAME_LENGTH - 3).append("...");
 		}
 
-		auto ItemText = new UIText(0.3666, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
+		auto ItemText = new UIText(0.35, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
 		ItemText->Wrap = true;
-		ItemText->WrapDistance = 0.2;
+		ItemText->WrapDistance = 0.21;
 		ItemText->SetTextWidthOverride(0.0);
 		NewBackground->AddChild(ItemText
-			->SetPadding(0.0025));
+			->SetPadding(0.002));
 
 		HorizontalSlices[i / ITEMS_PER_SLICE]->AddChild(NewBackground);
 	}

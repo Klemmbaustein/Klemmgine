@@ -13,6 +13,7 @@
 #include <World/Graphics.h>
 #include <Engine/Console.h>
 #include <filesystem>
+#include <Engine/EngineError.h>
 
 struct Source
 {
@@ -234,15 +235,11 @@ namespace Sound
 	void Init()
 	{
 		ALCdevice* device = alcOpenDevice(NULL);
-		if (device == NULL)
-		{
-			throw SoundException("Cannot open sound card");
-		}
+		ENGINE_ASSERT(device != NULL, "Cannot open sound card");
+
 		ALCcontext* context = alcCreateContext(device, NULL);
-		if (context == NULL)
-		{
-			throw SoundException("Cannot open Context");
-		}
+		ENGINE_ASSERT(context != NULL, "Cannot open OpenAL Context");
+
 		alcMakeContextCurrent(context);
 		alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 		alListenerf(AL_GAIN, 1.1f);

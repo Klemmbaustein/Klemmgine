@@ -400,6 +400,7 @@ void UIBox::UpdatePosition()
 void UIBox::InvalidateLayout()
 {
 	UI::RequiresRedraw = true;
+
 	if (Parent)
 	{
 		Parent->InvalidateLayout();
@@ -443,6 +444,7 @@ void UIBox::DrawAllUIElements()
 		if (elem->IsVisible != elem->PrevIsVisible)
 		{
 			UI::RequiresRedraw = true;
+			elem->PrevIsVisible = elem->IsVisible;
 		}
 		if (elem->ShouldBeTicked)
 		{

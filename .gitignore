@@ -22,4 +22,7 @@ Tools/BuildTool/Release/
 # Generated engine files
 paths.txt
 cppinfo.txt
+# C# related
+CSharpCore/obj
+CSharpCore/Build
 *.lastcodeanalysissucceeded

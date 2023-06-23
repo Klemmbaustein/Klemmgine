@@ -9,6 +9,7 @@
 #include "glm/ext.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
+#include <Engine/EngineError.h>
 
 Vector3 operator+(Vector3 a, Vector3 b)
 {
@@ -184,8 +185,7 @@ Vector3::Vector3(glm::vec3 xyz)
 
 float& Vector3::at(unsigned int Index)
 {
-	if (Index > 2)
-		throw "Invalid vector index";
+	ENGINE_ASSERT(Index <= 2, "Index of a Vector3 should never be greater than 2.\n(0, 1, 2 are valid)");
 	return *((float*)this + Index);
 }
 

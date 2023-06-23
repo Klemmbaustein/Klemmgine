@@ -60,29 +60,29 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 	{
 		if (std::filesystem::exists(TargetFolder))
 		{
-			Debugging::EngineStatus = "Build: Clearing folder";
-			Log::Print("Build: Clearing folder");
+			Debugging::EngineStatus = "[Build]: Clearing folder";
+			Log::Print("[Build]: Clearing folder");
 
 			for (const auto& entry : std::filesystem::directory_iterator(TargetFolder))
 				std::filesystem::remove_all(entry.path());
 
 			Debugging::EngineStatus = "Build: Copying .dll files";
-			Log::Print("Build: Copying .dll files");
+			Log::Print("[Build]: Copying .dll files");
 
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
 			std::filesystem::copy("OpenAL32.dll", TargetFolder + "OpenAL32.dll");
 
 			Debugging::EngineStatus = "Build: Creating folders";
-			Log::Print("Build: Creating folders");
+			Log::Print("[Build]: Creating folders");
 
 			std::filesystem::create_directories(TargetFolder + "/Assets/Content");
 
 			Debugging::EngineStatus = "Build: Packaging shaders";
-			Log::Print("Build: Packaging shaders");
+			Log::Print("[Build]: Packaging shaders");
 			Pack::SaveFolderToPack("Shaders/", TargetFolder + "/Assets/shaders.pack");
 
 			Debugging::EngineStatus = "Build: Copying assets";
-			Log::Print("Build: Copying assets");
+			Log::Print("[Build]: Copying assets");
 			const auto copyOptions = std::filesystem::copy_options::recursive;
 			std::filesystem::copy("Content", TargetFolder + "/Assets/Content", copyOptions);
 			std::filesystem::copy("Fonts", TargetFolder + "Assets/");
@@ -101,14 +101,14 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			}
 			if (SolutionName.empty())
 			{
-				Log::Print("Build system is 'msvc' but there is no .sln file in the main folder", Vector3(1, 0, 0));
+				Log::Print("[Build]: Build system is 'msvc' but there is no .sln file in the main folder", Vector3(1, 0, 0));
 				return "There is no MSBuild";
 			}
-			Log::Print("Build: Found .sln file: " + SolutionName, Vector3(0.5, 1, 0.5));
+			Log::Print("[Build]: Found .sln file: " + SolutionName, Vector3(0.5, 1, 0.5));
 
 			std::string Command = "\"" + VSInstallPath + "\" " + std::string(SolutionName) + ".sln /Build Release";
 
-			Log::Print("Build: Running command: " + Command + " (This can take a while)", Vector3(0.5));
+			Log::Print("[Build]: Running command: " + Command + " (This can take a while)", Vector3(0.5));
 			int CompileResult = system(Command.c_str());
 			if(!CompileResult)
 			{
@@ -116,17 +116,17 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			}
 			else
 			{
-				Log::Print("Build: Failure: MSBuild returned " + std::to_string(CompileResult), Vector3(1, 0, 0));
+				Log::Print("[Build]: Failure: MSBuild returned " + std::to_string(CompileResult), Vector3(1, 0, 0));
 				return "MSBuild Failure";
 			}
 #else
 			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
 			Log::Print("Pleasse recompile the program manually with the RELASE preprocessor definition (Release config).", Vector3(1, 0, 0));
 #endif
-			Log::Print("Build: Complete", Vector3(0, 1, 0));
+			Log::Print("[Build]: Complete", Vector3(0, 1, 0));
 			return "Sucess";
 		}
-		Log::Print("Build: Cannot find folder", Vector3(1, 0, 0));
+		Log::Print("[Build]: Cannot find folder", Vector3(1, 0, 0));
 		std::filesystem::create_directories(TargetFolder);
 		return Build::TryBuildProject(TargetFolder);
 	}

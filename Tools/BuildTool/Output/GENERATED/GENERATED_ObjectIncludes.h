@@ -1,3 +1,4 @@
+#include <Objects/CSharpObject.h>
 #include <Objects/InstancedMeshObject.h>
 #include <Objects/LightObject.h>
 #include <Objects/MeshObject.h>

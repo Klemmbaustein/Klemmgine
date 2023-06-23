@@ -12,6 +12,9 @@ struct ButtonEvent;
 
 namespace Application
 {
+
+	bool WindowHasFocus();
+
 	extern float LogicTime, RenderTime, SyncTime;
 	extern SDL_Window* Window;
 	void Quit();

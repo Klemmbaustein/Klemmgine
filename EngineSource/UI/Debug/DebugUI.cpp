@@ -37,17 +37,27 @@ DebugUI::DebugUI()
 
 void DebugUI::Tick()
 {
-	DebugTexts[0]->SetText("FPS: " + std::to_string((int)Performance::FPS));
-	DebugTexts[1]->SetText("Delta: " + std::to_string((int)(Performance::DeltaTime * 1000)) + "ms");
+	if (StatsRedrawTimer >= 1)
+	{
+		DebugTexts[0]->SetText("FPS: " + std::to_string(FPS));
+		DebugTexts[1]->SetText("Delta: " + std::to_string(1000 / FPS) + "ms");
 
-	std::string DeltaString;
-	DeltaString.append(std::to_string((int)(Application::LogicTime / Performance::DeltaTime * 100.f)) + "% Log ");
-	DeltaString.append(std::to_string((int)(Application::RenderTime / Performance::DeltaTime * 100.f)) + "% Rend ");
-	DeltaString.append(std::to_string((int)(Application::SyncTime / Performance::DeltaTime * 100.f)) + "% Buf");
+		std::string DeltaString;
+		DeltaString.append(std::to_string((int)(Application::LogicTime / Performance::DeltaTime * 100.f)) + "% Log ");
+		DeltaString.append(std::to_string((int)(Application::RenderTime / Performance::DeltaTime * 100.f)) + "% Rend ");
+		DeltaString.append(std::to_string((int)(Application::SyncTime / Performance::DeltaTime * 100.f)) + "% Buf");
 
-	DebugTexts[2]->SetText(DeltaString);
-	DebugTexts[3]->SetText("DrawCalls: " + std::to_string(Performance::DrawCalls));
-	DebugTexts[4]->SetText("CollisonMeshes: " + std::to_string(Collision::CollisionBoxes.size()));
+		DebugTexts[2]->SetText(DeltaString);
+		DebugTexts[3]->SetText("DrawCalls: " + std::to_string(Performance::DrawCalls));
+		DebugTexts[4]->SetText("CollisonMeshes: " + std::to_string(Collision::CollisionBoxes.size()));
+		StatsRedrawTimer = 0;
+		FPS = 0;
+	}
+	else
+	{
+		StatsRedrawTimer += Performance::DeltaTime;
+	}
+	FPS++;
 	if (Input::IsKeyDown(SDLK_RETURN) && !LogPrompt->GetIsEdited() && !IsEditingText)
 	{
 		IsEditingText = 5;
@@ -62,6 +72,7 @@ void DebugUI::Tick()
 	LogBackground->IsVisible = LogPrompt->GetIsEdited();
 	if (Log::Messages.size() != LogLength)
 	{
+		LogLength = Log::Messages.size();
 		GenerateLog();
 	}
 }

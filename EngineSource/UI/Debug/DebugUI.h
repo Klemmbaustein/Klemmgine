@@ -5,6 +5,8 @@
 
 class DebugUI : public UICanvas
 {
+	float StatsRedrawTimer = 0;
+	unsigned int FPS = 0;
 	int IsEditingText = 5;
 	size_t LogLength = 0;
 	TextRenderer* Text = nullptr;

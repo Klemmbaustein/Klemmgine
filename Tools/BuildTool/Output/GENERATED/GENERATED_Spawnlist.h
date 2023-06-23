@@ -1,3 +1,4 @@
+case 2263053289: return (WorldObject*)SpawnObject<CSharpObject>(ObjectTransform); 
 case 3200147776: return (WorldObject*)SpawnObject<InstancedMeshObject>(ObjectTransform); 
 case 3330444044: return (WorldObject*)SpawnObject<LightObject>(ObjectTransform); 
 case 3359741227: return (WorldObject*)SpawnObject<MeshObject>(ObjectTransform); 

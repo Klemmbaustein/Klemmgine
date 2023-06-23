@@ -4,6 +4,7 @@
 namespace Log
 {
 	void Print(std::string Text, Vector3 Color = Vector3(1, 1, 1));
+	void PrintMultiLine(std::string Text, Vector3 Color = Vector3(1, 1, 1), std::string Prefix = "");
 	struct Message
 	{
 		Vector3 Color;

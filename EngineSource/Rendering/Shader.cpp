@@ -214,13 +214,10 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type, std::stri
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 		if (!success)
 		{
-			std::cout << ShaderName << "\n::";
-
 			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-			std::cout << "ERROR::SHADER_COMPILATION_ERROR: " << ShaderName << " :TYPE " << type << "\n INFO LOG: \n" << infoLog
-				<< "\n -- --------------------------------------------------- -- " << std::endl;
-			std::cin.get();
-			//throw "Shader compile error";
+			Log::PrintMultiLine("ERROR::SHADER_COMPILATION_ERROR: " + ShaderName + " :TYPE " + type + "\n INFO LOG: \n" + std::string(infoLog)
+				+ "\n -- --------------------------------------------------- -- ", Log::LogColor::Red, "[Error]: ");
+			throw "Shader compile error";
 		}
 	}
 	else
@@ -228,13 +225,10 @@ void Shader::checkCompileErrors(unsigned int shader, std::string type, std::stri
 		glGetProgramiv(shader, GL_LINK_STATUS, &success);
 		if (!success)
 		{
-			std::cout << ShaderName << "\n::";
-
 			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-			std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << ShaderName << " :TYPE " << type << "\n INFO LOG: \n" << infoLog
-				<< "\n -- --------------------------------------------------- -- " << std::endl;
-			std::cin.get();
-			//throw "Shader compile error";
+			Log::PrintMultiLine("ERROR::PROGRAM_LINKING_ERROR of type: " + ShaderName + " :TYPE " + type + "\n INFO LOG: \n" + std::string(infoLog)
+				+ "\n -- --------------------------------------------------- -- ", Log::LogColor::Red, "[Error]: ");
+			throw "Shader compile error";
 		}
 	}
 }

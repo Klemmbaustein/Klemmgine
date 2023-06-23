@@ -11,6 +11,7 @@
 #include <World/Graphics.h>
 #include <GL/glew.h>
 #include <Engine/StringUtility.h>
+#include <Engine/EngineError.h>
 
 namespace _TextRenderer
 {
@@ -77,10 +78,7 @@ TextRenderer::TextRenderer(std::string filename, float CharacterSizeInPixels)
 	stbtt_bakedchar* cdata = new stbtt_bakedchar[96];
 	Uint8* ttfBuffer = (Uint8*)malloc(1 << 20);
 	Uint8* tmpBitmap = new Uint8[2048 * 2048];
-	if (ttfBuffer == NULL)
-	{
-		throw "EPIC MALLOC FAILURE";
-	}
+	ENGINE_ASSERT(ttfBuffer != nullptr, "The allocated buffer should never be null");
 	this->CharacterSizeInPixels = CharacterSizeInPixels;
 #if RELEASE
 	Filename = "Assets/" + filename;
@@ -317,10 +315,8 @@ void TextRenderer::Reinit()
 	stbtt_bakedchar* cdata = new stbtt_bakedchar[96];
 	Uint8* ttfBuffer = (Uint8*)malloc(1 << 20);
 	Uint8* tmpBitmap = new Uint8[2048 * 2048];
-	if (ttfBuffer == NULL)
-	{
-		throw "EPIC MALLOC FAILURE";
-	}
+	ENGINE_ASSERT(ttfBuffer != nullptr, "The allocated buffer should never be null.");
+
 	fread(ttfBuffer, 1, 1 << 20, fopen(Filename.c_str(), "rb"));
 	stbtt_BakeFontBitmap(ttfBuffer, 0, CharacterSizeInPixels, tmpBitmap, 2048, 2048, 32, 96, cdata); // no guarantee this fits!
 	// can free ttf_buffer at this point
