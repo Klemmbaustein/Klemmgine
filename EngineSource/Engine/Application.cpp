@@ -67,7 +67,7 @@ namespace Application
 	bool ShouldClose = false;
 	bool WindowHasFocus()
 	{
-		return SDL_GetKeyboardFocus() == Window;
+		return SDL_GetKeyboardFocus() == Window || Stats::Time <= 1;
 	}
 	void Quit()
 	{
@@ -192,13 +192,13 @@ std::string GetConsoleInput()
 
 void DrawFramebuffer(FramebufferObject* Buffer)
 {
-	ENGINE_ASSERT(Buffer->FramebufferCamera != nullptr, "Camera of framebuffer is valid.");
+	if (!Buffer->FramebufferCamera) return;
 
 #if EDITOR
 
 	if (!Application::WindowHasFocus())
 	{
-		//return;
+		return;
 	}
 
 #endif

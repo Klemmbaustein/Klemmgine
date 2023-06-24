@@ -58,20 +58,14 @@ Material Material::LoadMaterialFile(std::string Name, bool IsTemplate)
 	if (Name.substr(0, 8) == "Content/" && !std::filesystem::exists(File))
 	{
 		File = Assets::GetAsset(Name.substr(8) + Ext);
-		if (!std::filesystem::exists(File))
-		{
-			File = Name + Ext;
-		}
 	}
-	else if (!std::filesystem::exists(File))
+	if (!std::filesystem::exists(File))
 	{
 		File = Name + Ext;
 	}
 	if (!std::filesystem::exists(File))
 	{
-
-		Log::Print("Material given by the mesh does not exist. Falling back to default phong material - " + Name + Ext, Vector3(1, 0.5, 0));
-		File = "EditorContent/Materials/EngineDefaultPhong.jsmat";
+		File = "../../EditorContent/Materials/EngineDefaultPhong.jsmat";
 #ifdef RELEASE
 		throw MaterialException("Model has invalid material assigned: \"" + Name + "\". Cannot fall back to default material");
 #endif

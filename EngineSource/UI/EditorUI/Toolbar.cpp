@@ -5,8 +5,11 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Scene.h>
 #include <thread>
+#include <atomic>
 #include <UI/EditorUI/Viewport.h>
 #include <Engine/Build/Build.h>
+#include <CSharp/CSharpInterop.h>
+#include <filesystem>
 
 #define MAX_CATEGORY_BUTTONS 16
 
@@ -100,6 +103,7 @@ void Toolbar::SetButtonVisibility(std::string Name, bool IsVisible)
 	}
 }
 
+
 Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.8, 0.22), Vector2(2, 0.45))
 {
 	ToolbarInstance = this;
@@ -119,8 +123,21 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 			
 			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[20], []() { Viewport::ViewportInstance->OpenTab(6, "Settings.setting"); }),
 			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { new std::thread(Build::TryBuildProject, "Build/"); })
-
 		}));
+
+#ifdef ENGINE_CSHARP
+	RegisterNewButtonCategory(ButtonCategory("C#",
+		{
+			ButtonCategory::Button("Reload C#", Editor::CurrentUI->Textures[12], []() 
+				{ new std::thread(EditorUI::RebuildAndHotReload); }),
+			ButtonCategory::Button("Run", Editor::CurrentUI->Textures[21], []()
+				{
+					new std::thread([]() {
+						EditorUI::LaunchInEditor();
+					});
+				})
+		}));
+#endif
 
 	GenerateButtons();
 }

@@ -9,6 +9,7 @@ public static class Delegates
 	public delegate void VoidFloatInDelegate(float In);
 	public delegate void VoidInt32InDelegate(Int32 In);
 
+	public delegate void LoadAssemblyDelegate(string AsmPath, bool InEditor);
 	public delegate void LoadFunctionDelegate(IntPtr LoadedFunction);
 	public delegate void LoadNativeFunctionDelegate(string Name, IntPtr FunctionPtr);
 	public delegate Int32 InstantiateDelegate(string obj, EngineTransform t, IntPtr NativeObject);

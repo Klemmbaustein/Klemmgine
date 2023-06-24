@@ -3,6 +3,7 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Tabs/EditorTab.h>
 #include <UI/EditorUI/Toolbar.h>
+#include <Engine/Log.h>
 
 class PreferenceTab : public EditorTab
 {
@@ -21,6 +22,8 @@ class PreferenceTab : public EditorTab
 
 		std::vector<Setting> Settings;
 	};
+
+	std::vector<UIBox*> LoadedSettingElements;
 
 	size_t SelectedSetting = 0;
 	TextRenderer* Renderer;
@@ -46,9 +49,26 @@ class PreferenceTab : public EditorTab
 			SettingsCategory::Setting("Toolbar:Show Build Button", Type::E_BOOL, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Build", std::stoi(NewValue));
+			}),
+#ifdef ENGINE_CSHARP
+			SettingsCategory::Setting("Toolbar:Show run button", Type::E_BOOL, "1", [](std::string NewValue)
+			{
+				Toolbar::ToolbarInstance->SetButtonVisibility("Run", std::stoi(NewValue));
 			})
+#endif
 			}
 		),
+#ifdef ENGINE_CSHARP
+		SettingsCategory("Klemmgine.NET",
+			{
+				SettingsCategory::Setting("Run from editor:Launch arguments", Type::E_STRING, "-neverhideconsole", [](std::string NewValue)
+				{
+					EditorUI::LaunchInEditorArgs = NewValue;
+				})
+			}
+		),
+
+#endif
 	};
 
 	void GenerateUI();

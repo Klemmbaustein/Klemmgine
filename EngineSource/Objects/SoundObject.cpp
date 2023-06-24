@@ -14,7 +14,7 @@ void SoundObject::Begin()
 #if EDITOR
 	auto EditorBillboard = new BillboardComponent();
 	Attach(EditorBillboard);
-	EditorBillboard->Load("EditorContent/Images/Sound.png");
+	EditorBillboard->Load("Sound.png");
 	ModelGenerator::ModelData m;
 	m.AddElement().MakeCube(2, 0);
 

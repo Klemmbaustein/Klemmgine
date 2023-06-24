@@ -73,7 +73,7 @@ ObjectDescription WorldObject::GetObjectDescription()
 
 void WorldObject::TickComponents()
 {
-	for (int i = 0; i < Components.size(); i++)
+	for (size_t i = 0; i < Components.size(); i++)
 	{
 		Components.at(i)->Tick();
 	}

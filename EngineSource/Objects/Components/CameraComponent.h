@@ -10,8 +10,6 @@ public:
 	virtual void Tick() override;
 	virtual void Destroy() override;
 
-	void SetTransform(Transform NewTransform);
-	Transform& GetTransform();
 	void SetFOV(float FOV);
 	CameraComponent();
 
@@ -19,5 +17,4 @@ public:
 	void Use();
 protected:
 	Camera ComponentCamera = Camera(2, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
-	Transform RelativeTransform;
 };

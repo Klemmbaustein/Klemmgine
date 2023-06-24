@@ -9,13 +9,19 @@
 #include <Engine/EngineError.h>
 #include <Engine/Log.h>
 #include <World/Stats.h>
+#include <Objects/CSharpObject.h>
 
 #include <Utility/DotNet/nethost.h>
 #include <Utility/DotNet/coreclr_delegates.h>
 #include <Utility/DotNet/hostfxr.h>
 
 #define CSHARP_LIBRARY_NAME "CSharpCore"
+
+#if !RELEASE
 #define CSHARP_LIBRARY_PATH STR("../../CSharpCore/Build/CSharpCore")
+#else
+#define CSHARP_LIBRARY_PATH STR("CSharp/Core/CSharpCore")
+#endif
 
 #ifdef _WIN32
 #define NOMINMAX
@@ -121,7 +127,21 @@ namespace CSharp
 		// Pre-allocate a large buffer for the path to hostfxr
 		char_t buffer[MAX_PATH];
 		size_t buffer_size = sizeof(buffer) / sizeof(char_t);
+		std::wstring Path = std::filesystem::current_path().wstring() + L"/CSharp";
+		std::wstring NetPath = Path + L"/NetRuntime";
+
+#if RELEASE
+		get_hostfxr_parameters parameters = 
+		{
+			sizeof(hostfxr_initialize_parameters),
+			nullptr,
+			string_t(NetPath.begin(), NetPath.end()).c_str()
+		};
+
+		int rc = get_hostfxr_path(buffer, &buffer_size, &parameters);
+#else
 		int rc = get_hostfxr_path(buffer, &buffer_size, nullptr);
+#endif
 		if (rc != 0)
 			return false;
 
@@ -139,7 +159,22 @@ namespace CSharp
 	{
 		// Load .NET Core
 		void* load_assembly_and_get_function_pointer = nullptr;
+
+#if RELEASE
+		std::wstring Path = std::filesystem::current_path().wstring() + L"/CSharp";
+		std::wstring NetPath = Path + L"/NetRuntime";
+
+		hostfxr_initialize_parameters parameters = 
+		{
+			sizeof(hostfxr_initialize_parameters),
+			string_t(Path.begin(), Path.end()).c_str(),
+			string_t(NetPath.begin(), NetPath.end()).c_str()
+		};
+
+		int rc = init_fptr(config_path, &parameters, &cxt);
+#else
 		int rc = init_fptr(config_path, nullptr, &cxt);
+#endif
 		if (rc != 0 || cxt == nullptr)
 		{
 			Log::Print("Init failed: ");
@@ -240,6 +275,16 @@ void CSharp::SetObjectVectorField(CSharpWorldObject Obj, std::string Field, Vect
 	return CSharp::StaticCall<void, int32_t, const char*, Vector3>(SetPosFunction, Obj.ID, Field.c_str(), Value);
 }
 
+void CSharp::ReloadCSharpAssembly()
+{
+	LoadAssembly();
+	NativeFunctions::RegisterNativeFunctions();
+	for (auto i : Objects::GetAllObjectsWithID(CSharpObject::GetID()))
+	{
+		dynamic_cast<CSharpObject*>(i)->Reload();
+	}
+}
+
 void CSharp::LoadRuntime()
 {
 	CSharpLog("Loading .net runtime...", CS_Log_Runtime);
@@ -297,8 +342,13 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 
 void CSharp::LoadAssembly()
 {
-	StaticCall<void, const char*>(LoadCSharpFunction("LoadAssembly", "Engine", "VoidStringInDelegate"),
-		(std::filesystem::current_path().string() + "/CSharp/Build/CSharpAssembly.dll").c_str());
+#if !RELEASE
+	StaticCall<void, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
+		(std::filesystem::current_path().string() + "/CSharp/Build/CSharpAssembly.dll").c_str(), IsInEditor);
+#else
+	StaticCall<void, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
+		(std::filesystem::current_path().string() + "/CSharp/CSharpAssembly.dll").c_str(), IsInEditor);
+#endif
 }
 
 CSharp::CSharpWorldObject CSharp::InstantiateObject(std::string Typename, Transform t, WorldObject* NativeObject)

@@ -60,6 +60,7 @@ void PreferenceTab::GenerateUI()
 	LoadedSettings.clear();
 	size_t CurentCategory = 0;
 	size_t CurrentSettingIndex = 0;
+	LoadedSettingElements.clear();
 	for (auto& cat : Categories)
 	{
 		SettingsBox->AddChild(
@@ -89,6 +90,7 @@ void PreferenceTab::GenerateUI()
 void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value)
 {
 	Parent->AddChild((new UIText(0.7, UIColors[2], Name, Renderer))->SetPadding(0.01, 0.01, 0.05, 0.02));
+	UIBox* Element;
 	switch (SectionType)
 	{
 	case Type::E_FLOAT:
@@ -96,24 +98,33 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 	case Type::E_INT:
 		break;
 	case Type::E_STRING:
+		Element = (new UITextField(true, 0, UIColors[1], this, Index, Renderer))
+			->SetText(Value)
+			->SetMinSize(Vector2(0.8, 0.05))
+			->SetPadding(0.02, 0.02, 0.05, 0.02)
+			->SetBorder(UIBox::E_ROUNDED, 0.5);
+		Parent->AddChild(Element);
 		break;
 	case Type::E_VECTOR3:
 	case Type::E_VECTOR3_COLOR:
-		Parent->AddChild((new UIVectorField(0, Vector3::stov(Value), this, Index, Renderer))
+		Element = (new UIVectorField(0, Vector3::stov(Value), this, Index, Renderer))
 			->SetValueType(SectionType == Type::E_VECTOR3 ? UIVectorField::E_XYZ : UIVectorField::E_RGB)
-			->SetPadding(0.02, 0.02, 0.05, 0.02));
+			->SetPadding(0.02, 0.02, 0.05, 0.02);
+		Parent->AddChild(Element);
 		break;
 	case Type::E_BOOL:
-		Parent->AddChild((new UIButton(true, 0, 1, this, Index))
+		Element = (new UIButton(true, 0, 1, this, Index))
 			->SetUseTexture(std::stoi(Value), Editor::CurrentUI->Textures[16])
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
 			->SetMinSize(0.05)
 			->SetPadding(0.02, 0.02, 0.05, 0.02)
-			->SetBorder(UIBox::E_ROUNDED, 0.5));
+			->SetBorder(UIBox::E_ROUNDED, 0.5);
+		Parent->AddChild(Element);
 		break;
 	default:
 		break;
 	}
+	LoadedSettingElements.push_back(Element);
 }
 
 void PreferenceTab::OpenSettingsPage(std::string Name)
@@ -149,6 +160,10 @@ void PreferenceTab::OnButtonClicked(int Index)
 		{
 		case Type::E_BOOL:
 			Setting.Value = std::to_string(!std::stoi(Setting.Value));
+			break;
+		case Type::E_STRING:
+			Setting.Value = dynamic_cast<UITextField*>(LoadedSettingElements[Index])->GetText();
+			break;
 		default:
 			break;
 		}
@@ -167,7 +182,7 @@ PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : Editor
 
 void PreferenceTab::Load(std::string File)
 {
-	SaveGame Pref = SaveGame("EditorContent/Config/EditorPrefs", "pref", false);
+	SaveGame Pref = SaveGame("../../EditorContent/Config/EditorPrefs", "pref", false);
 	for (auto& cat : Preferences)
 	{
 		for (auto& i : cat.Settings)
@@ -193,7 +208,7 @@ void PreferenceTab::Load(std::string File)
 
 void PreferenceTab::Save()
 {
-	SaveGame Pref = SaveGame("EditorContent/Config/EditorPrefs", "pref", false);
+	SaveGame Pref = SaveGame("../../EditorContent/Config/EditorPrefs", "pref", false);
 	for (auto& cat : Preferences)
 	{
 		for (auto i : cat.Settings)

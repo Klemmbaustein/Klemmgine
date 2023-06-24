@@ -185,7 +185,7 @@ namespace CSM
 			glReadBuffer(GL_NONE);
 
 			int status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-			ENGINE_ASSERT(status != GL_FRAMEBUFFER_COMPLETE, "Framebuffer should be complete.");
+			ENGINE_ASSERT(status == GL_FRAMEBUFFER_COMPLETE, "Framebuffer should be complete.");
 
 			glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		}

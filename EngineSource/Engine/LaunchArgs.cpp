@@ -7,6 +7,7 @@
 #include <iostream>
 #include <Engine/Scene.h>
 #include <World/Graphics.h>
+#include <Engine/Application.h>
 
 namespace LaunchArgs
 {
@@ -18,7 +19,9 @@ namespace LaunchArgs
 
 	void LoadScene(std::vector<std::string> AdditionalArgs)
 	{
+		if (AdditionalArgs.size() != 1) Log::Print("Unexpected arguments in -loadscene", Vector3(1, 1, 0));
 		Scene::LoadNewScene(AdditionalArgs[0]);
+		Scene::Tick();
 	}
 
 	void NoVSync(std::vector<std::string> AdditionalArgs)
@@ -40,13 +43,20 @@ namespace LaunchArgs
 		exit(0);
 	}
 
-	std::map<std::string, void(*)(std::vector<std::string>)> Commands = 
+	void FullScreen(std::vector<std::string> AdditionalArgs)
+	{
+		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -fullscreen", Vector3(1, 1, 0));
+		Application::SetFullScreen(true);
+	}
+
+	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
 	{
 		std::pair("neverhideconsole", NeverHideConsole),
 		std::pair("loadscene", LoadScene),
 		std::pair("novsync", NoVSync),
 		std::pair("wireframe", Wireframe),
-		std::pair("version", GetVersion)
+		std::pair("version", GetVersion),
+		std::pair("fullscreen", FullScreen),
 	};
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments)
 	{
@@ -56,15 +66,11 @@ namespace LaunchArgs
 		{
 			if (arg[0] == '-')
 			{
-				if (CommandArguments.size())
+				if (!CurrentCommand.empty() && Commands.contains(CurrentCommand.substr(1)))
 				{
-					if (Commands.contains(CurrentCommand.substr(1)))
-					{
-						Commands[CurrentCommand.substr(1)](CommandArguments);
-					}
-					else Log::Print("Unknown Command: " + CurrentCommand[0]);
-					CommandArguments.clear();
+					Commands[CurrentCommand.substr(1)](CommandArguments);
 				}
+				CommandArguments.clear();
 				CurrentCommand = arg;
 			}
 			else if(!CurrentCommand.empty())
@@ -72,10 +78,9 @@ namespace LaunchArgs
 				CommandArguments.push_back(arg);
 			}
 		}
-		if (Commands.contains(CurrentCommand.substr(1)))
+		if (!CurrentCommand.empty() && Commands.contains(CurrentCommand.substr(1)))
 		{
 			Commands[CurrentCommand.substr(1)](CommandArguments);
 		}
-		else Log::Print("Unknown Command: " + CurrentCommand[0]);
 	}
 }

@@ -15,11 +15,15 @@ public:
 	void Tick() override;
 	void Destroy() override;
 
+	void Reload();
+
 	Transform CSharpTransform;
 
 	std::string CSharpClass;
 	std::string OldCSharpClass;
 
-	void OnPropertySet();
+	void OnPropertySet() override;
+	
+	void LoadClass(std::string ClassName);
 };
 #endif

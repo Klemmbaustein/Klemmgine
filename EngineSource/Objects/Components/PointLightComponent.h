@@ -9,8 +9,6 @@ public:
 	void Tick() override;
 	void Destroy() override;
 
-	void SetRelativeLocation(Vector3 NewLocation);
-	Vector3 GetRelativeLocation();
 
 	void SetColor(Vector3 NewColor);
 	Vector3 GetColor();
@@ -25,7 +23,6 @@ protected:
 	Graphics::Light CurrentLight;
 	Graphics::Light PreviousLight;
 
-	Vector3 RelativeTransform;
 	Transform PreviousTransform;
 
 	void Update();

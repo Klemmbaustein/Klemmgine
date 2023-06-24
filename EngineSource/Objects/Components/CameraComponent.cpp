@@ -33,15 +33,6 @@ void CameraComponent::Destroy()
 	}
 }
 
-void CameraComponent::SetTransform(Transform NewTransform)
-{
-	this->RelativeTransform = NewTransform;
-}
-
-Transform& CameraComponent::GetTransform()
-{
-	return RelativeTransform;
-}
 
 void CameraComponent::SetFOV(float FOV)
 {

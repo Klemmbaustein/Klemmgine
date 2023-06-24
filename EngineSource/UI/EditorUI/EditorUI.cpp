@@ -17,10 +17,12 @@
 #include <UI/EditorUI/ObjectList.h>
 #include <UI/EditorUI/ContextMenu.h>
 #include <GL/glew.h>
+#include <atomic>
 #include <Engine/Log.h>
 #include <Engine/Input.h>
 #include <UI/EditorUI/Popups/DialogBox.h>
 #include <Engine/Console.h>
+#include <CSharp/CSharpInterop.h>
 
 namespace Editor
 {
@@ -56,6 +58,7 @@ namespace Editor
 
 		return PrevColor;
 	}
+	std::atomic<bool> CanHotreload = false;
 }
 
 namespace UI
@@ -64,10 +67,31 @@ namespace UI
 }
 
 bool ChangedScene = false;
-// Experimental
-#define UI_LIGHT_MODE 0
 
 
+#ifdef ENGINE_CSHARP
+std::string EditorUI::LaunchInEditorArgs;
+
+void EditorUI::LaunchInEditor()
+{
+	if (std::filesystem::last_write_time("../../x64/Debug/" + Build::GetProjectBuildName() + ".exe") < std::filesystem::last_write_time("Code"))
+	{
+		Log::Print("Detected changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
+		Build::BuildCurrentSolution("Debug");
+	}
+	if (std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < std::filesystem::last_write_time("Scripts"))
+	{
+		RebuildAndHotReload();
+	}
+	system(("..\\..\\x64\\Debug\\TestProject.exe " + LaunchInEditorArgs).c_str());
+}
+void EditorUI::RebuildAndHotReload()
+{
+	Log::Print("Rebuilding C# assembly...", Log::LogColor::Green);
+	system("cd Scripts && dotnet build");
+	Editor::CanHotreload = true;
+}
+#endif
 
 void EditorUI::SaveCurrentScene()
 {
@@ -169,19 +193,6 @@ EditorUI::EditorUI()
 {
 	Editor::CurrentUI = this;
 
-	if (UI_LIGHT_MODE)
-	{
-		size_t it = 0;
-		for (auto i : {
-			Vector3(0.7, 0.7, 0.725),	//Default background
-			Vector3(0.5f),			//Dark background
-			Vector3(0)			//Highlight color};
-			})
-		{
-			UIColors[it++] = i;
-		}
-	}
-
 	GenUITextures();
 
 	Cursors[0] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
@@ -206,6 +217,10 @@ EditorUI::EditorUI()
 
 	Console::RegisterCommand(Console::Command("build", []() {new std::thread(Build::TryBuildProject, "Build/"); }, {}));
 	Console::RegisterCommand(Console::Command("save", EditorUI::SaveCurrentScene, {}));
+#ifdef ENGINE_CSHARP
+	Console::RegisterCommand(Console::Command("reload", EditorUI::RebuildAndHotReload, {}));
+	Console::RegisterCommand(Console::Command("run", EditorUI::LaunchInEditor, {}));
+#endif
 }
 
 void(*QuitFunction)();
@@ -233,6 +248,15 @@ void EditorUI::OnLeave(void(*ReturnF)())
 
 void EditorUI::Tick()
 {
+#ifdef ENGINE_CSHARP
+	if (Editor::CanHotreload == true)
+	{
+		Log::Print("Finished building assembly. Hotreloading .dll file...", Log::LogColor::Yellow);
+		CSharp::ReloadCSharpAssembly();
+		Editor::CanHotreload = false;
+	}
+#endif
+
 	Editor::HoveringPopup = Editor::PrevHoveringPopup;
 	Editor::PrevHoveringPopup = false;
 	Editor::DraggingPopup = false;
@@ -330,30 +354,31 @@ std::string EditorUI::ToShortString(float val)
 
 void EditorUI::GenUITextures()
 {
-	const int ImageSize = 21;
+	const int ImageSize = 22;
 	std::string Images[ImageSize]
-	{												//Texture Indices
-		"EditorContent/Images/CPPClass.png",		//00 -> C++ class icon
-		"EditorContent/Images/Wireframe.png",		//01 -> Symbol for button to toggle wireframe
-		"EditorContent/Images/Save.png",			//02 -> Save Button
-		"EditorContent/Images/Build.png",			//03 -> Package button
-		"EditorContent/Images/X.png",				//04 -> X Symbol
-		"EditorContent/Images/Folder.png",			//05 -> Folder symbol for item browser
-		"EditorContent/Images/Sound.png",			//06 -> Sound symbol for item browser
-		"EditorContent/Images/Scene.png",			//07 -> Scene symbol for item browser
-		"EditorContent/Images/ExitFolder.png",		//08 -> Icon used to navigate back one folder
-		"EditorContent/Images/Material.png",		//09 -> Material symbol for item browser
-		"EditorContent/Images/MaterialTemplate.png",//10 -> Material Template symbol for item browser
-		"EditorContent/Images/Model.png",			//11 -> Model symbol for item browser
-		"EditorContent/Images/Reload.png",			//12 -> Reload symbol
-		"EditorContent/Images/ExpandedArrow.png",	//13 -> Expanded arrow
-		"EditorContent/Images/CollapsedArrow.png",	//14 -> Collapsed arrow
-		"EditorContent/Images/Preferences.png",		//15 -> Collapsed arrow
-		"EditorContent/Images/Checkbox.png",		//16 -> Checked checkbox
-		"EditorContent/Images/Cubemap.png",			//17 -> Cubemap icon
-		"EditorContent/Images/Texture.png",			//18 -> Texture icon
-		"EditorContent/Images/Particle.png",		//19 -> Particle icon
-		"EditorContent/Images/Settings.png",		//20 -> Settings icon
+	{								//Texture Indices
+		"CPPClass.png",				//00 -> C++ class icon
+		"Wireframe.png",			//01 -> Symbol for button to toggle wireframe
+		"Save.png",					//02 -> Save Button
+		"Build.png",				//03 -> Package button
+		"X.png",					//04 -> X Symbol
+		"Folder.png",				//05 -> Folder symbol for item browser
+		"Sound.png",				//06 -> Sound symbol for item browser
+		"Scene.png",				//07 -> Scene symbol for item browser
+		"ExitFolder.png",			//08 -> Icon used to navigate back one folder
+		"Material.png",				//09 -> Material symbol for item browser
+		"MaterialTemplate.png",		//10 -> Material Template symbol for item browser
+		"Model.png",				//11 -> Model symbol for item browser
+		"Reload.png",				//12 -> Reload symbol
+		"ExpandedArrow.png",		//13 -> Expanded arrow
+		"CollapsedArrow.png",		//14 -> Collapsed arrow
+		"Preferences.png",			//15 -> Collapsed arrow
+		"Checkbox.png",				//16 -> Checked checkbox
+		"Cubemap.png",				//17 -> Cubemap icon
+		"Texture.png",				//18 -> Texture icon
+		"Particle.png",				//19 -> Particle icon
+		"Settings.png",				//20 -> Settings icon
+		"Play.png"					//21 -> Play icon
 	};
 
 	for (int i = 0; i < Textures.size(); i++)
@@ -366,7 +391,7 @@ void EditorUI::GenUITextures()
 		int TextureHeigth = 0;
 		int BitsPerPixel = 0;
 		stbi_set_flip_vertically_on_load(true);
-		auto TextureBuffer = stbi_load(Images[i].c_str(), &TextureWidth, &TextureHeigth, &BitsPerPixel, 4);
+		auto TextureBuffer = stbi_load(("../../EditorContent/Images/" + Images[i]).c_str(), &TextureWidth, &TextureHeigth, &BitsPerPixel, 4);
 
 
 		GLuint TextureID;

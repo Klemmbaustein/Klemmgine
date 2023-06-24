@@ -31,5 +31,9 @@ public static class CoreNativeFunction
 
 		return NewDel.DynamicInvoke(Args);
 	}
+	public static void UnloadNativeFunctions()
+	{
+		LoadedNativeFunctions.Clear();
+	}
 
 }

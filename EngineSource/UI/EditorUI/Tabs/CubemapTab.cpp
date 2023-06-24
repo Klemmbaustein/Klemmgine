@@ -156,7 +156,7 @@ void CubemapTab::UpdatePreviewModel()
 	elem.Sphereize(150);
 	elem.GenerateNormals();
 	m.TwoSided = false;
-	elem.ElemMaterial = "EditorContent/Materials/Reflective";
+	elem.ElemMaterial = "../../EditorContent/Materials/Reflective";
 	PreviewModel = new Model(m);
 	PreviewBuffer->ClearContent();
 	PreviewBuffer->UseWith(PreviewModel);

@@ -23,9 +23,6 @@ public:
 		return MeshModel;
 	}
 	ModelGenerator::ModelData GetModelData();
-	void SetRelativeTransform(Transform NewRelativeTransform);
-	Transform& GetRelativeTransform();
-
 	void SetVisibility(bool NewVisibility);
 
 
@@ -33,5 +30,4 @@ public:
 	void UpdateTransform();
 protected:
 	Model* MeshModel = nullptr;
-	Transform RelativeTransform;
 };

@@ -8,7 +8,6 @@ class CollisionComponent : public Component
 public:
 	Collision::HitResponse OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore = {});
 	CollisionComponent() {}
-	Transform RelativeTransform;
 	virtual void Destroy() override;
 	void Tick() override;
 	void Init(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Transform RelativeTransform = Transform());

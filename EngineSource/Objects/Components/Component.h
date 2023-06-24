@@ -14,6 +14,9 @@ public:
 	virtual void Destroy();
 	WorldObject* GetParent();
 	friend class ComponentModifier;
+
+	Transform RelativeTransform;
+
 private:
 	WorldObject* Parent = nullptr;
 };

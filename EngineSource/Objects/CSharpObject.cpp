@@ -37,21 +37,32 @@ void CSharpObject::Destroy()
 	CSharp::DestroyObject(CS_Obj);
 }
 
+void CSharpObject::Reload()
+{
+	OldCSharpClass = CSharpClass;
+	if (CS_Obj.ID)
+	{
+		CSharp::DestroyObject(CS_Obj);
+	}
+	CS_Obj = CSharp::InstantiateObject(CSharpClass, GetTransform(), this);
+	if (CS_Obj.ID)
+	{
+		CSharp::ExectuteFunctionOnObject(CS_Obj, "Begin");
+	}
+}
+
 void CSharpObject::OnPropertySet()
 {
 	if (OldCSharpClass != CSharpClass)
 	{
-		OldCSharpClass = CSharpClass;
-		if (CS_Obj.ID)
-		{
-			CSharp::DestroyObject(CS_Obj);
-		}
-		CS_Obj = CSharp::InstantiateObject(CSharpClass, GetTransform(), this);
-		if (CS_Obj.ID)
-		{
-			CSharp::ExectuteFunctionOnObject(CS_Obj, "Begin");
-		}
+		Reload();
 	}
+}
+
+void CSharpObject::LoadClass(std::string ClassName)
+{
+	CSharpClass = ClassName;
+	Reload();
 }
 
 #endif

@@ -10,7 +10,7 @@ void PointLightComponent::Tick()
 {
 	if (CurrentLight != PreviousLight || PreviousTransform != GetParent()->GetTransform())
 	{
-		CurrentLight.Position = Vector3::TranslateVector(RelativeTransform, GetParent()->GetTransform());
+		CurrentLight.Position = Vector3::TranslateVector(RelativeTransform.Location, GetParent()->GetTransform());
 		Update();
 		PreviousTransform = GetParent()->GetTransform();
 	}
@@ -21,16 +21,6 @@ void PointLightComponent::Destroy()
 	Graphics::Lights.erase(Graphics::Lights.begin() + GetLightIndex());
 }
 
-void PointLightComponent::SetRelativeLocation(Vector3 NewLocation)
-{
-	RelativeTransform = NewLocation;
-	CurrentLight.Position = Vector3::TranslateVector(NewLocation, GetParent()->GetTransform());
-}
-
-Vector3 PointLightComponent::GetRelativeLocation()
-{
-	return RelativeTransform;
-}
 
 void PointLightComponent::SetColor(Vector3 NewColor)
 {

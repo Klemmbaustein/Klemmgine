@@ -71,6 +71,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
 			std::filesystem::copy("OpenAL32.dll", TargetFolder + "OpenAL32.dll");
+			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
 
 			Debugging::EngineStatus = "Build: Creating folders";
 			Log::Print("[Build]: Creating folders");
@@ -89,40 +90,35 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			Debugging::EngineStatus = "Building C++ solution";
 #if _WIN32
 
-			std::string VSInstallPath = GetVSLocation() + "\\Common7\\IDE\\devenv.exe";
-			std::string SolutionName;
-			for (auto& i : std::filesystem::directory_iterator("."))
+			int CompileResult = BuildCurrentSolution("Release");
+			if (!CompileResult)
 			{
-				std::string SolutionString = i.path().string();
-				if (SolutionString.substr(SolutionString.find_last_of(".")) == ".sln")
-				{
-					SolutionName = FileUtil::GetFileNameWithoutExtensionFromPath(SolutionString);
-				}
-			}
-			if (SolutionName.empty())
-			{
-				Log::Print("[Build]: Build system is 'msvc' but there is no .sln file in the main folder", Vector3(1, 0, 0));
-				return "There is no MSBuild";
-			}
-			Log::Print("[Build]: Found .sln file: " + SolutionName, Vector3(0.5, 1, 0.5));
-
-			std::string Command = "\"" + VSInstallPath + "\" " + std::string(SolutionName) + ".sln /Build Release";
-
-			Log::Print("[Build]: Running command: " + Command + " (This can take a while)", Vector3(0.5));
-			int CompileResult = system(Command.c_str());
-			if(!CompileResult)
-			{
-				std::filesystem::copy("x64/Release/" + SolutionName + ".exe", TargetFolder + ProjectName + std::string(".exe"));
+				std::filesystem::copy("x64/Release/" + GetProjectBuildName() + ".exe", TargetFolder + ProjectName + std::string(".exe"));
 			}
 			else
 			{
 				Log::Print("[Build]: Failure: MSBuild returned " + std::to_string(CompileResult), Vector3(1, 0, 0));
-				return "MSBuild Failure";
+				return "";
 			}
 #else
 			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
 			Log::Print("Pleasse recompile the program manually with the RELASE preprocessor definition (Release config).", Vector3(1, 0, 0));
 #endif
+#if ENGINE_CSHARP
+
+			Log::Print("[Build]: Building C# core...");
+			system("cd ../../CSharpCore && dotnet publish -r win-x64 --self-contained false");
+
+			std::filesystem::create_directories(TargetFolder + "/CSharp/Core");
+			std::filesystem::copy("../../CSharpCore/Build/win-x64/publish", TargetFolder + "/CSharp/Core");
+			Log::Print("[Build]: Building game C# assembly...");
+			system("cd Scripts && dotnet publish -r win-x64 --self-contained false");
+
+			std::filesystem::copy("CSharp/Build/win-x64/publish", TargetFolder + "/CSharp");
+			std::filesystem::copy("../../CSharpCore/NetRuntime", TargetFolder + "/CSharp/NetRuntime", copyOptions);
+
+#endif
+
 			Log::Print("[Build]: Complete", Vector3(0, 1, 0));
 			return "Sucess";
 		}
@@ -135,5 +131,43 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 		Log::Print(std::string("Build: Failure: Exception thrown: ") + e.what(), Vector3(1, 0, 0));
 		return "Error";
 	}
+}
+int Build::BuildCurrentSolution(std::string Configuration)
+{
+	std::string VSInstallPath = GetVSLocation() + "\\Common7\\IDE\\devenv.exe";
+	std::string SolutionName;
+	for (auto& i : std::filesystem::directory_iterator("."))
+	{
+		std::string SolutionString = i.path().string();
+		if (SolutionString.substr(SolutionString.find_last_of(".")) == ".sln")
+		{
+			SolutionName = FileUtil::GetFileNameWithoutExtensionFromPath(SolutionString);
+		}
+	}
+	if (SolutionName.empty())
+	{
+		Log::Print("[Build]: Build system is 'msvc' but there is no .sln file in the main folder", Vector3(1, 0, 0));
+		return 1;
+	}
+	Log::Print("[Build]: Found .sln file: " + SolutionName, Vector3(0.5, 1, 0.5));
+
+	std::string Command = "\"" + VSInstallPath + "\" " + std::string(SolutionName) + ".sln /Build " + Configuration;
+
+	Log::Print("[Build]: Running command: " + Command + " (This can take a while)", Vector3(0.5));
+	return system(Command.c_str());
+
+}
+std::string Build::GetProjectBuildName()
+{
+	std::string ProjectName;
+	for (auto& i : std::filesystem::directory_iterator("."))
+	{
+		std::string SolutionString = i.path().string();
+		if (SolutionString.substr(SolutionString.find_last_of(".")) == ".sln")
+		{
+			ProjectName = FileUtil::GetFileNameWithoutExtensionFromPath(SolutionString);
+		}
+	}
+	return ProjectName;
 }
 #endif

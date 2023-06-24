@@ -74,6 +74,11 @@ namespace Editor
 class EditorUI : public UICanvas
 {
 public:
+#if ENGINE_CSHARP
+	static void LaunchInEditor();
+	static void RebuildAndHotReload();
+	static std::string LaunchInEditorArgs;
+#endif
 	static void SaveCurrentScene();
 	static void OpenScene(std::string NewScene);
 	static bool GetUseLightMode();

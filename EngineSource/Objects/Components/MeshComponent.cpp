@@ -70,16 +70,6 @@ ModelGenerator::ModelData MeshComponent::GetModelData()
 	return MeshModel->ModelMeshData;
 }
 
-void MeshComponent::SetRelativeTransform(Transform NewRelativeTransform)
-{
-	if(GetParent())
-	RelativeTransform = NewRelativeTransform;
-}
-
-Transform& MeshComponent::GetRelativeTransform()
-{
-	return RelativeTransform;
-}
 
 void MeshComponent::SetVisibility(bool NewVisibility)
 {

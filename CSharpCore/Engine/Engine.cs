@@ -51,12 +51,26 @@ internal static class Engine
 	static Dictionary<Int32, Object> WorldObjects = new Dictionary<Int32, Object>();
 	static List<Type> WorldObjectTypes = new List<Type>();
 
-	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path)
+	public static object GetObjectFromID(Int32 Id)
 	{
+		if (WorldObjects.ContainsKey(Id))
+		{
+			return WorldObjects[Id];
+		}
+		return null;
+	}
+	
+	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path, bool InEditor)
+	{
+		WorldObjectTypes.Clear();
+		CoreNativeFunction.UnloadNativeFunctions();
 		EngineLog.Print("Loading C# assembly...");
+
 		LoadedAsm = Assembly.Load(File.ReadAllBytes(Path));
 
 		LoadTypeFromAssembly("Log").GetMethod("LoadLogFunction").Invoke(null, new Delegate[] { EngineLog.Print });
+		
+		LoadTypeFromAssembly("WorldObject").GetMethod("LoadGetObjectFunction").Invoke(null, new object[] { GetObjectFromID });
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{
@@ -67,6 +81,7 @@ internal static class Engine
 		}
 
 		StatsObject = LoadTypeFromAssembly("Stats");
+		StatsObject.GetField("InEditor").SetValue(null, InEditor);
 	}
 
 	public static Int32 Instantiate(string obj, EngineTransform t, IntPtr NativeObject)
@@ -106,7 +121,7 @@ internal static class Engine
 			return;
 		}
 
-		ExecuteFunctionOnObject(ID, "DestroyObj");
+		ExecuteFunctionOnObject(ID, "DestroyObjectInternal");
 		WorldObjects.Remove(ID);
 	}
 

@@ -23,7 +23,7 @@ DebugUI::DebugUI()
 
 	for (auto& i : DebugTexts)
 	{
-		i = new UIText(1, Vector3(1, 1, 0), "TEXT", Text);
+		i = new UIText(1, Vector3(1, 1, 0), "", Text);
 		i->SetPadding(-0.005);
 		DebugTextBackground->AddChild(i);
 	}
