@@ -27,3 +27,4 @@ CSharpCore/obj
 CSharpCore/Build
 *.lastcodeanalysissucceeded
 CSharpCore/NetRuntime
+/EngineRelease

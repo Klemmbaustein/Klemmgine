@@ -19,7 +19,13 @@ std::string SafeGet(std::string Value, std::map<std::string, std::string>& Sourc
 	throw Exception("Value " + Value + " is not defined", "Error while trying to access 'path.txt'");
 }
 
-void sln::GenerateSolution(std::string path, std::string name, std::map<std::string, std::string> Values, std::vector<std::string> Files, std::string SourceCodeDir)
+void Replace(std::string& str, std::string from, std::string to)
+{
+	auto FilesRegex = std::regex(from);
+	str = std::regex_replace(str, FilesRegex, to);
+}
+
+void sln::GenerateSolution(std::string path, std::string name, std::map<std::string, std::string> Values, std::vector<std::string> Files, bool WithCSharp, std::string SourceCodeDir)
 { 
 	Log::Print("sln: Started writing " + name + ".sln");
 	std::vector<std::string> IncludeDirs = { "../EngineSource" };
@@ -39,7 +45,11 @@ void sln::GenerateSolution(std::string path, std::string name, std::map<std::str
 	LibraryDirs.push_back(SafeGet("glew_lib", Values));
 	LibraryDirs.push_back(SafeGet("assimp_lib", Values));
 	LibraryDirs.push_back(SafeGet("al_lib", Values));
-	GenerateVCProj(path, name, Files, IncludeDirs, LibraryDirs, SourceCodeDir, Util::GetAllFilesInFolder(path + "Shaders"));
+	if (WithCSharp)
+	{
+		LibraryDirs.push_back(std::filesystem::absolute("../CSharpCore/lib").string());
+	}
+	GenerateVCProj(path, name, Files, IncludeDirs, LibraryDirs, SourceCodeDir, Util::GetAllFilesInFolder(path + "Shaders"), WithCSharp);
 	std::vector<FilteredItem> FilteredFiles;
 	for (auto i : Files)
 	{
@@ -67,9 +77,21 @@ void sln::GenerateSolution(std::string path, std::string name, std::map<std::str
 	std::string ProjectFiles;
 	std::string TemplateFile = buf.str();
 
-	std::regex FilesRegex = std::regex("\\$NAME");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, name);
+	Replace(TemplateFile, "\\$NAME", name);
+	if (WithCSharp && SourceCodeDir != "../EngineSource/")
+	{
+		Replace(TemplateFile, "\\$CSHARP_PROJ", "Project(\"{9A19103F-16F7-4668-BE54-9A1E7A4F7556}\") = \"CSharpAssembly\", \"Scripts/CSharpAssembly.csproj\", \"{6250B51D-EB42-443E-A7E5-9EA178D109A2}\"\n\
+EndProject");
+		Replace(TemplateFile, "\\$CSHARP_DEP", "	ProjectSection(ProjectDependencies) = postProject\n\
+		{6250B51D-EB42-443E-A7E5-9EA178D109A2} = {6250B51D-EB42-443E-A7E5-9EA178D109A2}\n\
+	EndProjectSection");
 
+	}
+	else
+	{
+		Replace(TemplateFile, "\\$CSHARP_PROJ", "");
+		Replace(TemplateFile, "\\$CSHARP_DEP", "");
+	}
 	std::ofstream Out = std::ofstream(path + name + ".sln");
 	Out << TemplateFile;
 	Out.close();
@@ -81,7 +103,8 @@ void sln::GenerateSolution(std::string path, std::string name, std::map<std::str
 }
 
 void sln::GenerateVCProj(std::string path, std::string name,
-	std::vector<std::string> IncludedFiles, std::vector<std::string> IncludeDirs, std::vector<std::string> LibDirs, std::string SourceCodeDir, std::vector<std::string> Shaders)
+	std::vector<std::string> IncludedFiles, std::vector<std::string> IncludeDirs,
+	std::vector<std::string> LibDirs, std::string SourceCodeDir, std::vector<std::string> Shaders, bool WithCSharp)
 {
 	std::ifstream in = std::ifstream("../Tools/ProjectGenerator/Templates/vcxproj", std::ios::in);
 	std::stringstream buf; buf << in.rdbuf();
@@ -121,53 +144,44 @@ void sln::GenerateVCProj(std::string path, std::string name,
 		}
 	}
 
-	for (auto i : Shaders)
+	for (auto& i : Shaders)
 	{
 		ProjectShaders.append("<None Include = \"" + std::filesystem::absolute(path + "Shaders" + i).string() + "\" />\n");
 	}
 
-	std::regex FilesRegex = std::regex("\\$FILES");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, ProjectFiles);
-
-	FilesRegex = std::regex("\\$INCLUDES");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, ProjectHeaders);
-
-	FilesRegex = std::regex("\\$NAME");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, name);
-	FilesRegex = std::regex("\\$TYPE");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, IsStaticLibrary ? "StaticLibrary" : "Application");
-	FilesRegex = std::regex("\\$SHADERS");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, ProjectShaders);
+	Replace(TemplateFile, "\\$FILES", ProjectFiles);
+	Replace(TemplateFile, "\\$INCLUDES", ProjectHeaders);
+	Replace(TemplateFile, "\\$NAME", name);
+	Replace(TemplateFile, "\\$TYPE", IsStaticLibrary ? "StaticLibrary" : "Application");
+	Replace(TemplateFile, "\\$SHADERS", ProjectShaders);
 	std::string IncludeDirsString;
 	for (auto& i : IncludeDirs)
 	{
-		Log::Print(i, Log::E_WARNING);
 		IncludeDirsString.append(std::filesystem::absolute(i).string() + ";");
 	}
-	FilesRegex = std::regex("\\$INCLUDE_DIRS");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, IncludeDirsString);
+	Replace(TemplateFile, "\\$INCLUDE_DIRS", IncludeDirsString);
 	IncludeDirsString.clear();
 	for (auto& i : LibDirs)
 	{
 		IncludeDirsString.append(std::filesystem::absolute(i).string() + ";");
 	}
-	FilesRegex = std::regex("\\$LIBRARY_DIRS");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, IsStaticLibrary ? "" : IncludeDirsString);
-	FilesRegex = std::regex("\\$PREBUILDEVENT");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, IsStaticLibrary ? "" : "<PreBuildEvent>\n\
+
+	std::string  CSharpLib = WithCSharp ? "nethost.lib;" : "";
+
+	Replace(TemplateFile, "\\$CSHARP_PPDEF", WithCSharp ? "ENGINE_CSHARP;" : "");
+	Replace(TemplateFile, "\\$LIBRARY_DIRS", IsStaticLibrary ? "" : IncludeDirsString);
+	Replace(TemplateFile, "\\$PREBUILDEVENT", IsStaticLibrary ? "" : "<PreBuildEvent>\n\
 	<Command>FindObjects.bat</Command>\n\
 </PreBuildEvent>");
+
 	if (!IsStaticLibrary)
 	{
-		FilesRegex = std::regex("\\$LIBRARIES_RELEASE");
-		TemplateFile = std::regex_replace(TemplateFile, FilesRegex,
-			"assimp.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew32s.lib;Engine_Release.lib;");
-		FilesRegex = std::regex("\\$LIBRARIES_DEBUG");
-		TemplateFile = std::regex_replace(TemplateFile, FilesRegex,
-			"assimp.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew32s.lib;Engine_Debug.lib;");
-		FilesRegex = std::regex("\\$LIBRARIES_EDITOR");
-		TemplateFile = std::regex_replace(TemplateFile, FilesRegex,
-			"assimp.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew32s.lib;Engine_Editor.lib;");
+		Replace(TemplateFile, "\\$LIBRARIES_RELEASE",
+			"assimp.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew32s.lib;Engine_Release.lib;" + CSharpLib);
+		Replace(TemplateFile, "\\$LIBRARIES_DEBUG",
+			"assimp.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew32s.lib;Engine_Debug.lib;" + CSharpLib);
+		Replace(TemplateFile, "\\$LIBRARIES_EDITOR",
+			"assimp.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew32s.lib;Engine_Editor.lib;" + CSharpLib);
 	}
 	std::ofstream Out = std::ofstream(path + name + ".vcxproj");
 	Out << TemplateFile;
@@ -186,7 +200,6 @@ void sln::GenerateFilters(std::string path, std::string name, std::vector<Filter
 	std::string FiltersString;
 	std::string TemplateFile = buf.str();
 	std::set<std::string> Filters;
-	std::regex SlashRegex = std::regex("/");
 	Filters.insert("Code");
 	Filters.insert("Code\\Objects");
 	Filters.insert("Code\\UI");
@@ -195,7 +208,7 @@ void sln::GenerateFilters(std::string path, std::string name, std::vector<Filter
 
 	for (auto& i : Items)
 	{
-		i.Dir = std::regex_replace(i.Dir, SlashRegex, "\\");
+		Replace(i.Dir, "/", "\\");
 		Filters.insert(i.Dir);
 		if (i.Name.find(".") == std::string::npos)
 		{
@@ -233,29 +246,38 @@ void sln::GenerateFilters(std::string path, std::string name, std::vector<Filter
 		}
 	}
 
-	Filters.insert("Shaders");
+	if (std::filesystem::exists(path + "/Shaders"))
+	{
+		Filters.insert("Shaders");
+		for (auto& i : std::filesystem::directory_iterator(path + "\\Shaders"))
+		{
+			if (std::filesystem::is_directory(i))
+			{
+				Filters.insert("Shaders\\" + i.path().filename().string());
+			}
+		}
+		for (auto& i : Shaders)
+		{
+			std::string Dir = "Shaders" + i;
+			Dir = Dir.substr(0, Dir.find_last_of("/\\"));
+
+			Replace(Dir, "/", "\\");
+
+			ProjectShaders.append("    <None Include=\"" + std::filesystem::absolute(path + "Shaders" + i).string() + "\">\n\
+		<Filter>" + Dir + "</Filter>\n\
+	</None>\n");
+		}
+	}
 
 	for (auto& i : Filters)
 	{
 		FiltersString.append("    <Filter Include=\"" + i + "\">\n	</Filter>\n");
 	}
-	for (auto& i : Shaders)
-	{
-		ProjectShaders.append("    <None Include=\"" + std::filesystem::absolute(path + "Shaders" + i).string() + "\">\n\
-		<Filter>Shaders</Filter>\n\
-	</None>\n");
-	}
 
-
-
-	std::regex FilesRegex = std::regex("\\$FILES");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, ProjectFiles);
-	FilesRegex = std::regex("\\$FILTERS");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, FiltersString);
-	FilesRegex = std::regex("\\$INCLUDES");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, ProjectHeaders);
-	FilesRegex = std::regex("\\$SHADERS");
-	TemplateFile = std::regex_replace(TemplateFile, FilesRegex, ProjectShaders);
+	Replace(TemplateFile, "\\$FILES", ProjectFiles);
+	Replace(TemplateFile, "\\$FILTERS", FiltersString);
+	Replace(TemplateFile, "\\$INCLUDES", ProjectHeaders);
+	Replace(TemplateFile, "\\$SHADERS", ProjectShaders);
 	std::ofstream Out = std::ofstream(path + name + ".vcxproj.filters");
 	Out << TemplateFile;
 	Out.close();

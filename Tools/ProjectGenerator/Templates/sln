@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.2.32505.173
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "$NAME", "$NAME.vcxproj", "{53B4FA76-7692-4CBC-933A-275FB31CADB6}"
+$CSHARP_DEP
 EndProject
+$CSHARP_PROJ
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -17,4 +19,10 @@ Global
 		{53B4FA76-7692-4CBC-933A-275FB31CADB6}.Editor|x64.Build.0 = Editor|x64
 		{53B4FA76-7692-4CBC-933A-275FB31CADB6}.Release|x64.ActiveCfg = Release|x64
 		{53B4FA76-7692-4CBC-933A-275FB31CADB6}.Release|x64.Build.0 = Release|x64
+		{6250B51D-EB42-443E-A7E5-9EA178D109A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6250B51D-EB42-443E-A7E5-9EA178D109A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6250B51D-EB42-443E-A7E5-9EA178D109A2}.Editor|Any CPU.ActiveCfg = Debug|Any CPU
+		{6250B51D-EB42-443E-A7E5-9EA178D109A2}.Editor|Any CPU.Build.0 = Debug|Any CPU
+		{6250B51D-EB42-443E-A7E5-9EA178D109A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6250B51D-EB42-443E-A7E5-9EA178D109A2}.Release|Any CPU.Build.0 = Release|Any CPU
 EndGlobal

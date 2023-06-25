@@ -91,7 +91,9 @@ int CreateProject(std::string ProjectName, bool WithTemplate)
 	catch (std::exception& e)
 	{
 		Log::Print("Error while copying files: " + std::string(e.what()), Log::E_ERROR);
-		throw "Copy failed";
+		Background::BackgroundTask = "Creating Project... (COPY ERROR)";
+		Background::BackgroundProgress = 1.0;
+		return 1;
 	}
 	Background::BackgroundProgress = 0.2;
 	std::string compiler = "1";
@@ -129,7 +131,7 @@ int CreateProject(std::string ProjectName, bool WithTemplate)
 			Background::BackgroundTask = "Creating Project... (Generating VS project files)";
 			Background::BackgroundProgress = 0.8;
 			sln::GenerateSolution("../Games/" + ProjectName + "/", ProjectName, Paths,
-				Util::GetAllFilesInFolder("../Games/" + ProjectName + "/Code", true));
+				Util::GetAllFilesInFolder("../Games/" + ProjectName + "/Code", true), std::filesystem::exists("../CSharpCore"));
 			Background::BackgroundTask = "Creating Project... (Done)";
 			Background::BackgroundProgress = 1;
 			return 0;

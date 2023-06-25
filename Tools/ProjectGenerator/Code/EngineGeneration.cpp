@@ -9,6 +9,7 @@
 #include <Rendering/Texture.h>
 #include <UI/UIBackground.h>
 #include <Application.h>
+#include <filesystem>
 
 std::map<std::string, std::string> LibraryPaths =
 {
@@ -91,8 +92,16 @@ void GenerateFiles()
 			{
 				Log::Print("Found engine source code: " + i);
 			}
+
+
 			Log::Print("Generating .sln and .vcxproj files...");
-			sln::GenerateSolution("../", "Engine", Values, f, "../EngineSource/");
+			sln::GenerateSolution("../", "Engine", Values, f, std::filesystem::exists("../CSharpCore"), "../EngineSource/");
+
+			if (std::filesystem::exists("../CSharpCore"))
+			{
+				system("cd ../CSharpCore && dotnet build");
+			}
+
 			Util::Notify("Created project files. \n\
 Please compile the Editor, Debug and Release libraries, then run this program again to create a new project.");
 			Application::Quit = true;

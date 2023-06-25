@@ -10,6 +10,7 @@
 #include <Engine/Log.h>
 #include <World/Stats.h>
 #include <Objects/CSharpObject.h>
+#include <Engine/Build/Build.h>
 
 #include <Utility/DotNet/nethost.h>
 #include <Utility/DotNet/coreclr_delegates.h>
@@ -343,8 +344,23 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 void CSharp::LoadAssembly()
 {
 #if !RELEASE
+
+	std::string AssemblyPath = std::filesystem::current_path().string() + "/CSharp/Build/CSharpAssembly.dll";
+
+	if (!std::filesystem::exists(AssemblyPath))
+	{
+		CSharpLog("Could not find C# assembly. Attempting rebuild.", CS_Log_Runtime, CS_Log_Warn);
+		CSharpLog("-----------------------------------------------", CS_Log_Runtime, CS_Log_Warn);
+		system("cd Scripts && dotnet build");
+	}
+	if (!std::filesystem::exists(AssemblyPath))
+	{
+		CSharpLog("Could not find or rebuild C# assembly.", CS_Log_Runtime, CS_Log_Err);
+		return;
+	}
+
 	StaticCall<void, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
-		(std::filesystem::current_path().string() + "/CSharp/Build/CSharpAssembly.dll").c_str(), IsInEditor);
+		AssemblyPath.c_str(), IsInEditor);
 #else
 	StaticCall<void, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
 		(std::filesystem::current_path().string() + "/CSharp/CSharpAssembly.dll").c_str(), IsInEditor);

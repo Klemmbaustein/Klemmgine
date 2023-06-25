@@ -74,14 +74,20 @@ std::string EditorUI::LaunchInEditorArgs;
 
 void EditorUI::LaunchInEditor()
 {
-	if (std::filesystem::last_write_time("../../x64/Debug/" + Build::GetProjectBuildName() + ".exe") < std::filesystem::last_write_time("Code"))
+	try
 	{
-		Log::Print("Detected changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
-		Build::BuildCurrentSolution("Debug");
+		if (std::filesystem::last_write_time("../../x64/Debug/" + Build::GetProjectBuildName() + ".exe") < std::filesystem::last_write_time("Code"))
+		{
+			Log::Print("Detected changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
+			Build::BuildCurrentSolution("Debug");
+		}
+		if (std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < std::filesystem::last_write_time("Scripts"))
+		{
+			RebuildAndHotReload();
+		}
 	}
-	if (std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < std::filesystem::last_write_time("Scripts"))
+	catch (std::exception& e)
 	{
-		RebuildAndHotReload();
 	}
 	system(("..\\..\\x64\\Debug\\TestProject.exe " + LaunchInEditorArgs).c_str());
 }
