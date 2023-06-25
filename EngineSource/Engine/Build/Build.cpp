@@ -71,8 +71,9 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
 			std::filesystem::copy("OpenAL32.dll", TargetFolder + "OpenAL32.dll");
+#ifdef ENINGE_CSHARP
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
-
+#endif
 			Debugging::EngineStatus = "Build: Creating folders";
 			Log::Print("[Build]: Creating folders");
 
@@ -104,7 +105,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
 			Log::Print("Pleasse recompile the program manually with the RELASE preprocessor definition (Release config).", Vector3(1, 0, 0));
 #endif
-#if ENGINE_CSHARP
+#ifdef ENGINE_CSHARP
 
 			Log::Print("[Build]: Building C# core...");
 			system("cd ../../CSharpCore && dotnet publish -r win-x64 --self-contained false");
