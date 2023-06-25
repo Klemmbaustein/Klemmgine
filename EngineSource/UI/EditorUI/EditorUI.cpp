@@ -77,12 +77,14 @@ void EditorUI::LaunchInEditor()
 	std::string ProjectName = Build::GetProjectBuildName();
 	try
 	{
-		if (std::filesystem::last_write_time("../../x64/Debug/" + ProjectName + ".exe") < std::filesystem::last_write_time("Code"))
+		if (!std::filesystem::exists("x64/Debug/" + ProjectName + ".exe")
+			|| std::filesystem::last_write_time("x64/Debug/" + ProjectName + ".exe") < std::filesystem::last_write_time("Code"))
 		{
-			Log::Print("Detected changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
+			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
 			Build::BuildCurrentSolution("Debug");
 		}
-		if (std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < std::filesystem::last_write_time("Scripts"))
+		if (!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll") 
+			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < std::filesystem::last_write_time("Scripts"))
 		{
 			RebuildAndHotReload();
 		}
@@ -90,7 +92,7 @@ void EditorUI::LaunchInEditor()
 	catch (std::exception& e)
 	{
 	}
-	system(("..\\..\\x64\\Debug\\" + ProjectName + ".exe " + LaunchInEditorArgs).c_str());
+	system(("x64\\Debug\\" + ProjectName + ".exe " + LaunchInEditorArgs).c_str());
 }
 void EditorUI::RebuildAndHotReload()
 {
