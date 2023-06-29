@@ -24,6 +24,7 @@ $IrreleventFiles = "Tools/ProjectGenerator/Release/","Tools/ProjectGenerator/x64
 $IrreleventFiles += "Tools/ProjectGenerator/ProjectGenerator.vcxproj","Tools/ProjectGenerator/ProjectGenerator.vcxproj.filters","Tools/ProjectGenerator/ProjectGenerator.vcxproj.user"
 $IrreleventFiles += "Tools/BuildTool/x64","Tools/BuildTool/Release"
 $IrreleventFiles += "Tools/BuildTool/BuildTool.vcxproj","Tools/BuildTool/BuildTool.vcxproj.filters","Tools/BuildTool/BuildTool.vcxproj.user"
+$IrreleventFiles += "EditorContent/Config/"
 if ($WithCSharp) {
 	$IrreleventFiles += "CSharpCore/obj","CSharpCore/Build"
 } else {
