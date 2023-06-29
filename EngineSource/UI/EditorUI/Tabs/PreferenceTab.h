@@ -4,6 +4,7 @@
 #include <UI/EditorUI/Tabs/EditorTab.h>
 #include <UI/EditorUI/Toolbar.h>
 #include <Engine/Log.h>
+#include <Engine/EngineProperties.h>
 
 class PreferenceTab : public EditorTab
 {
@@ -58,17 +59,22 @@ class PreferenceTab : public EditorTab
 #endif
 			}
 		),
-#ifdef ENGINE_CSHARP
-		SettingsCategory("Klemmgine.NET",
+
+		SettingsCategory("Project specific",
 			{
-				SettingsCategory::Setting("Run from editor:Launch arguments", Type::E_STRING, "-neverhideconsole", [](std::string NewValue)
+#ifdef ENGINE_CSHARP
+				SettingsCategory::Setting("Run from editor:Launch arguments", Type::E_STRING, "", [](std::string NewValue)
+				{
+					EditorUI::LaunchInEditorArgs = NewValue;
+				}),
+				SettingsCategory::Setting("Klemmgine.NET:Use C# in project (Requires restart)", Type::E_BOOL, "1", [](std::string NewValue)
 				{
 					EditorUI::LaunchInEditorArgs = NewValue;
 				})
+#endif
 			}
 		),
 
-#endif
 	};
 
 	void GenerateUI();

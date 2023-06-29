@@ -62,7 +62,7 @@ vec4 ApplyFogColor(vec4 InColor)
 	float Depth = length(v_screenposition);
 	float Intensity = pow(min(max((Depth - FogDistance), 0) / FogFalloff, FogMaxDensity), 1);
 	Intensity -= v_position.y / 500;
-	return vec4(mix(InColor, vec4(FogColor * 0.7, 1), clamp((Intensity), 0, 1)).xyz, 1);
+	return vec4(mix(InColor, vec4(FogColor, 1), clamp((Intensity), 0, 1)).xyz, 1);
 }
 
 

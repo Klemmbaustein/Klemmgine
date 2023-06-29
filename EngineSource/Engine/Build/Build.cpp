@@ -1,14 +1,16 @@
-#if EDITOR
 #include "Build.h"
 #include <filesystem>
-#include <Engine/Build/Pack.h>
 #include <Engine/Log.h>
 #include <Engine/EngineProperties.h>
 #include <fstream>
 #include <sstream>
-#include <World/Stats.h>
 #include <Engine/FileUtility.h>
+
+#if EDITOR
+#include <World/Stats.h>
 #include <iostream>
+#include <CSharp/CSharpInterop.h>
+#include <Engine/Build/Pack.h>
 
 #if _WIN32
 namespace Build
@@ -71,7 +73,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
 			std::filesystem::copy("OpenAL32.dll", TargetFolder + "OpenAL32.dll");
-#ifdef ENINGE_CSHARP
+#ifdef ENGINE_CSHARP
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
 #endif
 			Debugging::EngineStatus = "Build: Creating folders";
@@ -107,17 +109,19 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 #endif
 #ifdef ENGINE_CSHARP
 
-			Log::Print("[Build]: Building C# core...");
-			system("cd ../../CSharpCore && dotnet publish -r win-x64 --self-contained false");
+			if (CSharp::GetUseCSharp())
+			{
+				Log::Print("[Build]: Building C# core...");
+				system("cd ../../CSharpCore && dotnet publish -r win-x64 --self-contained false");
 
-			std::filesystem::create_directories(TargetFolder + "/CSharp/Core");
-			std::filesystem::copy("../../CSharpCore/Build/win-x64/publish", TargetFolder + "/CSharp/Core");
-			Log::Print("[Build]: Building game C# assembly...");
-			system("cd Scripts && dotnet publish -r win-x64 --self-contained false");
+				std::filesystem::create_directories(TargetFolder + "/CSharp/Core");
+				std::filesystem::copy("../../CSharpCore/Build/win-x64/publish", TargetFolder + "/CSharp/Core");
+				Log::Print("[Build]: Building game C# assembly...");
+				system("cd Scripts && dotnet publish -r win-x64 --self-contained false");
 
-			std::filesystem::copy("CSharp/Build/win-x64/publish", TargetFolder + "/CSharp");
-			std::filesystem::copy("../../CSharpCore/NetRuntime", TargetFolder + "/CSharp/NetRuntime", copyOptions);
-
+				std::filesystem::copy("CSharp/Build/win-x64/publish", TargetFolder + "/CSharp");
+				std::filesystem::copy("../../CSharpCore/NetRuntime", TargetFolder + "/CSharp/NetRuntime", copyOptions);
+			}
 #endif
 
 			Log::Print("[Build]: Complete", Vector3(0, 1, 0));
@@ -158,6 +162,10 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	return system(Command.c_str());
 
 }
+#endif
+
+#if !RELEASE
+
 std::string Build::GetProjectBuildName()
 {
 	std::string ProjectName;
@@ -171,4 +179,5 @@ std::string Build::GetProjectBuildName()
 	}
 	return ProjectName;
 }
+
 #endif

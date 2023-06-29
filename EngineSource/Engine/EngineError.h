@@ -1,14 +1,12 @@
 #pragma once
 #include <string>
+#include <Engine/FileUtility.h>
 
-#if _WIN32
-#define __FILENAME__ (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-#else
-#define __FILENAME__ (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
-#endif
+#define __FILENAME__ FileUtil::GetFileNameFromPath(__FILE__)
 
 namespace Engine
 {
+	
 	void AssertFailure(std::string Name, std::string Location);
 	
 	inline void Assert(bool Value, std::string Name, std::string Location)

@@ -100,7 +100,7 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 	case Type::E_STRING:
 		Element = (new UITextField(true, 0, UIColors[1], this, Index, Renderer))
 			->SetText(Value)
-			->SetMinSize(Vector2(0.8, 0.05))
+			->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6, 0.05))
 			->SetPadding(0.02, 0.02, 0.05, 0.02)
 			->SetBorder(UIBox::E_ROUNDED, 0.5);
 		Parent->AddChild(Element);
@@ -159,7 +159,10 @@ void PreferenceTab::OnButtonClicked(int Index)
 		switch (Setting.Type)
 		{
 		case Type::E_BOOL:
-			Setting.Value = std::to_string(!std::stoi(Setting.Value));
+		{
+			bool Val = (bool)std::stoi(Setting.Value);
+			Setting.Value = std::to_string(!Val);
+		}
 			break;
 		case Type::E_STRING:
 			Setting.Value = dynamic_cast<UITextField*>(LoadedSettingElements[Index])->GetText();
@@ -183,8 +186,10 @@ PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : Editor
 void PreferenceTab::Load(std::string File)
 {
 	SaveGame Pref = SaveGame("../../EditorContent/Config/EditorPrefs", "pref", false);
+	SaveGame Proj = SaveGame(Build::GetProjectBuildName(), "keproj", false);
 	for (auto& cat : Preferences)
 	{
+		SaveGame& UsedSave = cat.Name == "Project specific" ? Proj : Pref;
 		for (auto& i : cat.Settings)
 		{
 			std::string NameCopy = i.Name;
@@ -197,9 +202,9 @@ void PreferenceTab::Load(std::string File)
 				}
 				NameCopy[Space] = '_';
 			}
-			if (Pref.GetPropterty(NameCopy).Type != Type::E_NULL)
+			if (UsedSave.GetPropterty(NameCopy).Type != Type::E_NULL)
 			{
-				i.Value = Pref.GetPropterty(NameCopy).Value;
+				i.Value = UsedSave.GetPropterty(NameCopy).Value;
 				i.OnChanged(i.Value);
 			}
 		}
@@ -209,8 +214,10 @@ void PreferenceTab::Load(std::string File)
 void PreferenceTab::Save()
 {
 	SaveGame Pref = SaveGame("../../EditorContent/Config/EditorPrefs", "pref", false);
+	SaveGame Proj = SaveGame(Build::GetProjectBuildName(), "keproj", false);
 	for (auto& cat : Preferences)
 	{
+		SaveGame& UsedSave = cat.Name == "Project specific" ? Proj : Pref;
 		for (auto i : cat.Settings)
 		{
 			while (true)
@@ -222,7 +229,7 @@ void PreferenceTab::Save()
 				}
 				i.Name[Space] = '_';
 			}
-			Pref.SetPropterty(SaveGame::SaveProperty(i.Name, i.Value, i.Type));
+			UsedSave.SetPropterty(SaveGame::SaveProperty(i.Name, i.Value, i.Type));
 		}
 	}
 }

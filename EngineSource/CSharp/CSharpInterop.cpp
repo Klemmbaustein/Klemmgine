@@ -11,6 +11,7 @@
 #include <World/Stats.h>
 #include <Objects/CSharpObject.h>
 #include <Engine/Build/Build.h>
+#include <Engine/Save.h>
 
 #include <Utility/DotNet/nethost.h>
 #include <Utility/DotNet/coreclr_delegates.h>
@@ -48,6 +49,9 @@ static_assert(sizeof(Transform) == sizeof(Vector3) * 3);
 
 namespace CSharp
 {
+	bool UseCSharp = false;
+	bool LoadedUseCSharp = false;
+
 	std::string CSharpLogTypes[3] =
 	{
 		"Runtime",
@@ -125,6 +129,10 @@ namespace CSharp
 	// Using the nethost library, discover the location of hostfxr and get exports
 	bool load_hostfxr()
 	{
+		if (!GetUseCSharp())
+		{
+			return false;
+		}
 		// Pre-allocate a large buffer for the path to hostfxr
 		char_t buffer[MAX_PATH];
 		size_t buffer_size = sizeof(buffer) / sizeof(char_t);
@@ -213,7 +221,6 @@ void WriteCSProj(std::string Name)
 </Project>";
 	out.close();
 }
-
 void CSharpInternalPrint(const char* Msg)
 {
 	CSharp::CSharpLog(Msg, CSharp::CS_Log_Script);
@@ -221,8 +228,14 @@ void CSharpInternalPrint(const char* Msg)
 
 void CSharp::Init()
 {
-	WriteCSProj("Scripts/CSharpAssembly.csproj");
-
+	if (!GetUseCSharp())
+	{
+		return;
+	}
+	if (!std::filesystem::exists("Scripts/CSharpAssembly.csproj"))
+	{
+		WriteCSProj("Scripts/CSharpAssembly.csproj");
+	}
 	CSharp::LoadRuntime();
 	void* LogRegister = CSharp::LoadCSharpFunction("LoadLogFunction", "EngineLog", "LoadFunctionDelegate");
 
@@ -242,9 +255,31 @@ void CSharp::Init()
 
 void CSharp::RunPerFrameLogic()
 {
+	if (!GetUseCSharp())
+	{
+		return;
+	}
 	CSharp::StaticCall<void, float>(SetDeltaFunction, Performance::DeltaTime);
 }
 
+bool CSharp::GetUseCSharp()
+{
+	if (!LoadedUseCSharp)
+	{
+		LoadedUseCSharp = true;
+#if RELEASE
+		UseCSharp = std::filesystem::exists("CSharp");
+#else
+		SaveGame g = SaveGame(Build::GetProjectBuildName(), "keproj", false);
+		UseCSharp = g.GetPropterty("Klemmgine.NET:Use_C#_in_project_(Requires_restart)").Value == "1";
+#endif
+		return UseCSharp;
+	}
+	else
+	{
+		return UseCSharp;
+	}
+}
 
 bool CSharp::IsAssemblyLoaded()
 {
@@ -278,6 +313,10 @@ void CSharp::SetObjectVectorField(CSharpWorldObject Obj, std::string Field, Vect
 
 void CSharp::ReloadCSharpAssembly()
 {
+	if (!GetUseCSharp())
+	{
+		return;
+	}
 	LoadAssembly();
 	NativeFunctions::RegisterNativeFunctions();
 	for (auto i : Objects::GetAllObjectsWithID(CSharpObject::GetID()))
@@ -288,6 +327,10 @@ void CSharp::ReloadCSharpAssembly()
 
 void CSharp::LoadRuntime()
 {
+	if (!GetUseCSharp())
+	{
+		return;
+	}
 	CSharpLog("Loading .net runtime...", CS_Log_Runtime);
 	string_t root_path = std::filesystem::current_path().wstring();
 	auto pos = root_path.find_last_of(DIR_SEPARATOR);
@@ -310,11 +353,19 @@ void CSharp::LoadRuntime()
 
 void CSharp::UnloadRuntime()
 {
+	if (!GetUseCSharp())
+	{
+		return;
+	}
 	UnloadLibrary(hostfxr_lib);
 }
 
 void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, std::string DelegateName)
 {
+	if (!GetUseCSharp())
+	{
+		return nullptr;
+	}
 	typedef void (CORECLR_DELEGATE_CALLTYPE* StaticFunction)();
 	StaticFunction fCallback = nullptr;
 
@@ -343,6 +394,10 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 
 void CSharp::LoadAssembly()
 {
+	if (!GetUseCSharp())
+	{
+		return;
+	}
 #if !RELEASE
 
 	std::string AssemblyPath = std::filesystem::current_path().string() + "/CSharp/Build/CSharpAssembly.dll";
@@ -369,11 +424,19 @@ void CSharp::LoadAssembly()
 
 CSharp::CSharpWorldObject CSharp::InstantiateObject(std::string Typename, Transform t, WorldObject* NativeObject)
 {
+	if (!GetUseCSharp())
+	{
+		return CSharpWorldObject();
+	}
 	return CSharpWorldObject(StaticCall<int32_t, const char*, Transform, void*>(InstantiateFunction, Typename.c_str(), t, NativeObject));
 }
 
 void CSharp::DestroyObject(CSharpWorldObject Obj)
 {
+	if (!GetUseCSharp())
+	{
+		return;
+	}
 	StaticCall<void, int32_t>(DestroyFunction, Obj.ID);
 }
 

@@ -59,8 +59,14 @@ void UITextField::MakeGLBuffers()
 void UITextField::Tick()
 {
 	if (!IsVisible) return;
-	TextObject->WrapDistance = std::max(Size.X * 2, 0.1f);
-
+	if (Size.X != 0)
+	{
+		TextObject->WrapDistance = std::max(Size.X * 2, 0.1f);
+	}
+	else
+	{
+		TextObject->WrapDistance = 10;
+	}
 	ButtonColorMultiplier = 1.f;
 	Vector2 Offset;
 	if (CurrentScrollObject != nullptr)

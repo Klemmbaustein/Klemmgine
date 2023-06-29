@@ -2,7 +2,6 @@
 #include "NativeFunctions.h"
 #include <CSharp/CSharpInterop.h>
 #include <Engine/EngineError.h>
-#include <Rendering/Utility/Framebuffer.h>
 #include <World/Assets.h>
 #include <World/Graphics.h>
 #include <Engine/Log.h>
@@ -105,7 +104,7 @@ namespace NativeFunctions
 		Sound::PlaySound2D(s, Pitch, Volume, Looping);
 	}
 	
-	void DestroySound(Sound::SoundBuffer* s)
+	void UnloadSound(Sound::SoundBuffer* s)
 	{
 		delete s;
 	}
@@ -139,6 +138,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(LoadScene);
 	REGISTER_FUNCTION(LoadSound);
 	REGISTER_FUNCTION(PlaySound);
+	REGISTER_FUNCTION(UnloadSound);
 }
 
 #endif

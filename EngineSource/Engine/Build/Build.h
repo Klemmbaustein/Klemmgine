@@ -1,3 +1,4 @@
+#if !RELEASE
 #pragma once
 #include <string>
 #include <vector>
@@ -12,3 +13,4 @@ namespace Build
 
 	std::string GetProjectBuildName();
 }
+#endif

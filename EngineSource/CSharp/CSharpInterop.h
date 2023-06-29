@@ -38,6 +38,8 @@ namespace CSharp
 		CS_Log_Script
 	};
 
+	bool GetUseCSharp();
+
 	bool IsAssemblyLoaded();
 	void CSharpLog(std::string Msg, CSharpLogType Type, CSharpLogSev Severity = CS_Log_Info);
 	void RegisterNativeFunction(std::string Name, void* Function);
