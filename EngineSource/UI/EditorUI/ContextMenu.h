@@ -32,7 +32,7 @@ public:
 	std::vector<std::string> ContextCategories;
 	std::vector<UIBox*> ContextButtons;
 
-	UITextField* GenerateTextField(std::string Content);
+	UITextField* GenerateTextField(std::string Content, int Index);
 	void GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index);
 
 	void Tick() override;

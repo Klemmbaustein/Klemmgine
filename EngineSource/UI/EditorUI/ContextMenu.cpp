@@ -19,9 +19,9 @@ ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edi
 	UpdateLayout();
 }
 
-UITextField* ContextMenu::GenerateTextField(std::string Content)
+UITextField* ContextMenu::GenerateTextField(std::string Content, int Index)
 {
-	auto NewElement = new UITextField(true, 0, 0.2, this, -1, Editor::CurrentUI->EngineUIText);
+	auto NewElement = new UITextField(true, 0, 0.2, this, Index, Editor::CurrentUI->EngineUIText);
 	((UITextField*)NewElement)->SetText(Content);
 	((UITextField*)NewElement)->SetTextSize(0.4);
 	NewElement->SetPadding(0.005, 0.005, 0.02, 0.005);
@@ -64,28 +64,29 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 		UIText* NewElementText = new UIText(0.45, UIColors[2], i.Name, Editor::CurrentUI->EngineUIText);
 		NewElementText->SetPadding(0.005, 0.005, 0.02, 0.005);
 		BackgroundBox->AddChild(NewElementText);
+		int ElemIndex = Name == "Object" ? -2 : -1;
 		switch (i.Type)
 		{
 			// Vector3_Colors and Vector3s both use VectorFields, so we basically treat them the same
 		case Type::E_VECTOR3_COLOR:
 		case Type::E_VECTOR3:
-			NewElement = new UIVectorField(0, *(Vector3*)i.Variable, this, -1, Editor::CurrentUI->EngineUIText);
+			NewElement = new UIVectorField(0, *(Vector3*)i.Variable, this, ElemIndex, Editor::CurrentUI->EngineUIText);
 			NewElement->SetPadding(0.005, 0, 0.02, 0);
 			// Here we tell the VectorField to use RGB values instead of XYZ if required
 			((UIVectorField*)NewElement)->SetValueType(i.Type == Type::E_VECTOR3 ? UIVectorField::E_XYZ : UIVectorField::E_RGB);
 			break;
 		case Type::E_FLOAT:
-			NewElement = GenerateTextField(EditorUI::ToShortString(*((float*)i.Variable)));
+			NewElement = GenerateTextField(EditorUI::ToShortString(*((float*)i.Variable)), ElemIndex);
 			break;
 		case Type::E_INT:
-			NewElement = GenerateTextField(std::to_string(*((int*)i.Variable)));
+			NewElement = GenerateTextField(std::to_string(*((int*)i.Variable)), ElemIndex);
 
 			break;
 		case Type::E_STRING:
-			NewElement = GenerateTextField(*((std::string*)i.Variable));
+			NewElement = GenerateTextField(*((std::string*)i.Variable), ElemIndex);
 			break;
 		case Type::E_BOOL:
-			NewElement = new UIButton(true, 0, 0.75, this, -1);
+			NewElement = new UIButton(true, 0, 0.75, this, ElemIndex);
 			NewElement->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
 			NewElement->SetMinSize(0.04);
 			NewElement->SetBorder(UIBox::E_ROUNDED, 0.3);
@@ -130,7 +131,7 @@ void ContextMenu::OnButtonClicked(int Index)
 		}
 		UpdateLayout();
 	}
-	if (Index == -1)
+	if (Index == -1 || Index == -2)
 	{
 		for (size_t i = 0; i < ContextButtons.size(); i++)
 		{
@@ -174,7 +175,8 @@ void ContextMenu::OnButtonClicked(int Index)
 			}
 		}
 		if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-			&& ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Properties.size())
+			&& ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Properties.size()
+			&& Index == -1)
 		{
 			((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->OnPropertySet();
 		}

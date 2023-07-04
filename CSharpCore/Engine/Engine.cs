@@ -69,12 +69,21 @@ internal static class Engine
 		LoadedAsm = Assembly.Load(File.ReadAllBytes(Path));
 
 		LoadTypeFromAssembly("Log").GetMethod("LoadLogFunction").Invoke(null, new Delegate[] { EngineLog.Print });
-		
-		LoadTypeFromAssembly("WorldObject").GetMethod("LoadGetObjectFunction").Invoke(null, new object[] { GetObjectFromID });
+
+
+		var WorldObjectType = LoadTypeFromAssembly("WorldObject");
+
+		if (WorldObjectType == null)
+		{
+			EngineLog.Print("Could not load WorldObject class.");
+			return;
+		}
+
+		WorldObjectType.GetMethod("LoadGetObjectFunction").Invoke(null, new object[] { GetObjectFromID });
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{
-			if (i.GetMethod("TickComponents") != null && !i.IsAbstract)
+			if (i.IsSubclassOf(WorldObjectType))
 			{
 				WorldObjectTypes.Add(i);
 			}
@@ -125,7 +134,7 @@ internal static class Engine
 		WorldObjects.Remove(ID);
 	}
 
-	public static System.Type? LoadTypeFromAssembly(string Type)
+	public static Type LoadTypeFromAssembly(string Type)
 	{
 		if (LoadedAsm == null)
 		{
@@ -194,5 +203,17 @@ internal static class Engine
 	public static void SetDelta(float NewDelta)
 	{
 		StatsObject.GetField("DeltaTime").SetValue(null, NewDelta);
+	}
+
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	public static string GetAllObjectTypes()
+	{
+		string AllTypes = "";
+		foreach (var i in WorldObjectTypes)
+		{
+			AllTypes += i.Name + " ";
+		}
+
+		return AllTypes;
 	}
 }

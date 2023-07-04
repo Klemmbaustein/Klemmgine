@@ -48,6 +48,10 @@ void CSharpObject::Reload()
 	if (CS_Obj.ID)
 	{
 		CSharp::ExectuteFunctionOnObject(CS_Obj, "Begin");
+		if (GetName() == "CSharpObject")
+		{
+			SetName(CSharpClass);
+		}
 	}
 }
 

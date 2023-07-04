@@ -72,6 +72,9 @@ namespace CSharp
 	void* SetPosFunction = nullptr;
 	void* SetDeltaFunction = nullptr;
 	void* RegisterNativeFunctionPtr = nullptr;
+	void* GetAllClassesPtr = nullptr;
+
+	std::vector<std::string> AllClasses;
 }
 
 using string_t = std::basic_string<char_t>;
@@ -207,6 +210,7 @@ namespace CSharp
 
 void WriteCSProj(std::string Name)
 {
+	std::filesystem::create_directories("CSharp/Build");
 	std::ofstream out = std::ofstream(Name);
 	out << "<Project Sdk=\"Microsoft.NET.Sdk\">\n\
 	<PropertyGroup>\n\
@@ -248,6 +252,7 @@ void CSharp::Init()
 	DestroyFunction = CSharp::LoadCSharpFunction("Destroy", "Engine", "VoidInt32InDelegate");
 	SetDeltaFunction = CSharp::LoadCSharpFunction("SetDelta", "Engine", "VoidFloatInDelegate");
 	RegisterNativeFunctionPtr = CSharp::LoadCSharpFunction("RegisterNativeFunction", "CoreNativeFunction", "LoadNativeFunctionDelegate");
+	GetAllClassesPtr = CSharp::LoadCSharpFunction("GetAllObjectTypes", "Engine", "StringDelegate");
 
 	LoadAssembly();
 	NativeFunctions::RegisterNativeFunctions();
@@ -260,6 +265,11 @@ void CSharp::RunPerFrameLogic()
 		return;
 	}
 	CSharp::StaticCall<void, float>(SetDeltaFunction, Performance::DeltaTime);
+}
+
+std::vector<std::string> CSharp::GetAllClasses()
+{
+	return AllClasses;
 }
 
 bool CSharp::GetUseCSharp()
@@ -420,6 +430,19 @@ void CSharp::LoadAssembly()
 	StaticCall<void, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
 		(std::filesystem::current_path().string() + "/CSharp/CSharpAssembly.dll").c_str(), IsInEditor);
 #endif
+
+	AllClasses.clear();
+	std::stringstream AllClassesStream;
+	AllClassesStream << StaticCall<const char*>(GetAllClassesPtr);
+	while (!AllClassesStream.eof())
+	{
+		std::string NewClass;
+		AllClassesStream >> NewClass;
+		if (!NewClass.empty())
+		{
+			AllClasses.push_back(NewClass);
+		}
+	}
 }
 
 CSharp::CSharpWorldObject CSharp::InstantiateObject(std::string Typename, Transform t, WorldObject* NativeObject)

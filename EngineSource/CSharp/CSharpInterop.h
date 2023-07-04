@@ -38,6 +38,13 @@ namespace CSharp
 		CS_Log_Script
 	};
 
+	struct CSharpClass
+	{
+		std::string Name;
+	};
+
+	std::vector<std::string> GetAllClasses();
+
 	bool GetUseCSharp();
 
 	bool IsAssemblyLoaded();

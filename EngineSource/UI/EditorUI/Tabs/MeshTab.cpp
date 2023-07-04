@@ -55,6 +55,8 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 
 	Rows[1] = new UIScrollBox(false, 0, 20);
 	Rows[1]->Align = UIBox::E_REVERSE;
+	Rows[1]->SetMinSize(Vector2(0, 1));
+	Rows[1]->SetMaxSize(Vector2(1, 1));
 	RowBox->AddChild(Rows[1]);
 }
 

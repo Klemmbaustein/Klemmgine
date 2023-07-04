@@ -46,7 +46,8 @@ namespace Editor
 		std::pair("jspart", Vector3(0.7, 0.4, 0.4)),
 		std::pair("wav", Vector3(0.7, 0, 0.4)),
 		std::pair("cpp", Vector3(0.5)),
-		std::pair("setting", Vector3(1))
+		std::pair("setting", Vector3(1)),
+		std::pair("cs", Vector3(0.603921569, 0.28627451, 0.576470588))
 	};
 	inline std::map<std::string, unsigned int> ItemTextures
 	{
@@ -59,6 +60,7 @@ namespace Editor
 		std::pair("cbm", 17),
 		std::pair("wav", 6),
 		std::pair("cpp", 0),
+		std::pair("cs", 22),
 		std::pair("jspart", 19)
 	};
 

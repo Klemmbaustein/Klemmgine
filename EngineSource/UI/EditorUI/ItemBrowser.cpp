@@ -19,6 +19,10 @@
 #include <Engine/Importers/ModelConverter.h>
 #include <UI/EditorUI/Popups/RenameBox.h>
 #include <World/Assets.h>
+#ifdef ENGINE_CSHARP
+#include <CSharp/CSharpInterop.h>
+#include <Objects/CSharpObject.h>
+#endif
 
 #define MAX_ITEM_NAME_LENGTH 19
 
@@ -98,6 +102,16 @@ std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 			}
 		}
 	}*/
+
+#ifdef ENGINE_CSHARP
+	for (auto& i : CSharp::GetAllClasses())
+	{
+		EditorClassesItem NewItem;
+		NewItem.Name = i;
+		NewItem.Object = ObjectDescription(i, CSharpObject::GetID());
+		RootPath.SubItems.push_back(NewItem);
+	}
+#endif
 	return RootPath.SubItems;
 }
 std::string ItemBrowser::GetCurrentCPPPathString()
@@ -254,7 +268,12 @@ void ItemBrowser::UpdateLayout()
 			}
 			else
 			{
-				DisplayedFiles.push_back(FileEntry(i.Name + ".cpp", false));
+#ifdef ENGINE_CSHARP
+				if (i.Object.ID == CSharpObject::GetID() && i.Object.Name != "CSharpObject")
+					DisplayedFiles.push_back(FileEntry(i.Name + ".cs", false));
+				else
+#endif
+					DisplayedFiles.push_back(FileEntry(i.Name + ".cpp", false));
 			}
 		}
 	}
@@ -484,9 +503,16 @@ void ItemBrowser::Tick()
 
 			if (IsCPPClass)
 			{
-				auto newObject = Objects::SpawnObjectFromID(GetContentsOfCurrentCPPFolder()[DraggedButton].Object.ID, Transform(TargetSpawnLocation, 0, 1));
+				auto Item = GetContentsOfCurrentCPPFolder()[DraggedButton].Object;
+				auto newObject = Objects::SpawnObjectFromID(Item.ID, Transform(TargetSpawnLocation, 0, 1));
 				newObject->IsSelected = true;
 				ChangedScene = true;
+#ifdef ENGINE_CSHARP
+				if (Item.ID == CSharpObject::GetID() && Item.Name != "CSharpObject")
+				{
+					dynamic_cast<CSharpObject*>(newObject)->LoadClass(Item.Name);
+				}
+#endif
 			}
 			for (auto i : Buttons)
 			{
@@ -579,7 +605,6 @@ void ItemBrowser::OnButtonClicked(int Index)
 			}
 			else
 			{
-
 				auto& p = Editor::CurrentUI->CurrentPath;
 
 				p = p.substr(0, p.find_last_of("/\\"));
@@ -610,7 +635,7 @@ void ItemBrowser::OnButtonClicked(int Index)
 		return;
 	}
 
-	// If one of the scene buttons was pressed
+	// If one of the item buttons was pressed
 	if (Index >= 0 && SelectedTab == 0)
 	{
 		if (CurrentFiles[Index].IsDirectory)
@@ -664,6 +689,16 @@ void ItemBrowser::OnButtonClicked(int Index)
 			CPPPath.push_back(Index);
 			UpdateLayout();
 		}
+#ifdef ENGINE_CSHARP
+		else
+		{
+			std::string File = "Scripts/" + GetContentsOfCurrentCPPFolder()[Index].Name + ".cs";
+			if (std::filesystem::exists(File))
+			{
+				OS::OpenFile(File);
+			}
+		}
+#endif
 	}
 }
 #endif

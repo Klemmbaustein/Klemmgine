@@ -15,7 +15,7 @@ void LightObject::Begin()
 #if EDITOR
 	Billboard = new BillboardComponent();
 	Attach(Billboard);
-	Billboard->Load("Light.png");
+	Billboard->Load("../../EditorContent/Images/Light.png");
 	ModelGenerator::ModelData m;
 	m.AddElement().MakeCube(2, 0);
 

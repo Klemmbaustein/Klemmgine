@@ -3,6 +3,7 @@
 #include <Engine/Save.h>
 #include <UI/EditorUI/UIVectorField.h>
 #include <Engine/Log.h>
+#include <CSharp/CSharpInterop.h>
 
 void PreferenceTab::GenerateUI()
 {
@@ -181,6 +182,13 @@ PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : Editor
 	this->Renderer = Renderer;
 	TabBackground->SetHorizontal(true);
 	GenerateUI();
+
+#if ENGINE_CSHARP
+	if (!CSharp::GetUseCSharp())
+	{
+		Toolbar::ToolbarInstance->SetButtonVisibility("Reload C#", false);
+	}
+#endif
 }
 
 void PreferenceTab::Load(std::string File)

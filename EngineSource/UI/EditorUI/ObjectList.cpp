@@ -7,6 +7,9 @@
 #include <Engine/Log.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Viewport.h>
+#ifdef ENGINE_CSHARP
+#include <Objects/CSharpObject.h>
+#endif
 
 ObjectList::ObjectList(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2, 0.5), Vector2(0.8, 1.25))
 {
@@ -90,7 +93,13 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 		* ----------------------
 		*/
 		auto v = dynamic_cast<Viewport*>(Editor::CurrentUI->UIElements[4]);
-
+		bool IsCSObj = false;
+#if ENGINE_CSHARP
+		IsCSObj = Object.Object && Object.Object->GetObjectDescription().ID == CSharpObject::GetID();
+		Vector3 ObjectColor = IsCSObj ? Editor::ItemColors.at("cs") : Editor::ItemColors.at("cpp");
+#else
+		Vector3 ObjectColor = Editor::ItemColors["cpp"];
+#endif
 		auto NewListEntryBackground = new UIButton(true, 0, UIColors[1], this, Object.Object ? Object.ListIndex : -1 - Object.ListIndex);
 		NewListEntryBackground->SetBorder(UIBox::E_ROUNDED, 0.8);
 		if (v && v->SelectedObjects.size() && Object.Object == v->SelectedObjects[0])
@@ -99,7 +108,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 		}
 		NewListEntryBackground->SetMinSize(Vector2(Scale.X / 1.2 - Depth, 0));
 		NewListEntryBackground->SetPadding(0.01, 0.0, 0.01 + Depth, 0.01);
-		auto ListEntryObjectColor = new UIBackground(true, 0, Vector3(0.5, 0.5, 0.5), Vector2(0.01, 0.055));
+		auto ListEntryObjectColor = new UIBackground(true, 0, ObjectColor, Vector2(0.01, 0.055));
 		ListEntryObjectColor->SetPadding(0);
 		NewListEntryBackground->AddChild(ListEntryObjectColor);
 		auto TextBox = new UIBox(false, 0);
@@ -119,8 +128,21 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 		UIText* ListEntryText;
 		if (Object.Object)
 		{
-			ListEntryObjectColor->SetColor(0.5);
-			ListEntryText = new UIText(0.3, 0.7, "Class " + Object.Object->GetObjectDescription().Name, Editor::CurrentUI->EngineUIText);
+			ListEntryObjectColor->SetColor(ObjectColor);
+			std::string ClassName;
+#if ENGINE_CSHARP
+			if (IsCSObj)
+			{
+				ClassName = "Class [C#] " + dynamic_cast<CSharpObject*>(Object.Object)->CSharpClass;
+			}
+			else
+			{
+				ClassName = "Class [C++] " + Object.Object->GetObjectDescription().Name;
+			}
+#else
+			ClassName = "Class " + Object.Object->GetObjectDescription().Name;
+#endif
+			ListEntryText = new UIText(0.3, 0.7, ClassName, Editor::CurrentUI->EngineUIText);
 		}
 		else
 		{

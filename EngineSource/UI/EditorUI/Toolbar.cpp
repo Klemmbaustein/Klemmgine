@@ -5,7 +5,6 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Scene.h>
 #include <thread>
-#include <atomic>
 #include <UI/EditorUI/Viewport.h>
 #include <Engine/Build/Build.h>
 #include <CSharp/CSharpInterop.h>
@@ -49,6 +48,7 @@ void Toolbar::GenerateButtons()
 		{
 			if (!btn.IsVisible)
 			{
+				j++;
 				continue;
 			}
 			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[3], Vector2(0.1)))
