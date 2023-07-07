@@ -111,7 +111,7 @@ void EditorUI::SaveCurrentScene()
 	}
 	else
 	{
-		Log::Print("Saving scene \"" + Scene::CurrentScene + "\"", Vector3(0.3, 0.4, 1));
+		Log::Print("Saving scene \"" + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene) + "\"", Vector3(0.3, 0.4, 1));
 		Scene::SaveSceneAs(Scene::CurrentScene);
 	}
 	ChangedScene = false;
@@ -123,7 +123,7 @@ void EditorUI::OpenScene(std::string NewScene)
 	if (ChangedScene)
 	{
 		EditorSceneToOpen = NewScene;
-		new DialogBox(Scene::CurrentScene, 0, "Scene has unsaved changes. Save?",
+		new DialogBox(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), 0, "Scene has unsaved changes. Save?",
 			{
 				DialogBox::Answer("Yes", []() {SaveCurrentScene(); ChangedScene = false; Scene::LoadNewScene(EditorSceneToOpen);
 				Viewport::ViewportInstance->ClearSelectedObjects();

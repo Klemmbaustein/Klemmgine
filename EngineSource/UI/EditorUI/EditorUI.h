@@ -99,10 +99,10 @@ public:
 
 	Vector3 UIColors[NumUIColors] =
 	{
-		Vector3(0.125, 0.125, 0.13),//Default background
-		Vector3(0.08f),				//Dark background
-		Vector3(1),					//Highlight color
-		Vector3(0.2),		//Brighter background
+		Vector3(0.125, 0.125, 0.13),	//Default background
+		Vector3(0.08f),					//Dark background
+		Vector3(1),						//Highlight color
+		Vector3(0.2),					//Brighter background
 	};
 	TextRenderer* EngineUIText = new TextRenderer("Font.ttf", 90);
 

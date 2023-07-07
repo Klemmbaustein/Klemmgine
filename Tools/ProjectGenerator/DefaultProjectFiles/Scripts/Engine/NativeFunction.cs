@@ -17,6 +17,11 @@ public static class NativeFunction
 		if (!LoadedNativeFunctions.ContainsKey(Name))
 		{
 			Log.Print("Failed to call native function: " + Name);
+			Log.Print("------------------------ Native functions: ------------------------");
+			foreach (var i in LoadedNativeFunctions)
+			{
+				Log.Print(i.Key);
+			}
 			return null;
 		}
 

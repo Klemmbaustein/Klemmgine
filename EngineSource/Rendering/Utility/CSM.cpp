@@ -219,12 +219,12 @@ namespace CSM
 		for (const auto& v : corners)
 		{
 			const auto trf = lightView * v;
-			minX = std::min(minX, trf.x);
-			maxX = std::max(maxX, trf.x);
-			minY = std::min(minY, trf.y);
-			maxY = std::max(maxY, trf.y);
-			minZ = std::min(minZ, trf.z);
-			maxZ = std::max(maxZ, trf.z);
+			minX = std::min(minX - SnapSize, trf.x);
+			maxX = std::max(maxX + SnapSize, trf.x);
+			minY = std::min(minY - SnapSize, trf.y);
+			maxY = std::max(maxY + SnapSize, trf.y);
+			minZ = std::min(minZ - SnapSize, trf.z);
+			maxZ = std::max(maxZ + SnapSize, trf.z);
 		}
 
 		minX = std::floor(minX / SnapSize) * SnapSize;
@@ -253,7 +253,7 @@ namespace CSM
 			maxZ *= zMult;
 		}
 
-		float zoom = 0.9;
+		float zoom = 1.5;
 
 		const glm::mat4 lightProjection = glm::ortho(minX / zoom, maxX / zoom, minY / zoom, maxY / zoom, minZ / zoom, maxZ / zoom);
 

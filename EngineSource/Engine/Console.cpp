@@ -12,6 +12,7 @@
 #include <Engine/Scene.h>
 #include <filesystem>
 #include <Engine/Application.h>
+#include <CSharp/CSharpInterop.h>
 
 #include <World/Graphics.h>
 #include <World/Stats.h>
@@ -170,7 +171,7 @@ void Console::InitializeConsole()
 			},
 			[]() {
 #if ENGINE_CSHARP
-				ConsoleLog("With C#: Yes");
+				ConsoleLog(CSharp::GetUseCSharp() ? "With C#: Yes" : "With C#: Turned off");
 #else
 				ConsoleLog("With C#: No");
 #endif

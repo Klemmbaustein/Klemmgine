@@ -14,6 +14,8 @@
 #include <Rendering/Camera/CameraShake.h>
 #include <Engine/Input.h>
 #include <Sound/Sound.h>
+#include <Math/Collision/Collision.h>
+#include <Engine/Console.h>
 
 namespace NativeFunctions
 {
@@ -108,6 +110,17 @@ namespace NativeFunctions
 	{
 		delete s;
 	}
+
+	Collision::HitResponse NativeRaycast(Vector3 Start, Vector3 End, WorldObject* ObjectsToIgnore)
+	{
+		return Collision::LineTrace(Start, End, {ObjectsToIgnore});
+	}
+
+	bool CallConsoleCommand(const char* cmd)
+	{
+		Log::Print(cmd);
+		return Console::ExecuteConsoleCommand(cmd, true);
+	}
 }
 
 #define REGISTER_FUNCTION(func) CSharp::RegisterNativeFunction(# func, func)
@@ -139,6 +152,8 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(LoadSound);
 	REGISTER_FUNCTION(PlaySound);
 	REGISTER_FUNCTION(UnloadSound);
+	REGISTER_FUNCTION(NativeRaycast);
+	REGISTER_FUNCTION(CallConsoleCommand);
 }
 
 #endif

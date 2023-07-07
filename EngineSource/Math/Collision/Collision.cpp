@@ -34,7 +34,7 @@ namespace Collision
 	// https://gdbooks.gitbooks.io/3dcollisions/content/Chapter4/aabb-triangle.html
 	bool TriangleAABBCollision(Vector3 v0, Vector3 v1, Vector3 v2, Collision::Box& b)
 	{
-		//TODO: L
+		//TODO: Decide if this function is really required.
 		return false;
 	}
 }
