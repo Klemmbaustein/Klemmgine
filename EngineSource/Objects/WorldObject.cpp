@@ -6,6 +6,19 @@
 namespace Objects
 {
 	std::set<WorldObject*> ObjectsToDestroy;
+	std::vector<WorldObject*> AllObjects;
+	std::vector<WorldObject*> GetAllObjectsWithID(uint32_t ID)
+	{
+		std::vector<WorldObject*> FoundObjects;
+		for (WorldObject* o : Objects::AllObjects)
+		{
+			if (o->GetObjectDescription().ID == ID && ObjectsToDestroy.find(o) == ObjectsToDestroy.end())
+			{
+				FoundObjects.push_back(o);
+			}
+		}
+		return FoundObjects;
+	}
 }
 
 WorldObject::WorldObject(ObjectDescription _d)

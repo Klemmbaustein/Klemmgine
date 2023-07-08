@@ -604,7 +604,7 @@ void ApplicationLoop()
 		UIBox::DrawAllUIElements();
 		UI::HoveredButton = UI::NewHoveredButton;
 	}
-	glEnable(GL_BLEND);
+	glDisable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	DrawPostProcessing();
@@ -695,7 +695,10 @@ int Initialize(int argc, char** argv)
 	std::string ApplicationTitle = ProjectName;
 	if (IsInEditor) ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
 #if ENGINE_CSHARP && !RELEASE
-	ApplicationTitle.append(" (C#-.net)");
+	if (CSharp::GetUseCSharp())
+	{
+		ApplicationTitle.append(" (C#-.net)");
+	}
 #endif
 	if (EngineDebug && !IsInEditor) ApplicationTitle.append(" (Debug)");
 	Application::Window = SDL_CreateWindow(ApplicationTitle.c_str(),
@@ -750,6 +753,8 @@ int Initialize(int argc, char** argv)
 
 	UIBox::InitUI();
 
+	Scene::LoadNewScene(GetStartupScene());
+	Scene::Tick();
 	if (argc > 1)
 	{
 		std::vector<std::string> LaunchArguments;
@@ -759,8 +764,6 @@ int Initialize(int argc, char** argv)
 		}
 		LaunchArgs::EvaluateLaunchArguments(LaunchArguments);
 	}
-	Scene::LoadNewScene(GetStartupScene());
-	Scene::Tick();
 #if EDITOR
 	// Initialize EditorUI
 	Application::EditorUserInterface = new EditorUI();

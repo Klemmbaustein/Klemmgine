@@ -281,7 +281,14 @@ bool CSharp::GetUseCSharp()
 		UseCSharp = std::filesystem::exists("CSharp");
 #else
 		SaveGame g = SaveGame(Build::GetProjectBuildName(), "keproj", false);
-		UseCSharp = g.GetPropterty("Klemmgine.NET:Use_C#_in_project_(Requires_restart)").Value == "1";
+		if (g.SaveGameIsNew())
+		{
+			UseCSharp = true;
+		}
+		else
+		{
+			UseCSharp = g.GetPropterty("Klemmgine.NET:Use_C#_in_project_(Requires_restart)").Value == "1";
+		}
 #endif
 		return UseCSharp;
 	}

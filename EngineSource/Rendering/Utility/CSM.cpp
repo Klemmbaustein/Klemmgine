@@ -194,7 +194,7 @@ namespace CSM
 	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane)
 	{
 		const auto proj = glm::perspective(
-			2.f, (float)Graphics::WindowResolution.X / (float)Graphics::WindowResolution.Y, nearPlane,
+			Graphics::MainCamera->FOV, (float)Graphics::WindowResolution.X / (float)Graphics::WindowResolution.Y, nearPlane,
 			farPlane);
 
 		const auto corners = getFrustumCornersWorldSpace(proj, Graphics::MainCamera->getView());

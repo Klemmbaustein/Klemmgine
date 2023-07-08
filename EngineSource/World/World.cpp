@@ -166,22 +166,6 @@ namespace Performance
 	unsigned int DrawCalls = 0;
 }
 
-namespace Objects
-{
-	std::vector<WorldObject*> AllObjects;
-	std::vector<WorldObject*> GetAllObjectsWithID(uint32_t ID)
-	{
-		std::vector<WorldObject*> FoundObjects;
-		for (WorldObject* o : Objects::AllObjects)
-		{
-			if (o->GetObjectDescription().ID == ID)
-			{
-				FoundObjects.push_back(o);
-			}
-		}
-		return FoundObjects;
-	}
-}
 
 namespace Stats
 {

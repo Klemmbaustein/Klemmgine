@@ -107,7 +107,6 @@ void UIVectorField::Generate()
 	DeleteChildren();
 	FieldBox = new UIBox(true, 0);
 	FieldBox->SetPadding(0);
-	//TODO: add color picker to editor UI in some way
 	if (Type == E_RGB)
 	{
 		ColorDisplay = new UIButton(true, 0, Value, nullptr, 3);
