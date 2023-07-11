@@ -61,8 +61,8 @@ namespace Scene
 			Graphics::MainCamera = DefaultCamera;
 			if (!IsInEditor)
 			{
-				//auto UIR = Graphics::UIToRender;
-				for (UICanvas* b : Graphics::UIToRender)
+				auto UIR = Graphics::UIToRender;
+				for (UICanvas* b : UIR)
 				{
 					delete b;
 				}

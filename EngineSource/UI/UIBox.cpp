@@ -143,7 +143,8 @@ void UIBox::RedrawUI()
 void UIBox::ClearUI()
 {
 	UI::ElementsToUpdate.clear();
-	for (auto* elem : UI::UIElements)
+	auto elems = UI::UIElements;
+	for (auto* elem : elems)
 	{
 		if (!elem->Parent)
 		{
