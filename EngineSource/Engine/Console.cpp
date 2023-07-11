@@ -171,7 +171,7 @@ void Console::InitializeConsole()
 			},
 			[]() {
 #if ENGINE_CSHARP
-				ConsoleLog(CSharp::GetUseCSharp() ? "With C#: Yes" : "With C#: Turned off");
+				ConsoleLog(CSharp::GetUseCSharp() ? "With C#: Yes" : "With C#: Disabled");
 #else
 				ConsoleLog("With C#: No");
 #endif
