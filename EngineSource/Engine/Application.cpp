@@ -655,6 +655,11 @@ void ApplicationLoop()
 	Performance::DeltaTime = std::min(Performance::DeltaTime, 0.1f);
 	Stats::Time += Performance::DeltaTime;
 	Performance::DrawCalls = 0u;
+
+	if (IS_IN_EDITOR && !Application::WindowHasFocus())
+	{
+		SDL_Delay(500 - (Performance::DeltaTime * 1000));
+	}
 }
 
 int Initialize(int argc, char** argv)
