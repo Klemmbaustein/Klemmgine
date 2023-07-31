@@ -9,6 +9,7 @@
 #include <Engine/Build/Build.h>
 #include <CSharp/CSharpInterop.h>
 #include <filesystem>
+#include <UI/EditorUI/Popups/BakeMenu.h>
 
 #define MAX_CATEGORY_BUTTONS 16
 
@@ -115,8 +116,10 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 			ButtonCategory::Button("Wireframe", Editor::CurrentUI->Textures[1], []() {
 					Log::Print("Toggled wireframe", Vector3(0.3, 0.4, 1));
 					Graphics::IsWireframe = !Graphics::IsWireframe;
+				}),
+			ButtonCategory::Button("Bake", Editor::CurrentUI->Textures[3], []() {
+					new BakeMenu();
 				})
-
 		}));
 	RegisterNewButtonCategory(ButtonCategory("Project",
 		{

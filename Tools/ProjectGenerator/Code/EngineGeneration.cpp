@@ -199,21 +199,21 @@ void Installation::ManageFirstInstall(TextRenderer* t)
 	TextBackground->SetMinSize(1);
 	TextBackground->SetPadding(0);
 	HorizontalBox->AddChild(TextBackground);
-	HorizontalBox->AddChild((new UIBackground(true, 0, 0.4, Vector2f(0.005, 1)))
+	HorizontalBox->AddChild((new UIBackground(true, 0, 0.4f, Vector2f(0.005, 1)))
 		->SetPadding(0, 0, 0.05, 0.05));
 
 	PackageBackground = new UIBox(false, 0);
 	HorizontalBox->AddChild(PackageBackground
 		->AddChild((new UIText(0.5, 0, "or provide path to library package", Text))
 			->SetPadding(0))
-		->AddChild((new UIButton(true, 0, Vector3f32(0, 0.8, 0), []() { LoadLibraryPackage(Util::ShowSelectFolderDialog()); }))
+		->AddChild((new UIButton(true, 0, Vector3f32(0, 0.8f, 0), []() { LoadLibraryPackage(Util::ShowSelectFolderDialog()); }))
 			->SetBorder(UIBox::E_ROUNDED, 0.75)
-			->AddChild((new UIText(0.4, 0, "Open library package", Text))->SetPadding(0.025))));
+			->AddChild((new UIText(0.4f, 0, "Open library package", Text))->SetPadding(0.025))));
 	LoadFileTexture = Texture::LoadTexture("Textures/Folder.png");
 	PackageBackground->Align = UIBox::E_REVERSE;
 	PackageBackground->SetMinSize(1);
 	PackageBackground->SetMaxSize(1);
-	(new UIButton(true, Vector2f32(-0.9, -0.9), Vector3f32(0, 0.85, 0), []() {GenerateFiles(); }))
+	(new UIButton(true, Vector2f32(-0.9f, -0.9f), Vector3f32(0, 0.85f, 0), []() {GenerateFiles(); }))
 		->SetBorder(UIBox::E_ROUNDED, 0.75)
 		->AddChild((new UIText(0.4, 0, "Generate", Text))
 			->SetPadding(0.03));
@@ -296,6 +296,6 @@ void Installation::UpdateLibrayPaths()
 			->SetPadding(0)
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE));
 		TextBackground->AddChild(b);
-		TextBackground->AddChild((new UIBackground(true, 0, 0.4, Vector2f(1, 0.01)))->SetPadding(0));
+		TextBackground->AddChild((new UIBackground(true, 0, 0.4f, Vector2f(1, 0.01)))->SetPadding(0));
 	}
 }

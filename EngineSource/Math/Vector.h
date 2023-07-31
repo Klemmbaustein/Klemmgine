@@ -67,7 +67,7 @@ struct Vector3
 
 	Vector3(glm::vec3 xyz);
 
-	operator glm::vec3()
+	operator glm::vec3() const
 	{
 		return glm::vec3(X, Y, Z);
 	}

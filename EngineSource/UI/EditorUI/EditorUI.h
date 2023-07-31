@@ -33,7 +33,7 @@ namespace Editor
 	extern bool PrevHoveringPopup;
 	extern Vector2 DragMinMax;
 	extern Vector2 NewDragMinMax;
-
+	extern bool IsBakingScene;
 	inline std::map<std::string, Vector3> ItemColors
 	{
 		std::pair("dir", Vector3(0.8, 0.5, 0)),
@@ -91,6 +91,8 @@ public:
 	void OnLeave(void(*ReturnF)());
 	virtual void Tick() override;
 	void GenUITextures();
+
+	static bool IsTitleBarHovered();
 
 	UIBox* DraggedItem = nullptr;
 	UIBox* Dropdown = nullptr;
@@ -168,6 +170,8 @@ public:
 	};
 	std::vector<ObjectListItem> GetObjectList();
 	void OnButtonClicked(int Index);
+
+	void BakeScene();
 
 	void OnResized();
 protected:

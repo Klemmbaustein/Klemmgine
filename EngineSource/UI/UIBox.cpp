@@ -461,6 +461,7 @@ void UIBox::DrawAllUIElements()
 		}
 		UI::ElementsToUpdate.clear();
 		glViewport(0, 0, Graphics::WindowResolution.X * 2, Graphics::WindowResolution.Y * 2);
+		glEnable(GL_BLEND);
 		glBindFramebuffer(GL_FRAMEBUFFER, UI::UIBuffer);
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);

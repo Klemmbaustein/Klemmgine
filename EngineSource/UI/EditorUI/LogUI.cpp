@@ -80,7 +80,7 @@ void LogUI::Tick()
 			{
 				Text.append(" (x" + std::to_string(Log::Messages[i].Amount + 1) + ")");
 			}
-			LogTexts.push_back((new UIText(0.4, Log::Messages[i].Color, Text, Editor::CurrentUI->EngineUIText)));
+			LogTexts.push_back((new UIText(0.425, Log::Messages[i].Color, Text, Editor::CurrentUI->EngineUIText)));
 			LogScrollBox->AddChild(LogTexts[LogTexts.size() - 1]
 				->SetPadding(-0.003));
 		}

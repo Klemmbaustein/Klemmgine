@@ -11,6 +11,12 @@ class StatusBar : public EditorPanel
 public:
 	StatusBar(Vector3* Colors);
 
+	void GenerateWindowButtons(std::vector<int> ButtonIndices);
+
+	UIBox* WindowButtonBox = nullptr;
+
+	static bool IsHovered();
+
 	void UpdateLayout() override;
 	void Tick() override;
 	void OnButtonClicked(int Index) override;

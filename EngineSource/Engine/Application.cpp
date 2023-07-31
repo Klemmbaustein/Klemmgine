@@ -25,6 +25,7 @@
 #include <Rendering/Utility/CSM.h>
 #include <Rendering/Utility/SSAO.h>
 #include <Rendering/Utility/Bloom.h>
+#include <Rendering/Utility/BakedLighting.h>
 #include <Rendering/Texture/Cubemap.h>
 #include <Rendering/Camera/Camera.h>
 #include <Rendering/Camera/FrustumCulling.h>
@@ -63,21 +64,94 @@ Vector2 GetMousePosition()
 
 namespace Application
 {
+	bool IsWindowFullscreen = false;
+
+#if EDITOR
+	constexpr int MOUSE_GRAB_PADDING = 8;
+
+	SDL_HitTestResult HitTestCallback(SDL_Window* Window, const SDL_Point* Area, void* Data)
+	{
+		int Width, Height;
+		SDL_GetWindowSize(Window, &Width, &Height);
+		int x;
+		int y;
+		SDL_GetMouseState(&x, &y);
+		Input::MouseLocation = Vector2(((float)Area->x / (float)Width - 0.5f) * 2.0f, 1.0f - ((float)Area->y / (float)Height * 2.0f));
+
+		if (IsWindowFullscreen || UI::HoveredButton)
+		{
+			return SDL_HITTEST_NORMAL;
+		}
+
+		if (Area->y < MOUSE_GRAB_PADDING)
+		{
+			if (Area->x < MOUSE_GRAB_PADDING)
+			{
+				return SDL_HITTEST_RESIZE_TOPLEFT;
+			}
+			else if (Area->x > Width - MOUSE_GRAB_PADDING)
+			{
+				return SDL_HITTEST_RESIZE_TOPRIGHT;
+			}
+			else
+			{
+				return SDL_HITTEST_RESIZE_TOP;
+			}
+		}
+		else if (Area->y > Height - MOUSE_GRAB_PADDING)
+		{
+			if (Area->x < MOUSE_GRAB_PADDING)
+			{
+				return SDL_HITTEST_RESIZE_BOTTOMLEFT;
+			}
+			else if (Area->x > Width - MOUSE_GRAB_PADDING)
+			{
+				return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
+			}
+			else
+			{
+				return SDL_HITTEST_RESIZE_BOTTOM;
+			}
+		}
+		else if (Area->x < MOUSE_GRAB_PADDING)
+		{
+			return SDL_HITTEST_RESIZE_LEFT;
+		}
+		else if (Area->x > Width - MOUSE_GRAB_PADDING)
+		{
+			return SDL_HITTEST_RESIZE_RIGHT;
+		}
+		else if (EditorUI::IsTitleBarHovered())
+		{
+			return SDL_HITTEST_DRAGGABLE;
+		}
+
+		return SDL_HITTEST_NORMAL;
+	}
+#endif
+
 	SDL_Window* Window = nullptr;
 	bool ShouldClose = false;
+	
 	bool WindowHasFocus()
 	{
 		return SDL_GetKeyboardFocus() == Window || Stats::Time <= 1;
 	}
+
 	void Quit()
 	{
 		ShouldClose = true;
 	}
+	void Minimize()
+	{
+		SDL_MinimizeWindow(Application::Window);
+	}
 	std::set<ButtonEvent> ButtonEvents;
 	Shader* PostProcessShader = nullptr;
 	Shader* ShadowShader = nullptr;
-	bool IsWindowFullscreen = false;
 #if EDITOR
+	Vector2 PreviousSize = 0;
+	Vector2 PreviousPosition = 0;
 	EditorUI* EditorUserInterface = nullptr;
 #endif
 
@@ -102,10 +176,27 @@ namespace Application
 		IsWindowFullscreen = NewFullScreen;
 		if (IsInEditor)
 		{
-			if (Application::IsWindowFullscreen)
-				SDL_MaximizeWindow(Application::Window);
+			int w, h;
+			if (IsWindowFullscreen)
+			{
+				SDL_GetWindowPosition(Application::Window, &w, &h);
+				PreviousSize = Application::GetWindowSize();
+				PreviousPosition = Vector2(w, h);
+				SDL_Rect r;
+				SDL_GetDisplayUsableBounds(SDL_GetWindowDisplayIndex(Application::Window), &r);
+
+				SDL_SetWindowPosition(Application::Window, r.x, r.y);
+				SDL_SetWindowSize(Application::Window, r.w, r.h);
+			}
 			else
-				SDL_RestoreWindow(Application::Window);
+			{
+				SDL_SetWindowPosition(Application::Window, PreviousPosition.X, PreviousPosition.Y);
+				SDL_SetWindowSize(Application::Window, PreviousSize.X, PreviousSize.Y);
+
+			}
+			SDL_GetWindowSize(Application::Window, &w, &h);
+			Graphics::SetWindowResolution(Vector2(w, h));
+			UIBox::RedrawUI();
 		}
 		else
 		{
@@ -304,6 +395,7 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, Buffer->ReflectionCubemap);
 	// Main pass
+	BakedLighting::BindToTexture();
 	for (auto o : Buffer->Renderables)
 	{
 		o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
@@ -514,37 +606,49 @@ void PollInput()
 
 void DrawPostProcessing()
 {
+	bool ShouldSkip3D = false;
 #if EDITOR
 	if (!Application::WindowHasFocus())
 	{
-		return;
+		ShouldSkip3D = true;
 	}
 #endif
-	unsigned int BloomTexture = Bloom::BlurFramebuffer(Graphics::MainFramebuffer->GetTextureID());
+	unsigned int BloomTexture = 0;
 
-	unsigned int SSAOTexture = SSAO::Render(
-		Graphics::MainFramebuffer->GetBuffer()->GetTextureID(2),
-		Graphics::MainFramebuffer->GetBuffer()->GetTextureID(3));
+	unsigned int SSAOTexture = 0;
+
+	if (!ShouldSkip3D)
+	{
+		BloomTexture = Bloom::BlurFramebuffer(Graphics::MainFramebuffer->GetTextureID());
+
+		SSAOTexture = SSAO::Render(
+			Graphics::MainFramebuffer->GetBuffer()->GetTextureID(2),
+			Graphics::MainFramebuffer->GetBuffer()->GetTextureID(3));
+	}
 
 	Vector2 ActualRes = Application::GetWindowSize();
 	glViewport(0, 0, ActualRes.X, ActualRes.Y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	Debugging::EngineStatus = "Rendering (Post process: Main)";
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0));
+
+	if (!ShouldSkip3D)
+	{
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0));
 #if EDITOR
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->OutlineBuffer->GetBuffer()->GetTextureID(1));
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->ArrowsBuffer->GetBuffer()->GetTextureID(0));
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->OutlineBuffer->GetBuffer()->GetTextureID(1));
+		glActiveTexture(GL_TEXTURE3);
+		glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->ArrowsBuffer->GetBuffer()->GetTextureID(0));
 #endif
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, BloomTexture);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, SSAOTexture);
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(1));
-	glActiveTexture(GL_TEXTURE7);
+		glActiveTexture(GL_TEXTURE4);
+		glBindTexture(GL_TEXTURE_2D, BloomTexture);
+		glActiveTexture(GL_TEXTURE5);
+		glBindTexture(GL_TEXTURE_2D, SSAOTexture);
+		glActiveTexture(GL_TEXTURE6);
+		glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(1));
+		glActiveTexture(GL_TEXTURE7);
+	}
 	glBindTexture(GL_TEXTURE_2D, UIBox::GetUIFramebuffer());
 	Application::PostProcessShader->Bind();
 	Application::PostProcessShader->SetFloat("u_gamma", Graphics::Gamma);
@@ -570,6 +674,7 @@ void DrawPostProcessing()
 	{
 		glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_bloomtexture"), 4);
 	}
+	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	Application::PostProcessShader->Unbind();
 	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
@@ -598,12 +703,9 @@ void ApplicationLoop()
 	}
 
 	Debugging::EngineStatus = "Rendering (UI)";
-	if (Application::WindowHasFocus() || !IS_IN_EDITOR)
-	{
-		UI::NewHoveredButton = nullptr;
-		UIBox::DrawAllUIElements();
-		UI::HoveredButton = UI::NewHoveredButton;
-	}
+	UI::NewHoveredButton = nullptr;
+	UIBox::DrawAllUIElements();
+	UI::HoveredButton = UI::NewHoveredButton;
 	glDisable(GL_BLEND);
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
@@ -658,7 +760,7 @@ void ApplicationLoop()
 
 	if (IS_IN_EDITOR && !Application::WindowHasFocus())
 	{
-		SDL_Delay(500 - (Performance::DeltaTime * 1000));
+		SDL_Delay(100 - (Performance::DeltaTime * 1000));
 	}
 }
 
@@ -705,6 +807,7 @@ int Initialize(int argc, char** argv)
 		ApplicationTitle.append(" (C#-.net)");
 	}
 #endif
+
 	if (EngineDebug && !IsInEditor) ApplicationTitle.append(" (Debug)");
 	Application::Window = SDL_CreateWindow(ApplicationTitle.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -713,6 +816,12 @@ int Initialize(int argc, char** argv)
 
 	SDL_GL_CreateContext(Application::Window);
 	SDL_SetWindowResizable(Application::Window, SDL_TRUE);
+
+#if EDITOR
+	SDL_SetWindowBordered(Application::Window, SDL_FALSE);
+	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
+	SDL_SetWindowHitTest(Application::Window, Application::HitTestCallback, 0);
+#endif
 
 	std::cout << "- Starting GLEW - ";
 	if (glewInit() != GLEW_OK)
@@ -752,6 +861,7 @@ int Initialize(int argc, char** argv)
 	CSM::Init();
 	Bloom::Init();
 	SSAO::Init();
+	BakedLighting::Init();
 	Console::InitializeConsole();
 	Cubemap::RegisterCommands();
 	InitializeShaders();

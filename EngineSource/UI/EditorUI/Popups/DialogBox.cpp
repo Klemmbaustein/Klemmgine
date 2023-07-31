@@ -27,6 +27,7 @@ DialogBox::DialogBox(std::string Title, Vector2 Position, std::string Message, s
 
 void DialogBox::UpdateLayout()
 {
+
 	ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075));
 }
 

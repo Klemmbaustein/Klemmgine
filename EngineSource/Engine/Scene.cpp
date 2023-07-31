@@ -14,6 +14,7 @@
 #include <Math/Collision/Collision.h>
 #include <Rendering/Camera/CameraShake.h>
 #include <Rendering/Camera/Camera.h>
+#include <Rendering/Utility/BakedLighting.h>
 #include <UI/Debug/DebugUI.h>
 #include <Engine/EngineProperties.h>
 
@@ -45,7 +46,7 @@ namespace Scene
 
 	bool ShouldLoadNewScene = false;
 	std::string NewLoadedScene;
-	Camera* DefaultCamera = new Camera(2, 1600, 900, false);
+	Camera* DefaultCamera = new Camera(1.8, 1600, 900, false);
 
 	std::string CurrentScene = "Content/NewScene";
 	void LoadSceneInternally(std::string FilePath)
@@ -167,6 +168,9 @@ namespace Scene
 					}
 				}
 			}
+
+			
+			BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(FilePath));
 			Log::Print(std::string("Loaded Scene (").append(std::to_string(ObjectLength)).append(std::string(" Object(s) Loaded)")));
 			Input.close();
 		}

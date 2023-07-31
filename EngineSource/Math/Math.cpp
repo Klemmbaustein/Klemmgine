@@ -65,16 +65,14 @@ int expression()
 }
 bool Maths::IsPointIn2DBox(Vector2 BoxA, Vector2 BoxB, Vector2 Point)
 {
-	bool InArea = false;
 	if (BoxA.X > BoxB.X)
 	{
-		InArea = (BoxA.X > Point.X && BoxA.Y > Point.Y && BoxB.X < Point.X && BoxB.Y < Point.Y);
+		return (BoxA.X >= Point.X && BoxA.Y >= Point.Y && BoxB.X <= Point.X && BoxB.Y <= Point.Y);
 	}
 	else
 	{
-		InArea = (BoxA.X < Point.X && BoxA.Y < Point.Y && BoxB.X > Point.X && BoxB.Y > Point.Y);
+		return (BoxA.X <= Point.X && BoxA.Y <= Point.Y && BoxB.X >= Point.X && BoxB.Y >= Point.Y);
 	}
-	return InArea;
 }
 int Maths::SolveExpr(std::string expr)
 {

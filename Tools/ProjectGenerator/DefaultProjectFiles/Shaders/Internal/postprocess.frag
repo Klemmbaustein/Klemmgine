@@ -77,35 +77,6 @@ vec4 sampleUI()
 	return UIsample;
 }
 
-vec4 blursample(sampler2D tex, vec2 coords)
-{
-	vec4 color = vec4(0);
-	vec2 texelSize = 0.5 / textureSize(u_texture, 0);
-	for (int x = -1; x <= 1; ++x)
-	{
-		for (int y = -1; y <= 1; ++y)
-		{
-			color.x += texture(u_texture, (vec2(x, y) * texelSize) + v_texcoords + vec2(u_chrabbsize * Vignette)).x;
-			color.y += texture(u_texture, (vec2(x, y) * texelSize) + v_texcoords + vec2(-u_chrabbsize * Vignette)).y;
-			color.z += texture(u_texture, (vec2(x, y) * texelSize) + v_texcoords + vec2(u_chrabbsize * Vignette, -u_chrabbsize * Vignette)).z;
-		}
-	}
-	color /= 9;
-	return color;
-}
-
-vec4 sharpen(in sampler2D tex, in vec2 coords, in vec2 renderSize) {
-  float dx = 1.0 / renderSize.x;
-  float dy = 1.0 / renderSize.y;
-  vec4 sum = vec4(0.0);
-  sum += -1. * blursample(tex, coords + vec2( -1.0 * dx , 0.0 * dy));
-  sum += -1. * blursample(tex, coords + vec2( 0.0 * dx , -1.0 * dy));
-  sum += 5. * blursample(tex, coords + vec2( 0.0 * dx , 0.0 * dy));
-  sum += -1. * blursample(tex, coords + vec2( 0.0 * dx , 1.0 * dy));
-  sum += -1. * blursample(tex, coords + vec2( 1.0 * dx , 0.0 * dy));
-  return sum;
-}
-
 void main()
 {
 	vec4 color = texture(u_texture, v_texcoords);
@@ -143,5 +114,6 @@ void main()
 	f_color = mix(f_color, enginearrows, length(enginearrows.rgb));
 	f_color *= (rand(v_texcoords) / 50) + 0.95; // To combat color banding
 	f_color -= Vignette * u_vignette;
-	f_color = mix(clamp(f_color, 0, 1), vec4(uicolor.xyz, 1), clamp(uicolor.w, 0, 1));
+	f_color.xyz = mix(clamp(f_color.xyz, 0, 1), uicolor.xyz, clamp(uicolor.w, 0, 1));
+	f_color.w = 1;
 }

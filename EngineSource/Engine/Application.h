@@ -18,6 +18,7 @@ namespace Application
 	extern float LogicTime, RenderTime, SyncTime;
 	extern SDL_Window* Window;
 	void Quit();
+	void Minimize();
 	void SetFullScreen(bool NewFullScreen);
 	bool GetFullScreen();
 	void SetCursorPosition(Vector2 NewPos);

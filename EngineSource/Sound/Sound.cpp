@@ -73,48 +73,6 @@ std::vector<std::string> GetAvaliableDevices(ALCdevice* device)
 
 	return devicesVec;
 }
-int InitAL(char*** argv, int* argc)
-{
-	const ALCchar* name;
-	CurrentDevice;
-
-	/* Open and initialize a device */
-	CurrentDevice = NULL;
-	if (argc && argv && *argc > 1 && strcmp((*argv)[0], "-device") == 0)
-	{
-		CurrentDevice = alcOpenDevice((*argv)[1]);
-		if (!CurrentDevice)
-			fprintf(stderr, "Failed to open \"%s\", trying default\n", (*argv)[1]);
-		(*argv) += 2;
-		(*argc) -= 2;
-	}
-	if (!CurrentDevice)
-		CurrentDevice = alcOpenDevice(NULL);
-	if (!CurrentDevice)
-	{
-		fprintf(stderr, "Could not open a device!\n");
-		return 1;
-	}
-
-	ALContext = alcCreateContext(CurrentDevice, NULL);
-	if (ALContext == NULL || alcMakeContextCurrent(ALContext) == ALC_FALSE)
-	{
-		if (ALContext != NULL)
-			alcDestroyContext(ALContext);
-		alcCloseDevice(CurrentDevice);
-		fprintf(stderr, "Could not set a context!\n");
-		return 1;
-	}
-
-	name = NULL;
-	if (alcIsExtensionPresent(CurrentDevice, "ALC_ENUMERATE_ALL_EXT"))
-		name = alcGetString(CurrentDevice, ALC_ALL_DEVICES_SPECIFIER);
-	if (!name || alcGetError(CurrentDevice) != AL_NO_ERROR)
-		name = alcGetString(CurrentDevice, ALC_DEVICE_SPECIFIER);
-	printf("Opened \"%s\"\n", name);
-
-	return 0;
-}
 
 bool IsBigEndian()
 {
@@ -226,9 +184,6 @@ namespace Sound
 				{
 					Update3DVolumeOfSound(CurrentSources[i], PositionVec);
 				}
-				else
-				{
-				}
 			}
 		}
 	}
@@ -255,7 +210,6 @@ namespace Sound
 				Console::ConsoleLog("Sound " + Console::CommandArgs()[0] + " doesn't exist!", Console::E_ERROR);
 			}, {Console::Command::Argument("sound", Type::E_STRING)}));
 		Console::RegisterConVar(Console::Variable("soundvolume", Type::E_FLOAT, &MasterVolume, nullptr));
-
 	}
 	void End()
 	{

@@ -14,6 +14,30 @@ bool Collision::CollisionAABB(Box a, Box b)
 }
 
 
+Collision::HitResponse testRayThruTriangle(glm::vec3 orig, glm::vec3 end, glm::vec3 A, glm::vec3 B, glm::vec3 C)
+{
+	glm::vec3 dir = end;
+	glm::vec3 E1 = C - A;
+	glm::vec3 E2 = B - A;
+	glm::vec3 N = glm::cross(E1, E2);
+	float det = -glm::dot(dir, N);
+	float invdet = 1.0 / det;
+	glm::vec3 AO = orig - A;
+	glm::vec3 DAO = glm::cross(AO, dir);
+	float u = dot(E2, DAO) * invdet;
+	float v = -dot(E1, DAO) * invdet;
+	float t = dot(AO, N) * invdet;
+	if (( t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0))
+		return Collision::HitResponse(true, orig + end * t, normalize(N), t);
+	else return Collision::HitResponse();
+}
+
+Collision::HitResponse Collision::TriangleLine(const Vector3& TriA, const Vector3& TriB, const Vector3& TriC, const Vector3& RayStart, const Vector3& RayEnd)
+{
+	return testRayThruTriangle(RayStart, RayEnd - RayStart, TriA, TriB, TriC);
+}
+
+
 bool SpheresOverlapping(glm::vec3 Sphere1Pos, float Sphere1Radius, glm::vec3 Sphere2Pos, float Sphere2Radius)
 {
 	return glm::distance(Sphere1Pos, Sphere2Pos) < Sphere1Radius + Sphere2Radius;
@@ -196,23 +220,6 @@ Collision::HitResponse Collision::LineCheckForAABB(Collision::Box a, Vector3 Ray
 	return HitResponse(true, ImpactLocation + RayStart, Normal, tMin);
 }
 
-Collision::HitResponse testRayThruTriangle(glm::vec3 orig, glm::vec3 end, glm::vec3 A, glm::vec3 B, glm::vec3 C)
-{
-	glm::vec3 dir = end;
-	glm::vec3 E1 = C - A;
-	glm::vec3 E2 = B - A;
-	glm::vec3 N = glm::cross(E1, E2);
-	float det = -glm::dot(dir, N);
-	float invdet = 1.0 / det;
-	glm::vec3 AO = orig - A;
-	glm::vec3 DAO = glm::cross(AO, dir);
-	float u = dot(E2, DAO) * invdet;
-	float v = -dot(E1, DAO) * invdet;
-	float t = dot(AO, N) * invdet;
-	if ((det >= 1e-6 && t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0))
-		return Collision::HitResponse(true, orig + end * t, normalize(N), t);
-	else return Collision::HitResponse();
-}
 
 Collision::CollisionMesh::CollisionMesh(std::vector<Vertex> Verts, std::vector<unsigned int> Indices, Transform T)
 {
@@ -358,9 +365,6 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstLine(Vector3 RaySta
 			}
 		}
 		return r;
-	}
-	else
-	{
 	}
 	return Collision::HitResponse();
 }

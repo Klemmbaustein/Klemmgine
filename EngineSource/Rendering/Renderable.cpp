@@ -6,6 +6,7 @@
 #include <Rendering/Utility/Framebuffer.h>
 #include <Rendering/Texture/Texture.h>
 #include "Utility/ShaderManager.h"
+#include <Rendering/Utility/BakedLighting.h>
 
 void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
 {
@@ -14,8 +15,10 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
 	glBindTexture(GL_TEXTURE_2D_ARRAY, CSM::ShadowMaps);
 	ShaderToApply->SetFloat("farPlane", CSM::cameraFarPlane);
 	ShaderToApply->SetInt("cascadeCount", CSM::shadowCascadeLevels.size());
-	ShaderToApply->SetInt("u_textureres", Graphics::ShadowResolution);
 	ShaderToApply->SetInt("shadowMap", 1);
+	ShaderToApply->SetInt("GiMap", 3);
+	ShaderToApply->SetInt("GiRes", BakedLighting::GetLightTextureSize());
+	ShaderToApply->SetVector3("GiScale", BakedLighting::GetLightMapScale());
 	ShaderToApply->SetInt("Skybox", 2);
 	ShaderToApply->SetFloat("u_biasmodifier", Vector3::Dot(
 		Vector3::GetForwardVector(Graphics::MainCamera->Rotation),

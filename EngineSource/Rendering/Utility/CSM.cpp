@@ -12,7 +12,7 @@ namespace CSM
 {
 	float CSMDistance = 1;
 	const float cameraFarPlane = 400.f;
-	std::vector<float> shadowCascadeLevels{ cameraFarPlane / 12.f, cameraFarPlane / 3.f, cameraFarPlane / 1.5f, cameraFarPlane / 1.f };
+	std::vector<float> shadowCascadeLevels{ cameraFarPlane / 12.f, cameraFarPlane / 4.f, cameraFarPlane / 1.5f, cameraFarPlane / 1.f };
 	GLuint LightFBO;
 	int Cascades = 4;
 	GLuint ShadowMaps;
@@ -253,7 +253,7 @@ namespace CSM
 			maxZ *= zMult;
 		}
 
-		float zoom = 1.5;
+		float zoom = 2;
 
 		const glm::mat4 lightProjection = glm::ortho(minX / zoom, maxX / zoom, minY / zoom, maxY / zoom, minZ / zoom, maxZ / zoom);
 

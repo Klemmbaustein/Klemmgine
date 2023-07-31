@@ -58,6 +58,7 @@ namespace Collision
 	};
 	bool CollisionAABB(Box a, Box b);
 
+	Collision::HitResponse TriangleLine(const Vector3& TriA, const Vector3& TriB, const Vector3& TriC, const Vector3& RayStart, const Vector3& RayEnd);
 
 	HitResponse BoxOverlapCheck(Box a, Vector3 Offset);
 	bool IsPointIn3DBox(Box a, Vector3 p);

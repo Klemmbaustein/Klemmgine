@@ -64,7 +64,6 @@ public:
 	static unsigned int GetUIFramebuffer();
 	static void RedrawUI();
 	static void ClearUI();
-	Vector2 GetScreenPosition();
 	bool IsHovered();
 	virtual Vector2 GetUsedSize();
 	ScrollObject* CurrentScrollObject = nullptr;

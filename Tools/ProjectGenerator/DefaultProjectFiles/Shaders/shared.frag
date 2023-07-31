@@ -39,12 +39,14 @@ uniform float cascadePlaneDistances[8];
 uniform float u_biasmodifier = 0;
 uniform DirectionalLight u_directionallight;
 uniform int u_shadowQuality = 0;
-uniform int u_textureres = 0;
 uniform vec3 u_cameraposition = vec3(0);
 uniform int u_shadows = 0;
 uniform PointLight u_lights[8];
 uniform bool u_ssao_reverse = true;
 uniform samplerCube Skybox;
+uniform sampler3D GiMap;
+uniform int GiRes;
+uniform vec3 GiScale;
 
 layout (std140, binding = 0) uniform LightSpaceMatrices
 {
@@ -85,7 +87,7 @@ float SampleFromShadowMap(vec2 distances)
 	return ShadowVal / ((PCF_SIZE - 1) * (PCF_SIZE - 1));
 }
 
-float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal)
+float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal, float BakedShadow)
 {
 	// select cascade layer
 	vec4 fragPosViewSpace = u_view * vec4(fragPosWorldSpace, 1.0);
@@ -106,7 +108,7 @@ float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal)
 	}
 	if (layer == cascadeCount)
 	{
-		return 0.f;
+		return 1 - BakedShadow;
 	}
 	vec4 fragPosLightSpace = lightSpaceMatrices[layer] * vec4(fragPosWorldSpace, 1.0);
 
@@ -121,7 +123,7 @@ float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal)
 	// keep the shadow at 0.0 when outside the far_plane region of the light's frustum.
 	if (currentDepth > 1.0)
 	{
-		return 0.f;
+		return 1 - BakedShadow;
 	}
 	vec2 texelSize = 1.f / textureSize(shadowMap, 0).xy;
 
@@ -137,7 +139,7 @@ float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal)
 
 	// PCF
 	float shadow = 0.f;
-	vec2 distances = vec2(mod(projCoords.x, texelSize.x), mod(projCoords.y, texelSize.y)) * vec2(u_textureres);
+	vec2 distances = vec2(mod(projCoords.x, texelSize.x), mod(projCoords.y, texelSize.y)) * vec2(textureSize(shadowMap, 0));
 	for (int x = 0; x < PCF_SIZE; ++x)
 	{
 		for (int y = 0; y < PCF_SIZE; ++y)
@@ -150,18 +152,24 @@ float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal)
 	return SampleFromShadowMap(distances);
 }
 
+vec3 SampleLightMap()
+{
+	return texture(GiMap, (v_position / GiScale) + 0.5).xyz;
+}
+
 vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, vec3 normal)
 {
 	vec3 view = normalize(v_position.xyz - u_cameraposition.xyz);
 	vec3 reflection = reflect(u_directionallight.Direction, normal);
 	float shadow = 1;
+	float LightmapShadow = SampleLightMap().x;
 	if (u_shadows == 1)
 	{
-		shadow = 1 - ShadowCalculation(v_position, normal); //ShadowCalculation is expensive because of PCF
+		shadow = 1 - ShadowCalculation(v_position, normal, LightmapShadow); //ShadowCalculation is expensive because of PCF
 	}
 	else
 	{
-		shadow = 1;
+		shadow = LightmapShadow;
 	}
 	float specular = 1 * pow(max(dot(reflection, view), 0.000001), specularsize * 35) * specularstrength;
 	vec3 light = (u_directionallight.Direction);
@@ -173,7 +181,10 @@ vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, v
 	float Intensity = max(dot(normal, light), 0.f);
 
 	vec3 DirectionalLightColor = Intensity * (color * u_directionallight.Intensity) * (1 - u_directionallight.AmbientIntensity) * u_directionallight.SunColor;
-	vec3 ambient = max(vec3(vec4(color, 1.f)) * vec3(u_directionallight.AmbientIntensity),  0.f) * u_directionallight.AmbientColor;
+	vec3 ambient = color
+	* u_directionallight.AmbientIntensity
+	* (mix(LightmapShadow, 1.0, 0.5))
+	* mix(u_directionallight.AmbientColor, vec3(1), LightmapShadow);
 
 	if (specularstrength > 0)
 	{
@@ -198,7 +209,6 @@ vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, v
 		}
 		else break;
 	}
-	lightingColor *= ambient / u_directionallight.AmbientIntensity;
 
 	return ambient + (DirectionalLightColor + specular) * shadow + lightingColor;
 }

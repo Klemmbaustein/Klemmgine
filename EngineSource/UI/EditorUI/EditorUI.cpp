@@ -23,6 +23,8 @@
 #include <UI/EditorUI/Popups/DialogBox.h>
 #include <Engine/Console.h>
 #include <CSharp/CSharpInterop.h>
+#include <Rendering/Utility/BakedLighting.h>
+#include <World/Assets.h>
 
 namespace Editor
 {
@@ -35,6 +37,7 @@ namespace Editor
 	Vector2 DragMinMax;
 	Vector2 NewDragMinMax = DragMinMax;
 	bool IsSavingScene = false;
+	bool IsBakingScene = false;
 
 	Vector3 NewUIColors[EditorUI::NumUIColors] =
 	{
@@ -275,6 +278,14 @@ void EditorUI::Tick()
 	}
 	Editor::DragMinMax = Editor::NewDragMinMax;
 
+	if (BakedLighting::FinishedBaking)
+	{
+		BakedLighting::FinishedBaking = false;
+		Editor::IsBakingScene = false;
+		Assets::ScanForAssets();
+		BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene));
+	}
+
 	if (UI::HoveredButton)
 	{
 		CurrentCursor = E_GRAB;
@@ -363,7 +374,7 @@ std::string EditorUI::ToShortString(float val)
 
 void EditorUI::GenUITextures()
 {
-	const int ImageSize = 23;
+	const int ImageSize = 27;
 	std::string Images[ImageSize]
 	{								//Texture Indices
 		"CPPClass.png",				//00 -> C++ class icon
@@ -389,6 +400,10 @@ void EditorUI::GenUITextures()
 		"Settings.png",				//20 -> Settings icon
 		"Play.png",					//21 -> Play icon
 		"CSharpClass.png",			//22 -> CSharp class icon
+		"WindowX.png",				//23 -> Window X icon
+		"WindowResize.png",			//24 -> Window Resize icon
+		"WindowResize2.png",		//25 -> Window Fulscreen Resize icon
+		"WindowMin.png"				//26 -> Window Minimize icon
 	};
 
 	for (int i = 0; i < Textures.size(); i++)
@@ -420,6 +435,11 @@ void EditorUI::GenUITextures()
 			stbi_image_free(TextureBuffer);
 		}
 	}
+}
+
+bool EditorUI::IsTitleBarHovered()
+{
+	return StatusBar::IsHovered();
 }
 
 std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
@@ -514,6 +534,12 @@ void EditorUI::OnButtonClicked(int Index)
 		delete Dropdown;
 		Dropdown = nullptr;
 	}
+}
+
+void EditorUI::BakeScene()
+{
+	Editor::IsBakingScene = true;
+	BakedLighting::BakeCurrentSceneToFile();
 }
 
 void EditorUI::OnResized()

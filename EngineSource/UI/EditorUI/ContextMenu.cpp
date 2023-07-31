@@ -10,6 +10,7 @@
 #include <Engine/FileUtility.h>
 #include <Engine/Scene.h>
 #include <Engine/Log.h>
+#include <Rendering/Utility/BakedLighting.h>
 
 ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.3, 0.5))
 {
