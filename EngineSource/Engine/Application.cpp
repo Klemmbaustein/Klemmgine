@@ -144,7 +144,7 @@ namespace Application
 	}
 	void Minimize()
 	{
-		SDL_MinimizeWindow(Application::Window);
+		SDL_MinimizeWindow(Window);
 	}
 	std::set<ButtonEvent> ButtonEvents;
 	Shader* PostProcessShader = nullptr;
@@ -178,28 +178,28 @@ namespace Application
 		int w, h;
 		if (IsWindowFullscreen)
 		{
-			SDL_GetWindowPosition(Application::Window, &w, &h);
-			PreviousSize = Application::GetWindowSize();
+			SDL_GetWindowPosition(Window, &w, &h);
+			PreviousSize = GetWindowSize();
 			PreviousPosition = Vector2(w, h);
 			SDL_Rect r;
-			SDL_GetDisplayUsableBounds(SDL_GetWindowDisplayIndex(Application::Window), &r);
+			SDL_GetDisplayUsableBounds(SDL_GetWindowDisplayIndex(Window), &r);
 
-			SDL_SetWindowPosition(Application::Window, r.x, r.y);
-			SDL_SetWindowSize(Application::Window, r.w, r.h);
+			SDL_SetWindowPosition(Window, r.x, r.y);
+			SDL_SetWindowSize(Window, r.w, r.h);
 		}
 		else
 		{
-			SDL_SetWindowPosition(Application::Window, PreviousPosition.X, PreviousPosition.Y);
-			SDL_SetWindowSize(Application::Window, PreviousSize.X, PreviousSize.Y);
+			SDL_SetWindowPosition(Window, PreviousPosition.X, PreviousPosition.Y);
+			SDL_SetWindowSize(Window, PreviousSize.X, PreviousSize.Y);
 		}
-		SDL_GetWindowSize(Application::Window, &w, &h);
+		SDL_GetWindowSize(Window, &w, &h);
 		Graphics::SetWindowResolution(Vector2(w, h));
 		UIBox::RedrawUI();
 #else
-		if (Application::IsWindowFullscreen) SDL_SetWindowFullscreen(Application::Window, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
-		else SDL_SetWindowFullscreen(Application::Window, SDL_WINDOW_OPENGL);
+		if (IsWindowFullscreen) SDL_SetWindowFullscreen(Window, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		else SDL_SetWindowFullscreen(Window, SDL_WINDOW_OPENGL);
 		int w, h;
-		SDL_GetWindowSize(Application::Window, &w, &h);
+		SDL_GetWindowSize(Window, &w, &h);
 		Graphics::SetWindowResolution(Vector2(w, h));
 		UIBox::RedrawUI();
 #endif
@@ -222,7 +222,7 @@ namespace Application
 	Vector2 GetWindowSize()
 	{
 		int w, h;
-		SDL_GetWindowSize(Application::Window, &w, &h);
+		SDL_GetWindowSize(Window, &w, &h);
 		return Vector2(w, h);
 	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
@@ -668,7 +668,6 @@ void DrawPostProcessing()
 	Application::PostProcessShader->SetInt("u_ssao", Graphics::SSAO);
 	Application::PostProcessShader->SetInt("u_editor", IS_IN_EDITOR);
 	Application::PostProcessShader->SetInt("u_hasWindowBorder", IS_IN_EDITOR && !Application::GetFullScreen());
-	Application::PostProcessShader->SetVector2("u_screenRes", Graphics::WindowResolution);
 	Application::PostProcessShader->SetVector3("u_borderColor", Application::WindowHasFocus() ? Vector3(0.5, 0.5, 1) : 0.5);
 	if (Graphics::Bloom)
 	{
