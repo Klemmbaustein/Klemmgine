@@ -793,6 +793,9 @@ int Initialize(int argc, char** argv)
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	int flags = SDL_WINDOW_OPENGL;
 
+	SDL_SetHint("SDL_BORDERLESS_WINDOWED_STYLE", "1");
+	SDL_SetHint("SDL_BORDERLESS_RESIZABLE_STYLE", "1");
+
 	// Set Window resolution to the screens resolution * 0.75
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
