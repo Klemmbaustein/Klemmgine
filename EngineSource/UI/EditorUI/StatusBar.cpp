@@ -15,18 +15,19 @@ StatusBar::StatusBar(Vector3* Colors) : EditorPanel(Colors, Vector2(-1, 0.95), V
 	TabBackground->SetColor(UIColors[0] * 0.75);
 	TabBackground->SetBorder(UIBox::E_NONE, 0);
 
-	Texts[0] = new UIText(0.6, UIColors[2], "FPS: ?", Editor::CurrentUI->EngineUIText);
-	TabBackground->AddChild(Texts[0]->SetPadding(0.005, 0.005, 0.01, 0.025));
-
-	Texts[1] = new UIText(0.4, UIColors[2], ProjectName, Editor::CurrentUI->EngineUIText);
-	TabBackground->AddChild(Texts[1]->SetPadding(0, 0.01, 0.01, 0));
-
-	std::string VersionText = std::string(VERSION_STRING) + "-Editor";
-#ifdef ENGINE_CSHARP
+	std::string VersionText = "Engine v" + std::string(VERSION_STRING);
+#if ENGINE_CSHARP
 	VersionText.append("-C#");
 #endif
-	Texts[2] = new UIText(0.45, UIColors[2], VersionText, Editor::CurrentUI->EngineUIText);
-	TabBackground->AddChild(Texts[2]->SetPadding(0, 0.01, 0.01, 0));
+
+	Texts[0] = new UIText(0.6, UIColors[2], std::string(ProjectName) + " Editor", Editor::CurrentUI->EngineUIText);
+	TabBackground->AddChild(Texts[0]->SetPadding(0.005, 0.005, 0.01, 0.025));
+
+	Texts[1] = new UIText(0.6, UIColors[2], VersionText, Editor::CurrentUI->EngineUIText);
+	TabBackground->AddChild(Texts[1]->SetPadding(0.005, 0.005, 0.01, 0.025));
+
+	Texts[2] = new UIText(0.6, UIColors[2], "FPS: ", Editor::CurrentUI->EngineUIText);
+	TabBackground->AddChild(Texts[2]->SetPadding(0.005, 0.005, 0.01, 0.025));
 
 	WindowButtonBox = (new UIBox(true, Vector2(0.75, 0.95)))
 		->SetMinSize(Vector2(0.25, 0.05));
@@ -81,7 +82,12 @@ void StatusBar::Tick()
 	// so we don't have to redraw the FPS counter every time the frame time changes.
 	if (FPSUpdateTimer >= 1)
 	{
-		Texts[0]->SetText("FPS: " + std::to_string(DisplayedFPS));
+		std::string StatsText = "FPS: " + std::to_string(DisplayedFPS)
+			+ "     Delta: " + std::to_string((int)(1.0f / DisplayedFPS * 1000))
+			+ "ms     Memory used: " + std::to_string(OS::GetMemUsage() / 1000ull / 1000ull) + "mb";
+		Texts[2]->SetText(StatsText);
+		Texts[1]->SetColor(UIColors[2] * 0.8);
+		Texts[2]->SetColor(UIColors[2] * 0.8);
 		FPSUpdateTimer = 0;
 		DisplayedFPS = 0;
 	}

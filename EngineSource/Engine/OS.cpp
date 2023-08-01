@@ -6,6 +6,7 @@
 #include <shobjidl.h> 
 #include <Engine/FileUtility.h>
 #include <map>
+#include <Psapi.h>
 #endif
 
 #if __linux__
@@ -17,6 +18,13 @@
 namespace OS
 {
 	bool ConsoleCanBeHidden = true;
+}
+
+size_t OS::GetMemUsage()
+{
+	PROCESS_MEMORY_COUNTERS_EX pmc;
+	GetProcessMemoryInfo(GetCurrentProcess(), (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc));
+	return pmc.WorkingSetSize;
 }
 
 void OS::SetConsoleCanBeHidden(bool NewConsoleCanBeHidden)
@@ -122,7 +130,7 @@ std::string OS::GetOSString()
 		osInfo.dwOSVersionInfoSize = sizeof(osInfo);
 		RtlGetVersion(&osInfo);
 		osver = osInfo.dwMajorVersion;
-		return "64-bit Windows " + std::to_string(osver) + "." + std::to_string(osInfo.dwMinorVersion) + " (Build " + std::to_string(osInfo.dwBuildNumber) + ")";
+		return "64-bit Windows NT " + std::to_string(osver) + "." + std::to_string(osInfo.dwMinorVersion) + " (Build " + std::to_string(osInfo.dwBuildNumber) + ")";
 	}
 	return "64-bit Windows (Unknown version)";
 }

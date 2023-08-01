@@ -20,6 +20,9 @@ namespace OS
 		E_BLUE = 4,
 		E_YELLOW = 5
 	};
+
+	size_t GetMemUsage();
+
 	void SetConsoleCanBeHidden(bool ConsoleCanBeHidden);
 	void SetConsoleWindowVisible(bool Visible);
 	std::string ShowOpenFileDialog();

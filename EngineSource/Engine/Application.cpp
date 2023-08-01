@@ -174,39 +174,35 @@ namespace Application
 	void SetFullScreen(bool NewFullScreen)
 	{
 		IsWindowFullscreen = NewFullScreen;
-		if (IsInEditor)
+#if EDITOR
+		int w, h;
+		if (IsWindowFullscreen)
 		{
-			int w, h;
-			if (IsWindowFullscreen)
-			{
-				SDL_GetWindowPosition(Application::Window, &w, &h);
-				PreviousSize = Application::GetWindowSize();
-				PreviousPosition = Vector2(w, h);
-				SDL_Rect r;
-				SDL_GetDisplayUsableBounds(SDL_GetWindowDisplayIndex(Application::Window), &r);
+			SDL_GetWindowPosition(Application::Window, &w, &h);
+			PreviousSize = Application::GetWindowSize();
+			PreviousPosition = Vector2(w, h);
+			SDL_Rect r;
+			SDL_GetDisplayUsableBounds(SDL_GetWindowDisplayIndex(Application::Window), &r);
 
-				SDL_SetWindowPosition(Application::Window, r.x, r.y);
-				SDL_SetWindowSize(Application::Window, r.w, r.h);
-			}
-			else
-			{
-				SDL_SetWindowPosition(Application::Window, PreviousPosition.X, PreviousPosition.Y);
-				SDL_SetWindowSize(Application::Window, PreviousSize.X, PreviousSize.Y);
-
-			}
-			SDL_GetWindowSize(Application::Window, &w, &h);
-			Graphics::SetWindowResolution(Vector2(w, h));
-			UIBox::RedrawUI();
+			SDL_SetWindowPosition(Application::Window, r.x, r.y);
+			SDL_SetWindowSize(Application::Window, r.w, r.h);
 		}
 		else
 		{
-			if (Application::IsWindowFullscreen) SDL_SetWindowFullscreen(Application::Window, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
-			else SDL_SetWindowFullscreen(Application::Window, SDL_WINDOW_OPENGL);
-			int w, h;
-			SDL_GetWindowSize(Application::Window, &w, &h);
-			Graphics::SetWindowResolution(Vector2(w, h));
-			UIBox::RedrawUI();
+			SDL_SetWindowPosition(Application::Window, PreviousPosition.X, PreviousPosition.Y);
+			SDL_SetWindowSize(Application::Window, PreviousSize.X, PreviousSize.Y);
 		}
+		SDL_GetWindowSize(Application::Window, &w, &h);
+		Graphics::SetWindowResolution(Vector2(w, h));
+		UIBox::RedrawUI();
+#else
+		if (Application::IsWindowFullscreen) SDL_SetWindowFullscreen(Application::Window, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		else SDL_SetWindowFullscreen(Application::Window, SDL_WINDOW_OPENGL);
+		int w, h;
+		SDL_GetWindowSize(Application::Window, &w, &h);
+		Graphics::SetWindowResolution(Vector2(w, h));
+		UIBox::RedrawUI();
+#endif
 	}
 	bool GetFullScreen()
 	{
@@ -670,6 +666,10 @@ void DrawPostProcessing()
 	Application::PostProcessShader->SetInt("u_fxaa", Graphics::FXAA);
 	Application::PostProcessShader->SetInt("u_bloom", Graphics::Bloom);
 	Application::PostProcessShader->SetInt("u_ssao", Graphics::SSAO);
+	Application::PostProcessShader->SetInt("u_editor", IS_IN_EDITOR);
+	Application::PostProcessShader->SetInt("u_hasWindowBorder", IS_IN_EDITOR && !Application::GetFullScreen());
+	Application::PostProcessShader->SetVector2("u_screenRes", Graphics::WindowResolution);
+	Application::PostProcessShader->SetVector3("u_borderColor", Application::WindowHasFocus() ? Vector3(0.5, 0.5, 1) : 0.5);
 	if (Graphics::Bloom)
 	{
 		glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_bloomtexture"), 4);
