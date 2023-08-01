@@ -175,26 +175,14 @@ namespace Application
 	{
 		IsWindowFullscreen = NewFullScreen;
 #if EDITOR
-		int w, h;
 		if (IsWindowFullscreen)
 		{
-			SDL_GetWindowPosition(Window, &w, &h);
-			PreviousSize = GetWindowSize();
-			PreviousPosition = Vector2(w, h);
-			SDL_Rect r;
-			SDL_GetDisplayUsableBounds(SDL_GetWindowDisplayIndex(Window), &r);
-
-			SDL_SetWindowPosition(Window, r.x, r.y);
-			SDL_SetWindowSize(Window, r.w, r.h);
+			SDL_MaximizeWindow(Window);
 		}
 		else
 		{
-			SDL_SetWindowPosition(Window, PreviousPosition.X, PreviousPosition.Y);
-			SDL_SetWindowSize(Window, PreviousSize.X, PreviousSize.Y);
+			SDL_RestoreWindow(Window);
 		}
-		SDL_GetWindowSize(Window, &w, &h);
-		Graphics::SetWindowResolution(Vector2(w, h));
-		UIBox::RedrawUI();
 #else
 		if (IsWindowFullscreen) SDL_SetWindowFullscreen(Window, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 		else SDL_SetWindowFullscreen(Window, SDL_WINDOW_OPENGL);

@@ -44,10 +44,10 @@ void StatusBar::GenerateWindowButtons(std::vector<int> ButtonIndices)
 			->SetMinSize(0.05)
 			->SetPadding(0)
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
-			->AddChild((new UIBackground(true, 0, UIColors[2], Vector2(0.03)))
+			->AddChild((new UIBackground(true, 0, UIColors[2], Vector2(0.02)))
 				->SetUseTexture(true, Editor::CurrentUI->Textures[23ull + (size_t)i])
 				->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
-				->SetPadding(0.01)));
+				->SetPadding(0.02, 0.01, 0.015, 0.015)));
 	}
 }
 
