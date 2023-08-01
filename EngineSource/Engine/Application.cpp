@@ -78,7 +78,7 @@ namespace Application
 		SDL_GetMouseState(&x, &y);
 		Input::MouseLocation = Vector2(((float)Area->x / (float)Width - 0.5f) * 2.0f, 1.0f - ((float)Area->y / (float)Height * 2.0f));
 
-		if (IsWindowFullscreen || UI::HoveredButton)
+		if (IsWindowFullscreen)
 		{
 			return SDL_HITTEST_NORMAL;
 		}
@@ -121,7 +121,7 @@ namespace Application
 		{
 			return SDL_HITTEST_RESIZE_RIGHT;
 		}
-		else if (EditorUI::IsTitleBarHovered())
+		else if (EditorUI::IsTitleBarHovered() && !UI::HoveredButton)
 		{
 			return SDL_HITTEST_DRAGGABLE;
 		}
