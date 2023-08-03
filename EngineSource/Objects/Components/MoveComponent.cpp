@@ -11,7 +11,6 @@ Collision::HitResponse MoveComponent::TryMove(Vector3 Direction, float Distance,
 	Vector3 PreviousLocation = GetParent()->GetTransform().Location;
 	Direction = Direction.Normalize();
 	Distance = Distance * Performance::DeltaTime;
-	auto DownTrace = Collision::LineTrace(GetParent()->GetTransform().Location, GetParent()->GetTransform().Location + Direction * Distance);
 	uint8_t Index = TryAdjust;
 	for (float Time = 0; Distance > 0 ? (Time < Distance) : (Time > Distance); Time = std::min(Distance, Time + (Distance > 0 ? 0.5f : -0.5f)))
 	{
@@ -19,8 +18,7 @@ Collision::HitResponse MoveComponent::TryMove(Vector3 Direction, float Distance,
 		auto MoveHit = CollisionMeshes[Index]->OverlapCheck(std::set({ CollisionMeshes[0], CollisionMeshes[1] }));
 		if (MoveHit.Hit)
 		{
-			MoveHit.Normal.Y += 0.1;
-			MoveHit.Normal.Normalize();
+			MoveHit.Normal = (MoveHit.Normal + Vector3(0, 0.1, 0)).Normalize();
 			if (TryAdjust)
 			{
 				Vector3 Dir = MoveHit.Normal * abs(Distance) * 0.3 + Vector3(Vector3::Dot(MoveHit.Normal, Vector3(0, 1, 0)) * abs(Distance) * 0.1);
@@ -28,9 +26,6 @@ Collision::HitResponse MoveComponent::TryMove(Vector3 Direction, float Distance,
 				{
 					GetParent()->GetTransform().Location += Dir;
 					MoveHit.Normal = Vector3(0, 1, 0);
-				}
-				else
-				{
 				}
 			}
 			return MoveHit;

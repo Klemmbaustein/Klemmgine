@@ -2,6 +2,7 @@
 #include <vector>
 #include <Rendering/Renderable.h>
 #include <Rendering/Particle.h>
+#include <World/Graphics.h>
 
 class Framebuffer
 {
@@ -33,6 +34,7 @@ public:
 	Vector2 CustomFramebufferResolution = Vector2(800, 600);
 	FramebufferObject();
 	~FramebufferObject();
+	std::vector<Graphics::Light> Lights;
 
 	unsigned int GetTextureID();
 	void ClearContent();

@@ -1,9 +1,10 @@
 #include "PointLightComponent.h"
 #include <Engine/Log.h>
+#include <Rendering/Utility/Framebuffer.h>
 
 void PointLightComponent::Begin()
 {
-	Graphics::Lights.push_back(CurrentLight);
+	Graphics::MainFramebuffer->Lights.push_back(CurrentLight);
 }
 
 void PointLightComponent::Tick()
@@ -18,7 +19,7 @@ void PointLightComponent::Tick()
 
 void PointLightComponent::Destroy()
 {
-	Graphics::Lights.erase(Graphics::Lights.begin() + GetLightIndex());
+	Graphics::MainFramebuffer->Lights.erase(Graphics::MainFramebuffer->Lights.begin() + GetLightIndex());
 }
 
 
@@ -54,15 +55,15 @@ float PointLightComponent::GetFalloff()
 
 void PointLightComponent::Update()
 {
-	Graphics::Lights[GetLightIndex()] = CurrentLight;
+	Graphics::MainFramebuffer->Lights[GetLightIndex()] = CurrentLight;
 	PreviousLight = CurrentLight;
 }
 
 size_t PointLightComponent::GetLightIndex()
 {
-	for (size_t i = 0; i < Graphics::Lights.size(); i++)
+	for (size_t i = 0; i < Graphics::MainFramebuffer->Lights.size(); i++)
 	{
-		if (Graphics::Lights[i] == PreviousLight)
+		if (Graphics::MainFramebuffer->Lights[i] == PreviousLight)
 		{
 			return i;
 		}

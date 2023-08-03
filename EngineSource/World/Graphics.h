@@ -60,7 +60,6 @@ namespace Graphics
 		}
 	};
 
-	extern std::vector<Light> Lights;
 	extern Sun WorldSun;
 	extern Fog WorldFog;
 	extern std::vector<UICanvas*> UIToRender;

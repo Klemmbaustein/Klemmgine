@@ -158,7 +158,7 @@ namespace ModelGenerator
 		Output.write((char*)&TwoSided, sizeof(uint8_t));
 		Output.close();
 	}
-	std::vector<Vertex> ModelData::GetMergedVertices()
+	std::vector<Vertex> ModelData::GetMergedVertices() const
 	{
 		std::vector<Vertex> MergedVertices;
 		for (auto& elem : Elements)
@@ -170,7 +170,7 @@ namespace ModelGenerator
 		}
 		return MergedVertices;
 	}
-	std::vector<unsigned int> ModelData::GetMergedIndices()
+	std::vector<unsigned int> ModelData::GetMergedIndices() const
 	{
 		std::vector<unsigned int> MergedIndices;
 		size_t prevSize = 0;
@@ -215,6 +215,53 @@ namespace ModelGenerator
 			}
 		}
 	}
+
+	void ModelData::SeperateElementToGrid(size_t Index, float Size)
+	{
+		MakeCollisionBox();
+
+		for (float X = CollisionBox.minX; X < CollisionBox.maxX; X += Size)
+		{
+			for (float Y = CollisionBox.minY; Y < CollisionBox.maxY; Y += Size)
+			{
+				for (float Z = CollisionBox.minZ; Z < CollisionBox.maxY; Z += Size)
+				{
+					Collision::Box SegmentBox = Collision::Box(X, X + Size, Y, Y + Size, Z, Z + Size);
+					ModelData::Element NewElement;
+					auto& CurrentElement = Elements[Index];
+
+					size_t NewIndex = 0;
+
+					for (size_t i = 0; i < CurrentElement.Indices.size(); i += 3)
+					{
+						auto& TriA = CurrentElement.Vertices[CurrentElement.Indices[i]];
+						auto& TriB = CurrentElement.Vertices[CurrentElement.Indices[i + 1]];
+						auto& TriC = CurrentElement.Vertices[CurrentElement.Indices[i + 2]];
+
+						float Tri2Length = glm::length((TriA.Position - TriB.Position)
+							+ (TriA.Position - TriC.Position));
+
+						if (SegmentBox.SphereInBox(TriA.Position, Tri2Length))
+						{
+							NewElement.Vertices.push_back(TriA);
+							NewElement.Vertices.push_back(TriB);
+							NewElement.Vertices.push_back(TriC);
+							NewElement.Indices.push_back(NewIndex++);
+							NewElement.Indices.push_back(NewIndex++);
+							NewElement.Indices.push_back(NewIndex++);
+						}
+					}
+					if (!NewElement.Vertices.empty())
+					{
+						Elements.push_back(NewElement);
+					}
+				}
+			}
+		}
+
+		Elements.erase(Elements.begin() + Index);
+	}
+
 	void ModelData::Element::GenerateNormals()
 	{
 		for (size_t i = 0; i < Indices.size(); i += 3) // <- Flat shading
@@ -246,6 +293,18 @@ namespace ModelGenerator
 			AddFace(Resolution, dir, Offset);
 		}
 	}
+
+	ModelData::Element& ModelData::MergeAll()
+	{
+		auto Verts = GetMergedVertices();
+		auto Inds = GetMergedIndices();
+		Elements.clear();
+		auto& NewElem = AddElement();
+		NewElem.Vertices = Verts;
+		NewElem.Indices = Inds;
+		return NewElem;
+	}
+
 	void ModelData::Element::AddFace(int32_t Resolution, Vector3 Normal, Vector3 Offset)
 	{
 		glm::vec3 AxisA = glm::vec3(Normal.Y, Normal.Z, Normal.X);

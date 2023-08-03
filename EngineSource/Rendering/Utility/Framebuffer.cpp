@@ -55,6 +55,7 @@ void FramebufferObject::ClearContent()
 	{
 		delete r;
 	}
+	Lights.clear();
 	Renderables.clear();
 	ParticleEmitters.clear();
 }

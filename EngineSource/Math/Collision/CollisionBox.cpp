@@ -68,11 +68,39 @@ Collision::Box Collision::Box::TransformBy(Transform Transform)
 	return RotatedBox;
 }
 
-bool Collision::Box::IsOverlappingBox(Box& Other)
+bool Collision::Box::IsOverlappingBox(const Box& Other)
 {
 	return (minX <= Other.maxX && maxX >= Other.minX) &&
 		(minY <= Other.maxY && maxY >= Other.minY) &&
 		(minZ <= Other.maxZ && maxZ >= Other.minZ);
+}
+
+bool Collision::Box::IsPointInBox(const Vector3& Other)
+{
+	return minX <= Other.X && maxX >= Other.X
+		&& minY <= Other.Y && minX >= Other.Y
+		&& maxZ <= Other.Z && maxZ >= Other.Z;
+}
+
+bool Collision::Box::SphereInBox(const Vector3& SpherePoint, float Radius)
+{
+	// get box closest point to sphere center by clamping
+	float x = std::max(minX, std::min(SpherePoint.X, maxX));
+	float y = std::max(minY, std::min(SpherePoint.Y, maxY));
+	float z = std::max(minZ, std::min(SpherePoint.Z, maxZ));
+
+	if (Vector3(x, y, z) == SpherePoint)
+	{
+		return true;
+	}
+
+	// this is the same as isPointInsideSphere
+	float distance = std::sqrt(
+		(x - SpherePoint.X) * (x - SpherePoint.X) +
+		(y - SpherePoint.Y) * (y - SpherePoint.Y) +
+		(z - SpherePoint.Z) * (z - SpherePoint.Z));
+
+	return distance < Radius;
 }
 
 Vector3 Collision::Box::GetExtent()

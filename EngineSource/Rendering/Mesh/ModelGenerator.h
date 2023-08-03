@@ -39,8 +39,13 @@ namespace ModelGenerator
 
 		void MakeCollisionBox();
 
+		// Merges all elements into a single one. Returns the reference to the new element.
+		Element& MergeAll();
+
+		void SeperateElementToGrid(size_t Index, float GridSize);
+
 		//Combine all meshes of the model to a single mesh
-		std::vector<Vertex> GetMergedVertices();
-		std::vector<unsigned int> GetMergedIndices();
+		std::vector<Vertex> GetMergedVertices() const;
+		std::vector<unsigned int> GetMergedIndices() const;
 	};
 }

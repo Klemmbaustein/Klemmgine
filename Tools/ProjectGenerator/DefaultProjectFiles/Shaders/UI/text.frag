@@ -19,5 +19,5 @@ void main()
 		discard;
 	}
 	float sampled = texture(u_texture, TexCoords).a;
-	color = vec4(v_color, pow(sampled, 0.25) * u_opacity);
+	color = vec4(v_color, sampled * u_opacity);
 }  

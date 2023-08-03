@@ -64,8 +64,6 @@ Vector2 GetMousePosition()
 
 namespace Application
 {
-	bool IsWindowFullscreen = false;
-
 #if EDITOR
 	constexpr int MOUSE_GRAB_PADDING = 8;
 
@@ -77,11 +75,6 @@ namespace Application
 		int y;
 		SDL_GetMouseState(&x, &y);
 		Input::MouseLocation = Vector2(((float)Area->x / (float)Width - 0.5f) * 2.0f, 1.0f - ((float)Area->y / (float)Height * 2.0f));
-
-		if (IsWindowFullscreen)
-		{
-			return SDL_HITTEST_NORMAL;
-		}
 
 		if (Area->y < MOUSE_GRAB_PADDING)
 		{
@@ -150,8 +143,6 @@ namespace Application
 	Shader* PostProcessShader = nullptr;
 	Shader* ShadowShader = nullptr;
 #if EDITOR
-	Vector2 PreviousSize = 0;
-	Vector2 PreviousPosition = 0;
 	EditorUI* EditorUserInterface = nullptr;
 #endif
 
@@ -173,9 +164,8 @@ namespace Application
 	}
 	void SetFullScreen(bool NewFullScreen)
 	{
-		IsWindowFullscreen = NewFullScreen;
 #if EDITOR
-		if (IsWindowFullscreen)
+		if (NewFullScreen)
 		{
 			SDL_MaximizeWindow(Window);
 		}
@@ -184,7 +174,7 @@ namespace Application
 			SDL_RestoreWindow(Window);
 		}
 #else
-		if (IsWindowFullscreen) SDL_SetWindowFullscreen(Window, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
+		if (NewFullScreen) SDL_SetWindowFullscreen(Window, SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP);
 		else SDL_SetWindowFullscreen(Window, SDL_WINDOW_OPENGL);
 		int w, h;
 		SDL_GetWindowSize(Window, &w, &h);
@@ -194,7 +184,14 @@ namespace Application
 	}
 	bool GetFullScreen()
 	{
-		return IsWindowFullscreen;
+#if EDITOR
+		auto flag = SDL_GetWindowFlags(Window);
+		auto is_fullscreen = flag & SDL_WINDOW_MAXIMIZED;
+#else
+		auto flag = SDL_GetWindowFlags(Window);
+		auto is_fullscreen = flag & SDL_WINDOW_FULLSCREEN;
+#endif
+		return is_fullscreen;
 	}
 	void SetCursorPosition(Vector2 NewPos)
 	{
@@ -349,15 +346,16 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	{
 		Renderable::ApplyDefaultUniformsToShader(s.second.UsedShader);
 		CSM::BindLightSpaceMatricesToShader(Matrices, s.second.UsedShader);
+		s.second.UsedShader->SetInt("u_useLightMap", Buffer == Graphics::MainFramebuffer ? 1 : 0);
 		for (int i = 0; i < 8; i++)
 		{
 			std::string CurrentLight = "u_lights[" + std::to_string(i) + "]";
-			if (i < Graphics::Lights.size())
+			if (i < Buffer->Lights.size())
 			{
-				s.second.UsedShader->SetVector3(CurrentLight + ".Position", Graphics::Lights[i].Position);
-				s.second.UsedShader->SetVector3(CurrentLight + ".Color", Graphics::Lights[i].Color);
-				s.second.UsedShader->SetFloat(CurrentLight + ".Falloff", Graphics::Lights[i].Falloff);
-				s.second.UsedShader->SetFloat(CurrentLight + ".Intensity", Graphics::Lights[i].Intensity);
+				s.second.UsedShader->SetVector3(CurrentLight + ".Position", Buffer->Lights[i].Position);
+				s.second.UsedShader->SetVector3(CurrentLight + ".Color", Buffer->Lights[i].Color);
+				s.second.UsedShader->SetFloat(CurrentLight + ".Falloff", Buffer->Lights[i].Falloff);
+				s.second.UsedShader->SetFloat(CurrentLight + ".Intensity", Buffer->Lights[i].Intensity);
 
 				s.second.UsedShader->SetInt(CurrentLight + ".Active", 1);
 			}
@@ -499,7 +497,7 @@ void PollInput()
 				TextInput::PollForText = false;
 				break;
 			case SDLK_F11:
-				Application::SetFullScreen(!Application::IsWindowFullscreen);
+				Application::SetFullScreen(!Application::GetFullScreen());
 			}
 		}
 		else if (Event.type == SDL_KEYUP)

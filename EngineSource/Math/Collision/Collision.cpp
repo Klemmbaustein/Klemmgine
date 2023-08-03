@@ -226,9 +226,10 @@ Collision::CollisionMesh::CollisionMesh(std::vector<Vertex> Verts, std::vector<u
 	RawVertices = Verts;
 	this->Indices = Indices;
 	ModelMatrix = T.ToMatrix();
-
+	Scale = T.Scale;
 	WorldPosition = T.Location;
 	WorldScale = std::max(std::max(T.Scale.X, T.Scale.Y), T.Scale.Z);
+
 	ApplyMatrix();
 }
 
@@ -252,6 +253,8 @@ void Collision::CollisionMesh::SetTransform(Transform T)
 		ModelMatrix = newM;
 		WorldPosition = T.Location;
 		WorldScale = std::max(std::max(T.Scale.X, T.Scale.Y), T.Scale.Z);
+		Scale = T.Scale;
+
 		ApplyMatrix();
 	}
 }
@@ -260,45 +263,53 @@ void Collision::CollisionMesh::ApplyMatrix()
 {
 	Vertices.clear();
 	Vertices.resize(RawVertices.size());
-	for (unsigned int i = 0; i < RawVertices.size(); i++)
+	SpherePosition = 0;
+	for (size_t i = 0; i < RawVertices.size(); i++)
 	{
 		Vertices[i] = RawVertices[i];
-		float dist = glm::distance(Vertices[i].Position, glm::vec3(0));
-		if (dist > SphereCollisionSize)
-		{
-			SphereCollisionSize = dist;
-		}
 		Vertices[i].Position = ModelMatrix * glm::vec4(Vertices[i].Position, 1);
 		Vertices[i].Normal = glm::normalize(glm::mat3(ModelMatrix) * Vertices[i].Normal);
+		SpherePosition += Vertices[i].Position;
 	}
-	SphereCollisionSize *= WorldScale;
+	SpherePosition = (SpherePosition / Vertices.size()) - WorldPosition;
+	SphereCollisionSize = 0;
+	glm::vec3 Furthest = glm::vec3(0);
+	for (size_t i = 0; i < RawVertices.size(); i++)
+	{
+		float dist = glm::distance(RawVertices[i].Position * (glm::vec3)Scale, (glm::vec3)SpherePosition);
+		if (dist > SphereCollisionSize)
+		{
+			Furthest = RawVertices[i].Position;
+			SphereCollisionSize = dist;
+		}
+	}
 }
-
+size_t Collisions = 0;
 //Wow, this function sucks
 Collision::HitResponse Collision::CollisionMesh::CheckAgainstMesh(CollisionMesh* b)
 {
 	if (!CanOverlap) return Collision::HitResponse();
 	if (!b->CanOverlap) return Collision::HitResponse();
-	if (SpheresOverlapping(WorldPosition, SphereCollisionSize, b->WorldPosition, b->SphereCollisionSize))
+	if (SpheresOverlapping(WorldPosition + SpherePosition, SphereCollisionSize,
+		b->WorldPosition + b->SpherePosition, b->SphereCollisionSize))
 	{
-		Collision::HitResponse r;
+		if (Collisions >= 100)
+		{
+			//std::cout << "INTERSECT: " << (WorldPosition + SpherePosition).ToString() << ", " << SphereCollisionSize
+			//	<< " : " << (b->WorldPosition + b->SpherePosition).ToString() << ", " << b->SphereCollisionSize << std::endl;
+		}
+		Collisions++;
+		HitResponse r;
 		r.Hit = false;
 		for (unsigned int i = 0; i < Indices.size(); i += 3)
 		{
 			for (int32_t j = 0; j < b->Indices.size(); j += 3)
 			{
+				
 				auto& Tri2A = b->Vertices[b->Indices[j]].Position;
 				auto& Tri2B = b->Vertices[b->Indices[j + 1]].Position;
 				auto& Tri2C = b->Vertices[b->Indices[j + 2]].Position;
-
-				float Tri2Length = glm::length((Tri2A - Tri2B)
-					+ (Tri2A - Tri2C));
-
-				if (!SpheresOverlapping(WorldPosition, SphereCollisionSize, Tri2A, Tri2Length))
-				{
-					continue;
-				}
-
+				
 				float* a1[3], *b1[3], *c1[3], *a2[3], *b2[3], *c2[3];
 
 				auto& Tri1A = Vertices[Indices[i]].Position;
@@ -337,12 +348,13 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstMesh(CollisionMesh*
 			return r;
 		}
 	}
+
 	return Collision::HitResponse();
 }
 
 Collision::HitResponse Collision::CollisionMesh::CheckAgainstLine(Vector3 RayStart, Vector3 RayEnd)
 {
-	Collision::Box BroadPhaseBox = Collision::Box(
+	Box BroadPhaseBox = Collision::Box(
 		SpherePosition.X - SphereCollisionSize, SpherePosition.X + SphereCollisionSize,
 		SpherePosition.Y - SphereCollisionSize, SpherePosition.Y + SphereCollisionSize,
 		SpherePosition.Z - SphereCollisionSize, SpherePosition.Z + SphereCollisionSize).TransformBy(Transform(WorldPosition, Vector3(), Vector3(1)));
@@ -350,14 +362,14 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstLine(Vector3 RaySta
 		RayStart, RayEnd).Hit)
 	{
 		Vector3 Dir = RayEnd - RayStart;
-		Collision::HitResponse r;
+		HitResponse r;
 		r.Hit = false;
 		r.t = INFINITY;
 
 		for (size_t i = 0; i < Indices.size(); i += 3)
 		{
 			Vector3 CurrentTriangle[3] = { Vertices[Indices[i]].Position, Vertices[Indices[i + 2]].Position, Vertices[Indices[i + 1]].Position };
-			Collision::HitResponse newR
+			HitResponse newR
 				= (testRayThruTriangle(RayStart, Dir, CurrentTriangle[0], CurrentTriangle[1], CurrentTriangle[2]));
 			if (newR.t < r.t && newR.Hit && newR.t < 1)
 			{
@@ -366,30 +378,41 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstLine(Vector3 RaySta
 		}
 		return r;
 	}
-	return Collision::HitResponse();
+	return HitResponse();
 }
 
 Collision::HitResponse Collision::CollisionMesh::CheckAgainstAABB(const Box& b)
 {
-	return Collision::HitResponse();
+	return HitResponse();
 }
 Collision::HitResponse Collision::CollisionMesh::OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore)
 {
-	for (CollisionComponent* c : Collision::CollisionBoxes)
+	Collisions = 0; 
+	for (CollisionComponent* c : CollisionBoxes)
 	{
 		if (MeshesToIgnore.find(c) == MeshesToIgnore.end())
 		{
 			if (c->CollMesh != this)
 			{
-				Collision::HitResponse newR = this->CheckAgainstMesh(c->CollMesh);
+				HitResponse newR = CheckAgainstMesh(c->CollMesh);
 				if (newR.Hit)
 				{
 					newR.HitObject = c->GetParent();
 					newR.HitComponent = c;
+					//Log::Print("Collisions: " + std::to_string(Collisions));
+					if (Collisions >= 100)
+					{
+						std::cout << "Large Collision: Mesh with " << Vertices.size() << " vertices and scale of " << Scale.ToString() << std::endl;
+					}
 					return newR;
 				}
 			}
 		}
 	}
-	return Collision::HitResponse();
+	//Log::Print("Collisions: " + std::to_string(Collisions));
+	if (Collisions >= 100)
+	{
+		std::cout << "Large Collision: Mesh with " << Vertices.size() << " vertices and scale of " << (Scale / 0.025).ToString() << std::endl;
+	}
+	return HitResponse();
 }

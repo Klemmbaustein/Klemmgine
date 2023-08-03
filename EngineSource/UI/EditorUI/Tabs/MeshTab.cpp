@@ -139,6 +139,8 @@ void MeshTab::Save()
 		ModelData.HasCollision = HasCollision;
 		ModelData.TwoSided = TwoSided;
 		ModelData.SaveModelData(InitialName, !MESHTAB_DEBUG);
+		PreviewModel = nullptr;
+		PreviewBuffer->ClearContent();
 	}
 	catch (std::exception& e)
 	{

@@ -31,7 +31,11 @@ namespace Collision
 		}
 		Box TransformBy(Transform Transform);
 
-		bool IsOverlappingBox(Box& Other);
+		bool IsOverlappingBox(const Box& Other);
+
+		bool IsPointInBox(const Vector3& Other);
+
+		bool SphereInBox(const Vector3& SpherePoint, float Radius);
 
 		Vector3 GetExtent();
 

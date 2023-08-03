@@ -13,7 +13,7 @@ public:
 	virtual void Destroy() override;
 
 	void Load(std::string File);
-	void Load(ModelGenerator::ModelData Data);
+	void Load(const ModelGenerator::ModelData& Data);
 	FrustumCulling::AABB GetBoundingBox();
 
 	void SetUniform(std::string Name, Type::TypeEnum Type, std::string Content, uint8_t MeshSection);
@@ -22,7 +22,7 @@ public:
 	{
 		return MeshModel;
 	}
-	ModelGenerator::ModelData GetModelData();
+	const ModelGenerator::ModelData& GetModelData();
 	void SetVisibility(bool NewVisibility);
 
 

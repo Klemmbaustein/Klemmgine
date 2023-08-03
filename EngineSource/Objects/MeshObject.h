@@ -17,9 +17,9 @@ public:
 	void LoadFromFile(std::string Filename);
 	virtual void OnPropertySet() override;
 protected:
+	std::vector<CollisionComponent*> MeshCollision;
 	void GenerateDefaultCategories();
 	MeshComponent* Mesh = nullptr;
-	CollisionComponent* MeshCollision = nullptr;
 	std::string PreviousFilename;
 	std::string Filename;
 	bool MeshCastShadow = true;

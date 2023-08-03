@@ -40,15 +40,21 @@ void MeshComponent::Tick()
 }
 void MeshComponent::Load(std::string File)
 {
-	if (MeshModel) delete MeshModel;
+	if (MeshModel)
+	{
+		Destroy();
+	}
 	MeshModel = new Model(Assets::GetAsset(File + ".jsm"));
 	Graphics::MainFramebuffer->Renderables.push_back(MeshModel);
 	MeshModel->UpdateTransform();
 }
 
-void MeshComponent::Load(ModelGenerator::ModelData Data)
+void MeshComponent::Load(const ModelGenerator::ModelData& Data)
 {
-	if (MeshModel) delete MeshModel;
+	if (MeshModel)
+	{
+		Destroy();
+	}
 	MeshModel = new Model(Data);
 	Graphics::MainFramebuffer->Renderables.push_back(MeshModel);
 	MeshModel->UpdateTransform();
@@ -65,7 +71,7 @@ void MeshComponent::SetUniform(std::string Name, Type::TypeEnum Type, std::strin
 }
 
 
-ModelGenerator::ModelData MeshComponent::GetModelData()
+const ModelGenerator::ModelData& MeshComponent::GetModelData()
 {
 	return MeshModel->ModelMeshData;
 }

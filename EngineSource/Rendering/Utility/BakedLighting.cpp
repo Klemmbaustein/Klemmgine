@@ -92,6 +92,9 @@ namespace Bake
 	{
 		const uint64_t SECTION_SIZE = BakedLighting::LightmapResolution / NUM_CHUNK_SPLITS;
 		const float ProgressPerPixel = 1.0f / (SECTION_SIZE * SECTION_SIZE * SECTION_SIZE);
+
+		const float TexelSize = BakeScale.X / BakedLighting::LightmapResolution;
+
 		for (uint64_t i = 0; i < BakedLighting::LightmapResolution * BakedLighting::LightmapResolution * BakedLighting::LightmapResolution; i++)
 		{
 			int64_t px = i % BakedLighting::LightmapResolution;
@@ -110,7 +113,7 @@ namespace Bake
 			Vector3 Pos = BakeMapToPos(i);
 			Pos = Pos / BakedLighting::LightmapResolution;
 			Pos = Pos * BakeScale;
-			float Intensity = BakedLighting::GetLightIntensityAt(Pos.X, Pos.Y, Pos.Z);
+			float Intensity = BakedLighting::GetLightIntensityAt(Pos.X, Pos.Y, Pos.Z, TexelSize);
 			Texture[i] = std::byte(Intensity * 255);
 			ThreadProgress[ThreadID] += ProgressPerPixel;
 		}
@@ -121,14 +124,13 @@ namespace Bake
 {
 	inline Collision::HitResponse BakeRayTrace(const glm::vec3& orig, const glm::vec3& end, const glm::vec3& A, const glm::vec3& B, const glm::vec3& C)
 	{
-		glm::vec3 dir = end;
 		glm::vec3 E1 = C - A;
 		glm::vec3 E2 = B - A;
 		glm::vec3 N = glm::cross(E1, E2);
-		float det = -glm::dot(dir, N);
+		float det = -glm::dot(end, N);
 		float invdet = 1.0 / det;
 		glm::vec3 AO = orig - A;
-		glm::vec3 DAO = glm::cross(AO, dir);
+		glm::vec3 DAO = glm::cross(AO, end);
 		float u = dot(E2, DAO) * invdet;
 		float v = -dot(E1, DAO) * invdet;
 		float t = dot(AO, N) * invdet;
@@ -136,9 +138,11 @@ namespace Bake
 			return Collision::HitResponse(true, orig + end * t, normalize(N), t);
 		else return Collision::HitResponse();
 	}
+
+	const float ShadowBias = 2;
 }
 
-float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z)
+float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float ElemSize)
 {
 	const float TraceDistance = 2500;
 	glm::vec3 StartPos = glm::vec3((float)x, (float)y, (float)z);
@@ -175,7 +179,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z)
 			}
 		}
 	}
-	return r.Hit ? 1 - std::min(r.t * TraceDistance / 10, 1.0f) : 1;
+	return r.Hit ? 1 - std::min(r.t / (ElemSize * Bake::ShadowBias), 1.0f) : 1;
 }
 
 std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
@@ -387,7 +391,7 @@ void BakedLighting::LoadBakeFile(std::string BakeFile)
 	}
 	if (!std::filesystem::exists(File))
 	{
-		Log::Print("Could not find .bkdat file: " + BakeFile, Log::LogColor::Red);
+		Log::Print("Could not find .bkdat file: " + BakeFile);
 		BakedLighting::Init();
 		return;
 	}
@@ -399,7 +403,7 @@ void BakedLighting::LoadBakeFile(std::string BakeFile)
 	InFile >> FileVer;
 	if (BKDAT_FILE_VERSION != FileVer)
 	{
-		Log::Print("FILE VERSION MISMATCH: " + std::to_string(FileVer));
+		Log::Print("File version mismatch of bkdat file. Supported version: " + std::to_string(BKDAT_FILE_VERSION) + ", Loaded version: " + std::to_string(FileVer), Log::LogColor::Red);
 		BakedLighting::Init();
 		return;
 	}

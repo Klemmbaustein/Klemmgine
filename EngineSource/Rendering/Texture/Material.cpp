@@ -65,6 +65,7 @@ Material Material::LoadMaterialFile(std::string Name, bool IsTemplate)
 	}
 	if (!std::filesystem::exists(File))
 	{
+		Log::Print("Could not load material: " + Name, Log::LogColor::Yellow);
 		File = "../../EditorContent/Materials/EngineDefaultPhong.jsmat";
 #ifdef RELEASE
 		throw MaterialException("Model has invalid material assigned: \"" + Name + "\". Cannot fall back to default material");

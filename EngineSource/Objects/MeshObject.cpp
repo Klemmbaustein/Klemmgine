@@ -28,7 +28,10 @@ void MeshObject::Begin()
 void MeshObject::LoadFromFile(std::string Filename)
 {
 	if (Mesh) Detach(Mesh);
-	if (MeshCollision) Detach(MeshCollision);
+	for (CollisionComponent* Elem : MeshCollision)
+	{
+		Detach(Elem);
+	}
 	ModelGenerator::ModelData m;
 	m.LoadModelFromFile(Filename);
 	for (size_t i = 0; i < m.Elements.size(); i++)
@@ -54,9 +57,23 @@ void MeshObject::LoadFromFile(std::string Filename)
 	this->Filename = Filename;
 	if (Mesh->GetModel()->HasCollision || (IsInEditor && Mesh->GetModelData().GetMergedVertices().size() < 5000))
 	{
-		MeshCollision = new CollisionComponent();
-		Attach(MeshCollision);
-		MeshCollision->Init(Mesh->GetModelData().GetMergedVertices(), Mesh->GetModelData().GetMergedIndices(), Transform(Vector3(), Vector3(), Vector3(1)));
+		ModelGenerator::ModelData CollDat;
+		auto& CollElem = CollDat.AddElement();
+		CollElem.Vertices = Mesh->GetModelData().GetMergedVertices();
+		CollElem.Indices = Mesh->GetModelData().GetMergedIndices();
+
+		if (Mesh->GetModelData().GetMergedVertices().size() >= 5000)
+		{
+			CollDat.SeperateElementToGrid(0, std::max(200.0f, m.CollisionBox.GetLength() / 6));
+		}
+		for (auto& i : CollDat.Elements)
+		{
+			CollisionComponent* NewCollider = new CollisionComponent();
+			NewCollider = new CollisionComponent();
+			Attach(NewCollider);
+			NewCollider->Init(i.Vertices, i.Indices, Transform(Vector3(), Vector3(), Vector3(1)));
+			MeshCollision.push_back(NewCollider);
+		}
 	}
 
 	Properties.clear();

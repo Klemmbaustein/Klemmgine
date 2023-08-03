@@ -46,6 +46,7 @@ namespace Collision
 		bool CanOverlap = true;
 		float SphereCollisionSize = 0;
 		Vector3 WorldPosition;
+		Vector3 Scale = 1;
 		Vector3 SpherePosition;
 		HitResponse OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore = {});
 		std::vector<Vertex> Vertices;

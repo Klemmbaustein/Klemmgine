@@ -29,7 +29,6 @@ namespace Graphics
 	bool Bloom = true, FXAA = false;
 	bool IsWireframe = false; 
 
-	std::vector<Light> Lights;
 	Sun WorldSun;
 	Fog WorldFog;
 	int ShadowResolution = 2000;

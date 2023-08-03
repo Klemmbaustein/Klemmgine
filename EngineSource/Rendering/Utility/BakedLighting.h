@@ -11,7 +11,7 @@ class BakedLighting
 public:
 	static void Init();
 
-	static float GetLightIntensityAt(int64_t x, int64_t y, int64_t z);
+	static float GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float ElemSize);
 	static void BindToTexture();
 	static int64_t GetLightTextureSize();
 	static Vector3 GetLightMapScale();

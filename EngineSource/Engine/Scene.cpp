@@ -87,7 +87,6 @@ namespace Scene
 			}
 			WorldObject::DestroyMarkedObjects();
 
-			Graphics::Lights.clear();
 			Objects::AllObjects.clear();
 			if (!IsInEditor)
 			{
