@@ -383,19 +383,15 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 		o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
 	}
 	Buffer->GetBuffer()->Bind();
-	for (auto p : Buffer->ParticleEmitters)
-	{
-		p->Draw(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
-	}
 	// Transparency pass
-	for (auto o : Buffer->Renderables)
-	{
-		o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, true);
-	}
-	Buffer->GetBuffer()->Bind();
 	for (auto p : Buffer->ParticleEmitters)
 	{
 		p->Draw(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, true);
+	}
+	Buffer->GetBuffer()->Bind();
+	for (auto o : Buffer->Renderables)
+	{
+		o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, true);
 	}
 
 
