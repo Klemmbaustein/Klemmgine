@@ -95,6 +95,10 @@ void MeshObject::OnPropertySet()
 {
 	if (!std::filesystem::exists(Assets::GetAsset(Filename + ".jsm")))
 	{
+		if (!Filename.empty())
+		{
+			Log::Print("Could find model file: " + Filename, Log::LogColor::Yellow);
+		}
 		return;
 	}
 	if (Filename != PreviousFilename)

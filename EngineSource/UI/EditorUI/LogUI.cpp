@@ -20,19 +20,19 @@ void LogUI::UpdateLogBoxSize()
 
 LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(UIColors, Position, Scale, Vector2(0.8, 0.35), Vector2(2, 0.6))
 {
-	LogScrollBox = new UIScrollBox(false, 0, 0);
+	LogScrollBox = new UIScrollBox(false, 0, true);
+	LogScrollBox->SetTryFill(true);
 	LogScrollBox->Align = UIBox::E_REVERSE;
 	LogPrompt = new UITextField(true, 0, UIColors[1] * 0.5, this, 0, Editor::CurrentUI->EngineUIText);
 	LogPrompt->HintText = "Enter command here";
 	TabBackground->AddChild((new UIBackground(false, 0, UIColors[1] * 0.99, 0))
-		->SetBorder(UIBox::E_ROUNDED, 0.5)
 		->AddChild(LogPrompt
 			->SetTextSize(0.45)
 			->SetPadding(0)
 			->SetTryFill(true))
 		->AddChild(LogScrollBox
 			->SetScrollSpeed(4)
-			->SetPadding(0.01, 0, 0.01, 0.01)));
+			->SetPadding(0, 0, 0.01, 0)));
 
 	UpdateLogBoxSize();
 }
@@ -44,7 +44,7 @@ void LogUI::UpdateLayout()
 	{
 		float TextDifference = LogScrollBox->GetPosition().Y - LogTexts[LogTexts.size() - 1]->GetPosition().Y;
 		LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.025, 0.0);
-		LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025, 0.0) * 10);
+		LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025, 0.0));
 	}
 }
 
@@ -92,7 +92,7 @@ void LogUI::Tick()
 
 			float TextDifference = LogScrollBox->GetPosition().Y - LogTexts[LogTexts.size() - 1]->GetPosition().Y;
 			LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.025, 0.0);
-			LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025, 0.0) * 10);
+			LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025, 0.0));
 			UIBox::RedrawUI();
 		}
 	}

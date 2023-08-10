@@ -68,6 +68,9 @@ public:
 	virtual Vector2 GetUsedSize();
 	ScrollObject* CurrentScrollObject = nullptr;
 
+	bool IsChildOf(UIBox* Parent);
+	bool HasMouseCollision = false;
+
 protected:
 	bool ShouldBeTicked = true;
 	bool TryFill = false;
@@ -75,6 +78,7 @@ protected:
 	virtual void Draw();
 	virtual void Tick();
 	virtual void UpdateTickState();
+	void UpdateHoveredState();
 	
 	Vector2 Position;
 	Vector2 OffsetPosition;
@@ -100,6 +104,6 @@ private:
 
 namespace UI
 {
-	extern UIButton* HoveredButton;
-	extern UIButton* NewHoveredButton;
+	extern UIBox* HoveredBox;
+	extern UIBox* NewHoveredBox;
 }

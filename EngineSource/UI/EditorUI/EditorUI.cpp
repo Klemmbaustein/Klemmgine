@@ -214,6 +214,7 @@ EditorUI::EditorUI()
 	Cursors[4] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEWE);
 	Cursors[5] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
 	Cursors[6] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
+	Cursors[7] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 	//new UIBackground(true, -1, 0.5, 2);
 
 	UIElements[0] = new StatusBar(UIColors);
@@ -286,9 +287,17 @@ void EditorUI::Tick()
 		BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene));
 	}
 
-	if (UI::HoveredButton)
+	if (dynamic_cast<UIButton*>(UI::HoveredBox))
 	{
 		CurrentCursor = E_GRAB;
+	}
+	if (dynamic_cast<UITextField*>(UI::HoveredBox))
+	{
+		CurrentCursor = E_TEXT_HOVER;
+	}
+	if (UIScrollBox::IsDraggingScrollBox)
+	{
+		CurrentCursor = E_DEFAULT;
 	}
 	if (CurrentCursor < E_LAST_CURSOR && CurrentCursor >= 0)
 	{
@@ -546,7 +555,10 @@ void EditorUI::OnResized()
 {
 	for (auto i : UIElements)
 	{
-		i->UpdateLayout();
+		if (i)
+		{
+			i->UpdateLayout();
+		}
 	}
 }
 

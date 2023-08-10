@@ -117,7 +117,8 @@ public:
 		E_RESIZE_WE = 4,
 		E_RESIZE_NS = 5,
 		E_RESIZE_ALL = 6,
-		E_LAST_CURSOR = 7
+		E_TEXT_HOVER = 7,
+		E_LAST_CURSOR
 	};
 
 	struct DropdownItem

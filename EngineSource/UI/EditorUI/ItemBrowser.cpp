@@ -195,12 +195,12 @@ void ItemBrowser::UpdateLayout()
 	Assets::ScanForAssets();
 	ContentBox->DeleteChildren();
 
-	BrowserScrollBox = new UIScrollBox(false, Scale - Vector2(0, 0.1), 25);
-	BrowserScrollBox->SetMinSize(Vector2(0, 1.65));
-	BrowserScrollBox->SetMaxSize(Vector2(MaxSize.X, 1.65));
+	BrowserScrollBox = new UIScrollBox(false, Scale - Vector2(0, 0.1), true);
+	BrowserScrollBox->SetMinSize(Vector2(TabBackground->GetMinSize().X, 1.675));
+	BrowserScrollBox->SetMaxSize(Vector2(MaxSize.X, 1.675));
 	BrowserScrollBox->Align = UIBox::E_REVERSE;
 	ContentBox->AddChild(BrowserScrollBox
-		->SetPadding(0.01, 0, 0, 0));
+		->SetPadding(0));
 
 	ContentBox->AddChild((new UIBackground(true, 0, UIColors[1], Vector2(Scale.X, 0.1)))
 		->SetPadding(0)

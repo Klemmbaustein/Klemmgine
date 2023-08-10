@@ -18,6 +18,8 @@ public:
 	static void BakeCurrentSceneToFile();
 	static void LoadBakeFile(std::string BakeFile);
 
+	static bool LoadedLightmap;
+
 	static void Update();
 
 	static float GetBakeProgress();

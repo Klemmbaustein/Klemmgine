@@ -64,7 +64,7 @@ MaterialTemplateTab::MaterialTemplateTab(Vector3* UIColors, TextRenderer* Text, 
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);
-	Rows[0] = new UIScrollBox(false, 0, 25);
+	Rows[0] = new UIScrollBox(false, 0, true);
 	Rows[0]->SetMaxSize(Vector2(999, 1.1));
 	RowBox->AddChild(Rows[0]);
 	Rows[0]->Align = UIBox::E_REVERSE;

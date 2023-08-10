@@ -70,7 +70,7 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int Rel
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);
-	Rows[0] = new UIScrollBox(false, 0, 25);
+	Rows[0] = new UIScrollBox(false, 0, true);
 	RowBox->AddChild(Rows[0]);
 	Rows[0]->Align = UIBox::E_REVERSE;
 

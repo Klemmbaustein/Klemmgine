@@ -14,7 +14,7 @@
 
 ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.3, 0.5))
 {
-	BackgroundBox = new UIScrollBox(false, 0, 25);
+	BackgroundBox = new UIScrollBox(false, 0, true);
 	BackgroundBox->SetPadding(0.01);
 	BackgroundBox->Align = UIBox::E_REVERSE;
 	UpdateLayout();

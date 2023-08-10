@@ -26,9 +26,8 @@ namespace _TextRenderer
 size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale, Vector2& LetterOutLocation)
 {
 	float originalScale = Scale;
-	Scale /= 2.f;
 	Scale /= CharacterSizeInPixels;
-	Scale *= 30.0f;
+	Scale *= 60.0f;
 	stbtt_bakedchar* cdata = (stbtt_bakedchar*)cdatapointer;
 	std::string TextString = TextSegment::CombineToString(Text);
 	TextString.append(" ");
@@ -55,12 +54,11 @@ size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, fl
 			}
 			MaxHeight = std::max(q.y1 - q.y0, MaxHeight);
 			numVertices += 6;
-			if (q.x0 / 1800 / Graphics::AspectRatio > Dist)
+			if (q.x0 / 1800 / Graphics::AspectRatio * Scale > Dist)
 			{
 				//std::cout << q.x0 / 225 / Application::AspectRatio;
 
-				LetterOutLocation = Vector2(PrevDepth / 1800 / Graphics::AspectRatio, 0);
-				if (i && q.x0 / 1800 / Graphics::AspectRatio > Dist + 0.0075) return i - 1;
+				LetterOutLocation = Vector2(PrevMaxDepth, 0) / Vector2(1800 * Graphics::AspectRatio, 1800) * Scale;
 				return i;
 			}
 			PrevMaxDepth = q.x1;
@@ -68,7 +66,7 @@ size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, fl
 		}
 		i++;
 	}
-	LetterOutLocation = Vector2(PrevMaxDepth / 1800 / Graphics::AspectRatio, 0);
+	LetterOutLocation = Vector2(PrevMaxDepth, 0) / Vector2(1800 * Graphics::AspectRatio, 1800) * Scale;
 	return TextString.size() - 1;
 }
 
@@ -151,80 +149,6 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 		}
 	}
 
-	return (Vector2(x, y + CharacterSizeInPixels) / Vector2(1800 * Graphics::AspectRatio, 1800)) * Scale;
-}
-
-Vector2 TextRenderer::RenderText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap, ScrollObject* CurrentScrollObject)
-{
-	float originalScale = Scale;
-	Scale /= 2.f;
-	Scale /= CharacterSizeInPixels;
-	Scale *= 30.0f;
-	Pos.X = Pos.X * 450 * Graphics::AspectRatio;
-	LengthBeforeWrap *= 2400;
-	Pos.Y = Pos.Y * -450;
-	Graphics::TextShader->Bind();
-	stbtt_bakedchar* cdata = (stbtt_bakedchar*)cdatapointer;
-	glBindVertexArray(fontVao);
-	glBindBuffer(GL_ARRAY_BUFFER, fontVertexBufferId);
-	size_t len = TextSegment::CombineToString(Text).size();
-	if (fontVertexBufferCapacity < len) {
-		fontVertexBufferCapacity = len;
-		glBufferData(GL_ARRAY_BUFFER, sizeof(FontVertex) * 6 * fontVertexBufferCapacity, 0, GL_DYNAMIC_DRAW);
-		delete[]fontVertexBufferData;
-		fontVertexBufferData = new FontVertex[fontVertexBufferCapacity * 6];
-	}
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, fontTexture);
-	glUniform1i(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_texture"), 0);
-	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "textColor"), Color.X, Color.Y, Color.Z);
-	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
-	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "transform"), (float)Pos.X, (float)Pos.Y, Scale);
-	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_opacity"), opacity);
-	if (CurrentScrollObject != nullptr)
-	{
-		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"),
-			-CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
-	}
-	else
-		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
-	float MaxHeight = 0.0f;
-	float x = 0.f, y = 0.f;
-	FontVertex* vData = fontVertexBufferData;
-	Uint32 numVertices = 0;
-	for (auto& seg : Text)
-	{
-		for (size_t i = 0; i < seg.Text.size(); i++)
-		{
-			if (seg.Text[i] >= 32 && seg.Text[i] < 128)
-			{
-				stbtt_aligned_quad q;
-				stbtt_GetBakedQuad(cdata, 2048, 2048, seg.Text[i] - 32, &x, &y, &q, 1);
-				vData[0].position = Vector2(q.x0, q.y1); vData[0].texCoords = Vector2(q.s0, q.t1);
-				vData[1].position = Vector2(q.x1, q.y1); vData[1].texCoords = Vector2(q.s1, q.t1);
-				vData[2].position = Vector2(q.x1, q.y0); vData[2].texCoords = Vector2(q.s1, q.t0);
-				vData[3].position = Vector2(q.x0, q.y0); vData[3].texCoords = Vector2(q.s0, q.t0);
-				vData[4].position = Vector2(q.x0, q.y1); vData[4].texCoords = Vector2(q.s0, q.t1);
-				vData[5].position = Vector2(q.x1, q.y0); vData[5].texCoords = Vector2(q.s1, q.t0);
-
-				vData[0].color = seg.Color;		vData[1].color = seg.Color;
-				vData[2].color = seg.Color;		vData[3].color = seg.Color;
-				vData[4].color = seg.Color;		vData[5].color = seg.Color;
-
-
-				MaxHeight = std::max(q.y1 - q.y0, MaxHeight);
-				vData += 6;
-				numVertices += 6;
-				if (x > LengthBeforeWrap / CharacterSizeInPixels * 150)
-				{
-					x = 0;
-					y += 50;
-				}
-			}
-		}
-	}
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(FontVertex) * numVertices, fontVertexBufferData);
-	glDrawArrays(GL_TRIANGLES, 0, numVertices);
 	return (Vector2(x, y + CharacterSizeInPixels) / Vector2(1800 * Graphics::AspectRatio, 1800)) * Scale;
 }
 

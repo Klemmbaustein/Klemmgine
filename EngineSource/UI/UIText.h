@@ -18,7 +18,6 @@ class UIText : public UIBox
 public:
 
 	void Tick() override;
-	bool IsDynamic = false;
 	bool Wrap = false;
 	float WrapDistance = 0.0f;
 	Vector3 GetColor();

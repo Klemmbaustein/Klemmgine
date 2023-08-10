@@ -6,12 +6,16 @@
 class TextRenderer;
 class UIText;
 struct VertexBuffer;
+class UIBackground;
 
 class UITextField : public UIBox
 {
 	VertexBuffer* ButtonVertexBuffer = nullptr;
 	bool IsHovered = false;
 	bool IsPressed = false;
+	Vector2 IBeamPosition;
+	Vector2 IBeamScale = Vector2(0.001, 0.03);
+	bool ShowIBeam = false;
 	Vector3 Color = Vector3(0.5);
 	Vector3 TextColor = 1;
 	Shader* ButtonShader = nullptr;

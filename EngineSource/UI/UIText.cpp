@@ -142,17 +142,12 @@ UIText::~UIText()
 Vector2 UIText::GetLetterLocation(size_t Index)
 {
 	std::string Text = TextSegment::CombineToString(RenderedText);
-	return Vector2(Renderer->GetTextSize({ TextSegment(Text.substr(0, Index), 1) }, TextSize * 4, false, 999999).X, 0) + OffsetPosition;
+	return Vector2(Renderer->GetTextSize({ TextSegment(Text.substr(0, Index), 1) }, TextSize * 2, false, 999999).X, 0) + OffsetPosition;
 }
 
 void UIText::Draw()
 {
-	if (IsDynamic)
-	{
-		Renderer->RenderText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
-			TextSize * 2, Color, Opacity, 999, CurrentScrollObject);
-	}
-	else if (Text)
+	if (Text)
 	{
 		Text->Opacity = Opacity;
 		Text->Draw(CurrentScrollObject);
@@ -161,19 +156,16 @@ void UIText::Draw()
 
 void UIText::Update()
 {
-	if (!IsDynamic)
+	if (Text) delete Text;
+	if (Wrap)
 	{
-		if (Text) delete Text;
-		if (Wrap)
-		{
-			Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
-				TextSize * 2, Color, Opacity, WrapDistance);
-		}
-		else
-		{
-			Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
-				TextSize * 2, Color, Opacity, 999);
-		}
+		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
+			TextSize * 2, Color, Opacity, WrapDistance);
+	}
+	else
+	{
+		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
+			TextSize * 2, Color, Opacity, 999);
 	}
 }
 

@@ -166,7 +166,7 @@ void ParticleEditorTab::Generate()
 	}
 	SettingsButtons.clear();
 	if (ParticleSettingsScrollBox) delete ParticleSettingsScrollBox;
-	ParticleSettingsScrollBox = new UIScrollBox(true, TabBackground->GetPosition() + Vector2(TabBackground->GetUsedSize().X * 0.5 - 0.1, 0), 10);
+	ParticleSettingsScrollBox = new UIScrollBox(true, TabBackground->GetPosition() + Vector2(TabBackground->GetUsedSize().X * 0.5 - 0.1, 0), true);
 	float ScrollSize = TabBackground->GetUsedSize().Y - 0.2;
 	ParticleSettingsScrollBox->SetMaxSize(Vector2(0.6, ScrollSize));
 	ParticleSettingsScrollBox->SetMinSize(Vector2(0, ScrollSize));

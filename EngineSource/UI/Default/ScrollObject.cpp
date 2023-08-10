@@ -30,19 +30,27 @@ ScrollObject::~ScrollObject()
 
 void ScrollObject::ScrollUp()
 {
+	if (!Active)
+	{
+		return;
+	}
 	if (Maths::IsPointIn2DBox(Position - Scale, Position, Input::MouseLocation))
 	{
 		Percentage += Speed / 100.f;
 	}
-	if (Percentage > MaxScroll / 10)
+	if (Percentage > MaxScroll)
 	{
-		Percentage = MaxScroll / 10;
+		Percentage = MaxScroll;
 	}
 	UIBox::RedrawUI();
 }
 
 void ScrollObject::ScrollDown()
 {
+	if (!Active)
+	{
+		return;
+	}
 	if (Maths::IsPointIn2DBox(Position - Scale, Position, Input::MouseLocation))
 	{
 		Percentage -= Speed / 100.f;

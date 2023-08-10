@@ -14,7 +14,7 @@
 ObjectList::ObjectList(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2, 0.5), Vector2(0.8, 1.25))
 {
 	TabBackground->SetHorizontal(false);
-	ObjectListBox = new UIScrollBox(false, 0, 50);
+	ObjectListBox = new UIScrollBox(false, 0, true);
 	HeaderBox = new UIBackground(false, 0, Vector3(UIColors[0]), 0);
 	HeaderBox->SetBorder(UIBox::E_DARKENED_EDGE, 0.25);
 	ObjectListBox

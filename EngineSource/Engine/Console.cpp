@@ -297,6 +297,38 @@ void Console::InitializeConsole()
 			ConsoleLog("Drawcalls: " + std::to_string(Performance::DrawCalls));
 		}, {}));
 
+	RegisterCommand(Command("locate", []()
+		{
+			Application::Timer t;
+			std::string FoundFile = Assets::GetAsset(CommandArgs()[0]);
+			float Duration = t.TimeSinceCreation();
+			if (FoundFile.empty())
+			{
+				FoundFile = "Not found";
+			}
+
+			std::string LogMessage = CommandArgs()[0] + " -> " + FoundFile;
+			if (CommandArgs().size() > 1 && CommandArgs()[1] != "0")
+			{
+				LogMessage.append(" (" + std::to_string(Duration) + " seconds)");
+			}
+
+			ConsoleLog(LogMessage);
+		}, { Command::Argument("file", Type::E_STRING), Command::Argument("displayFetchTime", Type::E_BOOL, true) }));
+
+	RegisterCommand(Command("getclass", []()
+		{
+			for (const auto& i : Objects::EditorObjects)
+			{
+				if (i.Name == CommandArgs()[0])
+				{
+					ConsoleLog(Objects::GetCategoryFromID(i.ID) + "/" + i.Name);
+					return;
+				}
+			}
+			ConsoleLog("Could not find class " + CommandArgs()[0], E_WARNING);
+		}, { Command::Argument("objectName", Type::E_STRING) }));
+
 	RegisterConVar(Variable("wireframe", Type::E_BOOL, &Graphics::IsWireframe, nullptr));
 	RegisterConVar(Variable("vignette", Type::E_FLOAT, &Graphics::Vignette, nullptr));
 	RegisterConVar(Variable("vsync", Type::E_BOOL, &Graphics::VSync, nullptr));

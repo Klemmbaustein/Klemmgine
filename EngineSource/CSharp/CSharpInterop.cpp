@@ -99,13 +99,13 @@ namespace CSharp
 	void* load_library(const char_t* path)
 	{
 		HMODULE h = ::LoadLibraryW(path);
-		ENGINE_ASSERT(h != nullptr, "Could not load library.");
+		ENGINE_ASSERT(h != nullptr, "Could not load library");
 		return (void*)h;
 	}
 	void* get_export(void* h, const char* name)
 	{
 		void* f = ::GetProcAddress((HMODULE)h, name);
-		ENGINE_ASSERT(f != nullptr, "Could not export library");
+		ENGINE_ASSERT(f != nullptr, "Could not export library: " + std::string(name));
 		return f;
 	}
 
@@ -353,14 +353,11 @@ void CSharp::LoadRuntime()
 	auto pos = root_path.find_last_of(DIR_SEPARATOR);
 	ENGINE_ASSERT(pos != string_t::npos, "Root path isn't valid");
 
-	if (!CSharp::load_hostfxr())
-	{
-		ENGINE_ASSERT(false, "Failure: load_hostfxr()");
-	}
+	ENGINE_ASSERT(load_hostfxr(), "Failure: load_hostfxr() failed.");
 
 	const string_t config_path = root_path + STR("/") + string_t(CSHARP_LIBRARY_PATH) + STR(".runtimeconfig.json");
 
-	load_assembly_and_get_function_pointer = CSharp::get_dotnet_load_assembly(config_path.c_str());
+	load_assembly_and_get_function_pointer = get_dotnet_load_assembly(config_path.c_str());
 	if (load_assembly_and_get_function_pointer == nullptr)
 	{
 		CSharpLog("Could not load .net runtime!", CS_Log_Runtime, CS_Log_Err);

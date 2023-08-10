@@ -47,13 +47,13 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);
-	Rows[0] = new UIScrollBox(false, 0, 20);
+	Rows[0] = new UIScrollBox(false, 0, true);
 	RowBox->AddChild(Rows[0]);
 	PreviewWindow = new UIBackground(true, 0, 1, 0.5);
 	Rows[0]->AddChild(PreviewWindow);
 	PreviewWindow->SetBorder(UIBox::E_ROUNDED, 1);
 
-	Rows[1] = new UIScrollBox(false, 0, 20);
+	Rows[1] = new UIScrollBox(false, 0, true);
 	Rows[1]->Align = UIBox::E_REVERSE;
 	Rows[1]->SetMinSize(Vector2(0, 1));
 	Rows[1]->SetMaxSize(Vector2(1, 1));

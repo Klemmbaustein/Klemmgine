@@ -5,6 +5,7 @@
 #include <Rendering/VertexBuffer.h>
 #include <GL/glew.h>
 #include <Engine/Application.h>
+#include <UI/UIScrollBox.h>
 
 #if EDITOR
 #include <UI/EditorUI/EditorUI.h>
@@ -61,7 +62,7 @@ void UIButton::Tick()
 	{
 		IsPressed = false;
 		IsHovered = false;
-		UI::NewHoveredButton = nullptr;
+		UI::HoveredBox = nullptr;
 		return;
 	}
 #endif
@@ -70,12 +71,12 @@ void UIButton::Tick()
 		return;
 	}
 	ButtonColorMultiplier = 1.0f;
-	if (UI::HoveredButton == this && !IsHovered)
+	if (UI::HoveredBox == this && !IsHovered)
 	{
 		RedrawUI();
 		IsHovered = true;
 	}
-	if (IsHovered && UI::HoveredButton != this)
+	if (IsHovered && UI::HoveredBox != this)
 	{
 		RedrawUI();
 		IsHovered = false;
@@ -85,18 +86,11 @@ void UIButton::Tick()
 		Offset.Y = CurrentScrollObject->Percentage;
 	}
 
-	if (UI::HoveredButton == this)
+	if (UI::HoveredBox == this)
 	{
 		ButtonColorMultiplier = 0.8f;
 	}
-
-	if (Maths::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation) // If the mouse is on top of the button
-		&& (!CurrentScrollObject || // Check if we have a scroll object
-			Maths::IsPointIn2DBox(CurrentScrollObject->Position - CurrentScrollObject->Scale, CurrentScrollObject->Position, Input::MouseLocation))) // do some very questionable math to check if the mouse is inside the scroll area
-	{
-		UI::NewHoveredButton = this;
-	}
-	else if (IsPressed && UI::HoveredButton != this)
+	if (IsPressed && UI::HoveredBox != this && !UIScrollBox::IsDraggingScrollBox)
 	{
 		IsSelected = false;
 		IsPressed = false;
@@ -112,7 +106,7 @@ void UIButton::Tick()
 		ButtonColorMultiplier = 0.6f;
 	}
 
-	if (UI::HoveredButton == this)
+	if (UI::HoveredBox == this)
 	{
 		if (Input::IsLMBDown)
 		{
@@ -232,6 +226,7 @@ UIButton::UIButton(bool Horizontal, Vector2 Position, Vector3 Color, UICanvas* U
 	this->ButtonIndex = ButtonIndex;
 	this->ParentUI = UI;
 	this->Color = Vector3::Clamp(Color, 0, 1);
+	HasMouseCollision = true;
 	MakeGLBuffers();
 }
 

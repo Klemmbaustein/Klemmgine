@@ -65,7 +65,7 @@ Vector2 GetMousePosition()
 namespace Application
 {
 #if EDITOR
-	constexpr int MOUSE_GRAB_PADDING = 8;
+	constexpr int MOUSE_GRAB_PADDING = 5;
 
 	SDL_HitTestResult HitTestCallback(SDL_Window* Window, const SDL_Point* Area, void* Data)
 	{
@@ -114,7 +114,7 @@ namespace Application
 		{
 			return SDL_HITTEST_RESIZE_RIGHT;
 		}
-		else if (EditorUI::IsTitleBarHovered() && !UI::HoveredButton)
+		else if (EditorUI::IsTitleBarHovered() && !UI::HoveredBox)
 		{
 			return SDL_HITTEST_DRAGGABLE;
 		}
@@ -346,7 +346,7 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	{
 		Renderable::ApplyDefaultUniformsToShader(s.second.UsedShader);
 		CSM::BindLightSpaceMatricesToShader(Matrices, s.second.UsedShader);
-		s.second.UsedShader->SetInt("u_useLightMap", Buffer == Graphics::MainFramebuffer ? 1 : 0);
+		s.second.UsedShader->SetInt("u_useLightMap", Buffer == Graphics::MainFramebuffer ? BakedLighting::LoadedLightmap : 0);
 		for (int i = 0; i < 8; i++)
 		{
 			std::string CurrentLight = "u_lights[" + std::to_string(i) + "]";
@@ -470,6 +470,7 @@ void PollInput()
 #if IS_IN_EDITOR
 			case SDLK_DELETE:
 				if (!TextInput::PollForText)
+				{
 					for (int i = 0; i < Objects::AllObjects.size(); i++)
 					{
 						if (Objects::AllObjects.at(i)->IsSelected)
@@ -478,6 +479,14 @@ void PollInput()
 
 						}
 					}
+				}
+				else
+				{
+					if (TextInput::TextIndex < TextInput::Text.size() && TextInput::TextIndex >= 0)
+					{
+						TextInput::Text.erase(TextInput::TextIndex, 1);
+					}
+				}
 				break;
 #endif
 			case SDLK_ESCAPE:
@@ -494,6 +503,22 @@ void PollInput()
 				break;
 			case SDLK_F11:
 				Application::SetFullScreen(!Application::GetFullScreen());
+				break;
+			case SDLK_v:
+				if (TextInput::PollForText && (Input::IsKeyDown(SDLK_LCTRL) || Input::IsKeyDown(SDLK_RCTRL)))
+				{
+					std::string ClipboardText = SDL_GetClipboardText();
+					if (TextInput::TextIndex < TextInput::Text.size())
+					{
+						TextInput::Text.insert(TextInput::TextIndex, ClipboardText);
+					}
+					else
+					{
+						TextInput::Text.append(ClipboardText);
+					}
+					TextInput::TextIndex += ClipboardText.size();
+				}
+				break;
 			}
 		}
 		else if (Event.type == SDL_KEYUP)
@@ -683,26 +708,6 @@ void ApplicationLoop()
 		DrawFramebuffer(Buffer);
 	}
 
-	Debugging::EngineStatus = "Rendering (UI)";
-	UI::NewHoveredButton = nullptr;
-	UIBox::DrawAllUIElements();
-	UI::HoveredButton = UI::NewHoveredButton;
-	glDisable(GL_BLEND);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	DrawPostProcessing();
-	float RenderTime = RenderTimer.TimeSinceCreation();
-#if !EDITOR && !RELEASE
-	if (!DebugUI::CurrentDebugUI)
-	{
-		new DebugUI();
-	}
-#endif
-	Debugging::EngineStatus = "Ticking (UI)";
-	for (int i = 0; i < Graphics::UIToRender.size(); i++)
-	{
-		Graphics::UIToRender[i]->Tick();
-	}
 	Debugging::EngineStatus = "Responding to button events";
 	for (ButtonEvent b : Application::ButtonEvents)
 	{
@@ -723,6 +728,26 @@ void ApplicationLoop()
 		}
 	}
 	Application::ButtonEvents.clear();
+
+	Debugging::EngineStatus = "Ticking (UI)";
+	for (int i = 0; i < Graphics::UIToRender.size(); i++)
+	{
+		Graphics::UIToRender[i]->Tick();
+	}
+
+	Debugging::EngineStatus = "Rendering (UI)";
+	UIBox::DrawAllUIElements();
+	glDisable(GL_BLEND);
+	glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	DrawPostProcessing();
+	float RenderTime = RenderTimer.TimeSinceCreation();
+#if !EDITOR && !RELEASE
+	if (!DebugUI::CurrentDebugUI)
+	{
+		new DebugUI();
+	}
+#endif
 	Scene::Tick();
 	Application::Timer SwapTimer;
 	SDL_GL_SetSwapInterval(0 - Graphics::VSync);
@@ -775,24 +800,27 @@ int Initialize(int argc, char** argv)
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	int flags = SDL_WINDOW_OPENGL;
 
-	SDL_SetHint("SDL_BORDERLESS_WINDOWED_STYLE", "1");
-	SDL_SetHint("SDL_BORDERLESS_RESIZABLE_STYLE", "1");
-
 	// Set Window resolution to the screens resolution * 0.75
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
 	Graphics::WindowResolution = Vector2(DM.w, DM.h) / 1.5;
 
 	std::string ApplicationTitle = ProjectName;
-	if (IsInEditor) ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
+	if (IsInEditor)
+	{
+		ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
+	}
 #if ENGINE_CSHARP && !RELEASE
 	if (CSharp::GetUseCSharp())
 	{
-		ApplicationTitle.append(" (C#-.net)");
+		ApplicationTitle.append(" (C#)");
 	}
 #endif
 
-	if (EngineDebug && !IsInEditor) ApplicationTitle.append(" (Debug)");
+	if (EngineDebug && !IsInEditor)
+	{
+		ApplicationTitle.append(" (Debug)");
+	}
 	Application::Window = SDL_CreateWindow(ApplicationTitle.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		Graphics::WindowResolution.X, Graphics::WindowResolution.Y,
@@ -802,7 +830,7 @@ int Initialize(int argc, char** argv)
 	SDL_SetWindowResizable(Application::Window, SDL_TRUE);
 
 #if EDITOR
-	SDL_SetWindowBordered(Application::Window, SDL_FALSE);
+	//SDL_SetWindowBordered(Application::Window, SDL_FALSE);
 	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
 	SDL_SetWindowHitTest(Application::Window, Application::HitTestCallback, 0);
 #endif

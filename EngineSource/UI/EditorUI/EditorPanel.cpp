@@ -5,6 +5,7 @@
 #include <Engine/Log.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/UIText.h>
+#include <UI/UIScrollBox.h>
 
 void EditorPanel::SetScale(Vector2 NewScale)
 {
@@ -64,6 +65,7 @@ EditorPanel::EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vec
 
 	TabBackground = new UIBackground(true, Position, UIColors[0], Scale);
 	TabBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2);
+	TabBackground->HasMouseCollision = true;
 	this->Position = Position;
 	this->Scale = Scale;
 	//TabBackground->IsVisible = false;
@@ -82,6 +84,7 @@ EditorPanel::EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vec
 		TabBackground->Align = UIBox::E_REVERSE;
 		TabBackground->SetPadding(0);
 		TitleBackground->SetPadding(0);
+		TitleBackground->HasMouseCollision = true;
 		this->Position = Position;
 		this->Scale = Scale;
 	}
@@ -102,7 +105,8 @@ EditorPanel::~EditorPanel()
 
 void EditorPanel::UpdatePanel()
 {
-	if ((UI::HoveredButton && !Editor::DraggingTab) || Editor::CurrentUI->DraggedItem)
+	if ((!dynamic_cast<UIBackground*>(UI::HoveredBox) && !dynamic_cast<UIScrollBox*>(UI::HoveredBox) && !Editor::DraggingTab)
+		|| Editor::CurrentUI->DraggedItem || UIScrollBox::IsDraggingScrollBox)
 	{
 		return;
 	}

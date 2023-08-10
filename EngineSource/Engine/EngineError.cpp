@@ -7,5 +7,9 @@ void Engine::AssertFailure(std::string Name, std::string Location)
 	Log::PrintMultiLine(Name, Log::LogColor::Red, "[Error]: ");
 	Log::Print("[Error]: " + Location, Log::LogColor::Red);
 
-	throw "Assert failed.";
+#if _WIN32
+	__debugbreak();
+#else
+	throw 0;
+#endif
 }

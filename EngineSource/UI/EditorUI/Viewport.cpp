@@ -237,7 +237,7 @@ void Viewport::Tick()
 	if (Input::IsLMBDown && !PressedLMB && !TabInstances[Tabs[SelectedTab].Index])
 	{
 		PressedLMB = true;
-		if (TabHas3DView && Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !UI::HoveredButton)
+		if (TabHas3DView && Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !UI::HoveredBox)
 		{
 			Vector3 DistanceScaleMultiplier;
 			if (SelectedObjects.size() > 0)

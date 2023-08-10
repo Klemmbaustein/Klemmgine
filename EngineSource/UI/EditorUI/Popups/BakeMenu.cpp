@@ -101,7 +101,6 @@ void BakeMenu::Tick()
 
 	if (BakeProgressText)
 	{
-		BakeProgressText->SetText("Progress: " + std::to_string((int)(BakedLighting::GetBakeProgress() * 100)) + "%");
 
 		if (!IsFinished && !Editor::IsBakingScene)
 		{
@@ -111,6 +110,14 @@ void BakeMenu::Tick()
 				->SetBorder(UIBox::E_ROUNDED, 0.2)
 				->AddChild((new UIText(0.45, 1 - UIColors[2], "Close", Editor::CurrentUI->EngineUIText))
 					->SetPadding(0.005)));
+		}
+		else if (Editor::IsBakingScene)
+		{
+			BakeProgressText->SetText("Progress: " + std::to_string((int)(BakedLighting::GetBakeProgress() * 100)) + "%");
+		}
+		else
+		{
+			BakeProgressText->SetText("Progress: 100%");
 		}
 	}
 
@@ -145,7 +152,7 @@ void BakeMenu::StartBake()
 	TabBackground->AddChild(BakeProgressText
 		->SetPadding(0.01, 0.01, 0.02, 0.005));
 
-	LogScrollBox = new UIScrollBox(false, 0, 25);
+	LogScrollBox = new UIScrollBox(false, 0, true);
 	LogScrollBox->SetMinSize(Vector2(0.45, 0.35));
 	LogScrollBox->SetMaxSize(Vector2(0.45, 0.35));
 	LogScrollBox->Align = UIBox::E_REVERSE;

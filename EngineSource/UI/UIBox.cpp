@@ -9,6 +9,7 @@
 #if EDITOR
 #include <UI/EditorUI/EditorUI.h>
 #endif
+#include <Engine/EngineError.h>
 
 class UIButton;
 
@@ -37,6 +38,13 @@ UIBox::UIBox(bool Horizontal, Vector2 Position)
 	this->Size = Size;
 	this->ChildrenHorizontal = Horizontal;
 	InvalidateLayout();
+	for (UIBox* elem : UI::UIElements)
+	{
+		if (elem == this)
+		{
+			throw 1;
+		}
+	}
 	UI::UIElements.push_back(this);
 }
 
@@ -44,6 +52,14 @@ UIBox::~UIBox()
 {
 	InvalidateLayout();
 	DeleteChildren();
+	if (UI::HoveredBox == this)
+	{
+		UI::HoveredBox = nullptr;
+	}
+	if (UI::NewHoveredBox == this)
+	{
+		UI::NewHoveredBox = nullptr;
+	}
 	for (unsigned int i = 0; i < UI::UIElements.size(); i++)
 	{
 		if (UI::UIElements[i] == this)
@@ -79,6 +95,22 @@ void UIBox::UpdateTickState()
 		c->UpdateTickState();
 	}
 	ShouldBeTicked = IsVisibleInHierarchy();
+}
+
+void UIBox::UpdateHoveredState()
+{
+#if EDITOR
+	if (!Editor::DraggingTab && IsHovered() && HasMouseCollision && IsVisibleInHierarchy())
+#else
+	if (IsHovered() && HasMouseCollision && IsVisibleInHierarchy())
+#endif
+	{
+		UI::NewHoveredBox = this;
+	}
+	for (UIBox* Child : Children)
+	{
+		Child->UpdateHoveredState();
+	}
 }
 
 void UIBox::OnChildClicked(int Index)
@@ -157,12 +189,34 @@ void UIBox::ClearUI()
 
 bool UIBox::IsHovered()
 {
-	return Maths::IsPointIn2DBox(OffsetPosition, OffsetPosition + Size, Input::MouseLocation);
+	Vector2 Offset;
+	if (CurrentScrollObject)
+	{
+		Offset.Y = CurrentScrollObject->Percentage;
+	}
+	return Maths::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation) // If the mouse is on top of the box
+		&& (!CurrentScrollObject // Check if we have a scroll object
+			|| Maths::IsPointIn2DBox( // do some very questionable math to check if the mouse is inside the scroll area
+				CurrentScrollObject->Position - CurrentScrollObject->Scale,
+				CurrentScrollObject->Position, Input::MouseLocation)); 
 }
 
 Vector2 UIBox::GetUsedSize()
 {
 	return Size;
+}
+
+bool UIBox::IsChildOf(UIBox* Parent)
+{
+	if (Parent == this->Parent)
+	{
+		return true;
+	}
+	if (!this->Parent)
+	{
+		return false;
+	}
+	return this->Parent->IsChildOf(Parent);
 }
 
 void UIBox::OnAttached()
@@ -318,7 +372,6 @@ void UIBox::UpdatePosition()
 {
 	float Offset = 0;
 
-
 	if (!Parent)
 	{
 		OffsetPosition = Position;
@@ -440,7 +493,9 @@ UIBox* UIBox::GetAbsoluteParent()
 
 void UIBox::DrawAllUIElements()
 {
-	for (auto elem : UI::UIElements)
+	UI::NewHoveredBox = nullptr;
+
+	for (UIBox* elem : UI::UIElements)
 	{
 		if (elem->IsVisible != elem->PrevIsVisible)
 		{
@@ -451,11 +506,16 @@ void UIBox::DrawAllUIElements()
 		{
 			elem->Tick();
 		}
+		if (!elem->Parent)
+		{
+			elem->UpdateHoveredState();
+		}
 	}
+	UI::HoveredBox = UI::NewHoveredBox;
 	if (UI::RequiresRedraw)
 	{
 		UI::RequiresRedraw = false;
-		for (auto elem : UI::ElementsToUpdate)
+		for (UIBox* elem : UI::ElementsToUpdate)
 		{
 			elem->UpdateSelfAndChildren();
 		}
@@ -465,10 +525,12 @@ void UIBox::DrawAllUIElements()
 		glBindFramebuffer(GL_FRAMEBUFFER, UI::UIBuffer);
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
-		for (auto elem : UI::UIElements)
+		for (UIBox* elem : UI::UIElements)
 		{
-			if (elem->Parent == nullptr)
+			if (!elem->Parent)
+			{
 				elem->DrawThisAndChildren();
+			}
 		}
 		glClearColor(0, 0, 0, 1);
 		glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
@@ -509,6 +571,6 @@ bool UIBox::IsVisibleInHierarchy()
 
 namespace UI
 {
-	UIButton* HoveredButton = nullptr;
-	UIButton* NewHoveredButton = nullptr;
+	UIBox* HoveredBox = nullptr;
+	UIBox* NewHoveredBox = nullptr;
 }

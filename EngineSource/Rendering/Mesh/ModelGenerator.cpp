@@ -27,7 +27,7 @@ namespace ModelGenerator
 			}
 		}
 		std::ifstream Input = std::ifstream(Path, std::ios::in | std::ios::binary);
-
+		Input.exceptions(std::ios_base::failbit | std::ios_base::badbit);
 		uint32_t NumMeshes;
 		Input.read((char*)&NumMeshes, sizeof(int));
 

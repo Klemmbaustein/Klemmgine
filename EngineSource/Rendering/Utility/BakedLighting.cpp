@@ -21,6 +21,7 @@ float BakedLighting::LightmapScaleMultiplier = 1;
 std::atomic<bool> BakedLighting::FinishedBaking = false;
 uint64_t BakedLighting::LightmapResolution = 100;
 constexpr uint8_t NUM_CHANNELS = 1;
+bool BakedLighting::LoadedLightmap = false;
 
 Vector3 LightmapScale = 200.0f;
 
@@ -40,7 +41,7 @@ void BakedLighting::Init()
 	{
 		glDeleteTextures(1, &LightTexture);
 	}
-
+	LoadedLightmap = false;
 	glGenTextures(1, &LightTexture);
 	glBindTexture(GL_TEXTURE_3D, LightTexture);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -438,7 +439,7 @@ void BakedLighting::LoadBakeFile(std::string BakeFile)
 		}
 	}
 
-
+	LoadedLightmap = true;
 	glDeleteTextures(1, &LightTexture);
 	glGenTextures(1, &LightTexture);
 	glBindTexture(GL_TEXTURE_3D, LightTexture);
