@@ -259,7 +259,7 @@ UIBox* UIBox::SetPosition(Vector2 NewPosition)
 	{
 		Position = NewPosition;
 		UpdateSelfAndChildren();
-		RedrawUI();
+		InvalidateLayout();
 	}
 	return this;
 }

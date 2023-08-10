@@ -167,7 +167,7 @@ void UIScrollBox::Update()
 	UpdateScrollObjectOfObject(this);
 
 
-	Tick();
+	//Tick();
 }
 
 void UIScrollBox::UpdateTickState()
