@@ -52,7 +52,7 @@ namespace LaunchArgs
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
 	{
 		std::pair("neverhideconsole", NeverHideConsole),
-		std::pair("loadscene", LoadScene),
+		std::pair("scene", LoadScene),
 		std::pair("novsync", NoVSync),
 		std::pair("wireframe", Wireframe),
 		std::pair("version", GetVersion),

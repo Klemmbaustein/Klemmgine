@@ -175,7 +175,7 @@ void MaterialTab::GenerateUI()
 	Rows[0]->AddChild(ParentTemplateText);
 
 	Rows[0]->AddChild(new UIText(0.675, UIColors[2], "Uniforms", Renderer));
-	auto ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.725, 0));
+	auto ElementBox = new UIBackground(true, 0, UIColors[1] * 1.25, Vector2(0.725, 0));
 
 	auto ElementNameText = new UIText(0.5, UIColors[2], "Uniform name", Renderer);
 	ElementNameText->SetPadding(0.02, 0.02, 0.02, 0.01);
@@ -195,7 +195,7 @@ void MaterialTab::GenerateUI()
 	Rows[0]->AddChild(ElementBox);
 	for (auto& i : LoadedMaterial.Uniforms)
 	{
-		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.5, Vector2(0.725, 0.09));
+		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.25, Vector2(0.725, 0.09));
 
 		auto ElementNameBox = new UIBox(true, 0);
 		auto ElementName = new UIText(0.5, UIColors[2], i.UniformName, Renderer);
