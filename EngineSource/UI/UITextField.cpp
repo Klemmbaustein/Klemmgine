@@ -97,6 +97,7 @@ void UITextField::Tick()
 			TextInput::PollForText = true;
 			TextInput::Text = EnteredText;
 			TextInput::TextIndex = Nearest;
+			TextFieldTimer = 0;
 			IsPressed = false;
 			RedrawUI();
 		}
@@ -139,11 +140,13 @@ void UITextField::Tick()
 		}
 	}
 	std::string RendererdText = EnteredText;
-	if (fmod(Stats::Time, 1) < 0.5f && IsEdited)
+	TextFieldTimer += Performance::DeltaTime;
+	if (fmod(TextFieldTimer, 1) < 0.5f && IsEdited)
 	{
 		Vector2 NewPos = TextObject->GetLetterLocation(TextInput::TextIndex);
 		if (NewPos != IBeamPosition)
 		{
+			TextFieldTimer = 0;
 			IBeamPosition = NewPos;
 			IBeamScale = Vector2(0.002, 0.066) * TextSize;
 			UIBox::RedrawUI();

@@ -29,6 +29,7 @@ class UITextField : public UIBox
 	void MakeGLBuffers();
 	void Tick() override;
 	float ButtonColorMultiplier = 1;
+	float TextFieldTimer = 0;
 public:
 	Vector3 GetColor();
 	UITextField* SetColor(Vector3 NewColor);

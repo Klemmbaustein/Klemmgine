@@ -16,7 +16,6 @@ class UIScrollBox : public UIBox
 	float DraggingDelta = 0;
 
 	float DesiredMaxScroll = 0;
-	float CurrentFrame = -1;
 	float GetDesiredChildrenSize();
 	void UpdateScrollObjectOfObject(UIBox* o);
 public:
@@ -26,11 +25,11 @@ public:
 	UIBackground* GetScrollBarSlider();
 	UIButton* GetScrollBarBackground();
 
-	void SetDisplayScrollBar(bool NewDisplay);
+	UIScrollBox* SetDisplayScrollBar(bool NewDisplay);
 	bool GetDiplayScrollBar();
 
 	void Tick() override;
-	void SetMaxScroll(float NewMaxScroll);
+	UIScrollBox* SetMaxScroll(float NewMaxScroll);
 	float GetMaxScroll();
 	UIScrollBox* SetScrollSpeed(float NewScrollSpeed);
 	float GetScrollSpeed();

@@ -47,19 +47,23 @@ UIButton* UIScrollBox::GetScrollBarBackground()
 	return ScrollBarBackground;
 }
 
-void UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
+UIScrollBox* UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 {
 	if (NewDisplay != DisplayScrollBar)
 	{
 		DisplayScrollBar = NewDisplay;
 		if (DisplayScrollBar)
 		{
-			ScrollBarBackground = new UIButton(false, 0, 0.3, nullptr, 0);
+			ScrollBarBackground = new UIButton(false, 0, 0.25, nullptr, 0);
 			ScrollBarBackground->ParentOverride = this;
 			ScrollBarBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2);
 			ScrollBarBackground->Align = UIBox::E_REVERSE;
 			ScrollBarBackground->SetPosition(OffsetPosition + Vector2(Size.X - ScrollBarBackground->GetUsedSize().X, 0));
+#if EDITOR
+			ScrollBar = new UIBackground(true, 0, 0.4, Vector2(0.01, 0.1));
+#else
 			ScrollBar = new UIBackground(true, 0, 0.75, Vector2(0.01, 0.1));
+#endif
 			ScrollBarBackground->AddChild(ScrollBar);
 			ScrollBar->SetBorder(UIBox::E_ROUNDED, 0.25);
 			ScrollBar->SetPadding(0);
@@ -69,6 +73,7 @@ void UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 			delete ScrollBarBackground;
 		}
 	}
+	return this;
 }
 
 bool UIScrollBox::GetDiplayScrollBar()
@@ -78,7 +83,6 @@ bool UIScrollBox::GetDiplayScrollBar()
 
 void UIScrollBox::Tick()
 {
-	CurrentFrame = Stats::Time;
 	ScrollClass.Active = UI::HoveredBox && (UI::HoveredBox == this || UI::HoveredBox->IsChildOf(this));
 	CurrentScrollObject = nullptr;
 	bool VisibleInHierarchy = IsVisibleInHierarchy();
@@ -128,10 +132,11 @@ void UIScrollBox::Tick()
 	}
 }
 
-void UIScrollBox::SetMaxScroll(float NewMaxScroll)
+UIScrollBox* UIScrollBox::SetMaxScroll(float NewMaxScroll)
 {
 	MaxScroll = NewMaxScroll;
 	Update();
+	return this;
 }
 
 float UIScrollBox::GetMaxScroll()

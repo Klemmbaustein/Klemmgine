@@ -10,10 +10,15 @@ void UIBackground::ScrollTick(Shader* UsedShader)
 {
 	if (CurrentScrollObject != nullptr)
 	{
-		glUniform3f(glGetUniformLocation(UsedShader->GetShaderID(), "u_offset"), -CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
+		glUniform3f(glGetUniformLocation(UsedShader->GetShaderID(), "u_offset"),
+			-CurrentScrollObject->Percentage,
+			CurrentScrollObject->Position.Y,
+			CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
 	}
 	else
+	{
 		glUniform3f(glGetUniformLocation(UsedShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
+	}
 }
 
 void UIBackground::MakeGLBuffers(bool InvertTextureCoordinates)

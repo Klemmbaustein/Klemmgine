@@ -153,7 +153,15 @@ void UIBox::InitUI()
 	// create floating point color buffer
 	glGenTextures(1, &UI::UITexture);
 	glBindTexture(GL_TEXTURE_2D, UI::UITexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, Graphics::WindowResolution.X * 2, Graphics::WindowResolution.Y * 2, 0, GL_RGBA, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D,
+		0, 
+		GL_RGBA16F,
+		Graphics::WindowResolution.X * 2,
+		Graphics::WindowResolution.Y * 2, 
+		0, 
+		GL_RGBA, 
+		GL_FLOAT, 
+		NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
@@ -175,7 +183,7 @@ void UIBox::RedrawUI()
 void UIBox::ClearUI()
 {
 	UI::ElementsToUpdate.clear();
-	auto elems = UI::UIElements;
+	std::vector<UIBox*> elems = UI::UIElements;
 	for (auto* elem : elems)
 	{
 		if (!elem->Parent)
@@ -193,12 +201,15 @@ bool UIBox::IsHovered()
 	if (CurrentScrollObject)
 	{
 		Offset.Y = CurrentScrollObject->Percentage;
+
 	}
-	return Maths::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation) // If the mouse is on top of the box
+	// If the mouse is on top of the box
+	return Maths::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation) 
 		&& (!CurrentScrollObject // Check if we have a scroll object
 			|| Maths::IsPointIn2DBox( // do some very questionable math to check if the mouse is inside the scroll area
 				CurrentScrollObject->Position - CurrentScrollObject->Scale,
-				CurrentScrollObject->Position, Input::MouseLocation)); 
+				CurrentScrollObject->Position,
+				Input::MouseLocation)); 
 }
 
 Vector2 UIBox::GetUsedSize()

@@ -236,7 +236,9 @@ void GLAPIENTRY MessageCallback(
 	const void* userParam
 )
 {
-	if ((type == GL_DEBUG_TYPE_ERROR || type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR || type == GL_DEBUG_TYPE_PORTABILITY))
+	if (type == GL_DEBUG_TYPE_ERROR
+		|| type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR
+		|| type == GL_DEBUG_TYPE_PORTABILITY)
 	{
 		Log::Print(message + std::string(" Status: ") + Debugging::EngineStatus);
 	}
@@ -658,9 +660,9 @@ void DrawPostProcessing()
 #if EDITOR
 	auto ViewportTab = Application::EditorUserInterface->UIElements[4];
 	Vector2 ViewportPos = (ViewportTab->Position + ViewportTab->Scale * 0.5);
-	glUniform2f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "Position"), ViewportPos.X, ViewportPos.Y);
+	Application::PostProcessShader->SetVector2("Position", ViewportPos.X);
 	Vector2 ViewportScale = ViewportTab->Scale;
-	glUniform2f(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "Scale"), ViewportScale.X, ViewportScale.Y);
+	Application::PostProcessShader->SetVector2("Scale", ViewportScale);
 #endif
 	Application::PostProcessShader->SetInt("u_texture", 1);
 	Application::PostProcessShader->SetInt("u_outlines", 2);
@@ -896,7 +898,7 @@ int Initialize(int argc, char** argv)
 	Application::EditorUserInterface = new EditorUI();
 #endif
 
-	Log::Print(std::string("Finished loading. (").append(std::to_string(StartupTimer.TimeSinceCreation()).append(" seconds)")), Vector3(1.f, 0.75, 0.f));
+	Log::Print("Finished loading. (" + std::to_string(StartupTimer.TimeSinceCreation()) + " seconds)", Vector3(1.f, 0.75, 0.f));
 	Console::ExecuteConsoleCommand("info");
 	if (!ENGINE_DEBUG && !IS_IN_EDITOR)
 	{

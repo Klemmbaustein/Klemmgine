@@ -13,39 +13,48 @@ namespace LaunchArgs
 {
 	void NeverHideConsole(std::vector<std::string> AdditionalArgs)
 	{
-		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -neverhideconsole", Vector3(1, 1, 0));
+		if (AdditionalArgs.size())
+		{
+			Log::Print("Unexpected arguments in -neverhideconsole", Log::LogColor::Yellow);
+		}
 		OS::SetConsoleCanBeHidden(false);
 	}
 
 	void LoadScene(std::vector<std::string> AdditionalArgs)
 	{
-		if (AdditionalArgs.size() != 1) Log::Print("Unexpected arguments in -loadscene", Vector3(1, 1, 0));
+		if (AdditionalArgs.size() != 1)
+		{
+			Log::Print("Unexpected arguments in -loadscene", Log::LogColor::Yellow);
+		}
 		Scene::LoadNewScene(AdditionalArgs[0]);
 		Scene::Tick();
 	}
 
 	void NoVSync(std::vector<std::string> AdditionalArgs)
 	{
-		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -novsync", Vector3(1, 1, 0));
+		if (AdditionalArgs.size())
+		{
+			Log::Print("Unexpected arguments in -novsync", Log::LogColor::Yellow);
+		}
 		Graphics::VSync = false;
 	}
 
 	void Wireframe(std::vector<std::string> AdditionalArgs)
 	{
-		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -wireframe", Vector3(1, 1, 0));
+		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -wireframe", Log::LogColor::Yellow);
 		Graphics::IsWireframe = true;
 	}
 
 	void GetVersion(std::vector<std::string> AdditionalArgs)
 	{
-		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -version", Vector3(1, 1, 0));
+		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -version", Log::LogColor::Yellow);
 		Console::ExecuteConsoleCommand("version");
 		exit(0);
 	}
 
 	void FullScreen(std::vector<std::string> AdditionalArgs)
 	{
-		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -fullscreen", Vector3(1, 1, 0));
+		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -fullscreen", Log::LogColor::Yellow);
 		Application::SetFullScreen(true);
 	}
 
