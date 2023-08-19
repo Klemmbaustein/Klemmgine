@@ -1,0 +1,19 @@
+[submodule "Dependencies/-b"]
+	path = Dependencies/-b
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "Dependencies/SDL"]
+	path = Dependencies/SDL
+	url = https://github.com/libsdl-org/SDL.git
+	branch = SDL2
+[submodule "Dependencies/glm"]
+	path = Dependencies/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Dependencies/glew"]
+	path = Dependencies/glew
+	url = https://github.com/nigels-com/glew.git
+[submodule "Dependencies/glew-cmake"]
+	path = Dependencies/glew-cmake
+	url = https://github.com/Perlmint/glew-cmake.git
+[submodule "Dependencies/openal-soft"]
+	path = Dependencies/openal-soft
+	url = https://github.com/kcat/openal-soft.git
