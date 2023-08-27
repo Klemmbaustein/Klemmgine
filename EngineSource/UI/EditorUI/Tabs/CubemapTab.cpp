@@ -2,7 +2,7 @@
 #pragma once
 #include "CubemapTab.h"
 #include <fstream>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 #include <Rendering/Mesh/ModelGenerator.h>
 #include <Engine/Log.h>
 #include <UI/UIText.h>
@@ -11,7 +11,7 @@
 #include <Rendering/Utility/Framebuffer.h>
 #include <UI/UIButton.h>
 #include <Rendering/Texture/Cubemap.h>
-#include <Engine/Save.h>
+#include <Engine/File/Save.h>
 
 CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors)
 {
@@ -19,7 +19,7 @@ CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UI
 
 	TabBackground->Align = UIBox::E_REVERSE;
 	TabName = new UIText(1, UIColors[2], "Model: ", Renderer);
-	TabName->SetPadding(0.1, 0.05, 0.05, 0);
+	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	if (!PreviewBuffer)
 	{
 		PreviewBuffer = new FramebufferObject();
@@ -30,12 +30,12 @@ CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UI
 		PreviewBuffer->FramebufferCamera = Cam;
 	}
 	TabBackground->AddChild(TabName);
-	CubemapSidesBox = new UIBackground(false, Vector2(-0.6, -0.3), UIColors[1]);
-	CubemapSidesBox->SetMinSize(Vector2(0.3, 0.8));
+	CubemapSidesBox = new UIBackground(false, Vector2(-0.6f, -0.3f), UIColors[1]);
+	CubemapSidesBox->SetMinSize(Vector2(0.3f, 0.8f));
 	CubemapSidesBox->Align = UIBox::E_REVERSE;
 	CubemapSidesBox->SetBorder(UIBox::E_ROUNDED, 1);
 	CubemapSidesBox->IsVisible = false;
-	PreviewWindow = new UIBackground(true, Vector2(-0.2, -0.3), 0.999, 0.8);
+	PreviewWindow = new UIBackground(true, Vector2(-0.2f, -0.3f), 0.999f, 0.8f);
 	PreviewWindow->SetBorder(UIBox::E_ROUNDED, 1);
 	PreviewWindow->IsVisible = false;
 
@@ -69,7 +69,7 @@ void CubemapTab::Load(std::string File)
 {
 	try
 	{
-		PreviewBuffer->GetBuffer()->ReInit(Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+		PreviewBuffer->GetBuffer()->ReInit((int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 		Graphics::MainCamera->Position = Vector3(0, 4, 15);
 		Graphics::MainCamera->SetRotation(Vector3(0, -90, 0));
 		TabName->SetText("Cubemap: " + FileUtil::GetFileNameWithoutExtensionFromPath(File));
@@ -106,16 +106,16 @@ void CubemapTab::Generate()
 	SideFields.clear();
 	for (size_t i = 0; i < Cubenames.size(); i++)
 	{
-		UITextField* text = new UITextField(true, 0, 0.2, this, 0, Renderer);
+		UITextField* text = new UITextField(true, 0, 0.2f, this, 0, Renderer);
 		text->SetText(SaveFile->GetPropterty(Cubenames[i]).Value);
-		text->SetMinSize(Vector2(0.2, 0.05));
+		text->SetMinSize(Vector2(0.2f, 0.05f));
 		text->SetPadding(0);
-		text->SetBorder(UIBox::E_ROUNDED, 0.5);
+		text->SetBorder(UIBox::E_ROUNDED, 0.5f);
 		SideFields.push_back(text);
 		CubemapSidesBox->AddChild((new UIBox(false, 0))
 			->AddChild(text)
-			->AddChild((new UIText(0.5, UIColors[2], DisplayNames[i], Renderer))
-				->SetPadding(0, 0.01, 0, 0)));
+			->AddChild((new UIText(0.5f, UIColors[2], DisplayNames[i], Renderer))
+				->SetPadding(0, 0.01f, 0, 0)));
 	}
 }
 
@@ -127,7 +127,7 @@ void CubemapTab::OnButtonClicked(int Index)
 	case 0:
 		for (size_t i = 0; i < SideFields.size(); i++)
 		{
-			SaveFile->SetPropterty(SaveGame::SaveProperty(Cubenames[i], SideFields[i]->GetText(), Type::E_STRING));
+			SaveFile->SetPropterty(SaveGame::SaveProperty(Cubenames[i], SideFields[i]->GetText(), Type::String));
 		}
 		Generate();
 		break;
@@ -143,7 +143,7 @@ CubemapTab::~CubemapTab()
 
 void CubemapTab::UpdateLayout()
 {
-	PreviewWindow->SetMinSize(Vector2(TabBackground->GetUsedSize().X * 0.5, TabBackground->GetUsedSize().X * 0.5));
+	PreviewWindow->SetMinSize(Vector2(TabBackground->GetUsedSize().X * 0.5f, TabBackground->GetUsedSize().X * 0.5f));
 }
 
 void CubemapTab::UpdatePreviewModel()

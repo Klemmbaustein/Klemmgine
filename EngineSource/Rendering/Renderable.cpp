@@ -1,12 +1,13 @@
 #include "Renderable.h"
 #include <GL/glew.h>
 #include <Rendering/Utility/CSM.h>
-#include <World/Graphics.h>
-#include <World/Stats.h>
+#include <Rendering/Graphics.h>
+#include <Engine/Stats.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <Rendering/Texture/Texture.h>
 #include "Utility/ShaderManager.h"
 #include <Rendering/Utility/BakedLighting.h>
+#include <Engine/EngineError.h>
 
 void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
 {
@@ -14,10 +15,10 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, CSM::ShadowMaps);
 	ShaderToApply->SetFloat("farPlane", CSM::cameraFarPlane);
-	ShaderToApply->SetInt("cascadeCount", CSM::shadowCascadeLevels.size());
+	ShaderToApply->SetInt("cascadeCount", (int)CSM::shadowCascadeLevels.size());
 	ShaderToApply->SetInt("shadowMap", 1);
 	ShaderToApply->SetInt("GiMap", 3);
-	ShaderToApply->SetInt("GiRes", BakedLighting::GetLightTextureSize());
+	ShaderToApply->SetInt("GiRes", (int)BakedLighting::GetLightTextureSize());
 	ShaderToApply->SetVector3("GiScale", BakedLighting::GetLightMapScale());
 	ShaderToApply->SetInt("Skybox", 2);
 	ShaderToApply->SetFloat("u_biasmodifier", Vector3::Dot(
@@ -51,10 +52,8 @@ ObjectRenderContext::ObjectRenderContext(Material m)
 {
 	this->Mat = m;
 	ContextShader = ReferenceShader("Shaders/" + m.VertexShader, "Shaders/" + m.FragmentShader);
-	if (!ContextShader)
-	{
-		throw "Loaded invalid shader";
-	}
+	ENGINE_ASSERT(ContextShader, "Failed to load shader: " + m.VertexShader + ", " + m.FragmentShader);
+
 	for (auto& i : m.Uniforms)
 	{
 		LoadUniform(i);
@@ -78,7 +77,7 @@ void ObjectRenderContext::Bind()
 void ObjectRenderContext::BindWithShader(Shader* s)
 {
 	s->Bind();
-	size_t TexIterator = 0;
+	GLint TexIterator = 0;
 	for (int i = 0; i < Uniforms.size(); ++i)
 	{
 		if (!Uniforms.at(i).Content)
@@ -87,16 +86,17 @@ void ObjectRenderContext::BindWithShader(Shader* s)
 		}
 		switch (Uniforms.at(i).Type)
 		{
-		case Type::E_INT:
+		case Type::Int:
 			s->SetInt(Uniforms.at(i).Name, *static_cast<int*>(Uniforms.at(i).Content));
 			break;
-		case Type::E_FLOAT:
+		case Type::Float:
 			s->SetFloat(Uniforms.at(i).Name, *static_cast<float*>(Uniforms.at(i).Content));
 			break;
-		case Type::E_VECTOR3:
+		case Type::Vector3Color:
+		case Type::Vector3:
 			s->SetVector3(Uniforms.at(i).Name, *static_cast<Vector3*>(Uniforms.at(i).Content));
 			break;
-		case Type::E_GL_TEXTURE:
+		case Type::GL_Texture:
 			glActiveTexture(GL_TEXTURE7 + TexIterator);
 			glBindTexture(GL_TEXTURE_2D, *(unsigned int*)Uniforms.at(i).Content);
 			glUniform1i(glGetUniformLocation(s->GetShaderID(), Uniforms.at(i).Name.c_str()), 7 + TexIterator);
@@ -131,7 +131,7 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 		UniformIndex = Uniforms.size() - 1;
 	}
 
-	if (u.Value.empty() && u.Type != Type::E_VECTOR3)
+	if (u.Value.empty() && u.Type != Type::Bool)
 	{
 		return;
 	}
@@ -139,36 +139,38 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 	{
 		switch (u.Type)
 		{
-		case Type::E_INT:
+		case Type::Int:
 			Uniforms[UniformIndex].Content = new int(std::stoi(u.Value));
 			break;
-		case Type::E_FLOAT:
+		case Type::Float:
 			Uniforms[UniformIndex].Content = new float(std::stof(u.Value));
 			break;
-		case Type::E_VECTOR3:
+		case Type::Vector3Color:
+		case Type::Vector3:
 			Uniforms[UniformIndex].Content = new Vector3(Vector3::stov(u.Value));
 			break;
-		case Type::E_GL_TEXTURE:
+		case Type::GL_Texture:
 			Uniforms[UniformIndex].Content = (void*)new unsigned int(Texture::LoadTexture(u.Value));
 			break;
 		default:
 			break;
 		}
 	}
-	catch (std::exception& e)
+	catch (std::exception)
 	{
 		switch (u.Type)
 		{
-		case Type::E_INT:
+		case Type::Int:
 			Uniforms[UniformIndex].Content = new int(0);
 			break;
-		case Type::E_FLOAT:
+		case Type::Float:
 			Uniforms[UniformIndex].Content = new float(0);
 			break;
-		case Type::E_VECTOR3:
+		case Type::Vector3Color:
+		case Type::Vector3:
 			Uniforms[UniformIndex].Content = new Vector3();
 			break;
-		case Type::E_GL_TEXTURE:
+		case Type::GL_Texture:
 			Uniforms[UniformIndex].Content = new unsigned int(0);
 			break;
 		default:
@@ -187,17 +189,17 @@ void ObjectRenderContext::Unload()
 		}
 		switch (u.Type)
 		{
-		case Type::E_INT:
+		case Type::Int:
 			delete reinterpret_cast<int*>(u.Content);
 			break;
-		case Type::E_FLOAT:
+		case Type::Float:
 			delete reinterpret_cast<float*>(u.Content);
 			break;
-		case Type::E_VECTOR3:
-		case Type::E_VECTOR3_COLOR:
+		case Type::Vector3:
+		case Type::Vector3Color:
 			delete reinterpret_cast<Vector3*>(u.Content);
 			break;
-		case Type::E_GL_TEXTURE:
+		case Type::GL_Texture:
 			delete reinterpret_cast<unsigned int*>(u.Content);
 			break;
 		default:

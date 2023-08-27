@@ -2,7 +2,7 @@
 #include <UI/Default/TextRenderer.h>
 #include <UI/UIBox.h>
 
-class Shader;
+struct Shader;
 class DrawableText;
 class TextRenderer;
 

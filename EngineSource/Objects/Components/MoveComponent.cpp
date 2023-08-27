@@ -1,10 +1,9 @@
 #include "MoveComponent.h"
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <Engine/Log.h>
 
-/*
-* This movement code is somewhat fucky, but hey, It works.
-*/
+// TODO: Rewrite
+// TODO: Rewrite again because this is really bad
 
 Collision::HitResponse MoveComponent::TryMove(Vector3 Direction, float Distance, bool TryAdjust)
 {
@@ -18,10 +17,10 @@ Collision::HitResponse MoveComponent::TryMove(Vector3 Direction, float Distance,
 		auto MoveHit = CollisionMeshes[Index]->OverlapCheck(std::set({ CollisionMeshes[0], CollisionMeshes[1] }));
 		if (MoveHit.Hit)
 		{
-			MoveHit.Normal = (MoveHit.Normal + Vector3(0, 0.1, 0)).Normalize();
+			MoveHit.Normal = (MoveHit.Normal + Vector3(0, 0.1f, 0)).Normalize();
 			if (TryAdjust)
 			{
-				Vector3 Dir = MoveHit.Normal * abs(Distance) * 0.3 + Vector3(Vector3::Dot(MoveHit.Normal, Vector3(0, 1, 0)) * abs(Distance) * 0.1);
+				Vector3 Dir = MoveHit.Normal * abs(Distance) * 0.3f + Vector3(Vector3::Dot(MoveHit.Normal, Vector3(0, 1, 0)) * abs(Distance) * 0.1f);
 				if (TryMove(Dir, Dir.Length(), false).Hit)
 				{
 					GetParent()->GetTransform().Location += Dir;
@@ -71,12 +70,12 @@ void MoveComponent::Begin()
 	CollisionMeshes[0] = new CollisionComponent();
 	GetParent()->Attach(CollisionMeshes[0]);
 	CollisionMeshes[0]->Init(CollisionModel.GetMergedVertices(), CollisionModel.GetMergedIndices());
-	CollisionMeshes[0]->RelativeTransform.Scale = Vector3(0.5, 1, 0.5);
+	CollisionMeshes[0]->RelativeTransform.Scale = Vector3(0.5f, 1.0f, 0.5f);
 
 	CollisionMeshes[1] = new CollisionComponent();
 	GetParent()->Attach(CollisionMeshes[1]);
 	CollisionMeshes[1]->Init(CollisionModel.GetMergedVertices(), CollisionModel.GetMergedIndices());
-	CollisionMeshes[1]->RelativeTransform.Scale = Vector3(0.5, 0.8, 0.5);
+	CollisionMeshes[1]->RelativeTransform.Scale = Vector3(0.5f, 0.8f, 0.5f);
 }
 
 void MoveComponent::Tick()
@@ -87,12 +86,12 @@ void MoveComponent::Tick()
 	}
 	InputDirection.Y = 0;
 	InputDirection.Normalize();
-	MovementVelocity.X += InputDirection.X * Performance::DeltaTime * Velocity * (IsOnGround ? 1 : 0.1);
-	MovementVelocity.Y += InputDirection.Z * Performance::DeltaTime * Velocity * (IsOnGround ? 1 : 0.1);
-	MovementVelocity *= IsOnGround ? powf(0.5, Performance::DeltaTime * 50) : powf(0.5, Performance::DeltaTime * 5);
+	MovementVelocity.X += InputDirection.X * Performance::DeltaTime * Velocity * (IsOnGround ? 1 : 0.1f);
+	MovementVelocity.Y += InputDirection.Z * Performance::DeltaTime * Velocity * (IsOnGround ? 1 : 0.1f);
+	MovementVelocity *= IsOnGround ? powf(0.5f, Performance::DeltaTime * 50) : powf(0.5f, Performance::DeltaTime * 5);
 	TryMove(Vector3(MovementVelocity.X, 0, MovementVelocity.Y), MovementVelocity.Length());
 	auto MoveHit = TryMove(Vector3(0, 1, 0), VerticalVelocity, false);
-	if (MoveHit.Hit && (Vector3::Dot(MoveHit.Normal, Vector3(0, 1, 0)) > 0.4))
+	if (MoveHit.Hit && (Vector3::Dot(MoveHit.Normal, Vector3(0, 1, 0)) > 0.4f))
 	{
 		VerticalVelocity = std::max(-5.0f, VerticalVelocity);
 		CanJump = true;
@@ -101,7 +100,7 @@ void MoveComponent::Tick()
 	}
 	else if (MoveHit.Hit)
 	{
-		GetParent()->GetTransform().Location += MoveHit.Normal * 0.2 + Vector3(0, Performance::DeltaTime, 0);
+		GetParent()->GetTransform().Location += MoveHit.Normal * 0.2f + Vector3(0, Performance::DeltaTime, 0);
 		if (!HasBounced)
 		{
 			auto ReflectedDirection = glm::reflect((glm::vec3)Vector3(MovementVelocity.X, VerticalVelocity, MovementVelocity.Y), (glm::vec3)MoveHit.Normal);
@@ -140,7 +139,7 @@ void MoveComponent::Jump()
 	if (CanJump)
 	{
 		VerticalVelocity = JumpHeight;
-		TryMove(Vector3(0, 1, 0), 0.1 / Performance::DeltaTime);
+		TryMove(Vector3(0, 1, 0), 0.1f / Performance::DeltaTime);
 		CanJump = false;
 	}
 }

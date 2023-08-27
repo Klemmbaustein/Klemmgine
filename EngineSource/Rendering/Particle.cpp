@@ -3,7 +3,7 @@
 #include <GL/glew.h>
 #include <glm/ext/matrix_transform.hpp>
 #include <Rendering/Shader.h>
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <Math/Math.h>
 #include <Engine/EngineRandom.h>
 #include <Rendering/Utility/ShaderManager.h>
@@ -12,8 +12,8 @@
 #include <Rendering/Texture/Material.h>
 #include <Rendering/Texture/Texture.h>
 #include <Rendering/Camera/Camera.h>
-#include <World/Assets.h>
-#include <World/Graphics.h>
+#include <Engine/File/Assets.h>
+#include <Rendering/Graphics.h>
 #include <Engine/Log.h>
 #include <Rendering/Renderable.h>
 
@@ -94,13 +94,13 @@ void Particles::ParticleEmitter::SaveToFile(std::vector<ParticleElement> Data, s
 {
 	std::ofstream OutF = std::ofstream(File, std::ios::out);
 
-	uint8_t NumElements = Data.size();
+	uint8_t NumElements = (uint8_t)Data.size();
 	OutF.write((char*)&NumElements, sizeof(uint8_t));
 	for (uint8_t i = 0; i < NumElements; i++)
 	{
 		OutF.write((char*)&Data[i], sizeof(ParticleElement));
 	}
-	NumElements = Materials.size();
+	NumElements = (uint8_t)Materials.size();
 	OutF.write((char*)&NumElements, sizeof(uint8_t));
 	for (uint8_t i = 0; i < NumElements; i++)
 	{
@@ -123,8 +123,8 @@ void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 			Inst = glm::translate(Inst, (glm::vec3)(Vector3::TranslateVector(T.Position, Transform(0, Rotation.DegreesToRadiants(), 1)) + Position));
 			Vector3 Rotation = Vector3() - MainCamera->Rotation.DegreesToRadiants();
 			Inst = glm::rotate(Inst, Rotation.Y, glm::vec3(0, 1, 0));
-			Inst = glm::rotate(Inst, (float)Maths::PI, glm::vec3(0, 1, 0));
-			Inst = glm::rotate(Inst, Rotation.X + -(float)Maths::PI / 2.f, glm::vec3(0, 0, 1));
+			Inst = glm::rotate(Inst, (float)Math::PI, glm::vec3(0, 1, 0));
+			Inst = glm::rotate(Inst, Rotation.X + -(float)Math::PI / 2.f, glm::vec3(0, 0, 1));
 
 			float TimePercentage = T.LifeTime / T.InitialLifeTime;
 			float ScaleMultiplier = std::lerp(T.EndScale, T.StartScale, TimePercentage);
@@ -139,15 +139,15 @@ void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 		unsigned int VAO = ParticleVertexBuffers[i]->VAO;
 		glBindVertexArray(VAO);
 		// vertex attributes
-		std::size_t vec4Size = sizeof(glm::vec4);
+		size_t vec4Size = sizeof(glm::vec4);
 		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * (GLsizei)vec4Size, (void*)0);
 		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * (GLsizei)vec4Size, (void*)(1 * vec4Size));
 		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * (GLsizei)vec4Size, (void*)(2 * vec4Size));
 		glEnableVertexAttribArray(7);
-		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * (GLsizei)vec4Size, (void*)(3 * vec4Size));
 
 		glVertexAttribDivisor(4, 1);
 		glVertexAttribDivisor(5, 1);
@@ -300,7 +300,7 @@ void Particles::ParticleEmitter::Draw(Camera* MainCamera , bool MainFrameBuffer,
 			unsigned int attachements[] = { GL_COLOR_ATTACHMENT0 };
 			glDrawBuffers(1, attachements);
 		}
-		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, ParticleInstances[Elem].size());
+		glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, (GLsizei)ParticleInstances[Elem].size());
 		ParticleVertexBuffers[Elem]->Unbind();
 	}
 }

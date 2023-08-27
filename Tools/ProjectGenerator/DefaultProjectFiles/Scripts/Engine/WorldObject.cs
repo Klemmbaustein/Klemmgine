@@ -31,7 +31,7 @@ public abstract class WorldObject
 
 	public static WorldObject? NewCSObject(string TypeName, Transform t)
 	{
-		object RetVal = NativeFunction.CallNativeFunction("NewCSObject", typeof(NewCSObjectDelegate), new object[] { TypeName, t });
+		object? RetVal = NativeFunction.CallNativeFunction("NewCSObject", typeof(NewCSObjectDelegate), new object[] { TypeName, t });
 		if (RetVal == null)
 		{
 			return null;

@@ -211,7 +211,7 @@ Vector3 Vector3::GetRightVector(Vector3 In)
 
 Vector3 Vector3::SnapToGrid(Vector3 In, float GridSize)
 {
-	Vector3 Result = Vector3((int)(In.X / GridSize), (int)(In.Y / GridSize), (int)(In.Z / GridSize));
+	Vector3 Result = Vector3((float)(int)(In.X / GridSize), (float)(int)(In.Y / GridSize), (float)(int)(In.Z / GridSize));
 	Result = Result * GridSize;
 	return Result;
 }
@@ -233,9 +233,9 @@ Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
 	if (Radiants)
-		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + M_PI / 2.f, 0);
+		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0);
 	else
-		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + M_PI / 2.f, 0).RadiantsToDegrees();
+		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0).RadiantsToDegrees();
 }
 Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)
 {
@@ -277,7 +277,7 @@ static void copy(const Axes& from, Axes& to)
 }
 static void mul(Axes& mat, Axes& b)
 {
-	Axes result;
+	Axes result = {};
 	for (size_t i = 0; i != 3; ++i)
 	{
 		for (size_t j = 0; j != 3; ++j)
@@ -342,7 +342,6 @@ Vector3 Vector3::GetScaledAxis(Vector3 Rot, unsigned int Dir)
 	mul(axes, matX);
 	mul(axes, matY);
 	mul(axes, matZ);
-
 
 	return Vector3(axes[Dir][2], axes[Dir][1], axes[Dir][0]).Normalize();
 }

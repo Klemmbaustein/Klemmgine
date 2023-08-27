@@ -17,7 +17,7 @@ public:
 	UITextField* LogPrompt = nullptr;
 	UIScrollBox* LogScrollBox;
 	size_t PrevLogLength = 0;
-	size_t PrevAmount = 0;
+	int PrevAmount = 0;
 	void OnButtonClicked(int Index) override;
 
 	void Tick() override;

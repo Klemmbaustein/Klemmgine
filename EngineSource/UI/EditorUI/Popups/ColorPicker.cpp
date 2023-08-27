@@ -99,11 +99,12 @@ HsvColor RgbToHsv(RgbColor rgb)
 
 
 
-ColorPicker::ColorPicker(UIVectorField* Color) : EditorPanel(Editor::CurrentUI->UIColors, 0, Vector2(0.5, 0.35), Vector2(0.5, 0.35), Vector2(0.45, 0.35), true, "Color picker")
+ColorPicker::ColorPicker(UIVectorField* Color)
+	: EditorPanel(Editor::CurrentUI->UIColors, 0, Vector2(0.5f, 0.35f), Vector2(0.5f, 0.35f), Vector2(0.45f, 0.35f), true, "Color picker")
 {
-	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5);
+	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2);
+	ButtonBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
 	TabBackground->AddChild(ButtonBackground);
 	TabBackground->Align = UIBox::E_DEFAULT;
 	std::vector<std::string> Answers =
@@ -115,11 +116,11 @@ ColorPicker::ColorPicker(UIVectorField* Color) : EditorPanel(Editor::CurrentUI->
 	for (size_t i = 0; i < Answers.size(); i++)
 	{
 		ButtonBackground->AddChild(
-			(new UIButton(true, 0, UIColors[2], this, i))
-			->SetPadding(0.01)
-			->SetBorder(UIBox::E_ROUNDED, 0.2)
-			->AddChild((new UIText(0.45, 1 - UIColors[2], Answers[i], Editor::CurrentUI->EngineUIText))
-				->SetPadding(0.005)));
+			(new UIButton(true, 0, UIColors[2], this, (int)i))
+			->SetPadding(0.01f)
+			->SetBorder(UIBox::E_ROUNDED, 0.2f)
+			->AddChild((new UIText(0.45f, 1 - UIColors[2], Answers[i], Editor::CurrentUI->EngineUIText))
+				->SetPadding(0.005f)));
 	}
 	SelectedColor = Color->GetValue();
 	ColorPtr = Color;
@@ -135,12 +136,12 @@ ColorPicker::ColorPicker(UIVectorField* Color) : EditorPanel(Editor::CurrentUI->
 	ColorPickerShaders[1] = new Shader("Shaders/UI/uishader.vert", "Shaders/Editor/color_picker.frag");
 	ColorPickerShaders[1]->Bind();
 
-	ColorPickerBackgrounds[0] = new UIBackground(true, 0, 1, 0.3, ColorPickerShaders[0]);
+	ColorPickerBackgrounds[0] = new UIBackground(true, 0, 1, 0.3f, ColorPickerShaders[0]);
 	ColorPickerBackgrounds[0]->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
-	ColorPickerBackgrounds[0]->SetPadding(0.01, 0.01, 0.02, 0.01);
-	ColorPickerBackgrounds[1] = new UIBackground(true, 0, 1, Vector2(0.025, 0.3), ColorPickerShaders[1]);
-	ColorPickerBackgrounds[1]->SetPadding(0.01, 0.01, 0.01, 0.01);
-	ColorPickerBackgrounds[2] = new UIBackground(true, 0, SelectedColor, Vector2(0.1, 0.075));
+	ColorPickerBackgrounds[0]->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
+	ColorPickerBackgrounds[1] = new UIBackground(true, 0, 1, Vector2(0.025f, 0.3f), ColorPickerShaders[1]);
+	ColorPickerBackgrounds[1]->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
+	ColorPickerBackgrounds[2] = new UIBackground(true, 0, SelectedColor, Vector2(0.1f, 0.075f));
 
 	RGBBox = new UIBox(false, 0);
 	RGBBox->SetPadding(0);
@@ -156,7 +157,7 @@ ColorPicker::ColorPicker(UIVectorField* Color) : EditorPanel(Editor::CurrentUI->
 
 	TabBackground->AddChild(PickerBackground);
 
-	auto c = RgbToHsv(RgbColor(SelectedColor.X * 255, SelectedColor.Y * 255, SelectedColor.Z * 255));
+	auto c = RgbToHsv(RgbColor((uint8_t)(SelectedColor.X * 255), (uint8_t)(SelectedColor.Y * 255), (uint8_t)(SelectedColor.Z * 255)));
 	SelectedHue = c.h / 255.f;
 	SV = Vector2(c.s / 255.f, c.v / 255.f);
 	UpdateColors();
@@ -165,26 +166,26 @@ ColorPicker::ColorPicker(UIVectorField* Color) : EditorPanel(Editor::CurrentUI->
 
 void ColorPicker::UpdateColors()
 {
-	auto c = HsvToRgb(HsvColor(SelectedHue * 255, 255, 255));
-	SelectedColor = Vector3::Lerp(0, Vector3::Lerp(1, Vector3(c.r, c.g, c.b) / 255, SV.X), SV.Y);
+	auto c = HsvToRgb(HsvColor((uint8_t)(SelectedHue * 255), 255, 255));
+	SelectedColor = Vector3::Lerp(0, Vector3::Lerp(1, Vector3(c.r, c.g, c.b) / 255.0f, SV.X), SV.Y);
 
 	size_t it = 0;
 	for (auto i : ColorPickerShaders)
 	{
 		i->Bind();
-		auto c = HsvToRgb(HsvColor(SelectedHue * 255, 255, 255));
-		i->SetVector3("selectedHue", Vector3(c.r, c.g, c.b) / 255);
+		auto c = HsvToRgb(HsvColor((uint8_t)(SelectedHue * 255), 255, 255));
+		i->SetVector3("selectedHue", Vector3(c.r, c.g, c.b) / 255.0f);
 		i->SetVector2("selectedPos", SV);
-		i->SetInt("mode", it++);
+		i->SetInt("mode", (int)it++);
 	}
 	ColorPickerBackgrounds[2]->SetColor(SelectedColor);
-	ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075));
+	UpdateLayout();
 	GenerateRGBDisplay();
 }
 
 void ColorPicker::UpdateLayout()
 {
-	ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075));
+	ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075f));
 }
 
 void ColorPicker::Tick()
@@ -237,11 +238,11 @@ void ColorPicker::OnButtonClicked(int Index)
 		{
 			try
 			{
-				SelectedColor.at(i) = std::stof(RGBTexts[i]->GetText());
+				SelectedColor.at((unsigned int)i) = std::stof(RGBTexts[i]->GetText());
 			}
 			catch (std::exception) {}
 		}
-		auto c = RgbToHsv(RgbColor(SelectedColor.X * 255, SelectedColor.Y * 255, SelectedColor.Z * 255));
+		auto c = RgbToHsv(RgbColor((uint8_t)(SelectedColor.X * 255), (uint8_t)(SelectedColor.Y * 255), (uint8_t)(SelectedColor.Z * 255)));
 		SelectedHue = c.h / 255.f;
 		SV = Vector2(c.s / 255.f, c.v / 255.f);
 		UpdateColors();
@@ -260,16 +261,16 @@ void ColorPicker::GenerateRGBDisplay()
 	{
 		RGBTexts[i] = new UITextField(true, 0, UIColors[1], this, 2, Editor::CurrentUI->EngineUIText);
 		RGBTexts[i]
-			->SetTextSize(0.4)
-			->SetMinSize(Vector2(0.06, 0.04))
-			->SetBorder(UIBox::E_ROUNDED, 0.5);
-		RGBTexts[i]->SetText(EditorUI::ToShortString(SelectedColor[i]));
+			->SetTextSize(0.4f)
+			->SetMinSize(Vector2(0.06f, 0.04f))
+			->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		RGBTexts[i]->SetText(EditorUI::ToShortString(SelectedColor[(int)i]));
 		RGBBox->AddChild((new UIBox(true, 0))
 				->SetPadding(0)
-				->AddChild((new UIText(0.4, UIColors[2], xyz[i], Editor::CurrentUI->EngineUIText))
-					->SetPadding(0.015, 0.015, 0.01, 0.005))
+				->AddChild((new UIText(0.4f, UIColors[2], xyz[i], Editor::CurrentUI->EngineUIText))
+					->SetPadding(0.015f, 0.015f, 0.01f, 0.005f))
 				->AddChild(RGBTexts[i]
-					->SetPadding(0.01, 0.01, 0, 0)));
+					->SetPadding(0.01f, 0.01f, 0, 0)));
 	}
 }
 ColorPicker::~ColorPicker()

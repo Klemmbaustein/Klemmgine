@@ -1,8 +1,8 @@
 #include "Cubemap.h"
-#include <Engine/Save.h>
+#include <Engine/File/Save.h>
 #include <Engine/Console.h>
 #include <Engine/Log.h>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 #include <filesystem>
 #include <Rendering/Texture/Texture.h>
 #include <GL/glew.h>
@@ -36,6 +36,5 @@ void Cubemap::UnloadCubemapFile(unsigned int map)
 
 void Cubemap::RegisterCommands()
 {
-	Console::RegisterCommand(Console::Command("cubetest", []() { LoadCubemapFile(Console::CommandArgs()[0]); }, { Console::Command::Argument("cubemap", Type::E_STRING)}));
 }
 

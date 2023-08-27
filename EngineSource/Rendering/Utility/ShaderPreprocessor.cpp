@@ -22,7 +22,7 @@ namespace Preprocessor
 	}
 }
 
-std::string Preprocessor::ParseGLSL(std::string Code)
+std::string Preprocessor::ParseGLSL(std::string Code, std::string Path)
 {
 	std::stringstream CodeStream;
 	CodeStream << Code;
@@ -81,25 +81,26 @@ std::string Preprocessor::ParseGLSL(std::string Code)
 			throw "ShaderParseError";
 		}
 #if !RELEASE
-		if (!std::filesystem::exists("Shaders/" + FileToParse))
+		if (!std::filesystem::exists(Path + "/" + FileToParse))
 		{
 			Log::Print("--------------------------------------------------------------------------------", Log::LogColor::Red);
 			Log::Print("ShaderParseError: File does not exist: " + FileToParse, Log::LogColor::Red);
+			Log::Print("Include path is: " + Path, Log::LogColor::Red);
 			Log::Print(Line + std::string(" <--"), Log::LogColor::Red);
 			throw "ShaderParseError";
 		}
 
 		std::ifstream IncludeFile;
-		IncludeFile.open("Shaders/" + FileToParse);
+		IncludeFile.open(Path + "/" + FileToParse);
 		std::stringstream IncludeStream;
 		// read file's buffer contents into streams
 		IncludeStream << IncludeFile.rdbuf();
 		// close file handlers
 		IncludeFile.close();
 		// convert stream into string
-		std::string IncludeString = ParseGLSL(IncludeStream.str());
+		std::string IncludeString = ParseGLSL(IncludeStream.str(), Path);
 #else
-		std::string IncludeString = ParseGLSL(Pack::GetFile(FileToParse));
+		std::string IncludeString = ParseGLSL(Pack::GetFile(FileToParse), Path);
 #endif
 
 		std::string NewCode = CodeStream.str().substr(0, StringPos - CurrentLine.str().size());

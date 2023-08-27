@@ -6,7 +6,7 @@ class Camera;
 struct VertexBuffer;
 struct Uniform;
 struct Material;
-class ObjectRenderContext;
+struct ObjectRenderContext;
 
 namespace Particles
 {

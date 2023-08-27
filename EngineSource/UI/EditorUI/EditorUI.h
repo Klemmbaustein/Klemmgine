@@ -36,18 +36,19 @@ namespace Editor
 	extern bool IsBakingScene;
 	inline std::map<std::string, Vector3> ItemColors
 	{
-		std::pair("dir", Vector3(0.8, 0.5, 0)),
-		std::pair("jsmat", Vector3(0, 0.7, 0)),
-		std::pair("jsmtmp", Vector3(0.1, 0.4, 0)),
-		std::pair("jsm", Vector3(0, 0, 0.75)),
-		std::pair("jscn", Vector3(1.0, 0.4, 0.4)),
-		std::pair("png", Vector3(0.3, 0, 1)),
-		std::pair("cbm", Vector3(0.7, 0.1, 0.4)),
-		std::pair("jspart", Vector3(0.7, 0.4, 0.4)),
-		std::pair("wav", Vector3(0.7, 0, 0.4)),
-		std::pair("cpp", Vector3(0.5)),
+		std::pair("dir", Vector3(0.8f, 0.5f, 0)),
+		std::pair("jsmat", Vector3(0, 0.7f, 0)),
+		std::pair("jsmtmp", Vector3(0.1f, 0.4f, 0)),
+		std::pair("jsm", Vector3(0, 0, 0.75f)),
+		std::pair("jscn", Vector3(1.0f, 0.4f, 0.4f)),
+		std::pair("png", Vector3(0.3f, 0, 1)),
+		std::pair("cbm", Vector3(0.7f, 0.1f, 0.4f)),
+		std::pair("jspart", Vector3(0.7f, 0.4f, 0.4f)),
+		std::pair("wav", Vector3(0.7f, 0, 0.4f)),
+		std::pair("cpp", Vector3(0.5f)),
 		std::pair("setting", Vector3(1)),
-		std::pair("cs", Vector3(0.603921569, 0.28627451, 0.576470588))
+		std::pair("bkdat", Vector3(1.0f, 0.6f, 0.2f)),
+		std::pair("cs", Vector3(0.603921569f, 0.28627451f, 0.576470588f))
 	};
 	inline std::map<std::string, unsigned int> ItemTextures
 	{
@@ -61,7 +62,8 @@ namespace Editor
 		std::pair("wav", 6),
 		std::pair("cpp", 0),
 		std::pair("cs", 22),
-		std::pair("jspart", 19)
+		std::pair("jspart", 19),
+		std::pair("bkdat", 27)
 	};
 
 	inline std::set<std::string> ModelFileExtensions =
@@ -80,6 +82,7 @@ public:
 	static void LaunchInEditor();
 	static void RebuildAndHotReload();
 	static std::string LaunchInEditorArgs;
+	static void SetLaunchCurrentScene(bool NewLaunch);
 #endif
 	static void SaveCurrentScene();
 	static void OpenScene(std::string NewScene);
@@ -101,10 +104,10 @@ public:
 
 	Vector3 UIColors[NumUIColors] =
 	{
-		Vector3(0.125, 0.125, 0.13),	//Default background
+		Vector3(0.125f, 0.125f, 0.13f),	//Default background
 		Vector3(0.08f),					//Dark background
 		Vector3(1),						//Highlight color
-		Vector3(0.2),					//Brighter background
+		Vector3(0.2f),					//Brighter background
 	};
 	TextRenderer* EngineUIText = new TextRenderer("Font.ttf", 90);
 

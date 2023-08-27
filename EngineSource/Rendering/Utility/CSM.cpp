@@ -1,6 +1,6 @@
 #include "CSM.h"
 #include <Rendering/Camera/Camera.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <iostream>
 #include <cmath>
 #include <Engine/Log.h>
@@ -136,9 +136,9 @@ namespace CSM
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		Console::RegisterConVar(Console::Variable("shadow_resolution", Type::E_INT, &Graphics::ShadowResolution, CSM::ReInit));
-		Console::RegisterConVar(Console::Variable("shadows", Type::E_BOOL, &Graphics::RenderShadows, CSM::ReInit));
-		Console::RegisterConVar(Console::Variable("shadow_distance", Type::E_FLOAT, &CSMDistance, nullptr));
+		Console::RegisterConVar(Console::Variable("shadow_resolution", Type::Int, &Graphics::ShadowResolution, CSM::ReInit));
+		Console::RegisterConVar(Console::Variable("shadows", Type::Bool, &Graphics::RenderShadows, CSM::ReInit));
+		Console::RegisterConVar(Console::Variable("shadow_distance", Type::Float, &CSMDistance, nullptr));
 	}
 
 	void ReInit()

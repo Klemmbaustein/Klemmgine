@@ -5,16 +5,19 @@
 #include <fstream>
 #include <filesystem>
 #include <Engine/Log.h>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 #include <UI/UIButton.h>
 #include <UI/UIText.h>
 #include <UI/UIScrollBox.h>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 
 
 void MaterialTab::OnButtonClicked(int Index)
 {
-	if (!TabBackground->IsVisible) return;
+	if (!TabBackground->IsVisible)
+	{
+		return;
+	}
 	if (Index == -2)
 	{
 		if (LoadedMaterial.Template != ParentTemplateText->GetText())
@@ -48,7 +51,7 @@ void MaterialTab::OnButtonClicked(int Index)
 	}
 	else if (Index >= 0)
 	{
-		if (LoadedMaterial.Uniforms.at(Index).Type != Type::E_VECTOR3)
+		if (LoadedMaterial.Uniforms.at(Index).Type != Type::Vector3)
 		{
 			LoadedMaterial.Uniforms.at(Index).Value = ((UITextField*)TextFields[Index])->GetText();
 		}
@@ -66,7 +69,7 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int Rel
 
 	TabBackground->Align = UIBox::E_REVERSE;
 	TabName = new UIText(1, UIColors[2], "Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
-	TabName->SetPadding(0.1, 0.05, 0.05, 0);
+	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);
@@ -78,7 +81,7 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int Rel
 	Rows[1]->Align = UIBox::E_REVERSE;
 	RowBox->AddChild(Rows[1]);
 
-	RightRow = new UIBox(false, 0.3);
+	RightRow = new UIBox(false, 0.3f);
 
 
 	GenerateUI();
@@ -145,8 +148,8 @@ void MaterialTab::FetchTemplate(std::string Template)
 
 void MaterialTab::UpdateLayout()
 {
-	Rows[0]->SetMinSize(Vector2(TabBackground->GetMinSize().X / 1.5, TabBackground->GetMinSize().Y - 0.275));
-	Rows[0]->SetMaxSize(Vector2(TabBackground->GetMinSize().X / 1.5, TabBackground->GetMinSize().Y - 0.275));
+	Rows[0]->SetMinSize(Vector2(TabBackground->GetMinSize().X / 1.5f, TabBackground->GetMinSize().Y - 0.275f));
+	Rows[0]->SetMaxSize(Vector2(TabBackground->GetMinSize().X / 1.5f, TabBackground->GetMinSize().Y - 0.275f));
 	GenerateMaterialProperties();
 
 }
@@ -166,28 +169,28 @@ void MaterialTab::GenerateUI()
 	TranslucencyText->SetText(LoadedMaterial.IsTranslucent ? "true" : "false");
 	CutoutText->SetText(LoadedMaterial.UseShadowCutout ? "true" : "false");
 
-	Rows[0]->AddChild(new UIText(0.8, UIColors[2], "Parent template", Renderer));
+	Rows[0]->AddChild(new UIText(0.8f, UIColors[2], "Parent template", Renderer));
 	ParentTemplateText = new UITextField(true, 0, UIColors[1], this, -2, Renderer);
 	ParentTemplateText->HintText = "Parent Template";
-	ParentTemplateText->SetMinSize(Vector2(0.3, 0.075));
-	ParentTemplateText->SetMaxSize(Vector2(0.3, 0.075));
+	ParentTemplateText->SetMinSize(Vector2(0.3f, 0.075f));
+	ParentTemplateText->SetMaxSize(Vector2(0.3f, 0.075f));
 	ParentTemplateText->SetText(LoadedMaterial.Template);
 	Rows[0]->AddChild(ParentTemplateText);
 
-	Rows[0]->AddChild(new UIText(0.675, UIColors[2], "Uniforms", Renderer));
-	auto ElementBox = new UIBackground(true, 0, UIColors[1] * 1.25, Vector2(0.725, 0));
+	Rows[0]->AddChild(new UIText(0.675f, UIColors[2], "Uniforms", Renderer));
+	auto ElementBox = new UIBackground(true, 0, UIColors[1] * 1.25f, Vector2(0.725f, 0));
 
-	auto ElementNameText = new UIText(0.5, UIColors[2], "Uniform name", Renderer);
-	ElementNameText->SetPadding(0.02, 0.02, 0.02, 0.01);
-	ElementNameText->SetTextWidthOverride(0.27);
+	auto ElementNameText = new UIText(0.5f, UIColors[2], "Uniform name", Renderer);
+	ElementNameText->SetPadding(0.02f, 0.02f, 0.02f, 0.01f);
+	ElementNameText->SetTextWidthOverride(0.27f);
 
-	auto ElementTypeText = new UIText(0.5, UIColors[2], "Type", Renderer);
-	ElementTypeText->SetPadding(0.02, 0.02, 0, 0.01);
-	ElementTypeText->SetTextWidthOverride(0.09);
+	auto ElementTypeText = new UIText(0.5f, UIColors[2], "Type", Renderer);
+	ElementTypeText->SetPadding(0.02f, 0.02f, 0, 0.01f);
+	ElementTypeText->SetTextWidthOverride(0.09f);
 
 	UIText* ElementDefaultText = new UIText(0.5, UIColors[2], "Default value", Renderer);
-	ElementDefaultText->SetPadding(0.02, 0.02, 0, 0.01);
-	ElementDefaultText->SetTextWidthOverride(0.3);
+	ElementDefaultText->SetPadding(0.02f, 0.02f, 0, 0.01f);
+	ElementDefaultText->SetTextWidthOverride(0.3f);
 
 	ElementBox->AddChild(ElementNameText);
 	ElementBox->AddChild(ElementTypeText);
@@ -195,40 +198,40 @@ void MaterialTab::GenerateUI()
 	Rows[0]->AddChild(ElementBox);
 	for (auto& i : LoadedMaterial.Uniforms)
 	{
-		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.25, Vector2(0.725, 0.09));
+		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.25f, Vector2(0.725f, 0.09f));
 
 		auto ElementNameBox = new UIBox(true, 0);
-		auto ElementName = new UIText(0.5, UIColors[2], i.UniformName, Renderer);
-		ElementNameBox->SetMinSize(Vector2(0.3, 0.075));
+		auto ElementName = new UIText(0.5f, UIColors[2], i.UniformName, Renderer);
+		ElementNameBox->SetMinSize(Vector2(0.3f, 0.075f));
 		ElementNameBox->AddChild(ElementName);
 		ElementNameBox->SetPadding(0);
-		ElementName->SetPadding(0, 0.02, 0.02, 0.01);
-		ElementName->SetMaxSize(Vector2(0.3, 0.075));
+		ElementName->SetPadding(0, 0.02f, 0.02f, 0.01f);
+		ElementName->SetMaxSize(Vector2(0.3f, 0.075f));
 
 		auto ElementTypeBox = new UIBox(true, 0);
 		auto ElementType = new UIText(0.5, UIColors[2], Type::Types[i.Type], Renderer);
-		ElementTypeBox->SetMinSize(Vector2(0.1, 0.075));
-		ElementType->SetPadding(0, 0.02, 0, 0.01);
+		ElementTypeBox->SetMinSize(Vector2(0.1f, 0.075f));
+		ElementType->SetPadding(0, 0.02f, 0, 0.01f);
 		ElementTypeBox->SetPadding(0);
-		ElementType->SetMaxSize(Vector2(0.3, 0.075));
+		ElementType->SetMaxSize(Vector2(0.3f, 0.075f));
 		ElementTypeBox->AddChild(ElementType);
 
 		UIBox* ElementDefaultValue = nullptr;
-		if (i.Type != Type::E_VECTOR3)
+		if (i.Type != Type::Vector3)
 		{
 			ElementDefaultValue = new UITextField(true, 0, UIColors[1], this, ButtonIndex, Renderer);
 			((UITextField*)ElementDefaultValue)->SetText(i.Value);
 			((UITextField*)ElementDefaultValue)->HintText = "Default value";
-			ElementDefaultValue->SetPadding(0, 0, 0, 0.01);
-			ElementDefaultValue->SetMinSize(Vector2(0.265, 0.075));
-			ElementDefaultValue->SetMaxSize(Vector2(0.265, 0.075));
-			ElementDefaultValue->SetBorder(UIBox::E_ROUNDED, 0.5);
-			ElementDefaultValue->SetPadding(0.0125, 0.0125, 0, 0.01);
+			ElementDefaultValue->SetPadding(0, 0, 0, 0.01f);
+			ElementDefaultValue->SetMinSize(Vector2(0.265f, 0.075f));
+			ElementDefaultValue->SetMaxSize(Vector2(0.265f, 0.075f));
+			ElementDefaultValue->SetBorder(UIBox::E_ROUNDED, 0.5f);
+			ElementDefaultValue->SetPadding(0.0125f, 0.0125f, 0, 0.01f);
 		}
 		else
 		{
-			ElementDefaultValue = (new UIVectorField(0, Vector3::stov(i.Value), this, ButtonIndex, Renderer))->SetValueType(UIVectorField::E_RGB);
-			ElementDefaultValue->SetPadding(0, 0.01, 0, 0.01);
+			ElementDefaultValue = (new UIVectorField(0, Vector3::stov(i.Value), this, ButtonIndex, Renderer))->SetValueType(UIVectorField::VecType::rgb);
+			ElementDefaultValue->SetPadding(0, 0.01f, 0, 0.01f);
 		}
 
 		ElementBox->AddChild(ElementNameBox);
@@ -245,51 +248,51 @@ void MaterialTab::GenerateMaterialProperties()
 
 
 	Rows[1]->DeleteChildren();
-	Rows[1]->AddChild((new UIText(0.8, UIColors[2], "Properties", Renderer)));
-	Rows[1]->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6, TabBackground->GetMinSize().Y - 0.275));
+	Rows[1]->AddChild((new UIText(0.8f, UIColors[2], "Properties", Renderer)));
+	Rows[1]->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6f, TabBackground->GetMinSize().Y - 0.275f));
 	Rows[1]->SetPadding(0);
 	UIBox* OptionBoxes[2];
 	OptionBoxes[0] = new UIBox(true, 0);
 	OptionBoxes[1] = new UIBox(true, 0);
-	auto NewText = new UIText(0.6, UIColors[2], "Use shadow cutout:", Renderer);
+	auto NewText = new UIText(0.6f, UIColors[2], "Use shadow cutout:", Renderer);
 	OptionBoxes[0]->AddChild(NewText);
 	NewText->SetPadding(0);
 	auto NewButton = new UIButton(true, 0, UIColors[0] * 2, this, -5);
 	OptionBoxes[0]->AddChild(NewButton);
-	OptionBoxes[0]->SetPadding(0, 0, 0.01, 0);
+	OptionBoxes[0]->SetPadding(0, 0, 0.01f, 0);
 
-	NewButton->SetPadding(0.005, 0, 0.01, 0);
-	NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
+	NewButton->SetPadding(0.005f, 0, 0.01f, 0);
+	NewButton->SetBorder(UIBox::E_ROUNDED, 0.5f);
 
-	CutoutText = new UIText(0.5, UIColors[2], LoadedMaterial.UseShadowCutout ? "true " : "false", Renderer);
-	CutoutText->SetPadding(0.005);
+	CutoutText = new UIText(0.5f, UIColors[2], LoadedMaterial.UseShadowCutout ? "true " : "false", Renderer);
+	CutoutText->SetPadding(0.005f);
 	NewButton->AddChild(CutoutText);
 
 
-	NewText = new UIText(0.6, UIColors[2], "Is translucent:   ", Renderer);
+	NewText = new UIText(0.6f, UIColors[2], "Is translucent:   ", Renderer);
 	OptionBoxes[1]->AddChild(NewText);
 	NewText->SetPadding(0);
 
 	NewButton = new UIButton(true, 0, UIColors[0] * 2, this, -6);
 	OptionBoxes[1]->AddChild(NewButton);
-	OptionBoxes[1]->SetPadding(0, 0, 0.01, 0);
-	NewButton->SetPadding(0.005, 0, 0.01, 0);
-	NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
+	OptionBoxes[1]->SetPadding(0, 0, 0.01f, 0);
+	NewButton->SetPadding(0.005f, 0, 0.01f, 0);
+	NewButton->SetBorder(UIBox::E_ROUNDED, 0.5f);
 
-	TranslucencyText = new UIText(0.5, UIColors[2], LoadedMaterial.IsTranslucent ? "true " : "false", Renderer);
-	TranslucencyText->SetPadding(0.005);
+	TranslucencyText = new UIText(0.5f, UIColors[2], LoadedMaterial.IsTranslucent ? "true " : "false", Renderer);
+	TranslucencyText->SetPadding(0.005f);
 	NewButton->AddChild(TranslucencyText);
 
 
 	auto NewBox = new UIBox(true, 0);
-	NewBox->SetPadding(0, 0.1, 0, 0);
+	NewBox->SetPadding(0, 0.1f, 0, 0);
 	NewButton = new UIButton(true, 0, 1, this, -4);
-	NewButton->SetMinSize(0.05);
+	NewButton->SetMinSize(0.05f);
 	NewButton->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
 
-	NewText = new UIText(0.6, UIColors[2], " Reload template: ", Renderer);
+	NewText = new UIText(0.6f, UIColors[2], " Reload template: ", Renderer);
 	NewText->SetPadding(0);
-	NewButton->SetPadding(0.01, 0, 0.02, 0);
+	NewButton->SetPadding(0.01f, 0, 0.02f, 0);
 	NewButton->SetUseTexture(true, ReloadTexture);
 
 	NewBox->AddChild(NewText);
@@ -311,8 +314,8 @@ void MaterialTab::GenerateMaterialProperties()
 
 	for (auto& i : TemplateTexts)
 	{
-		Rows[1]->AddChild((new UIText(0.5, UIColors[2] * 0.8, i, Renderer))
-			->SetPadding(0, 0, 0.025, 0));
+		Rows[1]->AddChild((new UIText(0.5f, UIColors[2] * 0.8f, i, Renderer))
+			->SetPadding(0, 0, 0.025f, 0));
 	}
 }
 

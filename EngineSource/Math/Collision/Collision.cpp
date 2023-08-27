@@ -6,6 +6,11 @@
 #include <cmath>
 #include <Math/Math.h>
 
+namespace Collision
+{
+	std::vector<CollisionComponent*> CollisionBoxes;
+}
+
 bool Collision::CollisionAABB(Box a, Box b)
 {
 	return (a.minX <= b.maxX && a.maxX >= b.minX) &&
@@ -21,13 +26,13 @@ Collision::HitResponse testRayThruTriangle(glm::vec3 orig, glm::vec3 end, glm::v
 	glm::vec3 E2 = B - A;
 	glm::vec3 N = glm::cross(E1, E2);
 	float det = -glm::dot(dir, N);
-	float invdet = 1.0 / det;
+	float invdet = 1.0f / det;
 	glm::vec3 AO = orig - A;
 	glm::vec3 DAO = glm::cross(AO, dir);
 	float u = dot(E2, DAO) * invdet;
 	float v = -dot(E1, DAO) * invdet;
 	float t = dot(AO, N) * invdet;
-	if (( t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0))
+	if (( t >= 0.0f && u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f))
 		return Collision::HitResponse(true, orig + end * t, normalize(N), t);
 	else return Collision::HitResponse();
 }
@@ -54,16 +59,9 @@ namespace Collision
 	{
 		return std::min(std::min(a, b), c);
 	}
-
-	// https://gdbooks.gitbooks.io/3dcollisions/content/Chapter4/aabb-triangle.html
-	bool TriangleAABBCollision(Vector3 v0, Vector3 v1, Vector3 v2, Collision::Box& b)
-	{
-		//TODO: Decide if this function is really required.
-		return false;
-	}
 }
 
-Collision::HitResponse Collision::BoxOverlapCheck(Collision::Box a, Vector3 Offset)
+/*Collision::HitResponse Collision::BoxOverlapCheck(Collision::Box a, Vector3 Offset)
 {
 	a = a + Offset;
 	Collision::HitResponse r;
@@ -96,7 +94,7 @@ Collision::HitResponse Collision::BoxOverlapCheck(Collision::Box a, Vector3 Offs
 	}
 	r.Normal = r.Normal.Normalize();
 	return r;
-}
+}*/
 
 
 bool Collision::IsPointIn3DBox(Box a, Vector3 p)
@@ -208,7 +206,7 @@ Collision::HitResponse Collision::LineCheckForAABB(Collision::Box a, Vector3 Ray
 	}
 	if (tMax < tzMax) tMax = tzMax;
 	Vector3 ImpactLocation = (RayDir * tMin);
-	Vector3 RayDirNormalized = Vector3(RayDir.X > 0 ? 1 : -1, RayDir.Y > 0 ? 1 : -1, RayDir.Z > 0 ? 1 : -1);
+	Vector3 RayDirNormalized = Vector3(RayDir.X > 0.0f ? 1.0f : -1.0f, RayDir.Y > 0.0f ? 1.0f : -1.0f, RayDir.Z > 0.0f ? 1.0f : -1.0f);
 	Normal = Normal * RayDirNormalized;
 	if (tMin < 0)
 	{
@@ -271,7 +269,7 @@ void Collision::CollisionMesh::ApplyMatrix()
 		Vertices[i].Normal = glm::normalize(glm::mat3(ModelMatrix) * Vertices[i].Normal);
 		SpherePosition += Vertices[i].Position;
 	}
-	SpherePosition = (SpherePosition / Vertices.size()) - WorldPosition;
+	SpherePosition = (SpherePosition / (float)Vertices.size()) - WorldPosition;
 	SphereCollisionSize = 0;
 	glm::vec3 Furthest = glm::vec3(0);
 	for (size_t i = 0; i < RawVertices.size(); i++)
@@ -408,11 +406,6 @@ Collision::HitResponse Collision::CollisionMesh::OverlapCheck(std::set<Collision
 				}
 			}
 		}
-	}
-	//Log::Print("Collisions: " + std::to_string(Collisions));
-	if (Collisions >= 100)
-	{
-		std::cout << "Large Collision: Mesh with " << Vertices.size() << " vertices and scale of " << (Scale / 0.025).ToString() << std::endl;
 	}
 	return HitResponse();
 }

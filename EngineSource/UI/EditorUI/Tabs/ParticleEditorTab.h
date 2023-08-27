@@ -3,7 +3,7 @@
 #include <UI/EditorUI/Tabs/EditorTab.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <Rendering/Particle.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <Rendering/Utility/ShaderManager.h>
 #include <Math/Math.h>
 

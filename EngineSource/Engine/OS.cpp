@@ -4,7 +4,7 @@
 #include <Windows.h>
 #include <Shlobj.h>
 #include <shobjidl.h> 
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 #include <map>
 #include <Psapi.h>
 #endif
@@ -117,7 +117,7 @@ std::string OS::ShowOpenFileDialog()
 #if _WIN64
 std::string OS::GetOSString()
 {
-	int osver = 0.0;
+	int osver = 0;
 
 	NTSTATUS(WINAPI * RtlGetVersion)(LPOSVERSIONINFOEXW);
 
@@ -183,26 +183,26 @@ void OS::ClearConsoleWindow()
 
 namespace OS
 {
-	std::map<EConsoleColor, WORD> WindowsColors =
+	std::map<ConsoleColor, WORD> WindowsColors =
 	{
-		std::pair(E_WHITE, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY),
-		std::pair(E_GRAY, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED),
-		std::pair(E_RED, FOREGROUND_RED | FOREGROUND_INTENSITY),
-		std::pair(E_GREEN, FOREGROUND_GREEN | FOREGROUND_INTENSITY),
-		std::pair(E_BLUE, FOREGROUND_BLUE | FOREGROUND_INTENSITY),
-		std::pair(E_YELLOW, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY),
+		std::pair(ConsoleColor::White, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY),
+		std::pair(ConsoleColor::Gray, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED),
+		std::pair(ConsoleColor::Red, FOREGROUND_RED | FOREGROUND_INTENSITY),
+		std::pair(ConsoleColor::Green, FOREGROUND_GREEN | FOREGROUND_INTENSITY),
+		std::pair(ConsoleColor::Blue, FOREGROUND_BLUE | FOREGROUND_INTENSITY),
+		std::pair(ConsoleColor::Yellow, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY),
 	};
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
 }
 
-void OS::SetConsoleColor(EConsoleColor NewColor)
+void OS::SetConsoleColor(ConsoleColor NewColor)
 {
 	SetConsoleTextAttribute(hConsole, WindowsColors[NewColor]);
 }
 #endif
 
 #if __linux__
-void OS::SetConsoleColor(EConsoleColor NewColor)
+void OS::SetConsoleColor(ConsoleColor NewColor)
 {
 	//TODO: implement console colors on linux
 }

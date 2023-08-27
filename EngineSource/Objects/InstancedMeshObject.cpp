@@ -12,13 +12,13 @@ void InstancedMeshObject::Tick()
 	{
 		for (int i = 0; i < Amount; i++)
 		{
-			Vector3 Loc = Vector3(Random::GetRandomFloat(-Range, Range),
-				0, Random::GetRandomFloat(-Range, Range));
+			Vector3 Loc = Vector3(Random::GetRandomFloat(-(float)Range, (float)Range),
+				0, Random::GetRandomFloat(-(float)Range, (float)Range));
 
 			Collision::HitResponse Hit = Collision::LineTrace(GetTransform().Location + Loc, GetTransform().Location + Loc - Vector3(0, 100, 0));
 			Vector3 AxisA = Vector3(Hit.Normal.Y, Hit.Normal.Z, Hit.Normal.X);
 			Vector3 AxisB = Vector3::Cross(Hit.Normal, AxisA);
-			Vector3 Rotation = Vector3(sin(AxisB.Y), atan2(AxisB.X, AxisB.Z) + 3.14, 0).RadiantsToDegrees();
+			Vector3 Rotation = Vector3(sin(AxisB.Y), atan2(AxisB.X, AxisB.Z) + 3.14f, 0).RadiantsToDegrees();
 			Rotation = Vector3(Rotation.X, 0, Rotation.Y).DegreesToRadiants();
 			if (Hit.Hit)
 			{
@@ -49,11 +49,11 @@ void InstancedMeshObject::Tick()
 
 void InstancedMeshObject::Begin()
 {
-	Properties.push_back(Objects::Property("Mesh", Type::E_STRING, &Filename));
-	Properties.push_back(Objects::Property("NumInstances", Type::E_INT, &Amount));
-	Properties.push_back(Objects::Property("Range", Type::E_INT, &Range));
-	Properties.push_back(Objects::Property("Component Name", Type::E_STRING, &ComponentName));
-	Properties.push_back(Objects::Property("Scale", Type::E_VECTOR3, &Scale));
+	Properties.push_back(Objects::Property("Mesh", Type::String, &Filename));
+	Properties.push_back(Objects::Property("NumInstances", Type::Int, &Amount));
+	Properties.push_back(Objects::Property("Range", Type::Int, &Range));
+	Properties.push_back(Objects::Property("Component Name", Type::String, &ComponentName));
+	Properties.push_back(Objects::Property("Scale", Type::Vector3, &Scale));
 
 	IMComponent = nullptr;
 

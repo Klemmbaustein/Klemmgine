@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Editor|x64">
+      <Configuration>Editor</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="CSharp\CSharpInterop.cpp" />
+    <ClCompile Include="CSharp\NativeFunctions.cpp" />
+    <ClCompile Include="Engine\Application.cpp" />
+    <ClCompile Include="Engine\Build\Build.cpp" />
+    <ClCompile Include="Engine\Build\Pack.cpp" />
+    <ClCompile Include="Engine\Console.cpp" />
+    <ClCompile Include="Engine\EngineError.cpp" />
+    <ClCompile Include="Engine\EngineRandom.cpp" />
+    <ClCompile Include="Engine\File\Assets.cpp" />
+    <ClCompile Include="Engine\File\Save.cpp" />
+    <ClCompile Include="Engine\Importers\Importer.cpp" />
+    <ClCompile Include="Engine\Importers\ModelConverter.cpp" />
+    <ClCompile Include="Engine\Input.cpp" />
+    <ClCompile Include="Engine\LaunchArgs.cpp" />
+    <ClCompile Include="Engine\Log.cpp" />
+    <ClCompile Include="Engine\OS.cpp" />
+    <ClCompile Include="Engine\Scene.cpp" />
+    <ClCompile Include="Engine\Stats.cpp" />
+    <ClCompile Include="Engine\Timer.cpp" />
+    <ClCompile Include="Engine\Utility\FileUtility.cpp" />
+    <ClCompile Include="Engine\Utility\StringUtility.cpp" />
+    <ClCompile Include="Math\Collision\Collision.cpp" />
+    <ClCompile Include="Math\Collision\CollisionBox.cpp" />
+    <ClCompile Include="Math\Math.cpp" />
+    <ClCompile Include="Math\Vector.cpp" />
+    <ClCompile Include="Objects\Components\BillboardComponent.cpp" />
+    <ClCompile Include="Objects\Components\CameraComponent.cpp" />
+    <ClCompile Include="Objects\Components\CollisionComponent.cpp" />
+    <ClCompile Include="Objects\Components\Component.cpp" />
+    <ClCompile Include="Objects\Components\InstancedMeshComponent.cpp" />
+    <ClCompile Include="Objects\Components\MeshComponent.cpp" />
+    <ClCompile Include="Objects\Components\MoveComponent.cpp" />
+    <ClCompile Include="Objects\Components\ParticleComponent.cpp" />
+    <ClCompile Include="Objects\Components\PointLightComponent.cpp" />
+    <ClCompile Include="Objects\CSharpObject.cpp" />
+    <ClCompile Include="Objects\InstancedMeshObject.cpp" />
+    <ClCompile Include="Objects\LightObject.cpp" />
+    <ClCompile Include="Objects\MeshObject.cpp" />
+    <ClCompile Include="Objects\ParticleObject.cpp" />
+    <ClCompile Include="Objects\SoundObject.cpp" />
+    <ClCompile Include="Objects\WorldObject.cpp" />
+    <ClCompile Include="Rendering\BillboardSprite.cpp" />
+    <ClCompile Include="Rendering\Camera\Camera.cpp" />
+    <ClCompile Include="Rendering\Camera\CameraShake.cpp" />
+    <ClCompile Include="Rendering\Camera\FrustumCulling.cpp" />
+    <ClCompile Include="Rendering\Graphics.cpp" />
+    <ClCompile Include="Rendering\Mesh\InstancedMesh.cpp" />
+    <ClCompile Include="Rendering\Mesh\InstancedModel.cpp" />
+    <ClCompile Include="Rendering\Mesh\Mesh.cpp" />
+    <ClCompile Include="Rendering\Mesh\Model.cpp" />
+    <ClCompile Include="Rendering\Mesh\ModelGenerator.cpp" />
+    <ClCompile Include="Rendering\Particle.cpp" />
+    <ClCompile Include="Rendering\Renderable.cpp" />
+    <ClCompile Include="Rendering\Shader.cpp" />
+    <ClCompile Include="Rendering\Texture\Cubemap.cpp" />
+    <ClCompile Include="Rendering\Texture\Material.cpp" />
+    <ClCompile Include="Rendering\Texture\Texture.cpp" />
+    <ClCompile Include="Rendering\Utility\BakedLighting.cpp" />
+    <ClCompile Include="Rendering\Utility\Bloom.cpp" />
+    <ClCompile Include="Rendering\Utility\CSM.cpp" />
+    <ClCompile Include="Rendering\Utility\Framebuffer.cpp" />
+    <ClCompile Include="Rendering\Utility\ShaderManager.cpp" />
+    <ClCompile Include="Rendering\Utility\ShaderPreprocessor.cpp" />
+    <ClCompile Include="Rendering\Utility\SSAO.cpp" />
+    <ClCompile Include="Rendering\VertexBuffer.cpp" />
+    <ClCompile Include="Sound\Sound.cpp" />
+    <ClCompile Include="UI\Debug\DebugUI.cpp" />
+    <ClCompile Include="UI\Default\ScrollObject.cpp" />
+    <ClCompile Include="UI\Default\TextRenderer.cpp" />
+    <ClCompile Include="UI\Default\UICanvas.cpp" />
+    <ClCompile Include="UI\EditorUI\ContextMenu.cpp" />
+    <ClCompile Include="UI\EditorUI\EditorPanel.cpp" />
+    <ClCompile Include="UI\EditorUI\EditorUI.cpp" />
+    <ClCompile Include="UI\EditorUI\ItemBrowser.cpp" />
+    <ClCompile Include="UI\EditorUI\LogUI.cpp" />
+    <ClCompile Include="UI\EditorUI\MaterialFunctions.cpp" />
+    <ClCompile Include="UI\EditorUI\ObjectList.cpp" />
+    <ClCompile Include="UI\EditorUI\Popups\BakeMenu.cpp" />
+    <ClCompile Include="UI\EditorUI\Popups\ColorPicker.cpp" />
+    <ClCompile Include="UI\EditorUI\Popups\DialogBox.cpp" />
+    <ClCompile Include="UI\EditorUI\Popups\RenameBox.cpp" />
+    <ClCompile Include="UI\EditorUI\StatusBar.cpp" />
+    <ClCompile Include="UI\EditorUI\Tabs\CubemapTab.cpp" />
+    <ClCompile Include="UI\EditorUI\Tabs\EditorTab.cpp" />
+    <ClCompile Include="UI\EditorUI\Tabs\MaterialTab.cpp" />
+    <ClCompile Include="UI\EditorUI\Tabs\MaterialTemplateTab.cpp" />
+    <ClCompile Include="UI\EditorUI\Tabs\MeshTab.cpp" />
+    <ClCompile Include="UI\EditorUI\Tabs\ParticleEditorTab.cpp" />
+    <ClCompile Include="UI\EditorUI\Tabs\PreferenceTab.cpp" />
+    <ClCompile Include="UI\EditorUI\Toolbar.cpp" />
+    <ClCompile Include="UI\EditorUI\UIVectorField.cpp" />
+    <ClCompile Include="UI\EditorUI\Viewport.cpp" />
+    <ClCompile Include="UI\UIBackground.cpp" />
+    <ClCompile Include="UI\UIBox.cpp" />
+    <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UIScrollBox.cpp" />
+    <ClCompile Include="UI\UIText.cpp" />
+    <ClCompile Include="UI\UITextField.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CSharp\CSharpInterop.h" />
+    <ClInclude Include="CSharp\NativeFunctions.h" />
+    <ClInclude Include="Engine\Application.h" />
+    <ClInclude Include="Engine\Build\Build.h" />
+    <ClInclude Include="Engine\Build\Pack.h" />
+    <ClInclude Include="Engine\Console.h" />
+    <ClInclude Include="Engine\EngineError.h" />
+    <ClInclude Include="Engine\EngineProperties.h" />
+    <ClInclude Include="Engine\EngineRandom.h" />
+    <ClInclude Include="Engine\File\Assets.h" />
+    <ClInclude Include="Engine\File\Save.h" />
+    <ClInclude Include="Engine\Importers\Importer.h" />
+    <ClInclude Include="Engine\Importers\ModelConverter.h" />
+    <ClInclude Include="Engine\Input.h" />
+    <ClInclude Include="Engine\Log.h" />
+    <ClInclude Include="Engine\OS.h" />
+    <ClInclude Include="Engine\Scene.h" />
+    <ClInclude Include="Engine\Stats.h" />
+    <ClInclude Include="Engine\Timer.h" />
+    <ClInclude Include="Engine\TypeEnun.h" />
+    <ClInclude Include="Engine\Utility\FileUtility.h" />
+    <ClInclude Include="Engine\Utility\StringUtility.h" />
+    <ClInclude Include="Math\Collision\Collision.h" />
+    <ClInclude Include="Math\Collision\CollisionBox.h" />
+    <ClInclude Include="Math\Collision\TriangleIntersect.h" />
+    <ClInclude Include="Math\Math.h" />
+    <ClInclude Include="Math\Vector.h" />
+    <ClInclude Include="Objects\Components\BillboardComponent.h" />
+    <ClInclude Include="Objects\Components\CameraComponent.h" />
+    <ClInclude Include="Objects\Components\CollisionComponent.h" />
+    <ClInclude Include="Objects\Components\Component.h" />
+    <ClInclude Include="Objects\Components\InstancedMeshComponent.h" />
+    <ClInclude Include="Objects\Components\MeshComponent.h" />
+    <ClInclude Include="Objects\Components\MoveComponent.h" />
+    <ClInclude Include="Objects\Components\ParticleComponent.h" />
+    <ClInclude Include="Objects\Components\PointLightComponent.h" />
+    <ClInclude Include="Objects\CSharpObject.h" />
+    <ClInclude Include="Objects\InstancedMeshObject.h" />
+    <ClInclude Include="Objects\LightObject.h" />
+    <ClInclude Include="Objects\MeshObject.h" />
+    <ClInclude Include="Objects\ParticleObject.h" />
+    <ClInclude Include="Objects\SoundObject.h" />
+    <ClInclude Include="Objects\WorldObject.h" />
+    <ClInclude Include="Rendering\BillboardSprite.h" />
+    <ClInclude Include="Rendering\Camera\Camera.h" />
+    <ClInclude Include="Rendering\Camera\CameraShake.h" />
+    <ClInclude Include="Rendering\Camera\FrustumCulling.h" />
+    <ClInclude Include="Rendering\Graphics.h" />
+    <ClInclude Include="Rendering\Mesh\InstancedMesh.h" />
+    <ClInclude Include="Rendering\Mesh\InstancedModel.h" />
+    <ClInclude Include="Rendering\Mesh\Mesh.h" />
+    <ClInclude Include="Rendering\Mesh\Model.h" />
+    <ClInclude Include="Rendering\Mesh\ModelGenerator.h" />
+    <ClInclude Include="Rendering\Particle.h" />
+    <ClInclude Include="Rendering\Renderable.h" />
+    <ClInclude Include="Rendering\Shader.h" />
+    <ClInclude Include="Rendering\Texture\Cubemap.h" />
+    <ClInclude Include="Rendering\Texture\Material.h" />
+    <ClInclude Include="Rendering\Texture\Texture.h" />
+    <ClInclude Include="Rendering\Utility\BakedLighting.h" />
+    <ClInclude Include="Rendering\Utility\Bloom.h" />
+    <ClInclude Include="Rendering\Utility\CSM.h" />
+    <ClInclude Include="Rendering\Utility\Framebuffer.h" />
+    <ClInclude Include="Rendering\Utility\ShaderManager.h" />
+    <ClInclude Include="Rendering\Utility\ShaderPreprocessor.h" />
+    <ClInclude Include="Rendering\Utility\SSAO.h" />
+    <ClInclude Include="Rendering\Vertex.h" />
+    <ClInclude Include="Rendering\VertexBuffer.h" />
+    <ClInclude Include="Sound\Sound.h" />
+    <ClInclude Include="UI\Debug\DebugUI.h" />
+    <ClInclude Include="UI\Default\ScrollObject.h" />
+    <ClInclude Include="UI\Default\TextRenderer.h" />
+    <ClInclude Include="UI\Default\TextSegment.h" />
+    <ClInclude Include="UI\Default\UICanvas.h" />
+    <ClInclude Include="UI\EditorUI\ContextMenu.h" />
+    <ClInclude Include="UI\EditorUI\EditorPanel.h" />
+    <ClInclude Include="UI\EditorUI\EditorUI.h" />
+    <ClInclude Include="UI\EditorUI\ItemBrowser.h" />
+    <ClInclude Include="UI\EditorUI\LogUI.h" />
+    <ClInclude Include="UI\EditorUI\MaterialFunctions.h" />
+    <ClInclude Include="UI\EditorUI\ObjectList.h" />
+    <ClInclude Include="UI\EditorUI\Popups\BakeMenu.h" />
+    <ClInclude Include="UI\EditorUI\Popups\ColorPicker.h" />
+    <ClInclude Include="UI\EditorUI\Popups\DialogBox.h" />
+    <ClInclude Include="UI\EditorUI\Popups\RenameBox.h" />
+    <ClInclude Include="UI\EditorUI\StatusBar.h" />
+    <ClInclude Include="UI\EditorUI\Tabs\CubemapTab.h" />
+    <ClInclude Include="UI\EditorUI\Tabs\EditorTab.h" />
+    <ClInclude Include="UI\EditorUI\Tabs\MaterialTab.h" />
+    <ClInclude Include="UI\EditorUI\Tabs\MaterialTemplateTab.h" />
+    <ClInclude Include="UI\EditorUI\Tabs\MeshTab.h" />
+    <ClInclude Include="UI\EditorUI\Tabs\ParticleEditorTab.h" />
+    <ClInclude Include="UI\EditorUI\Tabs\PreferenceTab.h" />
+    <ClInclude Include="UI\EditorUI\Toolbar.h" />
+    <ClInclude Include="UI\EditorUI\UIVectorField.h" />
+    <ClInclude Include="UI\EditorUI\Viewport.h" />
+    <ClInclude Include="UI\UIBackground.h" />
+    <ClInclude Include="UI\UIBox.h" />
+    <ClInclude Include="UI\UIButton.h" />
+    <ClInclude Include="UI\UIfwd.h" />
+    <ClInclude Include="UI\UIScrollBox.h" />
+    <ClInclude Include="UI\UIText.h" />
+    <ClInclude Include="UI\UITextField.h" />
+    <ClInclude Include="Utility\DotNet\coreclr_delegates.h" />
+    <ClInclude Include="Utility\DotNet\hostfxr.h" />
+    <ClInclude Include="Utility\DotNet\nethost.h" />
+    <ClInclude Include="Utility\stb_image.hpp" />
+    <ClInclude Include="Utility\stb_truetype.hpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{87f55d1d-99b2-4042-add5-aaae85b9a61b}</ProjectGuid>
+    <RootNamespace>Klemmgine</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Editor|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
+    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Label="MySettings">
+    <ShowAllFiles>true</ShowAllFiles>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnabled>false</VcpkgEnabled>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ProgramDataBaseFileName>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration).pdb</ProgramDataBaseFileName>
+      <ObjectFileName>..\$(IntDir)</ObjectFileName>
+      <AssemblerListingLocation>..\$(IntDir)</AssemblerListingLocation>
+      <ModuleOutputFile>..\$(IntDir)</ModuleOutputFile>
+      <ModuleDependenciesFile>..\$(IntDir)</ModuleDependenciesFile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)..\Tools\bin\BuildTool.exe  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
+    </PreBuildEvent>
+    <BuildLog>
+      <Path>..\$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;EDITOR;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ProgramDataBaseFileName>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration).pdb</ProgramDataBaseFileName>
+      <ObjectFileName>..\$(IntDir)</ObjectFileName>
+      <AssemblerListingLocation>..\$(IntDir)</AssemblerListingLocation>
+      <ModuleOutputFile>..\$(IntDir)</ModuleOutputFile>
+      <ModuleDependenciesFile>..\$(IntDir)</ModuleDependenciesFile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)..\Tools\bin\BuildTool.exe  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
+    </PreBuildEvent>
+    <BuildLog>
+      <Path>..\$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ProgramDataBaseFileName>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration).pdb</ProgramDataBaseFileName>
+      <ObjectFileName>..\$(IntDir)</ObjectFileName>
+      <AssemblerListingLocation>..\$(IntDir)</AssemblerListingLocation>
+      <ModuleOutputFile>..\$(IntDir)</ModuleOutputFile>
+      <ModuleDependenciesFile>..\$(IntDir)</ModuleDependenciesFile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)..\Tools\bin\BuildTool.exe  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
+    </PreBuildEvent>
+    <BuildLog>
+      <Path>..\$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

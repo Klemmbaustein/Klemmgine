@@ -51,7 +51,7 @@ internal static class Engine
 	static Dictionary<Int32, Object> WorldObjects = new Dictionary<Int32, Object>();
 	static List<Type> WorldObjectTypes = new List<Type>();
 
-	public static object GetObjectFromID(Int32 Id)
+	public static object? GetObjectFromID(Int32 Id)
 	{
 		if (WorldObjects.ContainsKey(Id))
 		{
@@ -68,7 +68,7 @@ internal static class Engine
 
 		LoadedAsm = Assembly.Load(File.ReadAllBytes(Path));
 
-		LoadTypeFromAssembly("Log").GetMethod("LoadLogFunction").Invoke(null, new Delegate[] { EngineLog.Print });
+		LoadTypeFromAssembly("Log")?.GetMethod("LoadLogFunction")?.Invoke(null, new Delegate[] { EngineLog.Print });
 
 
 		var WorldObjectType = LoadTypeFromAssembly("WorldObject");
@@ -79,7 +79,7 @@ internal static class Engine
 			return;
 		}
 
-		WorldObjectType.GetMethod("LoadGetObjectFunction").Invoke(null, new object[] { GetObjectFromID });
+		WorldObjectType?.GetMethod("LoadGetObjectFunction")?.Invoke(null, new object[] { GetObjectFromID });
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{
@@ -90,7 +90,7 @@ internal static class Engine
 		}
 
 		StatsObject = LoadTypeFromAssembly("Stats");
-		StatsObject.GetField("InEditor").SetValue(null, InEditor);
+		StatsObject?.GetField("InEditor")?.SetValue(null, InEditor);
 	}
 
 	public static Int32 Instantiate(string obj, EngineTransform t, IntPtr NativeObject)
@@ -134,14 +134,14 @@ internal static class Engine
 		WorldObjects.Remove(ID);
 	}
 
-	public static Type LoadTypeFromAssembly(string Type)
+	public static Type? LoadTypeFromAssembly(string Type)
 	{
 		if (LoadedAsm == null)
 		{
 			EngineLog.Print("Tried to call method while the C# assembly is unloaded!");
 			return null;
 		}
-		return LoadedAsm.GetType(Type);
+		return LoadedAsm?.GetType(Type);
 	}
 
 
@@ -162,15 +162,15 @@ internal static class Engine
 		func.Invoke(obj, Array.Empty<object>());
 	}
 
-	public static object Get(object obj, string member)
+	public static object? Get(object obj, string member)
 	{
 		var memb = obj.GetType().GetField(member);
-		return memb.GetValue(obj);
+		return memb?.GetValue(obj);
 	}
 	public static void Set(ref object? obj, string field, object value)
 	{
-		var memb = obj.GetType().GetField(field);
-		memb.SetValueDirect(__makeref(obj), value);
+		var memb = obj?.GetType().GetField(field);
+		memb?.SetValueDirect(__makeref(obj), value);
 	}
 
 	public static EngineVector GetVectorFieldOfObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string Field)
@@ -193,16 +193,16 @@ internal static class Engine
 			EngineLog.Print(string.Format("Tried to access {1} of object with ID {0} but that object doesn't exist!", ID, Field));
 		}
 		var obj = WorldObjects[ID];
-		var pos = obj.GetType().GetField(Field).GetValue(obj);
+		var pos = obj?.GetType()?.GetField(Field)?.GetValue(obj);
 		Set(ref pos, "X", NewValue.X);
 		Set(ref pos, "Y", NewValue.Y);
 		Set(ref pos, "Z", NewValue.Z);
-		obj.GetType().GetField(Field).SetValue(obj, pos);
+		obj?.GetType()?.GetField(Field)?.SetValue(obj, pos);
 	}
 
 	public static void SetDelta(float NewDelta)
 	{
-		StatsObject.GetField("DeltaTime").SetValue(null, NewDelta);
+		StatsObject?.GetField("DeltaTime")?.SetValue(null, NewDelta);
 	}
 
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]

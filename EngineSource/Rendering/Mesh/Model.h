@@ -36,9 +36,9 @@ public:
 		Vector3 Scale = NonScaledSize * ModelTransform.Scale;
 		Size = FrustumCulling::AABB(ModelTransform.Location, Scale.X, Scale.Y, Scale.Z);
 		
-		ModelTransform.Scale = ModelTransform.Scale * 0.025;
+		ModelTransform.Scale = ModelTransform.Scale * 0.025f;
 		MatModel = ModelTransform.ToMatrix();
-		ModelTransform.Scale = ModelTransform.Scale / 0.025;
+		ModelTransform.Scale = ModelTransform.Scale / 0.025f;
 		ConfigureVAO();
 	}
 

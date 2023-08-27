@@ -64,7 +64,7 @@ EditorPanel::EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vec
 	this->MaxSize = MaxSize;
 
 	TabBackground = new UIBackground(true, Position, UIColors[0], Scale);
-	TabBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2);
+	TabBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
 	TabBackground->HasMouseCollision = true;
 	this->Position = Position;
 	this->Scale = Scale;
@@ -75,9 +75,9 @@ EditorPanel::EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vec
 		Position = Position - (Scale * 0.5);
 		MainBackground = new UIBox(false, Position);
 		MainBackground->AddChild(TabBackground);
-		TitleBackground = new UIBackground(true, Position, UIColors[0] * 0.75, Vector2(Scale.X, 0));
-		TitleText = new UIText(0.5, UIColors[2], Title, Editor::CurrentUI->EngineUIText);
-		TitleText->SetPadding(0.005);
+		TitleBackground = new UIBackground(true, Position, UIColors[0] * 0.75f, Vector2(Scale.X, 0));
+		TitleText = new UIText(0.5f, UIColors[2], Title, Editor::CurrentUI->EngineUIText);
+		TitleText->SetPadding(0.005f);
 		TitleBackground->AddChild(TitleText);
 		MainBackground->AddChild(TitleBackground);
 		TabBackground->SetHorizontal(false);
@@ -122,7 +122,7 @@ void EditorPanel::UpdatePanel()
 
 
 
-	Vector2 BorderScale = Vector2(0.01) * Vector2(1, Graphics::AspectRatio);
+	Vector2 BorderScale = Vector2(0.01f) * Vector2(1, Graphics::AspectRatio);
 	if (!Input::IsLMBDown)
 	{
 		if (IsDragged)
@@ -133,13 +133,13 @@ void EditorPanel::UpdatePanel()
 		InitialMousePosition = 0;
 	}
 
-	if (Maths::NearlyEqual(ClampedMousePosition.Y, -1, BorderScale.Y)
-		|| Maths::NearlyEqual(ClampedMousePosition.Y, 0.95, BorderScale.Y)
-		|| Maths::NearlyEqual(ClampedMousePosition.Y, 1, BorderScale.Y))
+	if (Math::NearlyEqual(ClampedMousePosition.Y, -1, BorderScale.Y)
+		|| Math::NearlyEqual(ClampedMousePosition.Y, 0.95f, BorderScale.Y)
+		|| Math::NearlyEqual(ClampedMousePosition.Y, 1, BorderScale.Y))
 	{
 		return;
 	}
-	if (Maths::NearlyEqual(ClampedMousePosition.X, -1, BorderScale.X) || Maths::NearlyEqual(ClampedMousePosition.X, 1, BorderScale.X))
+	if (Math::NearlyEqual(ClampedMousePosition.X, -1, BorderScale.X) || Math::NearlyEqual(ClampedMousePosition.X, 1, BorderScale.X))
 	{
 		return;
 	}
@@ -153,15 +153,15 @@ void EditorPanel::UpdatePanel()
 	}
 
 	bool HorizontalOverride = !IsPopup && !Editor::DraggingPopup && (Editor::DraggingTab && !IsDragged && Editor::TabDragHorizontal
-		&& (Maths::NearlyEqual(ClampedMousePosition.X, Position.X, 0.02)
-		|| Maths::NearlyEqual(ClampedMousePosition.X, Position.X + Scale.X, 0.02)));
+		&& (Math::NearlyEqual(ClampedMousePosition.X, Position.X, 0.02f)
+		|| Math::NearlyEqual(ClampedMousePosition.X, Position.X + Scale.X, 0.02f)));
 
 	bool VerticalOverride = !IsPopup && !Editor::DraggingPopup && (Editor::DraggingTab && !IsDragged && !Editor::TabDragHorizontal
-		&& (Maths::NearlyEqual(ClampedMousePosition.Y, Position.Y, 0.02)
-			|| Maths::NearlyEqual(ClampedMousePosition.Y, Position.Y + Scale.Y, 0.02)));
-	if (HorizontalOverride || VerticalOverride || Maths::IsPointIn2DBox(Position, Position + Scale, ClampedMousePosition) && !IsDragged)
+		&& (Math::NearlyEqual(ClampedMousePosition.Y, Position.Y, 0.02f)
+			|| Math::NearlyEqual(ClampedMousePosition.Y, Position.Y + Scale.Y, 0.02f)));
+	if (HorizontalOverride || VerticalOverride || Math::IsPointIn2DBox(Position, Position + Scale, ClampedMousePosition) && !IsDragged)
 	{
-		if (HorizontalOverride || (!VerticalOverride && !Maths::IsPointIn2DBox(Position + BorderScale * Vector2(1, 0),
+		if (HorizontalOverride || (!VerticalOverride && !Math::IsPointIn2DBox(Position + BorderScale * Vector2(1, 0),
 			Position + Scale - BorderScale * Vector2(1, 0), ClampedMousePosition)))
 		{
 			if (!HorizontalOverride && IsMouseDown)
@@ -181,7 +181,7 @@ void EditorPanel::UpdatePanel()
 			}
 			Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_WE;
 		}
-		if (VerticalOverride || (!HorizontalOverride && !Maths::IsPointIn2DBox(Position + BorderScale * Vector2(0, 1),
+		if (VerticalOverride || (!HorizontalOverride && !Math::IsPointIn2DBox(Position + BorderScale * Vector2(0, 1),
 			Position + Scale - BorderScale * Vector2(0, 1), ClampedMousePosition)))
 		{
 			if (!VerticalOverride && IsMouseDown)

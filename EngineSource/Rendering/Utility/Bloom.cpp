@@ -4,23 +4,27 @@
 #include <Rendering/Utility/Framebuffer.h>
 #include <Engine/Console.h>
 
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 
 namespace Bloom
 {
 	Shader* BloomShader;
 	unsigned int pingpongFBO[2];
 	unsigned int pingpongBuffer[2];
-	float BloomResolutionMultiplier = 0.15;
+	float BloomResolutionMultiplier = 0.15f;
 }
 
 unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 {
 	if (Graphics::Bloom)
 	{
-		glViewport(0, 0, Graphics::WindowResolution.X * BloomResolutionMultiplier, Graphics::WindowResolution.Y * BloomResolutionMultiplier);
+		size_t Ratio = 2;
+		glViewport(0,
+			0,
+			(unsigned int)(Graphics::WindowResolution.X * BloomResolutionMultiplier),
+			(unsigned int)(Graphics::WindowResolution.Y * BloomResolutionMultiplier));
 		bool horizontal = true, first_iteration = true;
-		int amount = 15;
+		unsigned int amount = 15u;
 		BloomShader->Bind();
 		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -28,7 +32,7 @@ unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 		for (unsigned int i = 0; i < amount; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
-			glUniform1i(glGetUniformLocation(BloomShader->GetShaderID(), "horizontal"), horizontal);
+			glUniform1i(glGetUniformLocation(BloomShader->GetShaderID(), "horizontal"), (i % Ratio) != 0);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(
 				GL_TEXTURE_2D, first_iteration ? buf : pingpongBuffer[!horizontal]
@@ -39,7 +43,7 @@ unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 				first_iteration = false;
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+		glViewport(0, 0, (unsigned int)Graphics::WindowResolution.X, (unsigned int)Graphics::WindowResolution.Y);
 
 	}
     return pingpongBuffer[1];
@@ -55,8 +59,15 @@ void Bloom::Init()
 		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
 		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
 		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGBA16F, Graphics::WindowResolution.X * BloomResolutionMultiplier, Graphics::WindowResolution.Y * BloomResolutionMultiplier, 0,
-			GL_RGBA, GL_FLOAT, NULL
+			GL_TEXTURE_2D,
+			0, 
+			GL_RGBA16F,
+			(int)(Graphics::WindowResolution.X * BloomResolutionMultiplier),
+			(int)(Graphics::WindowResolution.Y * BloomResolutionMultiplier),
+			0,
+			GL_RGBA,
+			GL_FLOAT, 
+			NULL
 		);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -66,7 +77,7 @@ void Bloom::Init()
 			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0
 		);
 	}
-	Console::RegisterConVar(Console::Variable("bloom", Type::E_BOOL, &Graphics::Bloom, nullptr));
+	Console::RegisterConVar(Console::Variable("bloom", Type::Bool, &Graphics::Bloom, nullptr));
 }
 
 void Bloom::OnResized()
@@ -80,8 +91,15 @@ void Bloom::OnResized()
 		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
 		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
 		glTexImage2D(
-			GL_TEXTURE_2D, 0, GL_RGBA16F, Graphics::WindowResolution.X * BloomResolutionMultiplier, Graphics::WindowResolution.Y * BloomResolutionMultiplier, 0,
-			GL_RGBA, GL_FLOAT, NULL
+			GL_TEXTURE_2D,
+			0,
+			GL_RGBA16F,
+			(int)(Graphics::WindowResolution.X * BloomResolutionMultiplier),
+			(int)(Graphics::WindowResolution.Y * BloomResolutionMultiplier),
+			0,
+			GL_RGBA,
+			GL_FLOAT,
+			NULL
 		);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

@@ -1,7 +1,7 @@
 ﻿#ifdef EDITOR
 #include "EditorUI.h"
-#include "Utility/stb_image.h"
-#include "Engine/FileUtility.h"
+#include "Utility/stb_image.hpp"
+#include "Engine/Utility/FileUtility.h"
 #include <filesystem>
 #include "Math/Math.h"
 #include "Math/Collision/Collision.h"
@@ -24,7 +24,7 @@
 #include <Engine/Console.h>
 #include <CSharp/CSharpInterop.h>
 #include <Rendering/Utility/BakedLighting.h>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 
 namespace Editor
 {
@@ -38,11 +38,12 @@ namespace Editor
 	Vector2 NewDragMinMax = DragMinMax;
 	bool IsSavingScene = false;
 	bool IsBakingScene = false;
+	bool LaunchCurrentScene = false;
 
 	Vector3 NewUIColors[EditorUI::NumUIColors] =
 	{
-		Vector3(0.85, 0.85, 0.85),	//Default background
-		Vector3(0.6),				//Dark background
+		Vector3(0.85f, 0.85f, 0.85f),	//Default background
+		Vector3(0.6f),				//Dark background
 		Vector3(0),					//Highlight color,
 		Vector3(1)
 	};
@@ -62,6 +63,7 @@ namespace Editor
 		return PrevColor;
 	}
 	std::atomic<bool> CanHotreload = false;
+
 }
 
 namespace UI
@@ -78,24 +80,35 @@ std::string EditorUI::LaunchInEditorArgs;
 void EditorUI::LaunchInEditor()
 {
 	std::string ProjectName = Build::GetProjectBuildName();
+	std::cout << std::filesystem::last_write_time(ProjectName + "-Debug.exe") << std::endl;
+	std::cout << FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }) << std::endl;
 	try
 	{
-		if (!std::filesystem::exists("x64/Debug/" + ProjectName + ".exe")
-			|| std::filesystem::last_write_time("x64/Debug/" + ProjectName + ".exe") < std::filesystem::last_write_time("Code"))
+		if (!std::filesystem::exists(ProjectName + "-Debug.exe")
+			|| std::filesystem::last_write_time(ProjectName + "-Debug.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
 		{
 			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
 			Build::BuildCurrentSolution("Debug");
 		}
 		if (!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll") 
-			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < std::filesystem::last_write_time("Scripts"))
+			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
 		{
 			RebuildAndHotReload();
 		}
 	}
 	catch (std::exception& e)
 	{
+		Log::Print("Exception thrown trying to check for rebuild. " + std::string(e.what()));
+		return;
 	}
-	system(("x64\\Debug\\" + ProjectName + ".exe " + LaunchInEditorArgs).c_str());
+
+	std::string Args = LaunchInEditorArgs;
+	if (Editor::LaunchCurrentScene)
+	{
+		Args.append(" -scene " + FileUtil::GetFileNameFromPath(Scene::CurrentScene));
+	}
+	system((ProjectName + "-Debug.exe " + Args).c_str());
+
 }
 void EditorUI::RebuildAndHotReload()
 {
@@ -103,18 +116,22 @@ void EditorUI::RebuildAndHotReload()
 	system("cd Scripts && dotnet build");
 	Editor::CanHotreload = true;
 }
+void EditorUI::SetLaunchCurrentScene(bool NewLaunch)
+{
+	Editor::LaunchCurrentScene = NewLaunch;
+}
 #endif
 
 void EditorUI::SaveCurrentScene()
 {
 	if (Scene::CurrentScene.empty())
 	{
-		Log::Print("Saving scene \"Untitled\"", Vector3(0.3, 0.4, 1));
+		Log::Print("Saving scene \"Untitled\"", Vector3(0.3f, 0.4f, 1));
 		Scene::SaveSceneAs("Content/Untitled");
 	}
 	else
 	{
-		Log::Print("Saving scene \"" + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene) + "\"", Vector3(0.3, 0.4, 1));
+		Log::Print("Saving scene \"" + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene) + "\"", Vector3(0.3f, 0.4f, 1));
 		Scene::SaveSceneAs(Scene::CurrentScene);
 	}
 	ChangedScene = false;
@@ -218,12 +235,12 @@ EditorUI::EditorUI()
 	//new UIBackground(true, -1, 0.5, 2);
 
 	UIElements[0] = new StatusBar(UIColors);
-	UIElements[1] = new LogUI(UIColors, Vector2(-0.7, -1), Vector2(1.4, 0.4));
-	UIElements[2] = new Toolbar(UIColors, Vector2(-0.7, 0.73), Vector2(1.4, 0.22));
-	UIElements[3] = new ItemBrowser(UIColors, Vector2(-1, -1), Vector2(0.3, 1.95));
-	UIElements[4] = new Viewport(UIColors, Vector2(-0.7, -0.6), Vector2(1.4, 1.33));
-	UIElements[5] = new ObjectList(UIColors, Vector2(0.7, -0.2), Vector2(0.3, 1.15));
-	UIElements[6] = new ContextMenu(UIColors, Vector2(0.7, -1), Vector2(0.3, 0.8));
+	UIElements[1] = new LogUI(UIColors, Vector2(-0.7f, -1), Vector2(1.4f, 0.4f));
+	UIElements[2] = new Toolbar(UIColors, Vector2(-0.7f, 0.73f), Vector2(1.4f, 0.22f));
+	UIElements[3] = new ItemBrowser(UIColors, Vector2(-1, -1), Vector2(0.3f, 1.95f));
+	UIElements[4] = new Viewport(UIColors, Vector2(-0.7f, -0.6f), Vector2(1.4f, 1.33f));
+	UIElements[5] = new ObjectList(UIColors, Vector2(0.7f, -0.2f), Vector2(0.3f, 1.15f));
+	UIElements[6] = new ContextMenu(UIColors, Vector2(0.7f, -1), Vector2(0.3f, 0.8f));
 
 	// Load preferences from the preference tab after the UI is finished setting up
 	Viewport::ViewportInstance->TabInstances[6]->Load("");
@@ -233,6 +250,11 @@ EditorUI::EditorUI()
 #ifdef ENGINE_CSHARP
 	Console::RegisterCommand(Console::Command("reload", EditorUI::RebuildAndHotReload, {}));
 	Console::RegisterCommand(Console::Command("run", EditorUI::LaunchInEditor, {}));
+	Console::RegisterCommand(Console::Command("classtree", []()
+		{
+			auto Items = dynamic_cast<ItemBrowser*>(Editor::CurrentUI->UIElements[3])->GetEditorUIClasses();
+		}, {}));
+
 #endif
 }
 
@@ -347,7 +369,7 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 	CurrentDropdown = Menu;
 	Dropdown = new UIBackground(false, Position, UIColors[0] * 2);
 	Dropdown->Align = UIBox::E_REVERSE;
-	Dropdown->SetBorder(UIBox::E_ROUNDED, 0.4);
+	Dropdown->SetBorder(UIBox::E_ROUNDED, 0.4f);
 	for (size_t i = 0; i < Menu.size(); i++)
 	{
 		UIBox* NewElement = nullptr;
@@ -358,13 +380,13 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 		}
 		else
 		{
-			NewElement = new UIButton(true, 0, UIColors[0] * 2, this, i);
+			NewElement = new UIButton(true, 0, UIColors[0] * 2, this, (int)i);
 			Menu[i].Title = "   " + Menu[i].Title;
 		}
-		NewElement->SetBorder(UIBox::E_ROUNDED, 0.4);
-		NewElement->SetMinSize(Vector2(0.16, 0));
+		NewElement->SetBorder(UIBox::E_ROUNDED, 0.4f);
+		NewElement->SetMinSize(Vector2(0.16f, 0));
 		NewElement->SetPadding(0);
-		NewElement->AddChild((new UIText(0.45, UIColors[2], Menu[i].Title, EngineUIText))
+		NewElement->AddChild((new UIText(0.45f, UIColors[2], Menu[i].Title, EngineUIText))
 			->SetPadding(0));
 		Dropdown->AddChild(NewElement);
 	}
@@ -383,7 +405,7 @@ std::string EditorUI::ToShortString(float val)
 
 void EditorUI::GenUITextures()
 {
-	const int ImageSize = 27;
+	const int ImageSize = 28;
 	std::string Images[ImageSize]
 	{								//Texture Indices
 		"CPPClass.png",				//00 -> C++ class icon
@@ -412,7 +434,8 @@ void EditorUI::GenUITextures()
 		"WindowX.png",				//23 -> Window X icon
 		"WindowResize.png",			//24 -> Window Resize icon
 		"WindowResize2.png",		//25 -> Window Fulscreen Resize icon
-		"WindowMin.png"				//26 -> Window Minimize icon
+		"WindowMin.png",			//26 -> Window Minimize icon
+		"Lighting.png"				//27 -> Lightmap icon	
 	};
 
 	for (int i = 0; i < Textures.size(); i++)
@@ -473,7 +496,7 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 			std::string SceneName = FileUtil::GetFileNameFromPath(o->CurrentScene);
 			ObjectList.push_back(ObjectListItem(SceneName, {}, true, CollapsedItems.contains("OBJ_CAT_" + SceneName)));
 			ObjectCategories.push_back(FileUtil::GetFileNameFromPath(o->CurrentScene));
-			ObjectList[ObjectList.size() - 1].ListIndex = ObjectCategories.size() - 1;
+			ObjectList[ObjectList.size() - 1].ListIndex = (int)ObjectCategories.size() - 1;
 			SceneList = &ObjectList[ObjectList.size() - 1];
 		}
 
@@ -517,15 +540,16 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 					it++;
 				}
 				ObjectCategories.push_back(elem);
-				CurrentList->Children.insert(CurrentList->Children.begin() + it, ObjectListItem(elem, {}, false, CollapsedItems.contains("OBJ_CAT_" + elem)));
-				CurrentList->Children[it].ListIndex = ObjectCategories.size() - 1;
+				CurrentList->Children.insert(CurrentList->Children.begin() + it,
+					ObjectListItem(elem, {}, false, CollapsedItems.contains("OBJ_CAT_" + elem)));
+				CurrentList->Children[it].ListIndex = (int)ObjectCategories.size() - 1;
 				NewList = &CurrentList->Children[it];
 			}
 			CurrentList = NewList;
 		}
 		if (CurrentList && !CurrentList->IsCollapsed)
 		{
-			CurrentList->Children.push_back(ObjectListItem(o, ListIndex));
+			CurrentList->Children.push_back(ObjectListItem(o, (int)ListIndex));
 		}
 		ListIndex++;
 	}

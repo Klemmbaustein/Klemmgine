@@ -2,7 +2,7 @@
 #include <Engine/Log.h>
 #include <iostream>
 #include <GL/glew.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <Math/Math.h>
 #include <Engine/Input.h>
 
@@ -19,7 +19,7 @@ namespace UI
 	std::vector<UIBox*> UIElements;
 	bool RequiresRedraw = true;
 	unsigned int UIBuffer = 0;
-	unsigned int UITexture = 0;
+	unsigned int UITextures[2] = {0, 0};
 }
 
 UIBox* UIBox::SetSizeMode(E_SizeMode NewMode)
@@ -133,10 +133,9 @@ void UIBox::ForceUpdateUI()
 	if (UI::UIBuffer)
 	{
 		glDeleteFramebuffers(1, &UI::UIBuffer);
-		glDeleteTextures(1, &UI::UITexture);
+		glDeleteTextures(2, UI::UITextures);
 	}
 	UI::UIBuffer = 0;
-	UI::UITexture = 0;
 	InitUI();
 	for (auto i : UI::UIElements)
 	{
@@ -151,28 +150,37 @@ void UIBox::InitUI()
 {
 	glGenFramebuffers(1, &UI::UIBuffer);
 	// create floating point color buffer
-	glGenTextures(1, &UI::UITexture);
-	glBindTexture(GL_TEXTURE_2D, UI::UITexture);
-	glTexImage2D(GL_TEXTURE_2D,
-		0, 
-		GL_RGBA16F,
-		Graphics::WindowResolution.X * 2,
-		Graphics::WindowResolution.Y * 2, 
-		0, 
-		GL_RGBA, 
-		GL_FLOAT, 
-		NULL);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
+	glGenTextures(2, UI::UITextures);
 	glBindFramebuffer(GL_FRAMEBUFFER, UI::UIBuffer);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, UI::UITexture, 0);
+
+	for (unsigned int i = 0; i < 2; i++)
+	{
+		glBindTexture(GL_TEXTURE_2D, UI::UITextures[i]);
+		glTexImage2D(GL_TEXTURE_2D,
+			0,
+			GL_RGBA16F,
+			(size_t)Graphics::WindowResolution.X * 2,
+			(size_t)Graphics::WindowResolution.Y * 2,
+			0,
+			GL_RGBA,
+			GL_FLOAT,
+			NULL);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		// attach texture to framebuffer
+		glFramebufferTexture2D(
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, UI::UITextures[i], 0
+		);
+	}
+
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-unsigned int UIBox::GetUIFramebuffer()
+unsigned int* UIBox::GetUITextures()
 {
-	return UI::UITexture;
+	return UI::UITextures;
 }
 
 void UIBox::RedrawUI()
@@ -204,9 +212,9 @@ bool UIBox::IsHovered()
 
 	}
 	// If the mouse is on top of the box
-	return Maths::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation) 
+	return Math::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation) 
 		&& (!CurrentScrollObject // Check if we have a scroll object
-			|| Maths::IsPointIn2DBox( // do some very questionable math to check if the mouse is inside the scroll area
+			|| Math::IsPointIn2DBox( // do some very questionable math to check if the mouse is inside the scroll area
 				CurrentScrollObject->Position - CurrentScrollObject->Scale,
 				CurrentScrollObject->Position,
 				Input::MouseLocation)); 
@@ -531,7 +539,7 @@ void UIBox::DrawAllUIElements()
 			elem->UpdateSelfAndChildren();
 		}
 		UI::ElementsToUpdate.clear();
-		glViewport(0, 0, Graphics::WindowResolution.X * 2, Graphics::WindowResolution.Y * 2);
+		glViewport(0, 0, (size_t)Graphics::WindowResolution.X * 2, (size_t)Graphics::WindowResolution.Y * 2);
 		glEnable(GL_BLEND);
 		glBindFramebuffer(GL_FRAMEBUFFER, UI::UIBuffer);
 		glClearColor(0, 0, 0, 0);
@@ -544,7 +552,7 @@ void UIBox::DrawAllUIElements()
 			}
 		}
 		glClearColor(0, 0, 0, 1);
-		glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+		glViewport(0, 0, (size_t)Graphics::WindowResolution.X, (size_t)Graphics::WindowResolution.Y);
 	}
 }
 

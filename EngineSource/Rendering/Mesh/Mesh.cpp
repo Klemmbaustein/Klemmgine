@@ -10,8 +10,8 @@
 
 Mesh::Mesh(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Material Mat)
 {
-	NumVertices = Vertices.size();
-	NumIndices = Indices.size();
+	NumVertices = (int)Vertices.size();
+	NumIndices = (int)Indices.size();
 	MeshVertexBuffer = new VertexBuffer(Vertices, Indices);
 	RenderContext = ObjectRenderContext(Mat);
 }

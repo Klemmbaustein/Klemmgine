@@ -8,14 +8,14 @@
 #include <UI/UIText.h>
 #include <UI/UIScrollBox.h>
 #include <UI/UIButton.h>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 
 void MaterialTemplateTab::OnButtonClicked(int Index)
 {
 	if (!TabBackground->IsVisible) return;
 	if (Index == -1)
 	{
-		LoadedMaterial.Uniforms.push_back(Material::Param("", Type::E_INT, ""));
+		LoadedMaterial.Uniforms.push_back(Material::Param("", Type::Int, ""));
 		GenerateUI();
 	}
 	else if (Index == -2)
@@ -26,7 +26,7 @@ void MaterialTemplateTab::OnButtonClicked(int Index)
 	else if (Index >= 0)
 	{
 		LoadedMaterial.Uniforms[Index].UniformName = ((UITextField*)TextFields[Index * 3])->GetText();
-		if (LoadedMaterial.Uniforms[Index].Type != Type::E_VECTOR3)
+		if (LoadedMaterial.Uniforms[Index].Type != Type::Bool)
 		{
 			LoadedMaterial.Uniforms[Index].Value = ((UITextField*)TextFields[Index * 3 + 2])->GetText();
 		}
@@ -57,15 +57,16 @@ MaterialTemplateTab::MaterialTemplateTab(Vector3* UIColors, TextRenderer* Text, 
 	XTexture = XButtonIndex;
 	this->Renderer = Text;
 	this->Renderer = Renderer;
-
+	ShaderTextFields[0] = nullptr;
+	ShaderTextFields[1] = nullptr;
 	TabBackground->Align = UIBox::E_REVERSE;
 	TabName = new UIText(1, UIColors[2], "Material Template: ", Renderer);
-	TabName->SetPadding(0.1, 0.05, 0.05, 0);
+	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);
 	Rows[0] = new UIScrollBox(false, 0, true);
-	Rows[0]->SetMaxSize(Vector2(999, 1.1));
+	Rows[0]->SetMaxSize(Vector2(999, 1.1f));
 	RowBox->AddChild(Rows[0]);
 	Rows[0]->Align = UIBox::E_REVERSE;
 
@@ -116,29 +117,29 @@ void MaterialTemplateTab::GenerateUI()
 	int it = 0;
 	for (auto& i : ShaderTextFields)
 	{
-		Rows[0]->AddChild(new UIText(0.6, UIColors[2], ShaderHints[it], Renderer));
+		Rows[0]->AddChild(new UIText(0.6f, UIColors[2], ShaderHints[it], Renderer));
 		i = new UITextField(true, 0, UIColors[1], this, -2, Renderer);
 		i->HintText = ShaderHints[it] + " here";
-		i->SetMinSize(Vector2(0.3, 0.075));
-		i->SetMaxSize(Vector2(0.3, 0.075));
+		i->SetMinSize(Vector2(0.3f, 0.075f));
+		i->SetMaxSize(Vector2(0.3f, 0.075f));
 		i->SetText(ShaderTexts[it]);
 		Rows[0] ->AddChild(i);
 		it++;
 	}
-	Rows[0]->AddChild(new UIText(0.6, UIColors[2], "Uniforms", Renderer));
+	Rows[0]->AddChild(new UIText(0.6f, UIColors[2], "Uniforms", Renderer));
 	auto ElementBox = new UIBox(true, 0);
 
-	auto ElementNameText = new UIText(0.5, UIColors[2], "Uniform Name", Renderer);
-	ElementNameText->SetPadding(0, 0, 0, 0.01);
-	ElementNameText->SetTextWidthOverride(0.2);
+	auto ElementNameText = new UIText(0.5f, UIColors[2], "Uniform Name", Renderer);
+	ElementNameText->SetPadding(0, 0, 0, 0.01f);
+	ElementNameText->SetTextWidthOverride(0.2f);
 
-	auto ElementTypeText = new UIText(0.5, UIColors[2], "Type", Renderer);
-	ElementTypeText->SetPadding(0, 0, 0, 0.01);
-	ElementTypeText->SetTextWidthOverride(0.1);
+	auto ElementTypeText = new UIText(0.5f, UIColors[2], "Type", Renderer);
+	ElementTypeText->SetPadding(0, 0, 0, 0.01f);
+	ElementTypeText->SetTextWidthOverride(0.1f);
 
-	UIText* ElementDefaultText = new UIText(0.5, UIColors[2], "Default Value", Renderer);
-	ElementDefaultText->SetPadding(0, 0, 0, 0.01);
-	ElementDefaultText->SetTextWidthOverride(0.3);
+	UIText* ElementDefaultText = new UIText(0.5f, UIColors[2], "Default Value", Renderer);
+	ElementDefaultText->SetPadding(0, 0, 0, 0.01f);
+	ElementDefaultText->SetTextWidthOverride(0.3f);
 
 	ElementBox->AddChild(ElementNameText);
 	ElementBox->AddChild(ElementTypeText);
@@ -152,39 +153,39 @@ void MaterialTemplateTab::GenerateUI()
 		auto ElementName = new UITextField(true, 0, UIColors[1], this, ButtonIndex, Renderer);
 		ElementName->SetText(i.UniformName);
 		ElementName->HintText = "Uniform name";
-		ElementName->SetMinSize(Vector2(0.2, 0.08));
-		ElementName->SetPadding(0, 0, 0, 0.01);
-		ElementName->SetMaxSize(Vector2(0.3, 0.08));
+		ElementName->SetMinSize(Vector2(0.2f, 0.08f));
+		ElementName->SetPadding(0, 0, 0, 0.01f);
+		ElementName->SetMaxSize(Vector2(0.3f, 0.08f));
 
 		auto ElementType = new UITextField(true, 0, UIColors[1], this, ButtonIndex, Renderer);
 		ElementType->SetText(Type::Types[i.Type]);
 		ElementType->HintText = "Type";
-		ElementType->SetMinSize(Vector2(0.1, 0.08));
-		ElementType->SetPadding(0, 0, 0, 0.01);
-		ElementType->SetMaxSize(Vector2(0.3, 0.08));
+		ElementType->SetMinSize(Vector2(0.1f, 0.08f));
+		ElementType->SetPadding(0, 0, 0, 0.01f);
+		ElementType->SetMaxSize(Vector2(0.3f, 0.08f));
 
 		
 		UIBox* ElementDefaultValue = nullptr;
-		if (i.Type != Type::E_VECTOR3)
+		if (i.Type != Type::Bool)
 		{
 			ElementDefaultValue = new UITextField(true, 0, UIColors[1], this, ButtonIndex, Renderer);
 			((UITextField*)ElementDefaultValue)->SetText(i.Value);
 			((UITextField*)ElementDefaultValue)->HintText = "Default value";
-			ElementDefaultValue->SetPadding(0, 0, 0, 0.01);
-			ElementDefaultValue->SetMinSize(Vector2(0.265, 0.08));
-			ElementDefaultValue->SetMaxSize(Vector2(0.265, 0.08));
+			ElementDefaultValue->SetPadding(0, 0, 0, 0.01f);
+			ElementDefaultValue->SetMinSize(Vector2(0.265f, 0.08f));
+			ElementDefaultValue->SetMaxSize(Vector2(0.265f, 0.08f));
 		}
 		else
 		{
 			ElementDefaultValue = new UIVectorField(0, Vector3::stov(i.Value), this, ButtonIndex, Renderer);
-			((UIVectorField*)ElementDefaultValue)->SetValueType(UIVectorField::E_RGB);
-			ElementDefaultValue->SetPadding(0, 0, 0, 0.01);
+			((UIVectorField*)ElementDefaultValue)->SetValueType(UIVectorField::VecType::rgb);
+			ElementDefaultValue->SetPadding(0, 0, 0, 0.01f);
 		}
 
 		UIButton* DeleteButton = new UIButton(true, 0, 1, this, ButtonIndex - 100);
-		DeleteButton->SetPadding(0, 0, 0, 0.01);
+		DeleteButton->SetPadding(0, 0, 0, 0.01f);
 		DeleteButton->SetUseTexture(true, XTexture);
-		DeleteButton->SetMinSize(Vector2(0.9 / 24, 1.6 / 24));
+		DeleteButton->SetMinSize(Vector2(0.9f / 24, 1.6f / 24));
 		ElementBox->AddChild(ElementName);
 		TextFields.push_back(ElementName);
 		ElementBox->AddChild(ElementType);
@@ -196,13 +197,13 @@ void MaterialTemplateTab::GenerateUI()
 		ButtonIndex++;
 	}
 	auto AddNewButton = new UIButton(true, 0, Vector3(0, 1, 0), this, -1);
-	auto AddNewText = new UIText(0.6, 0, "Add new", Renderer);
+	auto AddNewText = new UIText(0.6f, 0, "Add new", Renderer);
 	AddNewButton->AddChild(AddNewText);
 	Rows[0]->AddChild(AddNewButton);
 }
 void MaterialTemplateTab::UpdateLayout()
 {
-	Rows[0]->SetMinSize(Vector2(0, TabBackground->GetMinSize().Y - 0.275));
-	Rows[0]->SetMaxSize(Vector2(2, TabBackground->GetMinSize().Y - 0.275));
+	Rows[0]->SetMinSize(Vector2(0, TabBackground->GetMinSize().Y - 0.275f));
+	Rows[0]->SetMaxSize(Vector2(2, TabBackground->GetMinSize().Y - 0.275f));
 }
 #endif

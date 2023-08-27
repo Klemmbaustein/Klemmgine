@@ -3,7 +3,7 @@
 
 class Camera;
 class FramebufferObject;
-class VertexBuffer;
+struct VertexBuffer;
 
 class BillboardSprite : public Renderable
 {

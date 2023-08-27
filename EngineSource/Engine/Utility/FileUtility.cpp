@@ -98,4 +98,32 @@ namespace FileUtil
 
 		return RetVal;
 	}
+	std::filesystem::file_time_type GetLastWriteTimeOfFolder(std::string Folder, std::set<std::string> FoldersToIgnore)
+	{
+		auto Files = GetAllFilesInFolder(Folder);
+
+		std::filesystem::file_time_type Latest = Latest = std::filesystem::last_write_time(Folder);
+
+		for (auto& i : std::filesystem::directory_iterator(Folder))
+		{
+			if (std::filesystem::is_directory(i) && !FoldersToIgnore.contains(i.path().filename().string()))
+			{
+				auto WriteTime = GetLastWriteTimeOfFolder(i.path().string(), FoldersToIgnore);
+				if (WriteTime > Latest)
+				{
+					Latest = WriteTime;
+				}
+			}
+			else
+			{
+				auto WriteTime = std::filesystem::last_write_time(i);
+				if (WriteTime > Latest)
+				{
+					Latest = WriteTime;
+				}
+			}
+		}
+
+		return Latest;
+	}
 }

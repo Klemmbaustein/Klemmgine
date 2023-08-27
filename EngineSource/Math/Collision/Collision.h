@@ -22,15 +22,14 @@ namespace Collision
 		HitResponse()
 		{
 			Hit = false;
-			ImpactPoint = Vector3();
 		}
-		HitResponse(bool Hit, Vector3 ImpactPoint, Vector3 Normal, float t = INFINITY, WorldObject* InModel = nullptr)
+		HitResponse(bool Hit, Vector3 ImpactPoint, Vector3 Normal, float t = INFINITY, WorldObject* HitObject = nullptr)
 		{
 			this->Hit = Hit;
 			this->ImpactPoint = ImpactPoint;
 			this->t = t;
 			this->Normal = Normal;
-			HitObject = InModel;
+			this->HitObject = HitObject;
 		}
 	};
 	struct CollisionMesh
@@ -44,7 +43,7 @@ namespace Collision
 		Collision::HitResponse CheckAgainstLine(Vector3 RayStart, Vector3 RayEnd);
 		Collision::HitResponse CheckAgainstAABB(const Box& b);
 		bool CanOverlap = true;
-		float SphereCollisionSize = 0;
+		float SphereCollisionSize = 0.0f;
 		Vector3 WorldPosition;
 		Vector3 Scale = 1;
 		Vector3 SpherePosition;
@@ -52,7 +51,7 @@ namespace Collision
 		std::vector<Vertex> Vertices;
 		std::vector<Vertex>	RawVertices; std::vector<unsigned int> Indices;
 	protected:
-		float WorldScale = 1;
+		float WorldScale = 1.0f;
 		void ApplyMatrix();
 		glm::mat4 ModelMatrix;
 

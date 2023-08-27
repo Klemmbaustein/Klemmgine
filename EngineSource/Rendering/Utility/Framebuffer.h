@@ -2,7 +2,7 @@
 #include <vector>
 #include <Rendering/Renderable.h>
 #include <Rendering/Particle.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 
 class Framebuffer
 {

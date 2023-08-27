@@ -1,9 +1,9 @@
 #include "ParticleComponent.h"
 #include <filesystem>
 #include <Rendering/Particle.h>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 #include <Rendering/Mesh/Model.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <Engine/Log.h>
 #include <Rendering/Mesh/Mesh.h>

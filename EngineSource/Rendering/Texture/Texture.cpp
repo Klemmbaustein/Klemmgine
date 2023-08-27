@@ -1,6 +1,6 @@
 #include "Texture.h"
 #define STB_IMAGE_IMPLEMENTATION
-#include <Utility/stb_image.h>
+#include <Utility/stb_image.hpp>
 #include <GL/glew.h>
 #include <Engine/Log.h>
 #include <filesystem>

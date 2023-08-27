@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <Rendering/Utility/ShaderManager.h>
 #include <Rendering/Camera/Camera.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <GL/glew.h>
 #include <Engine/Console.h>
 
@@ -60,21 +60,29 @@ void SSAO::Init()
 	glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 	glGenTextures(1, &ssaoColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Graphics::WindowResolution.X / ResolutionDivider, Graphics::WindowResolution.Y / ResolutionDivider, 0, GL_RED, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D,
+		0,
+		GL_RG,
+		(int)(Graphics::WindowResolution.X / ResolutionDivider),
+		(int)(Graphics::WindowResolution.Y / ResolutionDivider),
+		0,
+		GL_RED,
+		GL_FLOAT,
+		NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
 	AOShader = new Shader("Shaders/Internal/postprocess.vert", "Shaders/Internal/ssao.frag");
-	Console::RegisterConVar(Console::Variable("ssao", Type::E_BOOL, &Graphics::SSAO, nullptr));
+	Console::RegisterConVar(Console::Variable("ssao", Type::Bool, &Graphics::SSAO, nullptr));
 }
 
 unsigned int SSAO::Render(unsigned int NormalBuffer, unsigned int PositionBuffer)
 {
 	if (!Graphics::MainCamera) return 0;
 	if (!Graphics::SSAO) return 0;
-	glViewport(0, 0, Graphics::WindowResolution.X / ResolutionDivider, Graphics::WindowResolution.Y / ResolutionDivider);
+	glViewport(0, 0, (int)(Graphics::WindowResolution.X / ResolutionDivider), (int)(Graphics::WindowResolution.Y / ResolutionDivider));
 	glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 	glDisable(GL_BLEND);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -98,7 +106,7 @@ unsigned int SSAO::Render(unsigned int NormalBuffer, unsigned int PositionBuffer
 	glUniformMatrix4fv(glGetUniformLocation(AOShader->GetShaderID(), "projection"), 1, false, &Graphics::MainCamera->GetProjection()[0][0]);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+	glViewport(0, 0, (GLsizei)Graphics::WindowResolution.X, (GLsizei)Graphics::WindowResolution.Y);
 	glEnable(GL_BLEND);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -116,7 +124,15 @@ void SSAO::ResizeBuffer(unsigned int X, unsigned int Y)
 	glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 	glGenTextures(1, &ssaoColorBuffer);
 	glBindTexture(GL_TEXTURE_2D, ssaoColorBuffer);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, Graphics::WindowResolution.X / ResolutionDivider, Graphics::WindowResolution.Y / ResolutionDivider, 0, GL_RED, GL_FLOAT, NULL);
+	glTexImage2D(GL_TEXTURE_2D,
+		0,
+		GL_RG,
+		(GLsizei)(Graphics::WindowResolution.X / ResolutionDivider),
+		(GLsizei)(Graphics::WindowResolution.Y / ResolutionDivider),
+		0,
+		GL_RED,
+		GL_FLOAT,
+		NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);

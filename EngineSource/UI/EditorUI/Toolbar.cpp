@@ -32,12 +32,12 @@ void Toolbar::GenerateButtons()
 		{
 			continue;
 		}
-		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5, Vector2(0.001, 0.2)))
-			->SetPadding(0.01, 0.01, 0.02, 0.01));
+		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.2f)))
+			->SetPadding(0.01f, 0.01f, 0.02f, 0.01f));
 		auto Elem = new UIBox(false, 0);
 		Elem->Align = UIBox::E_REVERSE;
-		Elem->SetPadding(0.0, 0.0, 0, 0);
-		Elem->AddChild((new UIText(0.4, UIColors[2] * 0.7, Buttons[i].Name, Editor::CurrentUI->EngineUIText))->SetPadding(0));
+		Elem->SetPadding(0.0f, 0.0f, 0, 0);
+		Elem->AddChild((new UIText(0.4f, UIColors[2] * 0.7f, Buttons[i].Name, Editor::CurrentUI->EngineUIText))->SetPadding(0));
 		TabBackground->AddChild(Elem);
 
 		UIBox* ButtonBackground = new UIBox(true, 0);
@@ -52,21 +52,21 @@ void Toolbar::GenerateButtons()
 				j++;
 				continue;
 			}
-			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[3], Vector2(0.1)))
-				->SetBorder(UIBox::E_ROUNDED, 0.5)
+			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[3], Vector2(0.1f)))
+				->SetBorder(UIBox::E_ROUNDED, 0.5f)
 				->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
-				->AddChild((new UIText(0.35, UIColors[2], btn.Name, Editor::CurrentUI->EngineUIText))
-					->SetPadding(0.005))
-				->AddChild((new UIButton(true, 0, 1, this, i * MAX_CATEGORY_BUTTONS + j))
+				->AddChild((new UIText(0.4f, UIColors[2], btn.Name, Editor::CurrentUI->EngineUIText))
+					->SetPadding(0.005f))
+				->AddChild((new UIButton(true, 0, 1, this, (int)i * MAX_CATEGORY_BUTTONS + (int)j))
 					->SetUseTexture(true, btn.Texture)
-					->SetMinSize(0.075)
-					->SetPadding(0.015)
+					->SetMinSize(0.075f)
+					->SetPadding(0.015f)
 					->SetSizeMode(UIBox::E_PIXEL_RELATIVE)));
 			j++;
 		}
 	}
-	TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5, Vector2(0.001, 0.2)))
-		->SetPadding(0.01, 0.01, 0.02, 0.01));
+	TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.2f)))
+		->SetPadding(0.01f, 0.01f, 0.02f, 0.01f));
 }
 
 void Toolbar::RemoveButton(std::string Name)
@@ -105,7 +105,7 @@ void Toolbar::SetButtonVisibility(std::string Name, bool IsVisible)
 }
 
 
-Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.8, 0.22), Vector2(2, 0.45))
+Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.8f, 0.22f), Vector2(2, 0.45f))
 {
 	ToolbarInstance = this;
 	RegisterNewButtonCategory(ButtonCategory("Scene", 
@@ -114,7 +114,7 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 					EditorUI::SaveCurrentScene();
 				}),
 			ButtonCategory::Button("Wireframe", Editor::CurrentUI->Textures[1], []() {
-					Log::Print("Toggled wireframe", Vector3(0.3, 0.4, 1));
+					Log::Print("Toggled wireframe", Vector3(0.3f, 0.4f, 1));
 					Graphics::IsWireframe = !Graphics::IsWireframe;
 				}),
 			ButtonCategory::Button("Bake", Editor::CurrentUI->Textures[3], []() {

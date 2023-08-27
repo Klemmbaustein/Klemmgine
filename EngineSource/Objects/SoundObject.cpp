@@ -3,13 +3,13 @@
 #include <Objects/Components/CollisionComponent.h>
 void SoundObject::Begin()
 {
-	Properties.push_back(Objects::Property("Sound:Sound File", Type::E_STRING, &Filename));
-	Properties.push_back(Objects::Property("Sound:Pitch", Type::E_FLOAT, &Pitch));
-	Properties.push_back(Objects::Property("Sound:Volume", Type::E_FLOAT, &Volume));
-	Properties.push_back(Objects::Property("Sound:Looping", Type::E_BOOL, &IsLooping));
+	Properties.push_back(Objects::Property("Sound:Sound File", Type::String, &Filename));
+	Properties.push_back(Objects::Property("Sound:Pitch", Type::Float, &Pitch));
+	Properties.push_back(Objects::Property("Sound:Volume", Type::Float, &Volume));
+	Properties.push_back(Objects::Property("Sound:Looping", Type::Bool, &IsLooping));
 
-	Properties.push_back(Objects::Property("3D-Sound:In 3D-Space", Type::E_BOOL, &IsSpacialSound));
-	Properties.push_back(Objects::Property("3D-Sound:Falloff Range", Type::E_FLOAT, &FalloffRange));
+	Properties.push_back(Objects::Property("3D-Sound:In 3D-Space", Type::Bool, &IsSpacialSound));
+	Properties.push_back(Objects::Property("3D-Sound:Falloff Range", Type::Float, &FalloffRange));
 
 #if EDITOR
 	auto EditorBillboard = new BillboardComponent();

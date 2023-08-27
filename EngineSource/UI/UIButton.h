@@ -1,7 +1,7 @@
 #pragma once
 #include <UI/UIBox.h>
 #include <UI/Default/UICanvas.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 
 struct VertexBuffer;
 

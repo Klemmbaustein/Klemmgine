@@ -23,3 +23,10 @@ namespace Input
 	bool IsRMBDown = false;
 	Vector2 Input::MouseMovement;
 }
+
+namespace TextInput
+{
+	bool PollForText = false;
+	std::string Text;
+	int TextIndex = 0u;
+}

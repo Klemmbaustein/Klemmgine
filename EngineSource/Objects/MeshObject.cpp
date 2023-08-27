@@ -1,8 +1,8 @@
 #include "MeshObject.h"
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <filesystem>
 #include <Engine/Log.h>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 
 void MeshObject::Destroy()
 {
@@ -20,7 +20,7 @@ void MeshObject::Begin()
 	for (size_t i = 0; i < 16; i++)
 	{
 		MaterialNames[i] = "";
-		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::E_STRING, &MaterialNames[i]));
+		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
 	}
 	OnPropertySet();
 }
@@ -36,7 +36,7 @@ void MeshObject::LoadFromFile(std::string Filename)
 	m.LoadModelFromFile(Filename);
 	for (size_t i = 0; i < m.Elements.size(); i++)
 	{
-		if (i >= MaterialNames.size() || MaterialNames[i] == "")
+		if (i >= MaterialNames.size() || MaterialNames.at(i) == "")
 		{
 			continue;
 		}
@@ -87,7 +87,7 @@ void MeshObject::LoadFromFile(std::string Filename)
 		{
 			MaterialNames[i] = MaterialNames[i].substr(8);
 		}
-		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::E_STRING, &MaterialNames[i]));
+		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
 	}
 }
 
@@ -121,13 +121,13 @@ void MeshObject::OnPropertySet()
 		{
 			MaterialNames[i] = MaterialNames[i].substr(8);
 		}
-		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::E_STRING, &MaterialNames[i]));
+		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
 	}
 }
 
 void MeshObject::GenerateDefaultCategories()
 {	
 	// Categories are sorted alphabetically. The text renderer doesn't render newlines, so the categories have \n first so they will be sorted first.
-	Properties.push_back(Objects::Property("\nMesh:Mesh file", Type::E_STRING, &Filename));
-	Properties.push_back(Objects::Property("\nMesh:Cast Shadow", Type::E_BOOL, &MeshCastShadow));
+	Properties.push_back(Objects::Property("\nMesh:Mesh file", Type::String, &Filename));
+	Properties.push_back(Objects::Property("\nMesh:Cast Shadow", Type::Bool, &MeshCastShadow));
 }

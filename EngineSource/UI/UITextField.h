@@ -1,7 +1,7 @@
 #pragma once
 #include <UI/UIBox.h>
 #include <UI/Default/UICanvas.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 
 class TextRenderer;
 class UIText;
@@ -14,7 +14,7 @@ class UITextField : public UIBox
 	bool IsHovered = false;
 	bool IsPressed = false;
 	Vector2 IBeamPosition;
-	Vector2 IBeamScale = Vector2(0.001, 0.03);
+	Vector2 IBeamScale = Vector2(0.001f, 0.03f);
 	bool ShowIBeam = false;
 	Vector3 Color = Vector3(0.5);
 	Vector3 TextColor = 1;

@@ -12,19 +12,21 @@ namespace Type
 		"vector3_color",
 		"texture",
 		"byte",
-		"bool"
+		"bool",
+		"rotation"
 	};
 
 	enum TypeEnum
 	{
-		E_NULL = -1,
-		E_VECTOR3 = 0,
-		E_FLOAT = 1,
-		E_INT = 2,
-		E_STRING = 3,
-		E_VECTOR3_COLOR = 4,
-		E_GL_TEXTURE = 5,
-		E_BYTE = 6,
-		E_BOOL = 7
+		Null = -1,
+		Vector3 = 0,
+		Float = 1,
+		Int = 2,
+		String = 3,
+		Vector3Color = 4,
+		GL_Texture = 5,
+		Byte = 6,
+		Bool = 7,
+		Vector3Rotation = 8
 	};
 }

@@ -1,6 +1,6 @@
 #include "Sound.h"
 #include <AL/al.h>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 #include <AL/alc.h>
 #include "AL/alext.h"
 #include <fstream>
@@ -8,9 +8,9 @@
 #include <cmath>
 #include <Engine/Log.h>
 #include <Rendering/Camera/Camera.h>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 #include <iostream>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <Engine/Console.h>
 #include <filesystem>
 #include <Engine/EngineError.h>
@@ -208,8 +208,8 @@ namespace Sound
 					return;
 				}
 				Console::ConsoleLog("Sound " + Console::CommandArgs()[0] + " doesn't exist!", Console::E_ERROR);
-			}, {Console::Command::Argument("sound", Type::E_STRING)}));
-		Console::RegisterConVar(Console::Variable("soundvolume", Type::E_FLOAT, &MasterVolume, nullptr));
+			}, {Console::Command::Argument("sound", Type::String)}));
+		Console::RegisterConVar(Console::Variable("soundvolume", Type::Float, &MasterVolume, nullptr));
 	}
 	void End()
 	{

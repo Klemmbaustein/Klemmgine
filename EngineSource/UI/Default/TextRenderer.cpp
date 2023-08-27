@@ -1,16 +1,16 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include "TextRenderer.h"
 #define STB_TRUETYPE_IMPLEMENTATION
-#include <Utility/stb_truetype.h>
-#include <Engine/FileUtility.h>
+#include <Utility/stb_truetype.hpp>
+#include <Engine/Utility/FileUtility.h>
 #include <UI/Default/ScrollObject.h>
 #include <Engine/Log.h>
 #include <Rendering/Shader.h>
 #include <SDL.h>
-#include <World/Stats.h>
-#include <World/Graphics.h>
+#include <Engine/Stats.h>
+#include <Rendering/Graphics.h>
 #include <GL/glew.h>
-#include <Engine/StringUtility.h>
+#include <Engine/Utility/StringUtility.h>
 #include <Engine/EngineError.h>
 
 namespace _TextRenderer
@@ -183,7 +183,7 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 	stbtt_bakedchar* cdata = (stbtt_bakedchar*)cdatapointer;
 	glBindVertexArray(newVAO);
 	glBindBuffer(GL_ARRAY_BUFFER, newVBO);
-	size_t len = TextSegment::CombineToString(Text).size();
+	uint32_t len = (uint32_t)TextSegment::CombineToString(Text).size();
 	if (fontVertexBufferCapacity < len) {
 		fontVertexBufferCapacity = len;
 		glBufferData(GL_ARRAY_BUFFER, sizeof(FontVertex) * 6 * fontVertexBufferCapacity, 0, GL_DYNAMIC_DRAW);

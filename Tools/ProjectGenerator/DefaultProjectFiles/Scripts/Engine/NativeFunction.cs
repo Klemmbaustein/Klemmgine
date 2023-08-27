@@ -29,6 +29,12 @@ public static class NativeFunction
 
 		if (NewDel == null)
 		{
+			Log.Print("Failed to get delegate for native function: " + Name);
+			Log.Print("------------------------ Native functions: ------------------------");
+			foreach (var i in LoadedNativeFunctions)
+			{
+				Log.Print(i.Key);
+			}
 			return null;
 		}
 

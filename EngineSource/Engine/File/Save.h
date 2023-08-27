@@ -10,7 +10,7 @@ struct SaveGame
 	{
 		SaveProperty(std::string Name, std::string Value, Type::TypeEnum Type);
 		SaveProperty() {}
-		std::string Name = ""; std::string Value = ""; Type::TypeEnum Type = Type::E_NULL;
+		std::string Name = ""; std::string Value = ""; Type::TypeEnum Type = Type::Null;
 		auto operator<=>(SaveProperty const&) const = default;
 	};
 

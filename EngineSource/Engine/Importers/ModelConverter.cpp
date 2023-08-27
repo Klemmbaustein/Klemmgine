@@ -7,6 +7,7 @@
 #include <vector>
 #include <assimp/postprocess.h>
 #include <UI/EditorUI/Popups/DialogBox.h>
+#include <Engine/EngineError.h>
 
 namespace fs = std::filesystem;
 uint8_t NumMaterials = 0;
@@ -33,8 +34,8 @@ void ProcessMesh(aiMesh* Mesh, const aiScene* Scene)
 	{
 
 		aiFace Face = Mesh->mFaces[i];
-		assert(Face.mNumIndices == 3);
-		for (int j = 0; j < Face.mNumIndices; j++)
+		ENGINE_ASSERT(Face.mNumIndices == 3, "Face should always have 3 indices.");
+		for (unsigned int j = 0; j < Face.mNumIndices; j++)
 		{
 			m.Indicies.push_back(Face.mIndices[j]);
 		}
@@ -80,9 +81,8 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 		{
 			Log::Print("Error: Could not load Scene");
 			if (Scene->mFlags == AI_SCENE_FLAGS_INCOMPLETE)
-				std::cout << ": AI_SCENE_FLAGS_INCOMPLETE";
-			throw "model loading error!";
-			return "";
+				Log::Print(": AI_SCENE_FLAGS_INCOMPLETE");
+			ENGINE_ASSERT(false, "Error: Could not load Scene");
 		}
 		ProcessMaterials(Scene);
 		ProcessNode(Scene->mRootNode, Scene);
@@ -94,7 +94,7 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 		{
 			Importer::From = Name;
 			Importer::To = OutputFileName;
-			new DialogBox("Model Import", 0, "\"" + FileUtil::GetFileNameWithoutExtensionFromPath(OutputFileName) + "\" already exists!",
+			new DialogBox("Model Import", 0, "\"" + FileUtil::GetFileNameWithoutExtensionFromPath(OutputFileName) + "\" already exists.",
 			{
 				DialogBox::Answer("Replace", []()
 				{
@@ -110,13 +110,13 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 		int iNumMaterials = NumMaterials;
 		Output.write((char*)&iNumMaterials, sizeof(int));
 
-		float Scale = FileUtil::GetExtension(Name) == "fbx" ? 1 : 100;
+		float Scale = FileUtil::GetExtension(Name) == "fbx" ? 1.0f : 100.0f;
 
 		for (int j = 0; j < NumMaterials; j++)
 		{
 			ImportMesh CurrentMesh = Meshes.at(j);
-			int NumVertices = CurrentMesh.Positions.size();
-			int NumIndices = CurrentMesh.Indicies.size();
+			int NumVertices = (int)CurrentMesh.Positions.size();
+			int NumIndices = (int)CurrentMesh.Indicies.size();
 
 			Output.write((char*)&NumVertices, sizeof(int));
 			Output.write((char*)&NumIndices, sizeof(int));
@@ -142,7 +142,7 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 			{
 				Output.write((char*)&CurrentMesh.Indicies.at(i), sizeof(int));
 			}
-			std::string DefaultMaterial = "Content/NONE";
+			std::string DefaultMaterial = "NONE";
 			size_t size = DefaultMaterial.size();
 			Output.write((char*)&size, sizeof(size_t));
 			Output.write(DefaultMaterial.c_str(), sizeof(char) * size);

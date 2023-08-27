@@ -54,10 +54,7 @@ namespace Graphics
 		float Falloff = 250.f;
 		Vector3 Color = 1.f;
 
-		bool operator==(Light b)
-		{
-			return Position == b.Position && Color == b.Color && Intensity == b.Intensity && Falloff == b.Falloff;
-		}
+		bool operator==(Light b);
 	};
 
 	extern Sun WorldSun;

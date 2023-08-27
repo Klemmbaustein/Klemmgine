@@ -1,7 +1,7 @@
 #include "ShaderManager.h"
 #include <Engine/Log.h>
 #include <filesystem>
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <Engine/EngineError.h>
 
 std::map<ShaderDescription, ShaderElement> Shaders;

@@ -12,7 +12,7 @@ struct ButtonEvent;
 
 namespace Application
 {
-
+	extern std::string StartupSceneOverride;
 	bool WindowHasFocus();
 
 	extern float LogicTime, RenderTime, SyncTime;

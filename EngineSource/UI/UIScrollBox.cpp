@@ -15,10 +15,6 @@ float UIScrollBox::GetDesiredChildrenSize()
 	for (UIBox* i : Children)
 	{
 		DesiredSize += i->UpPadding + i->DownPadding + std::max({ i->GetUsedSize().Y, i->GetMinSize().Y, 0.0f });
-		if (!i->GetUsedSize().Y)
-		{
-			GetAbsoluteParent()->InvalidateLayout();
-		}
 	}
 	return DesiredSize;
 }
@@ -54,15 +50,15 @@ UIScrollBox* UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 		DisplayScrollBar = NewDisplay;
 		if (DisplayScrollBar)
 		{
-			ScrollBarBackground = new UIButton(false, 0, 0.25, nullptr, 0);
+			ScrollBarBackground = new UIButton(false, 0, 0.25f, nullptr, 0);
 			ScrollBarBackground->ParentOverride = this;
-			ScrollBarBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2);
+			ScrollBarBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
 			ScrollBarBackground->Align = UIBox::E_REVERSE;
 			ScrollBarBackground->SetPosition(OffsetPosition + Vector2(Size.X - ScrollBarBackground->GetUsedSize().X, 0));
 #if EDITOR
-			ScrollBar = new UIBackground(true, 0, 0.4, Vector2(0.01, 0.1));
+			ScrollBar = new UIBackground(true, 0, 0.4f, Vector2(0.01f, 0.1f));
 #else
-			ScrollBar = new UIBackground(true, 0, 0.75, Vector2(0.01, 0.1));
+			ScrollBar = new UIBackground(true, 0, 0.75f, Vector2(0.01f, 0.1f));
 #endif
 			ScrollBarBackground->AddChild(ScrollBar);
 			ScrollBar->SetBorder(UIBox::E_ROUNDED, 0.25);
@@ -90,25 +86,25 @@ void UIScrollBox::Tick()
 	ScrollBarBackground->IsVisible = VisibleInHierarchy;
 	if (ScrollBar && VisibleInHierarchy)
 	{
-		ScrollBarBackground->SetMinSize(Vector2(0.015, GetUsedSize().Y));
+		ScrollBarBackground->SetMinSize(Vector2(0.015f, GetUsedSize().Y));
 		ScrollBarBackground->SetPosition(OffsetPosition + Vector2(Size.X - ScrollBarBackground->GetUsedSize().X, 0));
 
 		float ScrollPercentage = ScrollClass.Percentage / ScrollClass.MaxScroll;
 
 		if (DesiredMaxScroll <= Size.Y)
 		{
-			ScrollBar->SetMinSize(Vector2(0.01, Size.Y - 0.005));
-			ScrollBar->SetPadding(0.0025);
+			ScrollBar->SetMinSize(Vector2(0.01f, Size.Y - 0.005f));
+			ScrollBar->SetPadding(0.0025f);
 			ScrollPercentage = 0;
 		}
 		else
 		{
-			ScrollBar->SetMinSize(Vector2(0.01, Size.Y / (DesiredMaxScroll / Size.Y)));
+			ScrollBar->SetMinSize(Vector2(0.01f, Size.Y / (DesiredMaxScroll / Size.Y)));
 
 			ScrollBar->SetPadding(std::max((ScrollPercentage * Size.Y) - (ScrollPercentage * ScrollBar->GetUsedSize().Y) - 0.005f, 0.0025f),
-				0.0025,
-				0.0025,
-				0.0025);
+				0.0025f,
+				0.0025f,
+				0.0025f);
 		}
 		if ((ScrollBarBackground->GetIsPressed() && !IsDraggingScrollBox) || IsDragging && ScrollClass.MaxScroll)
 		{

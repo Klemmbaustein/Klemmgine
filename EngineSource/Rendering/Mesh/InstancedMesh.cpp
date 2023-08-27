@@ -9,8 +9,8 @@
 
 InstancedMesh::InstancedMesh(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Material Mat)
 {
-	NumVertices = Vertices.size();
-	NumIndices = Indices.size();
+	NumVertices = (int)Vertices.size();
+	NumIndices = (int)Indices.size();
 	MeshVertexBuffer = new VertexBuffer(Vertices, Indices);
 	RenderContext = ObjectRenderContext(Mat);
 }
@@ -35,7 +35,7 @@ void InstancedMesh::Render(Shader* UsedShader, bool MainFramebuffer)
 		unsigned int attachements[] = { GL_COLOR_ATTACHMENT0 };
 		glDrawBuffers(1, attachements);
 	}
-	glDrawElementsInstanced(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0, Instances.size());
+	glDrawElementsInstanced(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0, (int)Instances.size());
 	MeshVertexBuffer->Unbind();
 }
 
@@ -51,7 +51,7 @@ void InstancedMesh::SimpleRender(Shader* UsedShader)
 		UsedShader->SetInt("u_usetexture", 0);
 	}
 	MeshVertexBuffer->Bind();
-	glDrawElementsInstanced(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0, Instances.size());
+	glDrawElementsInstanced(GL_TRIANGLES, NumIndices, GL_UNSIGNED_INT, 0, (int)Instances.size());
 	MeshVertexBuffer->Unbind();
 }
 

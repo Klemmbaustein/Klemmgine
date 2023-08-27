@@ -4,6 +4,7 @@ layout(location = 0) in vec3 a_position;
 layout(location = 1) in vec2 a_texcoords;
 uniform vec3 u_offset; //X = Y offset; Y = MaxDistance
 uniform vec4 u_transform; // xy = position zw = scale
+uniform vec2 u_screenres = vec2(50);
 out vec2 v_position;
 out vec2 v_texcoords;
 

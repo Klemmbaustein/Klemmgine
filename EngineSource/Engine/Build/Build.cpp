@@ -4,10 +4,10 @@
 #include <Engine/EngineProperties.h>
 #include <fstream>
 #include <sstream>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 
 #if EDITOR
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <iostream>
 #include <CSharp/CSharpInterop.h>
 #include <Engine/Build/Pack.h>
@@ -96,7 +96,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			int CompileResult = BuildCurrentSolution("Release");
 			if (!CompileResult)
 			{
-				std::filesystem::copy("x64/Release/" + GetProjectBuildName() + ".exe", TargetFolder + ProjectName + std::string(".exe"));
+				std::filesystem::copy(GetProjectBuildName() + "-Release.exe", TargetFolder + ProjectName + std::string(".exe"));
 			}
 			else
 			{
@@ -159,8 +159,9 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	std::string Command = "\"" + VSInstallPath + "\" " + std::string(SolutionName) + ".sln /Build " + Configuration;
 
 	Log::Print("[Build]: Running command: " + Command + " (This can take a while)", Vector3(0.5));
-	return system(Command.c_str());
-
+	int ret = system(Command.c_str());
+	Log::Print("[Build]: Built project for configuration: " + Configuration, Vector3(0.5, 1, 0.5));
+	return ret;
 }
 #endif
 

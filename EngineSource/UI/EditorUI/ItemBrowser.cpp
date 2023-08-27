@@ -6,7 +6,7 @@
 #include <UI/UIScrollBox.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Log.h>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 #include <Engine/OS.h>
 #include <Engine/Scene.h>
 #include <Engine/Input.h>
@@ -18,7 +18,7 @@
 #include <Engine/Importers/Importer.h>
 #include <Engine/Importers/ModelConverter.h>
 #include <UI/EditorUI/Popups/RenameBox.h>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 #ifdef ENGINE_CSHARP
 #include <CSharp/CSharpInterop.h>
 #include <Objects/CSharpObject.h>
@@ -178,7 +178,7 @@ void ItemBrowser::ScanForAssets()
 	}
 }
 
-ItemBrowser::ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2, 1), Vector2(0.9, 4))
+ItemBrowser::ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2f, 1), Vector2(0.9f, 4))
 {
 	CPPClasses = GetEditorUIClasses();
 	TabBackground->SetHorizontal(false);
@@ -195,28 +195,28 @@ void ItemBrowser::UpdateLayout()
 	Assets::ScanForAssets();
 	ContentBox->DeleteChildren();
 
-	BrowserScrollBox = new UIScrollBox(false, Scale - Vector2(0, 0.1), true);
-	BrowserScrollBox->SetMinSize(Vector2(TabBackground->GetMinSize().X, 1.675));
-	BrowserScrollBox->SetMaxSize(Vector2(MaxSize.X, 1.675));
+	BrowserScrollBox = new UIScrollBox(false, Scale - Vector2(0, 0.1f), true);
+	BrowserScrollBox->SetMinSize(Vector2(TabBackground->GetMinSize().X, 1.675f));
+	BrowserScrollBox->SetMaxSize(Vector2(MaxSize.X, 1.675f));
 	BrowserScrollBox->Align = UIBox::E_REVERSE;
 	ContentBox->AddChild(BrowserScrollBox
 		->SetPadding(0));
 
-	ContentBox->AddChild((new UIBackground(true, 0, UIColors[1], Vector2(Scale.X, 0.1)))
+	ContentBox->AddChild((new UIBackground(true, 0, UIColors[1], Vector2(Scale.X, 0.1f)))
 		->SetPadding(0)
 		->AddChild((new UIButton(true, 0, 1, this, -2))
 			->SetUseTexture(true, Editor::CurrentUI->Textures[8])
-			->SetMinSize(Vector2(0.06))
+			->SetMinSize(Vector2(0.06f))
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
-			->SetPadding(0.01))
+			->SetPadding(0.01f))
 		->AddChild((new UITextField(true, 0, UIColors[0], this, -3, Editor::CurrentUI->EngineUIText))
 			->SetTextColor(UIColors[2])
 			->SetText(SelectedTab == 0 ? Editor::CurrentUI->CurrentPath + "/" : GetCurrentCPPPathString())
-			->SetTextSize(0.4)
-			->SetMinSize(Vector2(Scale.X / 1.2 - 0.12 / Graphics::AspectRatio, 0.08))
-			->SetMaxSize(Vector2(Scale.X / 1.2 - 0.12 / Graphics::AspectRatio, 0.08))
-			->SetBorder(UIBox::E_ROUNDED, 0.5)
-			->SetPadding(0.01)));
+			->SetTextSize(0.4f)
+			->SetMinSize(Vector2(Scale.X / 1.2f - 0.12f / Graphics::AspectRatio, 0.08f))
+			->SetMaxSize(Vector2(Scale.X / 1.2f - 0.12f / Graphics::AspectRatio, 0.08f))
+			->SetBorder(UIBox::E_ROUNDED, 0.5f)
+			->SetPadding(0.01f)));
 
 
 	auto TabBox = new UIBox(true, 0);
@@ -224,25 +224,25 @@ void ItemBrowser::UpdateLayout()
 	ContentBox->AddChild(TabBox->SetPadding(0));
 	for (auto& i : Tabs)
 	{
-		auto NewButton = new UIButton(true, 0, UIColors[0] * (ButtonIndex == SelectedTab ? 1.5 : 1), this, -5 - (ButtonIndex));
+		auto NewButton = new UIButton(true, 0, UIColors[0] * (ButtonIndex == SelectedTab ? 1.5f : 1.0f), this, -5 - ((int)ButtonIndex));
 		NewButton->Align = UIBox::E_CENTERED;
 		TabBox->AddChild(NewButton
-			->SetBorder(UIBox::E_DARKENED_EDGE, 0.25)
+			->SetBorder(UIBox::E_DARKENED_EDGE, 0.25f)
 			->SetPadding(0)
 			->SetMinSize(Vector2(Scale.X / Tabs.size(), 0.05f))
-			->AddChild((new UIText(0.45, UIColors[2], i, Editor::CurrentUI->EngineUIText))
-				->SetPadding(0.01, 0.01, 0, 0)));
+			->AddChild((new UIText(0.45f, UIColors[2], i, Editor::CurrentUI->EngineUIText))
+				->SetPadding(0.01f, 0.01f, 0, 0)));
 		ButtonIndex++;
 	}
 
-	ContentBox->AddChild((new UIButton(true, 0, Vector3(0.2, 0.7, 0), this, -1))
-		->SetBorder(UIBox::E_ROUNDED, 0.25)
-		->SetPadding(0.02, 0.02, Scale.X / 2 - 0.0575, 0.02)
-		->AddChild((new UIText(0.5, 0, "Import", Editor::CurrentUI->EngineUIText))));
+	ContentBox->AddChild((new UIButton(true, 0, Vector3(0.2f, 0.7f, 0), this, -1))
+		->SetBorder(UIBox::E_ROUNDED, 0.25f)
+		->SetPadding(0.02f, 0.02f, Scale.X / 2.0f - 0.0575f, 0.02f)
+		->AddChild((new UIText(0.5f, 0, "Import", Editor::CurrentUI->EngineUIText))));
 
 	ScanForAssets();
 	Buttons.clear();
-	const int ITEMS_PER_SLICE = Scale.X / 0.17 * Graphics::AspectRatio;
+	const int ITEMS_PER_SLICE = (int)(Scale.X / 0.17f * Graphics::AspectRatio);
 	std::vector<UIBox*> HorizontalSlices;
 
 	// if the bar isnt large enough to fit a single row of items, do nothing.
@@ -282,7 +282,7 @@ void ItemBrowser::UpdateLayout()
 	for (UIBox*& i : HorizontalSlices)
 	{
 		i = new UIBox(true, 0);
-		i->SetPadding(0, 0, 0.02, 0);
+		i->SetPadding(0, 0, 0.02f, 0);
 		BrowserScrollBox->AddChild(i);
 	}
 
@@ -301,29 +301,29 @@ void ItemBrowser::UpdateLayout()
 		{
 			TextureID = Editor::ItemTextures[ext];
 		}
-		Vector3 Color = Vector3(0.8, 0, 0);
+		Vector3 Color = Vector3(0.8f, 0, 0);
 		if (Editor::ItemColors.contains(ext))
 		{
 			Color = Editor::ItemColors[ext];
 		}
 
-		auto NewBackground = new UIButton(false, 0, UIColors[0] * 1.2, this, i);
+		auto NewBackground = new UIButton(false, 0, UIColors[0] * 1.2f, this, (int)i);
 		Buttons.push_back(NewBackground);
 		NewBackground->SetCanBeDragged(true);
-		NewBackground->SetMinSize(Vector2(0.14, 0.19));
+		NewBackground->SetMinSize(Vector2(0.14f, 0.19f));
 		NewBackground->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
-		NewBackground->SetPadding(0.005 * Graphics::AspectRatio, 0.005 * Graphics::AspectRatio, 0.005, 0.005);
+		NewBackground->SetPadding(0.005f * Graphics::AspectRatio, 0.005f * Graphics::AspectRatio, 0.005f, 0.005f);
 		NewBackground->Align = UIBox::E_REVERSE;
-		NewBackground->SetBorder(UIBox::E_ROUNDED, 0.5);
+		NewBackground->SetBorder(UIBox::E_ROUNDED, 0.5f);
 		NewBackground->SetNeedsToBeSelected(true);
-		UIBackground* ItemImage = new UIBackground(true, 0, 1, Vector2(0.12));
+		UIBackground* ItemImage = new UIBackground(true, 0, 1, Vector2(0.12f));
 		ItemImage->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
 		ItemImage->SetUseTexture(true, Editor::CurrentUI->Textures[TextureID]);
 		ItemImage->SetPadding(0);
-		NewBackground->AddChild((new UIBackground(true, 0, Color, 0.1))
-			->SetBorder(UIBox::E_ROUNDED, 0.5)
+		NewBackground->AddChild((new UIBackground(true, 0, Color, 0.1f))
+			->SetBorder(UIBox::E_ROUNDED, 0.5f)
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
-			->SetPadding(0.0025 * Graphics::AspectRatio, 0, 0.005, 0.005)
+			->SetPadding(0.0025f * Graphics::AspectRatio, 0, 0.005f, 0.005f)
 			->AddChild(ItemImage));
 
 		std::string ItemName = FileUtil::GetFileNameWithoutExtensionFromPath(DisplayedFiles[i].Name);
@@ -333,12 +333,12 @@ void ItemBrowser::UpdateLayout()
 			ItemName = ItemName.substr(0, MAX_ITEM_NAME_LENGTH - 3).append("...");
 		}
 
-		auto ItemText = new UIText(0.35, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
+		auto ItemText = new UIText(0.35f, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
 		ItemText->Wrap = true;
-		ItemText->WrapDistance = 0.21;
-		ItemText->SetTextWidthOverride(0.0);
+		ItemText->WrapDistance = 0.21f;
+		ItemText->SetTextWidthOverride(0.0f);
 		NewBackground->AddChild(ItemText
-			->SetPadding(0.002));
+			->SetPadding(0.002f));
 
 		HorizontalSlices[i / ITEMS_PER_SLICE]->AddChild(NewBackground);
 	}
@@ -362,7 +362,7 @@ void ItemBrowser::Tick()
 					EditorUI::DropdownItem("# " + FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[i].Name)),
 					EditorUI::DropdownItem("Open", []()
 					{
-						Editor::CurrentUI->UIElements[3]->OnButtonClicked(SelectedButton);
+						Editor::CurrentUI->UIElements[3]->OnButtonClicked((int)SelectedButton);
 					}),
 					EditorUI::DropdownItem("Rename", []()
 					{
@@ -447,11 +447,11 @@ void ItemBrowser::Tick()
 
 		IsDraggingButton--;
 
-		if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation))
+		if (Math::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation))
 		{
 			IsDraggingButton = 0;
 
-			Vector2 RelativeMouseLocation = Input::MouseLocation - (Viewport->Position + (Viewport->Scale * 0.5));
+			Vector2 RelativeMouseLocation = Input::MouseLocation - (Viewport->Position + (Viewport->Scale * 0.5f));
 			Vector3 Direction = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
 			Vector3 TargetSpawnLocation = Graphics::MainCamera->Position + Direction * 25;
@@ -558,7 +558,7 @@ void ItemBrowser::OnButtonDragged(int Index)
 		TextureID = Editor::ItemTextures[ext];
 	}
 
-	auto DragBox = new UIBackground(true, Input::MouseLocation, 1, 0.12);
+	auto DragBox = new UIBackground(true, Input::MouseLocation, 1, 0.12f);
 	DragBox->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
 	DragBox->SetUseTexture(true, Editor::CurrentUI->Textures[TextureID]);
 

@@ -4,7 +4,7 @@
 #include <SDL.h>
 #include <iostream>
 #include <Engine/Log.h>
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <Engine/Application.h>
 
 int Initialize(int argc, char** argv);
@@ -34,9 +34,10 @@ void HandleError(std::string ErrorMessage)
 
 int main(int argc, char** argv)
 {
+	return Initialize(argc, argv);
+
 	try
 	{
-		return Initialize(argc, argv);
 	}
 	catch (const std::exception& e)
 	{

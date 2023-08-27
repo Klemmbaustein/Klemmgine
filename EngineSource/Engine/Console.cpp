@@ -14,9 +14,9 @@
 #include <Engine/Application.h>
 #include <CSharp/CSharpInterop.h>
 
-#include <World/Graphics.h>
-#include <World/Stats.h>
-#include <World/Assets.h>
+#include <Rendering/Graphics.h>
+#include <Engine/Stats.h>
+#include <Engine/File/Assets.h>
 
 struct ForceQuitException : std::exception
 {
@@ -36,18 +36,18 @@ namespace Console
 	{
 		if (strspn(str.c_str(), "-0123456789") == str.size())
 		{
-			return Type::E_INT;
+			return Type::Int;
 		}
 
 		if (strspn(str.c_str(), "-.0123456789") == str.size())
 		{
-			return Type::E_FLOAT;
+			return Type::Float;
 		}
-		return Type::E_STRING;
+		return Type::String;
 	}
 	bool IsTypeNumber(Type::TypeEnum GivenType)
 	{
-		return GivenType == Type::E_INT || GivenType == Type::E_FLOAT;
+		return GivenType == Type::Int || GivenType == Type::Float;
 	}
 
 	template<typename T>
@@ -143,7 +143,7 @@ void Console::InitializeConsole()
 	RegisterCommand(Command("echo",
 		[]() {
 			Console::ConsoleLog(CommandArgs()[0]);
-		}, { Console::Command::Argument("msg", Type::E_STRING) }));
+		}, { Console::Command::Argument("msg", Type::String) }));
 
 	RegisterCommand(Command("version",
 		[]() {
@@ -217,7 +217,7 @@ void Console::InitializeConsole()
 	}
 	ConsoleLog("Unknown info topic: " + CommandArgs()[0], E_ERROR);
 	ConsoleLog("Topics are: version, graphics, sound.", E_ERROR);
-		}, { Command::Argument("info_type", Type::E_STRING, true) }));
+		}, { Command::Argument("info_type", Type::String, true) }));
 
 
 	RegisterCommand(Command("listpack",
@@ -244,7 +244,7 @@ void Console::InitializeConsole()
 		}
 		ConsoleLog(LogString);
 	}
-		}, { Command::Argument("pack_file", Type::E_STRING) }));
+		}, { Command::Argument("pack_file", Type::String) }));
 
 
 	RegisterCommand(Command("find",
@@ -257,7 +257,7 @@ void Console::InitializeConsole()
 	}
 	ConsoleLog(CommandArgs()[0] + " -> " + File);
 
-		}, { Command::Argument("file", Type::E_STRING) }));
+		}, { Command::Argument("file", Type::String) }));
 
 	RegisterCommand(Command("open", []() {
 		if (std::filesystem::exists(Assets::GetAsset(CommandArgs()[0] + +".jscn")))
@@ -268,7 +268,7 @@ void Console::InitializeConsole()
 		{
 			ConsoleLog("Could not find scene \"" + CommandArgs()[0] + "\"", E_ERROR);
 		}
-		}, { Command::Argument("scene", Type::E_STRING)}));
+		}, { Command::Argument("scene", Type::String)}));
 
 	RegisterCommand(Command("help", []() {
 		std::string CommandString = CommandArgs()[0];
@@ -280,7 +280,7 @@ void Console::InitializeConsole()
 			return;
 		}
 		ConsoleLog("Help: " + CommandString + " is not a registered command.", E_ERROR);
-		}, { Command::Argument("command", Type::E_STRING) }));
+		}, { Command::Argument("command", Type::String) }));
 
 	RegisterCommand(Command("getcommands", []() {
 		for (auto& i : Commands)
@@ -314,7 +314,15 @@ void Console::InitializeConsole()
 			}
 
 			ConsoleLog(LogMessage);
-		}, { Command::Argument("file", Type::E_STRING), Command::Argument("displayFetchTime", Type::E_BOOL, true) }));
+		}, { Command::Argument("file", Type::String), Command::Argument("displayFetchTime", Type::Bool, true) }));
+
+	RegisterCommand(Command("assetdmp", []()
+		{
+			for (auto& i : Assets::Assets)
+			{
+				ConsoleLog(i.Filepath + " - " + i.Name);
+			}
+		}, {  }));
 
 	RegisterCommand(Command("getclass", []()
 		{
@@ -327,13 +335,12 @@ void Console::InitializeConsole()
 				}
 			}
 			ConsoleLog("Could not find class " + CommandArgs()[0], E_WARNING);
-		}, { Command::Argument("objectName", Type::E_STRING) }));
-
-	RegisterConVar(Variable("wireframe", Type::E_BOOL, &Graphics::IsWireframe, nullptr));
-	RegisterConVar(Variable("vignette", Type::E_FLOAT, &Graphics::Vignette, nullptr));
-	RegisterConVar(Variable("vsync", Type::E_BOOL, &Graphics::VSync, nullptr));
-	RegisterConVar(Variable("timescale", Type::E_FLOAT, &Performance::TimeMultiplier, nullptr));
-	RegisterConVar(Variable("resolution_scale", Type::E_FLOAT, &Graphics::ResolutionScale, []() {Graphics::SetWindowResolution(Application::GetWindowSize()); }));
+		}, { Command::Argument("objectName", Type::String) }));
+	RegisterConVar(Variable("wireframe", Type::Bool, &Graphics::IsWireframe, nullptr));
+	RegisterConVar(Variable("vignette", Type::Float, &Graphics::Vignette, nullptr));
+	RegisterConVar(Variable("vsync", Type::Bool, &Graphics::VSync, nullptr));
+	RegisterConVar(Variable("timescale", Type::Float, &Performance::TimeMultiplier, nullptr));
+	RegisterConVar(Variable("resolution_scale", Type::Float, &Graphics::ResolutionScale, []() {Graphics::SetWindowResolution(Application::GetWindowSize()); }));
 }
 
 void Console::ConsoleLog(std::string Message, ConsoleLogType Severity)
@@ -349,28 +356,29 @@ bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
 	if (CommandVec.size() == 1 && ConVars.contains(CommandVec[0]))
 	{
 		std::string ValueString;
-		auto FoundVar = ConVars[CommandVec[0]];
+		Variable FoundVar = ConVars[CommandVec[0]];
 		switch (FoundVar.Type)
 		{
-		case Type::E_FLOAT:
+		case Type::Float:
 			ValueString = std::to_string(*(float*)FoundVar.Var);
 			break;
-		case Type::E_INT:
+		case Type::Int:
 			ValueString = std::to_string(*(int*)FoundVar.Var);
 			break;
-		case Type::E_BYTE:
+		case Type::Byte:
 			ValueString = std::to_string(*(char*)FoundVar.Var);
 			break;
-		case Type::E_BOOL:
+		case Type::Bool:
 			ValueString = std::to_string(*(bool*)FoundVar.Var);
 			break;
-		case Type::E_STRING:
+		case Type::String:
 			ValueString = *(std::string*)FoundVar.Var;
 			break;
 		default:
 			return false;
 		}
 		ConsoleLog(FoundVar.Name + " = " + ValueString);
+		return true;
 	}
 
 	// Check if we are assigning a ConVar by checking if [0] is a ConVar and [1] is '='
@@ -396,19 +404,19 @@ bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
 		{
 			switch (FoundVar.Type)
 			{
-			case Type::E_FLOAT:
+			case Type::Float:
 				SafePtrAssign<float>(FoundVar.Var, std::stof(CommandVec[2]));
 				break;
-			case Type::E_INT:
+			case Type::Int:
 				SafePtrAssign<int>(FoundVar.Var, std::stoi(CommandVec[2]));
 				break;
-			case Type::E_BYTE:
+			case Type::Byte:
 				SafePtrAssign<char>(FoundVar.Var, std::stoi(CommandVec[2]));
 				break;
-			case Type::E_BOOL:
+			case Type::Bool:
 				SafePtrAssign<bool>(FoundVar.Var, std::stoi(CommandVec[2]));
 				break;
-			case Type::E_STRING:
+			case Type::String:
 				SafePtrAssign<std::string>(FoundVar.Var, CommandVec[2]);
 				break;
 			default:
@@ -417,7 +425,7 @@ bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
 		}
 		catch (std::exception& e)
 		{
-			ConsoleLog("Invalid type. Expected " + Type::Types[FoundVar.Type], E_ERROR);
+			ConsoleLog("Invalid type. Expected " + Type::Types[FoundVar.Type] + " (" + std::string(e.what()) + ")", E_ERROR);
 			return false;
 		}
 		ConsoleLog("Assigned " + FoundVar.Name + " = " + CommandVec[2]);
@@ -440,19 +448,19 @@ bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
 			}
 			switch (ConVars[i].Type)
 			{
-			case Type::E_INT:
+			case Type::Int:
 				i = std::to_string(*(int*)ConVars[i].Var);
 				break;
-			case Type::E_BYTE:
+			case Type::Byte:
 				i = std::to_string(*(char*)ConVars[i].Var);
 				break;
-			case Type::E_FLOAT:
+			case Type::Float:
 				i = std::to_string(*(int*)ConVars[i].Var);
 				break;
-			case Type::E_STRING:
+			case Type::String:
 				i = *(std::string*)ConVars[i].Var;
 				break;
-			case Type::E_BOOL:
+			case Type::Bool:
 				i = std::to_string(*(bool*)ConVars[i].Var);
 				break;
 			default:
@@ -488,6 +496,15 @@ bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
 
 		FoundCommand.Function();
 		return true;
+	}
+
+	if (CommandVec.size())
+	{
+		ConsoleLog("Unknown convar or command: " + CommandVec[0], E_ERROR);
+	}
+	else
+	{
+		ConsoleLog("Expected a command.", E_ERROR);
 	}
 	return false;
 }

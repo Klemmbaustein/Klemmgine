@@ -3,9 +3,9 @@
 #include <iostream>
 #include <glm/fwd.hpp>
 
-class Vector4;
-class Vector3;
-class Vector2;
+struct Vector4;
+struct Vector3;
+struct Vector2;
 
 struct Shader
 {

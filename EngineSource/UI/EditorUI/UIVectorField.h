@@ -7,10 +7,11 @@ class UICanvas;
 class UIVectorField : public UIBox
 {
 public:
-	enum EFieldValueType
+	enum class VecType
 	{
-		E_XYZ = 0,
-		E_RGB = 1
+		xyz = 0,
+		rgb = 1,
+		PitchYawRoll = 2
 	};
 protected:
 	UITextField* TextFields[3];
@@ -21,12 +22,12 @@ protected:
 	TextRenderer* Renderer;
 	UICanvas* ParentUI;
 	int Index;
-	EFieldValueType Type = E_XYZ;
+	VecType Type = VecType::xyz;
 	UIBox* FieldBox = nullptr;
 	UIText* ColorText = nullptr;
 public:
 	void SendNotifyEvent();
-	UIVectorField* SetValueType(EFieldValueType Type);
+	UIVectorField* SetValueType(VecType Type);
 	Vector3 GetValue();
 	void SetValue(Vector3 NewValue);
 	UIVectorField(Vector2 Position, Vector3 StartValue, UICanvas* ParentUI, int Index, TextRenderer* Renderer);

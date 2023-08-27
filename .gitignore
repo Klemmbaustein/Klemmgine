@@ -6,8 +6,6 @@ Docs/
 x64/
 Release/
 .vs/
-*.sln
-*.vcxproj
 *.filters
 *.user
 Tools/ProjectGenerator/x64/
@@ -17,8 +15,7 @@ Tools/BuildTool/Release/
 # binary files
 *.exe
 *.dll
-*.lib
-./Components/
+./lib/
 # Generated engine files
 paths.txt
 cppinfo.txt
@@ -28,3 +25,5 @@ CSharpCore/Build
 *.lastcodeanalysissucceeded
 CSharpCore/NetRuntime
 /EngineRelease
+/EditorContent/Config/EditorPrefs.pref
+/lib

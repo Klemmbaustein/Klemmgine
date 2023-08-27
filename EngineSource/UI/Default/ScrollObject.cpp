@@ -1,6 +1,6 @@
 #include <UI/Default/ScrollObject.h>
 #include <Math/Math.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <Engine/Input.h>
 #include <Engine/Log.h>
 #include <iostream>
@@ -34,7 +34,7 @@ void ScrollObject::ScrollUp()
 	{
 		return;
 	}
-	if (Maths::IsPointIn2DBox(Position - Scale, Position, Input::MouseLocation))
+	if (Math::IsPointIn2DBox(Position - Scale, Position, Input::MouseLocation))
 	{
 		Percentage += Speed / 100.f;
 	}
@@ -51,7 +51,7 @@ void ScrollObject::ScrollDown()
 	{
 		return;
 	}
-	if (Maths::IsPointIn2DBox(Position - Scale, Position, Input::MouseLocation))
+	if (Math::IsPointIn2DBox(Position - Scale, Position, Input::MouseLocation))
 	{
 		Percentage -= Speed / 100.f;
 	}

@@ -1,6 +1,6 @@
 #pragma once
 #include <Objects/WorldObject.h>
-#include <GENERATED/GENERATED_LightObject.h>
+#include <GENERATED/LightObject.h>
 
 class PointLightComponent;
 class BillboardComponent;
@@ -8,7 +8,7 @@ class BillboardComponent;
 class LightObject : public WorldObject
 {
 public:
-	LIGHTOBJECT_GENERATED("Default/Misc")
+	LIGHTOBJECT_GENERATED("Default")
 	void Begin() override;
 	void OnPropertySet() override;
 	PointLightComponent* Light = nullptr;

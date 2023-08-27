@@ -5,16 +5,17 @@
 #include <Engine/EngineError.h>
 #include <iostream>
 #include <Math/Collision/Collision.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <Objects/Components/MeshComponent.h>
 #include <Rendering/Mesh/ModelGenerator.h>
 #include <thread>
 #include <Engine/Log.h>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 #include <filesystem>
 #include <Engine/Scene.h>
 #include <fstream>
 #include <Engine/Application.h>
+#include <Rendering/Utility/Framebuffer.h>
 
 unsigned int BakedLighting::LightTexture = 0;
 float BakedLighting::LightmapScaleMultiplier = 1;
@@ -49,7 +50,16 @@ void BakedLighting::Init()
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, LightmapResolution, LightmapResolution, LightmapResolution, 0, GL_RED, GL_UNSIGNED_BYTE, Texture);
+	glTexImage3D(GL_TEXTURE_3D,
+		0,
+		GL_R8, 
+		(GLsizei)LightmapResolution,
+		(GLsizei)LightmapResolution,
+		(GLsizei)LightmapResolution,
+		0, 
+		GL_RED, 
+		GL_UNSIGNED_BYTE, 
+		Texture);
 	delete[] Texture;
 	
 }
@@ -72,6 +82,7 @@ constexpr uint8_t BKDAT_FILE_VERSION = 1;
 namespace Bake
 {
 	std::vector<Collision::CollisionMesh> Meshes;
+	std::vector<Graphics::Light> Lights;
 	Vector3 BakeScale;
 
 	Vector3 BakeMapToPos(uint64_t TextureElement)
@@ -80,13 +91,13 @@ namespace Bake
 		int64_t y = (TextureElement / BakedLighting::LightmapResolution) % BakedLighting::LightmapResolution;
 		int64_t z = TextureElement / (BakedLighting::LightmapResolution * BakedLighting::LightmapResolution);
 
-		return Vector3(x, y, z) - (BakedLighting::LightmapResolution / 2);
+		return Vector3((float)x, (float)y, (float)z) - ((float)BakedLighting::LightmapResolution / 2.0f);
 	}
 
 
 	std::byte* Texture = nullptr;
 
-#define NUM_CHUNK_SPLITS 2
+	constexpr int NUM_CHUNK_SPLITS = 2;
 	std::atomic<float> ThreadProgress[NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS];
 
 	void BakeSection(int64_t x, int64_t y, int64_t z, size_t ThreadID)
@@ -112,9 +123,9 @@ namespace Bake
 
 
 			Vector3 Pos = BakeMapToPos(i);
-			Pos = Pos / BakedLighting::LightmapResolution;
+			Pos = Pos / (float)BakedLighting::LightmapResolution;
 			Pos = Pos * BakeScale;
-			float Intensity = BakedLighting::GetLightIntensityAt(Pos.X, Pos.Y, Pos.Z, TexelSize);
+			float Intensity = BakedLighting::GetLightIntensityAt((int64_t)Pos.X, (int64_t)Pos.Y, (int64_t)Pos.Z, TexelSize);
 			Texture[i] = std::byte(Intensity * 255);
 			ThreadProgress[ThreadID] += ProgressPerPixel;
 		}
@@ -129,65 +140,110 @@ namespace Bake
 		glm::vec3 E2 = B - A;
 		glm::vec3 N = glm::cross(E1, E2);
 		float det = -glm::dot(end, N);
-		float invdet = 1.0 / det;
+		float invdet = 1.0f / det;
 		glm::vec3 AO = orig - A;
 		glm::vec3 DAO = glm::cross(AO, end);
 		float u = dot(E2, DAO) * invdet;
 		float v = -dot(E1, DAO) * invdet;
 		float t = dot(AO, N) * invdet;
-		if ((t >= 0.0 && u >= 0.0 && v >= 0.0 && (u + v) <= 1.0))
+		if ((t >= 0.0f && u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f))
 			return Collision::HitResponse(true, orig + end * t, normalize(N), t);
 		else return Collision::HitResponse();
 	}
 
 	const float ShadowBias = 2;
+
+	Collision::HitResponse BakeLine(const glm::vec3& start, const glm::vec3& end, bool mode)
+	{
+		Collision::HitResponse r;
+		if (mode)
+		{
+			r.t = INFINITY;
+		}
+		else
+		{
+			r.t = 0;
+		}
+
+		for (auto& mesh : Bake::Meshes)
+		{
+			Collision::Box BroadPhaseBox = Collision::Box(
+				mesh.SpherePosition.X - mesh.SphereCollisionSize, mesh.SpherePosition.X + mesh.SphereCollisionSize,
+				mesh.SpherePosition.Y - mesh.SphereCollisionSize, mesh.SpherePosition.Y + mesh.SphereCollisionSize,
+				mesh.SpherePosition.Z - mesh.SphereCollisionSize, mesh.SpherePosition.Z + mesh.SphereCollisionSize)
+				.TransformBy(Transform(mesh.WorldPosition, Vector3(), Vector3(1)));
+			if (!Collision::LineCheckForAABB(BroadPhaseBox,
+				start, end).Hit)
+			{
+				continue;
+			}
+			for (size_t i = 0; i < mesh.Indices.size(); i += 3)
+			{
+				glm::vec3* CurrentTriangle[3] =
+				{
+					&mesh.Vertices[mesh.Indices[i]].Position,
+					&mesh.Vertices[mesh.Indices[i + 2]].Position,
+					&mesh.Vertices[mesh.Indices[i + 1]].Position
+				};
+				Collision::HitResponse newR
+					= (Bake::BakeRayTrace(start, end - start, *CurrentTriangle[0], *CurrentTriangle[1], *CurrentTriangle[2]));
+				if (newR.Hit)
+				{
+					if (mode && newR.t < r.t)
+					{
+						r = newR;
+					}
+					else if (!mode && newR.t > r.t)
+					{
+						r = newR;
+					}
+				}
+			}
+		}
+		return r;
+	}
 }
 
 float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float ElemSize)
 {
 	const float TraceDistance = 2500;
 	glm::vec3 StartPos = glm::vec3((float)x, (float)y, (float)z);
-	StartPos = StartPos + glm::vec3(Bake::BakeScale / LightmapResolution / 2);
+	StartPos = StartPos + glm::vec3(Bake::BakeScale / (float)LightmapResolution / 2);
 	glm::vec3 Direction = (glm::vec3)Graphics::WorldSun.Direction;
 	Collision::HitResponse r;
 	r.t = 0;
+	
+	float TotalLightIntensity = 0;
 
-	for (auto& mesh : Bake::Meshes)
+	for (auto& i : Bake::Lights)
 	{
-		Collision::Box BroadPhaseBox = Collision::Box(
-			mesh.SpherePosition.X - mesh.SphereCollisionSize, mesh.SpherePosition.X + mesh.SphereCollisionSize,
-			mesh.SpherePosition.Y - mesh.SphereCollisionSize, mesh.SpherePosition.Y + mesh.SphereCollisionSize,
-			mesh.SpherePosition.Z - mesh.SphereCollisionSize, mesh.SpherePosition.Z + mesh.SphereCollisionSize)
-			.TransformBy(Transform(mesh.WorldPosition, Vector3(), Vector3(1)));
-		if (!Collision::LineCheckForAABB(BroadPhaseBox,
-			StartPos, StartPos + Direction * glm::vec3(TraceDistance)).Hit)
+		glm::vec3 pointLightDir = (i.Position - StartPos);
+		float dirLength = length(pointLightDir);
+		float NewIntensity = i.Falloff / (1 + 0.09f * dirLength + 0.032f * (dirLength * dirLength));
+		if (NewIntensity > 0)
 		{
-			continue;
-		}
-		for (size_t i = 0; i < mesh.Indices.size(); i += 3)
-		{
-			glm::vec3* CurrentTriangle[3] = 
-			{ 
-				&mesh.Vertices[mesh.Indices[i]].Position,
-				&mesh.Vertices[mesh.Indices[i + 2]].Position,
-				&mesh.Vertices[mesh.Indices[i + 1]].Position 
-			};
-			Collision::HitResponse newR
-				= (Bake::BakeRayTrace(StartPos, Direction, *CurrentTriangle[0], *CurrentTriangle[1], *CurrentTriangle[2]));
-			if (newR.Hit && newR.t > r.t)
+			r = Bake::BakeLine(i.Position, StartPos, true);
+			if (r.Hit && r.t < 0.9)
 			{
-				r = newR;
+				NewIntensity = 0;
 			}
 		}
+		TotalLightIntensity += glm::clamp(NewIntensity, 0.0f, 4.0f);
 	}
-	return r.Hit ? 1 - std::min(r.t / (ElemSize * Bake::ShadowBias), 1.0f) : 1;
+
+	r = Bake::BakeLine(StartPos, StartPos + Direction * TraceDistance, false);
+
+
+	float LightInt = r.Hit ? 1 - std::min(r.t * TraceDistance / 12.0f, 1.0f) : 1;
+
+	return std::min((LightInt / 2 + TotalLightIntensity / 4.0f), 1.0f);
 }
 
 std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
 {
-	if (x < 0 || x >= BakedLighting::LightmapResolution
-		|| y < 0 || y >= BakedLighting::LightmapResolution
-		|| z < 0 || z >= BakedLighting::LightmapResolution)
+	if (x < 0 || x >= (int64_t)BakedLighting::LightmapResolution
+		|| y < 0 || y >= (int64_t)BakedLighting::LightmapResolution
+		|| z < 0 || z >= (int64_t)BakedLighting::LightmapResolution)
 	{
 		return std::byte(255);
 	}
@@ -197,6 +253,8 @@ std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
 
 void BakedLighting::BakeCurrentSceneToFile()
 {
+	const int Number = 25;
+	const bool IsEven = !(Number & 1);
 	Bake::Meshes.clear();
 
 	for (WorldObject* i : Objects::AllObjects)
@@ -218,6 +276,8 @@ void BakedLighting::BakeCurrentSceneToFile()
 			}
 		}
 	}
+
+	Bake::Lights = Graphics::MainFramebuffer->Lights;
 
 	new std::thread([]() {
 
@@ -275,7 +335,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 		Bake::BakeScale = std::max(Bake::BakeScale.X, std::max(Bake::BakeScale.Y, Bake::BakeScale.Z)) * LightmapScaleMultiplier;
 		BakeLog("Baking with scale: " + std::to_string(Bake::BakeScale.X));
 
-		size_t Thread3DArraySize = NUM_CHUNK_SPLITS;
+		size_t Thread3DArraySize = Bake::NUM_CHUNK_SPLITS;
 
 		size_t ThreadID = 0;
 		for (size_t x = 0; x < Thread3DArraySize; x++)
@@ -373,7 +433,7 @@ float BakedLighting::GetBakeProgress()
 	{
 		Progress += i;
 	}
-	return Progress / (NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS);
+	return Progress / (Bake::NUM_CHUNK_SPLITS * Bake::NUM_CHUNK_SPLITS * Bake::NUM_CHUNK_SPLITS);
 }
 
 
@@ -448,9 +508,18 @@ void BakedLighting::LoadBakeFile(std::string BakeFile)
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	float borderColor[] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float borderColor[] = { 0.5f, 0.5f, 0.5f, 1.0f };
 	glTexParameterfv(GL_TEXTURE_3D, GL_TEXTURE_BORDER_COLOR, borderColor);
-	glTexImage3D(GL_TEXTURE_3D, 0, GL_R8, LightmapResolution, LightmapResolution, LightmapResolution, 0, GL_RED, GL_UNSIGNED_BYTE, Texture);
+	glTexImage3D(GL_TEXTURE_3D,
+		0, 
+		GL_R8,
+		(GLsizei)LightmapResolution, 
+		(GLsizei)LightmapResolution,
+		(GLsizei)LightmapResolution,
+		0, 
+		GL_RED,
+		GL_UNSIGNED_BYTE, 
+		Texture);
 	delete[] Texture;
 }
 

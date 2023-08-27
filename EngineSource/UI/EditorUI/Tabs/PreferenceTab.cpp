@@ -1,36 +1,39 @@
 #if EDITOR
 #include "PreferenceTab.h"
-#include <Engine/Save.h>
+#include <Engine/File/Save.h>
 #include <UI/EditorUI/UIVectorField.h>
 #include <Engine/Log.h>
 #include <CSharp/CSharpInterop.h>
 
 void PreferenceTab::GenerateUI()
 {
-	float SegmentSize = TabBackground->GetMinSize().X - 0.5;
+	float SegmentSize = TabBackground->GetMinSize().X - 0.5f;
 
 	TabBackground->DeleteChildren();
-	auto SettingsCategoryBox = new UIBackground(false, 0, UIColors[0] * 1.2, Vector2(0, TabBackground->GetUsedSize().Y - 0.2));
+	auto SettingsCategoryBox = new UIBackground(false, 0, UIColors[0] * 1.2f, Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
 	SettingsCategoryBox->Align = UIBox::E_REVERSE;
 	TabBackground->AddChild(SettingsCategoryBox);
 
 	for (size_t i = 0; i < Preferences.size(); i++)
 	{
 		SettingsCategoryBox->AddChild(
-			(new UIButton(true, 0, UIColors[1] + (float)(i == SelectedSetting) / 8.f, this, i))->
-			SetPadding(0.005, 0.005, 0.01, 0.01)->SetBorder(UIBox::E_ROUNDED, 0.5)->
-			AddChild((new UIText(0.5, UIColors[2], Preferences[i].Name, Renderer))->SetTextWidthOverride(0.2)->SetPadding(0.01)));
+			(new UIButton(true, 0, UIColors[1] + (float)(i == SelectedSetting) / 8.f, this, (int)i))
+			->SetPadding(0.005f, 0.005f, 0.01f, 0.01f)->SetBorder(UIBox::E_ROUNDED, 0.5f)
+			->AddChild((new UIText(0.5f, UIColors[2], Preferences[i].Name, Renderer))
+				->SetTextWidthOverride(0.2f)
+				->SetPadding(0.01f)));
 	}
 
 	auto SettingsBox = new UIBox(false, 0);
 	SettingsBox->Align = UIBox::E_REVERSE;
-	SettingsBox->SetMinSize(Vector2(0, TabBackground->GetUsedSize().Y - 0.2));
+	SettingsBox->SetMinSize(Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
 	TabBackground->AddChild(SettingsBox);
 
 	SettingsBox->AddChild((new UIText(1, UIColors[2], "Settings/" + Preferences[SelectedSetting].Name, Renderer))
 		->SetPadding(0, 0, 0, 0));
 
-	SettingsBox->AddChild((new UIBackground(true, 0, UIColors[2], Vector2(SegmentSize, 0.005)))->SetPadding(0, 0.1, 0, 0));
+	SettingsBox->AddChild((new UIBackground(true, 0, UIColors[2], Vector2(SegmentSize, 0.005f)))
+		->SetPadding(0, 0.1f, 0, 0));
 
 	std::map<std::string, std::vector<SettingsCategory::Setting>> Categories;
 
@@ -59,17 +62,17 @@ void PreferenceTab::GenerateUI()
 		}
 	}
 	LoadedSettings.clear();
-	size_t CurentCategory = 0;
-	size_t CurrentSettingIndex = 0;
+	int CurentCategory = 0;
+	int CurrentSettingIndex = 0;
 	LoadedSettingElements.clear();
 	for (auto& cat : Categories)
 	{
 		SettingsBox->AddChild(
 			(new UIButton(true, 0, UIColors[1], this, -400 + CurentCategory))
-				->SetPadding(0.01, 0.01, 0, 0)
+				->SetPadding(0.01f, 0.01f, 0, 0)
 				->SetMinSize(Vector2(SegmentSize, 0))
-				->AddChild((new UIText(0.7, UIColors[2], "> " + cat.first, Renderer))
-					->SetPadding(0.01)));
+				->AddChild((new UIText(0.7f, UIColors[2], "> " + cat.first, Renderer))
+					->SetPadding(0.01f)));
 
 		for (size_t i = 0; i < cat.second.size(); i++)
 		{
@@ -77,7 +80,7 @@ void PreferenceTab::GenerateUI()
 			{
 				GenerateSection(SettingsBox, cat.second[i].Name, -200 + CurrentSettingIndex, cat.second[i].Type, cat.second[i].Value);
 			}
-			catch (std::exception& e)
+			catch (std::exception)
 			{
 				cat.second[i].Value = "0";
 			}
@@ -90,36 +93,40 @@ void PreferenceTab::GenerateUI()
 
 void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value)
 {
-	Parent->AddChild((new UIText(0.7, UIColors[2], Name, Renderer))->SetPadding(0.01, 0.01, 0.05, 0.02));
+	Parent->AddChild((new UIText(0.7f, UIColors[2], Name, Renderer))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
 	UIBox* Element;
 	switch (SectionType)
 	{
-	case Type::E_FLOAT:
+	case Type::Float:
 		break;
-	case Type::E_INT:
+	case Type::Int:
 		break;
-	case Type::E_STRING:
+	case Type::String:
 		Element = (new UITextField(true, 0, UIColors[1], this, Index, Renderer))
 			->SetText(Value)
-			->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6, 0.05))
-			->SetPadding(0.02, 0.02, 0.05, 0.02)
-			->SetBorder(UIBox::E_ROUNDED, 0.5);
+			->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6f, 0.05f))
+			->SetPadding(0.02f, 0.02f, 0.05f, 0.02f)
+			->SetBorder(UIBox::E_ROUNDED, 0.5f);
 		Parent->AddChild(Element);
 		break;
-	case Type::E_VECTOR3:
-	case Type::E_VECTOR3_COLOR:
+	case Type::Vector3:
+	case Type::Vector3Color:
 		Element = (new UIVectorField(0, Vector3::stov(Value), this, Index, Renderer))
-			->SetValueType(SectionType == Type::E_VECTOR3 ? UIVectorField::E_XYZ : UIVectorField::E_RGB)
-			->SetPadding(0.02, 0.02, 0.05, 0.02);
+			->SetValueType(SectionType == Type::Vector3 ? UIVectorField::VecType::xyz : UIVectorField::VecType::rgb)
+			->SetPadding(0.02f, 0.02f, 0.05f, 0.02f);
 		Parent->AddChild(Element);
 		break;
-	case Type::E_BOOL:
+	case Type::Bool:
+		if (Value != "0" && Value != "1")
+		{
+			Value = "1";
+		}
 		Element = (new UIButton(true, 0, 1, this, Index))
 			->SetUseTexture(std::stoi(Value), Editor::CurrentUI->Textures[16])
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
-			->SetMinSize(0.05)
-			->SetPadding(0.02, 0.02, 0.05, 0.02)
-			->SetBorder(UIBox::E_ROUNDED, 0.5);
+			->SetMinSize(0.05f)
+			->SetPadding(0.02f, 0.02f, 0.05f, 0.02f)
+			->SetBorder(UIBox::E_ROUNDED, 0.5f);
 		Parent->AddChild(Element);
 		break;
 	default:
@@ -159,13 +166,13 @@ void PreferenceTab::OnButtonClicked(int Index)
 		auto& Setting = Preferences[LoadedSettings.at(Index).cat].Settings[LoadedSettings.at(Index).entry];
 		switch (Setting.Type)
 		{
-		case Type::E_BOOL:
+		case Type::Bool:
 		{
 			bool Val = (bool)std::stoi(Setting.Value);
 			Setting.Value = std::to_string(!Val);
 		}
 			break;
-		case Type::E_STRING:
+		case Type::String:
 			Setting.Value = dynamic_cast<UITextField*>(LoadedSettingElements[Index])->GetText();
 			break;
 		default:
@@ -210,7 +217,7 @@ void PreferenceTab::Load(std::string File)
 				}
 				NameCopy[Space] = '_';
 			}
-			if (UsedSave.GetPropterty(NameCopy).Type != Type::E_NULL)
+			if (UsedSave.GetPropterty(NameCopy).Type != Type::Null)
 			{
 				i.Value = UsedSave.GetPropterty(NameCopy).Value;
 				i.OnChanged(i.Value);

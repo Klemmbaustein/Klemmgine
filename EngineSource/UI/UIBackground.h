@@ -1,6 +1,6 @@
 #pragma once
 #include <UI/UIBox.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 
 struct Shader;
 
@@ -27,6 +27,7 @@ public:
 	UIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale = Vector2(0), Shader* UsedShader = Graphics::UIShader);
 	virtual ~UIBackground();
 	void Draw() override;
+
 	void Update() override;
 	void OnAttached() override;
 };

@@ -66,7 +66,7 @@ int WorldObject::Attach(Component* NewComponent)
 	Components.push_back(NewComponent);
 	ComponentModifier::SetParent(NewComponent, this);
 	NewComponent->Begin();
-	return Components.size() - 1;
+	return (int)Components.size() - 1;
 }
 
 void WorldObject::SetName(std::string Name)
@@ -128,20 +128,20 @@ std::string WorldObject::GetPropertiesAsString()
 		OutProperties << p.Name << ";" << p.Type << ";";
 		switch (p.Type)
 		{
-		case Type::E_FLOAT:
+		case Type::Float:
 			OutProperties << std::to_string(*(float*)p.Data);
 			break;
-		case Type::E_INT:
+		case Type::Int:
 			OutProperties << std::to_string(*((int*)p.Data));
 			break;
-		case Type::E_STRING:
+		case Type::String:
 			OutProperties << *((std::string*)p.Data);
 			break;
-		case Type::E_VECTOR3_COLOR:
-		case Type::E_VECTOR3:
+		case Type::Vector3Color:
+		case Type::Vector3:
 			OutProperties << (*(Vector3*)p.Data).ToString();
 			break;
-		case Type::E_BOOL:
+		case Type::Bool:
 			OutProperties << std::to_string(*((bool*)p.Data));
 			break;
 		default:
@@ -155,7 +155,7 @@ std::string WorldObject::GetPropertiesAsString()
 void WorldObject::LoadProperties(std::string in)
 {
 	int i = 0;
-	Objects::Property CurrentProperty = Objects::Property("", Type::E_FLOAT, nullptr);
+	Objects::Property CurrentProperty = Objects::Property("", Type::Float, nullptr);
 	std::string current;
 	for (char c : in)
 	{
@@ -187,20 +187,20 @@ void WorldObject::LoadProperties(std::string in)
 					{
 						switch (CurrentProperty.Type)
 						{
-						case Type::E_FLOAT:
+						case Type::Float:
 							*((float*)p.Data) = std::stof(current);
 							break;
-						case Type::E_INT:
+						case Type::Int:
 							*((int*)p.Data) = std::stoi(current);
 							break;
-						case Type::E_STRING:
+						case Type::String:
 							*((std::string*)p.Data) = (current);
 							break;
-						case Type::E_VECTOR3_COLOR:
-						case Type::E_VECTOR3:
+						case Type::Vector3Color:
+						case Type::Vector3:
 							*((Vector3*)p.Data) = Vector3::stov(current);
 							break;
-						case Type::E_BOOL:
+						case Type::Bool:
 							*((bool*)p.Data) = std::stoi(current);
 							break;
 						default:

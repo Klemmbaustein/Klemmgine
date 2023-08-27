@@ -1,13 +1,13 @@
 #include "Scene.h"
-#include "FileUtility.h"
+#include "Utility/FileUtility.h"
 #include <filesystem>
 #include <sstream>
 #include <Engine/Log.h>
 #include <Sound/Sound.h>
 #include <UI/Default/UICanvas.h>
-#include <World/Assets.h>
-#include <World/Graphics.h>
-#include <World/Stats.h>
+#include <Engine/File/Assets.h>
+#include <Rendering/Graphics.h>
+#include <Engine/Stats.h>
 #include <Engine/Input.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <UI/UIBox.h>
@@ -39,14 +39,14 @@ namespace Scene
 
 	void WriteBinaryStringToFile(std::string str, std::ofstream& BinFile)
 	{
-		int len = str.size();
+		int len = (int)str.size();
 		BinFile.write((char*)&len, sizeof(int));
 		BinFile.write(str.c_str(), len);
 	}
 
 	bool ShouldLoadNewScene = false;
 	std::string NewLoadedScene;
-	Camera* DefaultCamera = new Camera(1.8, 1600, 900, false);
+	Camera* DefaultCamera = new Camera(1.8f, 1600, 900, false);
 
 	std::string CurrentScene = "Content/NewScene";
 	void LoadSceneInternally(std::string FilePath)
@@ -212,7 +212,7 @@ namespace Scene
 		}
 #endif
 		WriteBinaryStringToFile(Graphics::MainFramebuffer->ReflectionCubemapName, Output);
-		int ObjectLength = SavedObjects.size();
+		int ObjectLength = (int)SavedObjects.size();
 		Output.write((char*)&ObjectLength, sizeof(int));
 
 		for (int i = 0; i < ObjectLength; i++)

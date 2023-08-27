@@ -1,10 +1,10 @@
 #include "Framebuffer.h"
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <GL/glew.h>
 FramebufferObject::FramebufferObject()
 {
 	buf = new Framebuffer();
-	buf->ReInit(Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+	buf->ReInit((int)(Graphics::WindowResolution.X), (int)(Graphics::WindowResolution.Y));
 	Graphics::AllFramebuffers.push_back(this);
 }
 
@@ -29,12 +29,18 @@ void FramebufferObject::ReInit()
 {
 	if (!UseMainWindowResolution)
 	{
-		buf->ReInit(CustomFramebufferResolution.X, CustomFramebufferResolution.Y);
-		FramebufferCamera->ReInit(FramebufferCamera->FOV, CustomFramebufferResolution.X, CustomFramebufferResolution.Y);
+		buf->ReInit((unsigned int)(CustomFramebufferResolution.X),
+			(unsigned int)(CustomFramebufferResolution.Y));
+
+		FramebufferCamera->ReInit(FramebufferCamera->FOV,
+			CustomFramebufferResolution.X,
+			CustomFramebufferResolution.Y);
 	}
 	else
 	{
-		buf->ReInit(Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+		buf->ReInit((unsigned int)(Graphics::WindowResolution.X),
+			(unsigned int)(Graphics::WindowResolution.Y));
+
 		FramebufferCamera->ReInit(FramebufferCamera->FOV, Graphics::WindowResolution.X, Graphics::WindowResolution.X);
 	}
 }

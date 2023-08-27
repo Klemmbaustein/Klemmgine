@@ -3,16 +3,18 @@
 
 namespace Log
 {
-	enum EMessageType
+	enum class MessageType
 	{
-		E_INFO = 0,
-		E_WARNING = 1,
-		E_ERROR = 2
+		Info = 0,
+		Warning = 1,
+		Error = 2
 	};
 
 	void SetIsVerbose(bool NewIsVerbose);
 	bool GetIsVerbose();
 
-	void Print(std::string Message, EMessageType Type = E_INFO);
+	void SetConsoleColor(MessageType TypeColor);
+
+	void Print(std::string Message, MessageType Type = MessageType::Info, std::string LogClass = "");
 	void PrintVerbose(std::string Message);
 }

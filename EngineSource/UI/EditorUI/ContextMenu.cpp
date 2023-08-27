@@ -7,48 +7,48 @@
 #include <UI/UIScrollBox.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Viewport.h>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 #include <Engine/Scene.h>
 #include <Engine/Log.h>
 #include <Rendering/Utility/BakedLighting.h>
 
-ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.3, 0.5))
+ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.3f, 0.5f))
 {
 	BackgroundBox = new UIScrollBox(false, 0, true);
-	BackgroundBox->SetPadding(0.01);
+	BackgroundBox->SetPadding(0.01f);
 	BackgroundBox->Align = UIBox::E_REVERSE;
 	UpdateLayout();
 }
 
 UITextField* ContextMenu::GenerateTextField(std::string Content, int Index)
 {
-	auto NewElement = new UITextField(true, 0, 0.2, this, Index, Editor::CurrentUI->EngineUIText);
+	auto NewElement = new UITextField(true, 0, 0.2f, this, Index, Editor::CurrentUI->EngineUIText);
 	((UITextField*)NewElement)->SetText(Content);
-	((UITextField*)NewElement)->SetTextSize(0.4);
-	NewElement->SetPadding(0.005, 0.005, 0.02, 0.005);
-	NewElement->SetBorder(UIBox::E_ROUNDED, 0.5);
-	NewElement->SetMinSize(Vector2(0.265, 0.04));
-	NewElement->SetMaxSize(Vector2(0.3, 0.04));
+	((UITextField*)NewElement)->SetTextSize(0.4f);
+	NewElement->SetPadding(0.005f, 0.005f, 0.02f, 0.005f);
+	NewElement->SetBorder(UIBox::E_ROUNDED, 0.5f);
+	NewElement->SetMinSize(Vector2(0.265f, 0.04f));
+	NewElement->SetMaxSize(Vector2(0.3f, 0.04f));
 	return NewElement;
 }
 
 void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index)
 {
-	auto SeperatorBorder = new UIButton(true, 0, 0.5, this, Index);
+	auto SeperatorBorder = new UIButton(true, 0, 0.5f, this, Index);
 
 	std::string Prefix = ContextObject ? "OBJ_CAT_" : "SCN_";
 
 	auto SeperatorArrow = new UIBackground(true, Vector2(0), 0, Vector2(1, Graphics::AspectRatio) / 45);
-	SeperatorArrow->SetPadding(0, 0, 0.01, 0);
+	SeperatorArrow->SetPadding(0, 0, 0.01f, 0);
 	SeperatorArrow->SetUseTexture(true,
 		Editor::CurrentUI->CollapsedItems.contains(Prefix + Name) ? Editor::CurrentUI->Textures[14] : Editor::CurrentUI->Textures[13]);
 	//SeperatorArrow->SetTryFill(true);
 	SeperatorBorder->AddChild(SeperatorArrow);
 
-	auto SeperatorText = new UIText(0.5, 0, Name, Editor::CurrentUI->EngineUIText);
+	auto SeperatorText = new UIText(0.5f, 0, Name, Editor::CurrentUI->EngineUIText);
 	SeperatorText->SetTryFill(true);
-	SeperatorText->SetPadding(0.005);
-	SeperatorBorder->SetPadding(0.03, 0.03, 0, 0);
+	SeperatorText->SetPadding(0.005f);
+	SeperatorBorder->SetPadding(0.015f, 0.015f, 0, 0);
 	SeperatorBorder->SetMinSize(Vector2(Scale.X, 0));
 	BackgroundBox->AddChild(SeperatorBorder);
 	SeperatorBorder->AddChild(SeperatorText);
@@ -62,36 +62,42 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 	for (const auto& i : Section)
 	{
 		UIBox* NewElement = nullptr;
-		UIText* NewElementText = new UIText(0.45, UIColors[2], i.Name, Editor::CurrentUI->EngineUIText);
-		NewElementText->SetPadding(0.005, 0.005, 0.02, 0.005);
+		UIText* NewElementText = new UIText(0.45f, UIColors[2], i.Name, Editor::CurrentUI->EngineUIText);
+		NewElementText->SetPadding(0.005f, 0.005f, 0.02f, 0.005f);
 		BackgroundBox->AddChild(NewElementText);
 		int ElemIndex = Name == "Object" ? -2 : -1;
+		UIVectorField::VecType VectorType = UIVectorField::VecType::xyz;
 		switch (i.Type)
 		{
 			// Vector3_Colors and Vector3s both use VectorFields, so we basically treat them the same
-		case Type::E_VECTOR3_COLOR:
-		case Type::E_VECTOR3:
+		case Type::Vector3Color:
+			VectorType = UIVectorField::VecType::rgb;
+		case Type::Vector3Rotation:
+			if (VectorType == UIVectorField::VecType::xyz)
+			{
+				VectorType = UIVectorField::VecType::PitchYawRoll;
+			}
+		case Type::Vector3:
 			NewElement = new UIVectorField(0, *(Vector3*)i.Variable, this, ElemIndex, Editor::CurrentUI->EngineUIText);
-			NewElement->SetPadding(0.005, 0, 0.02, 0);
-			// Here we tell the VectorField to use RGB values instead of XYZ if required
-			((UIVectorField*)NewElement)->SetValueType(i.Type == Type::E_VECTOR3 ? UIVectorField::E_XYZ : UIVectorField::E_RGB);
+			NewElement->SetPadding(0.005f, 0, 0.02f, 0);
+			((UIVectorField*)NewElement)->SetValueType(VectorType);
 			break;
-		case Type::E_FLOAT:
+		case Type::Float:
 			NewElement = GenerateTextField(EditorUI::ToShortString(*((float*)i.Variable)), ElemIndex);
 			break;
-		case Type::E_INT:
+		case Type::Int:
 			NewElement = GenerateTextField(std::to_string(*((int*)i.Variable)), ElemIndex);
 
 			break;
-		case Type::E_STRING:
+		case Type::String:
 			NewElement = GenerateTextField(*((std::string*)i.Variable), ElemIndex);
 			break;
-		case Type::E_BOOL:
-			NewElement = new UIButton(true, 0, 0.75, this, ElemIndex);
+		case Type::Bool:
+			NewElement = new UIButton(true, 0, 0.75f, this, ElemIndex);
 			NewElement->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
-			NewElement->SetMinSize(0.04);
-			NewElement->SetBorder(UIBox::E_ROUNDED, 0.3);
-			NewElement->SetPadding(0.01, 0.01, 0.02, 0.01);
+			NewElement->SetMinSize(0.04f);
+			NewElement->SetBorder(UIBox::E_ROUNDED, 0.3f);
+			NewElement->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
 			if (*((bool*)i.Variable))
 			{
 				((UIButton*)NewElement)->SetUseTexture(true, Editor::CurrentUI->Textures[16]);
@@ -140,19 +146,20 @@ void ContextMenu::OnButtonClicked(int Index)
 			{
 				switch (ContextSettings[i].Type)
 				{
-				case Type::E_VECTOR3_COLOR:
-				case Type::E_VECTOR3:
+				case Type::Vector3Color:
+				case Type::Vector3Rotation:
+				case Type::Vector3:
 					if (ContextSettings[i].Normalized) *(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
 					else
 						*(Vector3*)(ContextSettings[i].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue();
 					break;
-				case Type::E_FLOAT:
+				case Type::Float:
 					*(float*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
 					break;
-				case Type::E_INT:
-					*(int*)(ContextSettings[i].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
+				case Type::Int:
+					*(int*)(ContextSettings[i].Variable) = std::stoi(((UITextField*)ContextButtons[i])->GetText());
 					break;
-				case Type::E_STRING:
+				case Type::String:
 					*(std::string*)(ContextSettings[i].Variable) = ((UITextField*)ContextButtons[i])->GetText();
 					if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
 						&& ContextSettings[i].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
@@ -160,7 +167,7 @@ void ContextMenu::OnButtonClicked(int Index)
 						Editor::CurrentUI->UIElements[5]->UpdateLayout();
 					}
 					break;
-				case Type::E_BOOL:
+				case Type::Bool:
 					if (((UIButton*)ContextButtons[i])->GetIsHovered())
 					{
 						*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
@@ -170,9 +177,8 @@ void ContextMenu::OnButtonClicked(int Index)
 					break;
 				}
 			}
-			catch (std::exception& e)
+			catch (std::exception)
 			{
-
 			}
 		}
 		if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
@@ -201,13 +207,14 @@ void ContextMenu::UpdateLayout()
 	{
 		Properties.clear();
 		WorldObject* SelectedObject = ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0];
-		BackgroundBox->AddChild((new UIText(0.6, UIColors[2], "Object: " + SelectedObject->GetName(), Editor::CurrentUI->EngineUIText))->SetPadding(0.01));
+		BackgroundBox->AddChild((new UIText(0.6f, UIColors[2], "Object: " + SelectedObject->GetName(), Editor::CurrentUI->EngineUIText))
+			->SetPadding(0.01f));
 		GenerateSection(
 			{
-				ContextMenuSection(&SelectedObject->GetTransform().Location, Type::E_VECTOR3, "Location"),
-				ContextMenuSection(&SelectedObject->GetTransform().Rotation, Type::E_VECTOR3, "Rotation"),
-				ContextMenuSection(&SelectedObject->GetTransform().Scale, Type::E_VECTOR3, "Scale"),
-				ContextMenuSection(&SelectedObject->Name, Type::E_STRING, "Name"),
+				ContextMenuSection(&SelectedObject->GetTransform().Location, Type::Vector3, "Location"),
+				ContextMenuSection(&SelectedObject->GetTransform().Rotation, Type::Vector3Rotation, "Rotation"),
+				ContextMenuSection(&SelectedObject->GetTransform().Scale, Type::Vector3, "Scale"),
+				ContextMenuSection(&SelectedObject->Name, Type::String, "Name"),
 			},
 			"Object", ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0], 0);
 
@@ -240,32 +247,32 @@ void ContextMenu::UpdateLayout()
 	}
 	else
 	{
-		BackgroundBox->AddChild((new UIText(0.6, UIColors[2], "Scene: " + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), Editor::CurrentUI->EngineUIText))
-			->SetPadding(0.01));
+		BackgroundBox->AddChild((new UIText(0.6f, UIColors[2], "Scene: " + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), Editor::CurrentUI->EngineUIText))
+			->SetPadding(0.01f));
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::WorldSun.Direction, Type::E_VECTOR3, "Direction", true),
-				ContextMenuSection(&Graphics::WorldSun.SunColor, Type::E_VECTOR3_COLOR, "Color"),
-				ContextMenuSection(&Graphics::WorldSun.Intensity, Type::E_FLOAT, "Intensity")
+				ContextMenuSection(&Graphics::WorldSun.Direction, Type::Vector3Rotation, "Direction", true),
+				ContextMenuSection(&Graphics::WorldSun.SunColor, Type::Vector3Color, "Color"),
+				ContextMenuSection(&Graphics::WorldSun.Intensity, Type::Float, "Intensity")
 			},
 			"Sun", nullptr, 0);
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::WorldSun.AmbientColor, Type::E_VECTOR3_COLOR, "Color"),
-				ContextMenuSection(&Graphics::WorldSun.AmbientIntensity, Type::E_FLOAT, "Intensity")
+				ContextMenuSection(&Graphics::WorldSun.AmbientColor, Type::Vector3Color, "Color"),
+				ContextMenuSection(&Graphics::WorldSun.AmbientIntensity, Type::Float, "Intensity")
 			},
 			"Ambient light", nullptr, 1);
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::WorldFog.FogColor, Type::E_VECTOR3_COLOR, "Color"),
-				ContextMenuSection(&Graphics::WorldFog.Distance, Type::E_FLOAT, "Start distance"),
-				ContextMenuSection(&Graphics::WorldFog.Falloff, Type::E_FLOAT, "Falloff"),
-				ContextMenuSection(&Graphics::WorldFog.MaxDensity, Type::E_FLOAT, "Max density")
+				ContextMenuSection(&Graphics::WorldFog.FogColor, Type::Vector3Color, "Color"),
+				ContextMenuSection(&Graphics::WorldFog.Distance, Type::Float, "Start distance"),
+				ContextMenuSection(&Graphics::WorldFog.Falloff, Type::Float, "Falloff"),
+				ContextMenuSection(&Graphics::WorldFog.MaxDensity, Type::Float, "Max density")
 			},
 			"Fog", nullptr, 2);
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::MainFramebuffer->ReflectionCubemapName, Type::E_STRING, "Cubemap file"),
+				ContextMenuSection(&Graphics::MainFramebuffer->ReflectionCubemapName, Type::String, "Cubemap file"),
 			},
 			"Reflection", nullptr, 3);
 	}

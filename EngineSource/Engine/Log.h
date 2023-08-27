@@ -20,10 +20,10 @@ namespace Log
 	namespace LogColor
 	{
 		const inline Vector3 White = Vector3(1);
-		const inline Vector3 Gray = Vector3(0.5);
-		const inline Vector3 Red = Vector3(1, 0.2, 0);
-		const inline Vector3 Green = Vector3(0.2, 1, 0);
-		const inline Vector3 Blue = Vector3(0, 0.2, 1);
-		const inline Vector3 Yellow = Vector3(1, 1, 0.2);
+		const inline Vector3 Gray = Vector3(0.5f);
+		const inline Vector3 Red = Vector3(1, 0.2f, 0);
+		const inline Vector3 Green = Vector3(0.2f, 1, 0);
+		const inline Vector3 Blue = Vector3(0, 0.2f, 1);
+		const inline Vector3 Yellow = Vector3(1, 1, 0.2f);
 	}
 }

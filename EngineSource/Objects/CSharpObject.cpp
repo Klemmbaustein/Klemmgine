@@ -1,9 +1,10 @@
 #ifdef ENGINE_CSHARP
 #include "CSharpObject.h"
+#include <Engine/Log.h>
 
 void CSharpObject::Begin()
 {
-	Properties.push_back(Objects::Property("Object class", Type::E_STRING, &CSharpClass));
+	Properties.push_back(Objects::Property("Object class", Type::String, &CSharpClass));
 }
 
 void CSharpObject::Tick()

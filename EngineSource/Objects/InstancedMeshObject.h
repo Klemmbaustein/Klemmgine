@@ -1,6 +1,6 @@
 #pragma once
 #include <Objects/Components/InstancedMeshComponent.h>
-#include <GENERATED/GENERATED_InstancedMeshObject.h>
+#include <GENERATED/InstancedMeshObject.h>
 
 class InstancedMeshObject : public WorldObject
 {

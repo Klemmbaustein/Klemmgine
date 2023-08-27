@@ -1,5 +1,4 @@
 #include "Util.h"
-#include "Log.h"
 #include <iostream>
 
 #if _WIN32
@@ -79,7 +78,7 @@ namespace Util
 		}
 		catch (std::exception& e)
 		{
-			Log::Print(e.what());
+			std::cout << e.what() << std::endl;
 		}
 		return "";
 	}
@@ -149,7 +148,7 @@ namespace Util
 		bool IsCorrect = false;
 		while (!IsCorrect)
 		{
-			Log::Print("Please enter the " + PathName + " (enter 'f' for open file dialog)");
+			//Log::Print("Please enter the " + PathName + " (enter 'f' for open file dialog)");
 			std::cin >> Path;
 
 			if (Path == "f")
@@ -158,12 +157,12 @@ namespace Util
 			}
 			if (std::filesystem::exists(Path))
 			{
-				Log::Print(PathName + " = '" + Path + "'");
+				//Log::Print(PathName + " = '" + Path + "'");
 				IsCorrect = true;
 			}
 			else
 			{
-				Log::Print("'" + Path + "' does not exist", Log::E_WARNING);
+				//Log::Print("'" + Path + "' does not exist", Log::E_WARNING);
 			}
 		}
 		return Path;
@@ -238,7 +237,7 @@ namespace Util
 		}
 		catch (std::exception& e)
 		{
-			Log::Print("Error while copying files: " + std::string(e.what()), Log::E_ERROR);
+			//Log::Print("Error while copying files: " + std::string(e.what()), Log::E_ERROR);
 			throw "Copy failed";
 		}
 	}

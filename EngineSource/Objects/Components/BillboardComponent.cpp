@@ -1,7 +1,7 @@
 #include "BillboardComponent.h"
 #include <Rendering/BillboardSprite.h>
 #include <Rendering/Texture/Texture.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <Engine/Log.h>
 
 BillboardComponent::BillboardComponent()

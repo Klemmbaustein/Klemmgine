@@ -2,7 +2,7 @@
 #include "Shader.h"
 #include <fstream>
 #include <iostream>
-#include <Utility/stb_image.h>
+#include <Utility/stb_image.hpp>
 #include <sstream>
 #include <Engine/Log.h>
 #include <Engine/Build/Pack.h>
@@ -121,6 +121,17 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 	std::ifstream fShaderFile;
 	std::ifstream fSharedFile;
 	std::ifstream gShaderFile;
+
+	std::vector<std::string> Paths = { VertexShader, FragmentShader };
+	if (GeometryShader != nullptr)
+	{
+		Paths.push_back(GeometryShader);
+	}
+	for (auto& i : Paths)
+	{
+		i = i.substr(0, i.find_last_of("/\\"));
+	}
+
 	// ensure ifstream objects can throw exceptions:
 	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
@@ -140,8 +151,8 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 		vShaderFile.close();
 		fShaderFile.close();
 		// convert stream into string
-		vertexCode = Preprocessor::ParseGLSL(vShaderStream.str());
-		fragmentCode = Preprocessor::ParseGLSL(fShaderStream.str());
+		vertexCode = Preprocessor::ParseGLSL(vShaderStream.str(), Paths[0]);
+		fragmentCode = Preprocessor::ParseGLSL(fShaderStream.str(), Paths[1]);
 		// if geometry shader path is present, also load a geometry shader
 		if (GeometryShader != nullptr)
 		{
@@ -149,17 +160,17 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 			std::stringstream gShaderStream;
 			gShaderStream << gShaderFile.rdbuf();
 			gShaderFile.close();
-			geometryCode = Preprocessor::ParseGLSL(gShaderStream.str());
+			geometryCode = Preprocessor::ParseGLSL(gShaderStream.str(), Paths[2]);
 		}
 	}
 	else
 	{
-		vertexCode = Preprocessor::ParseGLSL(Pack::GetFile(VertexShader));
-		fragmentCode = Preprocessor::ParseGLSL(Pack::GetFile(FragmentShader));
+		vertexCode = Preprocessor::ParseGLSL(Pack::GetFile(VertexShader), Paths[0]);
+		fragmentCode = Preprocessor::ParseGLSL(Pack::GetFile(FragmentShader), Paths[1]);
 		// if geometry shader path is present, also load a geometry shader
 		if (GeometryShader != nullptr)
 		{
-			geometryCode = Preprocessor::ParseGLSL(Pack::GetFile(GeometryShader));
+			geometryCode = Preprocessor::ParseGLSL(Pack::GetFile(GeometryShader), Paths[2]);
 		}
 	}
 	const char* vShaderCode = vertexCode.c_str();

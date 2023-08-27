@@ -1,4 +1,4 @@
-#include "Engine/Save.h"
+#include "Engine/File/Save.h"
 #include <fstream>
 #include <filesystem>
 #include <Engine/Log.h>
@@ -25,7 +25,7 @@ SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolde
 	//if a save does not exist yet, it will be created on deconstruction.
 	if (std::filesystem::exists(SaveName))
 	{
-		IsNew = false;
+		IsNew = std::filesystem::is_empty(SaveName);
 		std::ifstream InFile = std::ifstream(SaveName, std::ios::in);
 		char CurrentBuff[100];
 
@@ -33,8 +33,8 @@ SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolde
 		while (!InFile.eof())
 		{
 
-			Type::TypeEnum CurrentType = Type::E_NULL;
-			std::string CurrentName = "unkown";
+			Type::TypeEnum CurrentType = Type::Null;
+			std::string CurrentName = "";
 			std::string Value = "";
 
 			std::string CurrentLine;
@@ -59,7 +59,7 @@ SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolde
 						CurrentType = (Type::TypeEnum)((int)i);
 					}
 				}
-				if (CurrentType == Type::E_NULL)
+				if (CurrentType == Type::Null)
 				{
 					Log::Print("Error reading save file: " + Type + " is not a valid type (" + CurrentLine + ")", Vector3(1, 0, 0));
 				}

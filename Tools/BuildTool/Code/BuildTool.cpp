@@ -1,14 +1,16 @@
 #include "Log.h"
 #include <vector>
-#include "Exception.h"
 #include <filesystem>
 #include <fstream>
 #include <algorithm>
 
-struct ParseException : public Exception
+void ParseError(std::string Reason, std::string File, std::string Function, size_t Line)
 {
-	ParseException(std::string Text) : Exception(Text, "Parsing Error") {}
-};
+	Log::Print(Reason, Log::MessageType::Error, File);
+	exit(1);
+}
+
+#define PARSE_ERROR(reason) ParseError(reason, __FILE__, __FUNCTION__, __LINE__)
 
 // 32bit string hash for gnerating the ID of an object
 inline uint32_t hash_str_uint32(const std::string& str) {
@@ -107,7 +109,7 @@ void WriteHeaderForObject(std::string TargetFolder, Object Object)
 		<< Object.Name << "() : WorldObject(ObjectDescription(\"" << Object.Name << "\", " << std::to_string(ID) << ")) {}\\\n"
 		<< "static std::string GetCategory() { return Category; }\\\n";
 	OutStream << "static uint32_t GetID() { return " << std::to_string(ID) << ";}";
-	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_" + Object.Name + ".h");
+	WriteToFile(OutStream.str(), TargetFolder + "/" + Object.Name + ".h");
 }
 
 void RecursiveSearch(std::string InLoc, std::vector<Object>& Objects, std::string RelativePath = "")
@@ -145,64 +147,58 @@ void RecursiveSearch(std::string InLoc, std::vector<Object>& Objects, std::strin
 
 int main(int argc, char** argv)
 {
-	try
+	std::vector<std::string> InLoc;
+	std::string OutLoc;
+	for (int i = 0; i < argc; i++)
 	{
-		std::vector<std::string> InLoc;
-		std::string OutLoc;
-		for (int i = 0; i < argc; i++)
+		std::string ArgStr = argv[i];
+		if (ArgStr.substr(0, ArgStr.find_first_of("=")) == "in")
 		{
-			std::string ArgStr = argv[i];
-			if (ArgStr.substr(0, ArgStr.find_first_of("=")) == "In")
+			ArgStr = ArgStr.substr(ArgStr.find_first_of("=") + 1);
+			if (!std::filesystem::exists(ArgStr))
+			{
+				PARSE_ERROR("In path does not exist: " + ArgStr + " - Current Path: " + std::filesystem::current_path().u8string());
+			}
+			InLoc.push_back(ArgStr);
+		}
+
+		if (ArgStr.substr(0, ArgStr.find_first_of("=")) == "out")
+		{
+			if (OutLoc.empty())
 			{
 				ArgStr = ArgStr.substr(ArgStr.find_first_of("=") + 1);
-				if (!std::filesystem::exists(ArgStr))
-				{
-					throw ParseException("In path does not exist: " + ArgStr);
-				}
-				InLoc.push_back(ArgStr);
+				OutLoc = ArgStr;
 			}
-
-			if (ArgStr.substr(0, ArgStr.find_first_of("=")) == "Out")
+			else
 			{
-				if (OutLoc.empty())
-				{
-					ArgStr = ArgStr.substr(ArgStr.find_first_of("=") + 1);
-					OutLoc = ArgStr;
-				}
-				else
-				{
-					throw ParseException("Output path has been defined more than once");
-				}
+				PARSE_ERROR("Output path has been defined more than once");
 			}
-		}
-
-		if (InLoc.empty())
-		{
-			throw ParseException("In path has not been defined (In=[Path to Code/Objects folder])");
-		}
-		if (OutLoc.empty())
-		{
-			throw ParseException("Out path has not been defined (Out=[Path where to put the headers])");
-		}
-
-		std::filesystem::create_directories(OutLoc);
-		std::vector<Object> Objects;
-		for (const auto& location : InLoc)
-		{
-			RecursiveSearch(location, Objects);
-		}
-
-		WriteIncludeList	(Objects, OutLoc);
-		WriteObjectList		(Objects, OutLoc);
-		WriteSpawnList		(Objects, OutLoc);
-		WriteCategoryList	(Objects, OutLoc);
-		for (unsigned int i = 0; i < Objects.size(); i++)
-		{
-			WriteHeaderForObject(OutLoc, Objects[i]);
 		}
 	}
-	catch (Exception& e)
+
+	if (InLoc.empty())
 	{
-		Log::Print(e.What(), Log::E_ERROR);
+		PARSE_ERROR("In path has not been defined (In=[Path to Code/Objects folder])");
+	}
+	if (OutLoc.empty())
+	{
+		PARSE_ERROR("Out path has not been defined (Out=[Path where to put the headers])");
+	}
+
+	OutLoc.append("/GENERATED");
+	std::filesystem::create_directories(OutLoc);
+	std::vector<Object> Objects;
+	for (const auto& location : InLoc)
+	{
+		RecursiveSearch(location, Objects);
+	}
+
+	WriteIncludeList	(Objects, OutLoc);
+	WriteObjectList		(Objects, OutLoc);
+	WriteSpawnList		(Objects, OutLoc);
+	WriteCategoryList	(Objects, OutLoc);
+	for (unsigned int i = 0; i < Objects.size(); i++)
+	{
+		WriteHeaderForObject(OutLoc, Objects[i]);
 	}
 }

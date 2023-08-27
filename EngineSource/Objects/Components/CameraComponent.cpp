@@ -1,6 +1,6 @@
 #pragma once
 #include "CameraComponent.h"
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <Engine/Log.h>
 
@@ -36,7 +36,7 @@ void CameraComponent::Destroy()
 
 void CameraComponent::SetFOV(float FOV)
 {
-	ComponentCamera.ReInit((FOV / 180) * 3.14159 * 2, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
+	ComponentCamera.ReInit((FOV / 180) * 3.14159f * 2, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
 }
 
 CameraComponent::CameraComponent()

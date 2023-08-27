@@ -8,10 +8,10 @@
 #include <iostream>
 #include <Engine/EngineError.h>
 #include <Engine/Log.h>
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <Objects/CSharpObject.h>
 #include <Engine/Build/Build.h>
-#include <Engine/Save.h>
+#include <Engine/File/Save.h>
 
 #include <Utility/DotNet/nethost.h>
 #include <Utility/DotNet/coreclr_delegates.h>

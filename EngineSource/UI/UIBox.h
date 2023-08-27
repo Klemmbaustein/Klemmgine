@@ -7,7 +7,7 @@ class UIScrollBox;
 class UIButton;
 class UIBox
 {
-public:	
+public:
 	bool IsVisible = true;
 	enum E_UIAlign
 	{
@@ -61,7 +61,7 @@ public:
 	UIBox* SetBorder(UIBox::E_BorderType Type, float Size);
 	static void ForceUpdateUI();
 	static void InitUI();
-	static unsigned int GetUIFramebuffer();
+	static unsigned int* GetUITextures();
 	static void RedrawUI();
 	static void ClearUI();
 	bool IsHovered();
@@ -85,10 +85,10 @@ protected:
 	Vector2 MaxSize = Vector2(2, 2);
 	Vector2 MinSize = Vector2(0, 0);
 
-	float UpPadding = 0.02;
-	float DownPadding = 0.02;
-	float RightPadding = 0.02;
-	float LeftPadding = 0.02;
+	float UpPadding = 0.02f;
+	float DownPadding = 0.02f;
+	float RightPadding = 0.02f;
+	float LeftPadding = 0.02f;
 	Vector2 Size;
 	E_SizeMode SizeMode = E_SCREEN_RELATIVE;
 

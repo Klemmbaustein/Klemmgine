@@ -6,6 +6,7 @@ public struct Vector3
 {
 	public float X, Y, Z;
 
+	private delegate Vector3 VecScaledAxis(Vector3 Rotation, uint Dir);
 	public Vector3()
 	{
 		X = 0;
@@ -71,6 +72,25 @@ public struct Vector3
 	private static bool _nearlyequal(float a, float b, float t)
 	{
 		return a > b - t && a < b + t;
+	}
+
+	public enum Axis
+	{
+		X = 0,
+		Y = 1,
+		Z = 2
+	}
+
+	public static Vector3 GetScaledAxis(Vector3 Rot, Axis Dir)
+	{
+		return (Vector3)NativeFunction.CallNativeFunction(
+			"Vector3::GetScaledAxis",
+			typeof(VecScaledAxis),
+			new object[] 
+			{ 
+				Rot / 180 * MathF.PI,
+				(uint)Dir 
+			});
 	}
 
 	public static bool NearlyEqual(Vector3 a, Vector3 b, float Threshold)

@@ -1,6 +1,6 @@
 #pragma once
 #include <Objects/Components/Component.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 
 class PointLightComponent : public Component
 {

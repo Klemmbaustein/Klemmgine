@@ -1,6 +1,6 @@
 #include "InstancedMeshComponent.h"
-#include <World/Graphics.h>
-#include <World/Assets.h>
+#include <Rendering/Graphics.h>
+#include <Engine/File/Assets.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <Rendering/Mesh/InstancedModel.h>
 #include <filesystem>

@@ -11,14 +11,14 @@
 
 namespace OS
 {
-	enum EConsoleColor
+	enum class ConsoleColor
 	{
-		E_WHITE = 0,
-		E_GRAY = 1,
-		E_RED = 2,
-		E_GREEN = 3,
-		E_BLUE = 4,
-		E_YELLOW = 5
+		White = 0,
+		Gray = 1,
+		Red = 2,
+		Green = 3,
+		Blue = 4,
+		Yellow = 5
 	};
 
 	size_t GetMemUsage();
@@ -28,6 +28,6 @@ namespace OS
 	std::string ShowOpenFileDialog();
 	std::string GetOSString();
 	void ClearConsoleWindow();
-	void SetConsoleColor(EConsoleColor NewColor);
+	void SetConsoleColor(ConsoleColor NewColor);
 	void OpenFile(std::string Path);
 }

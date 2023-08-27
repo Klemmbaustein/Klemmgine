@@ -2,7 +2,7 @@
 #include <fstream>
 #include <filesystem>
 #include <iostream>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 #include <Engine/Log.h>
 #include <glm/ext/vector_float2.hpp>
 #include <glm/geometric.hpp>
@@ -28,11 +28,11 @@ namespace ModelGenerator
 		}
 		std::ifstream Input = std::ifstream(Path, std::ios::in | std::ios::binary);
 		Input.exceptions(std::ios_base::failbit | std::ios_base::badbit);
-		uint32_t NumMeshes;
+		uint32_t NumMeshes = 0;
 		Input.read((char*)&NumMeshes, sizeof(int));
 
-		int NewNumVertices; int NewNumIndices;
-		for (int j = 0; j < NumMeshes; j++)
+		int NewNumVertices = 0; int NewNumIndices = 0;
+		for (uint32_t j = 0; j < NumMeshes; j++)
 		{
 			std::vector<Vertex> Vertices;
 			std::vector<unsigned int> Indices;
@@ -120,12 +120,12 @@ namespace ModelGenerator
 	{
 		std::ofstream Output(Path, std::ios::out | std::ios::binary);
 
-		int NumElements = Elements.size();
+		int NumElements = (int)Elements.size();
 		Output.write((char*)&NumElements, sizeof(int));
 		for (int j = 0; j < NumElements; j++)
 		{
-			int NumVertices = Elements[j].Vertices.size();
-			int NumIndices = Elements[j].Indices.size();
+			int NumVertices = (int)Elements[j].Vertices.size();
+			int NumIndices = (int)Elements[j].Indices.size();
 
 			Output.write((char*)&NumVertices, sizeof(int));
 			Output.write((char*)&NumIndices, sizeof(int));
@@ -173,14 +173,14 @@ namespace ModelGenerator
 	std::vector<unsigned int> ModelData::GetMergedIndices() const
 	{
 		std::vector<unsigned int> MergedIndices;
-		size_t prevSize = 0;
-		for (size_t i = 0; i < Elements.size(); i++)
+		unsigned int prevSize = 0;
+		for (unsigned int i = 0; i < Elements.size(); i++)
 		{
 			for (size_t j = 0; j < Elements[i].Indices.size(); j++)
 			{
 				MergedIndices.push_back(Elements[i].Indices[j] + prevSize);
 			}
-			prevSize += Elements[i].Vertices.size();
+			prevSize += (unsigned int)Elements[i].Vertices.size();
 		}
 		return MergedIndices;
 	}
@@ -230,7 +230,7 @@ namespace ModelGenerator
 					ModelData::Element NewElement;
 					auto& CurrentElement = Elements[Index];
 
-					size_t NewIndex = 0;
+					unsigned int NewIndex = 0;
 
 					for (size_t i = 0; i < CurrentElement.Indices.size(); i += 3)
 					{
@@ -309,7 +309,7 @@ namespace ModelGenerator
 	{
 		glm::vec3 AxisA = glm::vec3(Normal.Y, Normal.Z, Normal.X);
 		glm::vec3 AxisB = glm::cross((glm::vec3)Normal, AxisA);
-		size_t InitialSize = this->Vertices.size();
+		int32_t InitialSize = (int32_t)Vertices.size();
 		for (int32_t x = 0; x < Resolution; x++)
 		{
 			for (int32_t y = 0; y < Resolution; y++)

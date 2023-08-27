@@ -9,6 +9,7 @@ class ObjectList : public EditorPanel
 public:
 	size_t ObjectSize = 0;
 	UIBox* HeaderBox;
+	size_t ListIterator = 0;
 	UIScrollBox* ObjectListBox;
 	bool RecalculateObjects = false;
 

@@ -7,7 +7,8 @@
 #include <Engine/Scene.h>
 #include <Engine/Console.h>
 #include <Engine/EngineError.h>
-
+#include <Engine/File/Assets.h>
+#include <Engine/Stats.h>
 #include <Sound/Sound.h>
 
 #include <UI/Default/UICanvas.h>
@@ -29,17 +30,11 @@
 #include <Rendering/Texture/Cubemap.h>
 #include <Rendering/Camera/Camera.h>
 #include <Rendering/Camera/FrustumCulling.h>
+#include <Rendering/Graphics.h>
 
 #include <Math/Collision/Collision.h>
 
 #include <CSharp/CSharpInterop.h>
-
-
-// World includes
-#include <World/Graphics.h>
-#include <World/Assets.h>
-#include <World/Stats.h>
-
 
 // Library includes
 #include <GL/glew.h>
@@ -64,6 +59,7 @@ Vector2 GetMousePosition()
 
 namespace Application
 {
+	std::string StartupSceneOverride;
 #if EDITOR
 	constexpr int MOUSE_GRAB_PADDING = 5;
 
@@ -178,7 +174,7 @@ namespace Application
 		else SDL_SetWindowFullscreen(Window, SDL_WINDOW_OPENGL);
 		int w, h;
 		SDL_GetWindowSize(Window, &w, &h);
-		Graphics::SetWindowResolution(Vector2(w, h));
+		Graphics::SetWindowResolution(Vector2((float)w, (float)h));
 		UIBox::RedrawUI();
 #endif
 	}
@@ -198,7 +194,7 @@ namespace Application
 		Vector2 Size = GetWindowSize();
 		Vector2 TranslatedPos = Vector2(((NewPos.X + 1) / 2) * Size.X, (((NewPos.Y) + 1) / 2) * Size.Y);
 		TranslatedPos.Y = Size.Y - TranslatedPos.Y;
-		SDL_WarpMouseInWindow(Window, TranslatedPos.X, TranslatedPos.Y);
+		SDL_WarpMouseInWindow(Window, (int)TranslatedPos.X, (int)TranslatedPos.Y);
 	}
 	Vector2 GetCursorPosition()
 	{
@@ -208,7 +204,7 @@ namespace Application
 	{
 		int w, h;
 		SDL_GetWindowSize(Window, &w, &h);
-		return Vector2(w, h);
+		return Vector2((float)w, (float)h);
 	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
 	std::thread ConsoleThread;
@@ -340,7 +336,7 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	Debugging::EngineStatus = "Rendering (Framebuffer: Main pass)";
 
 	Vector2 BufferResolution = Buffer->UseMainWindowResolution ? Graphics::WindowResolution : Buffer->CustomFramebufferResolution;
-	glViewport(0, 0, BufferResolution.X, BufferResolution.Y);
+	glViewport(0, 0, (int)BufferResolution.X, (int)BufferResolution.Y);
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	auto Matrices = CSM::getLightSpaceMatrices();
@@ -400,7 +396,7 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 }
 
 void InitializeShaders()
@@ -464,25 +460,13 @@ void PollInput()
 					}
 					else if (TextInput::TextIndex > 0)
 					{
-						TextInput::Text.erase(TextInput::TextIndex - 1, 1);
+						TextInput::Text.erase((size_t)TextInput::TextIndex - 1, 1);
 					}
 					TextInput::TextIndex = std::max(std::min(TextInput::TextIndex - 1, (int)TextInput::Text.size()), 0);
 				}
 				break;
-#if IS_IN_EDITOR
 			case SDLK_DELETE:
-				if (!TextInput::PollForText)
-				{
-					for (int i = 0; i < Objects::AllObjects.size(); i++)
-					{
-						if (Objects::AllObjects.at(i)->IsSelected)
-						{
-							Objects::DestroyObject(Objects::AllObjects[i]);
-
-						}
-					}
-				}
-				else
+				if (TextInput::PollForText)
 				{
 					if (TextInput::TextIndex < TextInput::Text.size() && TextInput::TextIndex >= 0)
 					{
@@ -490,14 +474,7 @@ void PollInput()
 					}
 				}
 				break;
-#endif
 			case SDLK_ESCAPE:
-#if IS_IN_EDITOR
-				for (int i = 0; i < Objects::AllObjects.size(); i++)
-				{
-					Objects::AllObjects.at(i)->IsSelected = false;
-				}
-#endif
 				TextInput::PollForText = false;
 				break;
 			case SDLK_RETURN:
@@ -518,7 +495,7 @@ void PollInput()
 					{
 						TextInput::Text.append(ClipboardText);
 					}
-					TextInput::TextIndex += ClipboardText.size();
+					TextInput::TextIndex += (int)ClipboardText.size();
 				}
 				break;
 			}
@@ -543,7 +520,7 @@ void PollInput()
 			{
 				int w, h;
 				SDL_GetWindowSize(Application::Window, &w, &h);
-				Graphics::SetWindowResolution(Vector2(w, h));
+				Graphics::SetWindowResolution(Vector2((float)w, (float)h));
 				UIBox::RedrawUI();
 			}
 		}
@@ -582,10 +559,10 @@ void PollInput()
 				{
 					if (TextInput::Text.size() < TextInput::TextIndex)
 					{
-						TextInput::TextIndex = TextInput::Text.size();
+						TextInput::TextIndex = (int)TextInput::Text.size();
 					}
 					TextInput::Text.insert(TextInput::TextIndex, std::string(Event.text.text));
-					TextInput::TextIndex += strlen(Event.text.text);
+					TextInput::TextIndex += (int)strlen(Event.text.text);
 				}
 			}
 		}
@@ -632,7 +609,7 @@ void DrawPostProcessing()
 	}
 
 	Vector2 ActualRes = Application::GetWindowSize();
-	glViewport(0, 0, ActualRes.X, ActualRes.Y);
+	glViewport(0, 0, (int)ActualRes.X, (int)ActualRes.Y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	Debugging::EngineStatus = "Rendering (Post process: Main)";
 
@@ -652,15 +629,17 @@ void DrawPostProcessing()
 		glBindTexture(GL_TEXTURE_2D, SSAOTexture);
 		glActiveTexture(GL_TEXTURE6);
 		glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(1));
-		glActiveTexture(GL_TEXTURE7);
 	}
-	glBindTexture(GL_TEXTURE_2D, UIBox::GetUIFramebuffer());
+	glActiveTexture(GL_TEXTURE7);
+	glBindTexture(GL_TEXTURE_2D, UIBox::GetUITextures()[0]);
+	glActiveTexture(GL_TEXTURE8);
+	glBindTexture(GL_TEXTURE_2D, UIBox::GetUITextures()[1]);
 	Application::PostProcessShader->Bind();
 	Application::PostProcessShader->SetFloat("u_gamma", Graphics::Gamma);
 #if EDITOR
 	auto ViewportTab = Application::EditorUserInterface->UIElements[4];
 	Vector2 ViewportPos = (ViewportTab->Position + ViewportTab->Scale * 0.5);
-	Application::PostProcessShader->SetVector2("Position", ViewportPos.X);
+	Application::PostProcessShader->SetVector2("Position", ViewportPos);
 	Vector2 ViewportScale = ViewportTab->Scale;
 	Application::PostProcessShader->SetVector2("Scale", ViewportScale);
 #endif
@@ -670,6 +649,7 @@ void DrawPostProcessing()
 	Application::PostProcessShader->SetInt("u_ssaotexture", 5);
 	Application::PostProcessShader->SetInt("u_depth", 6);
 	Application::PostProcessShader->SetInt("u_ui", 7);
+	Application::PostProcessShader->SetInt("u_uialpha", 8);
 	Application::PostProcessShader->SetFloat("u_time", Stats::Time);
 	Application::PostProcessShader->SetFloat("u_vignette", Graphics::Vignette);
 	Application::PostProcessShader->SetInt("u_fxaa", Graphics::FXAA);
@@ -685,7 +665,7 @@ void DrawPostProcessing()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	Application::PostProcessShader->Unbind();
-	glViewport(0, 0, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 }
 
 void ApplicationLoop()
@@ -768,7 +748,7 @@ void ApplicationLoop()
 
 	if (IS_IN_EDITOR && !Application::WindowHasFocus())
 	{
-		SDL_Delay(100 - (Performance::DeltaTime * 1000));
+		SDL_Delay(100 - (Uint32)(Performance::DeltaTime * 1000));
 	}
 }
 
@@ -805,7 +785,7 @@ int Initialize(int argc, char** argv)
 	// Set Window resolution to the screens resolution * 0.75
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
-	Graphics::WindowResolution = Vector2(DM.w, DM.h) / 1.5;
+	Graphics::WindowResolution = Vector2((float)DM.w, (float)DM.h) / 1.5f;
 
 	std::string ApplicationTitle = ProjectName;
 	if (IsInEditor)
@@ -825,7 +805,7 @@ int Initialize(int argc, char** argv)
 	}
 	Application::Window = SDL_CreateWindow(ApplicationTitle.c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-		Graphics::WindowResolution.X, Graphics::WindowResolution.Y,
+		(int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y,
 		flags);
 
 	SDL_GL_CreateContext(Application::Window);
@@ -882,8 +862,6 @@ int Initialize(int argc, char** argv)
 
 	UIBox::InitUI();
 
-	Scene::LoadNewScene(GetStartupScene());
-	Scene::Tick();
 	if (argc > 1)
 	{
 		std::vector<std::string> LaunchArguments;
@@ -893,6 +871,15 @@ int Initialize(int argc, char** argv)
 		}
 		LaunchArgs::EvaluateLaunchArguments(LaunchArguments);
 	}
+
+	std::string Startup = GetStartupScene();
+	if (!Application::StartupSceneOverride.empty())
+	{
+		Startup = Application::StartupSceneOverride;
+	}
+	Scene::LoadNewScene(Startup);
+	Scene::Tick();
+
 #if EDITOR
 	// Initialize EditorUI
 	Application::EditorUserInterface = new EditorUI();

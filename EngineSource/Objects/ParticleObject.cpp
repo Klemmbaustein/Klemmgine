@@ -1,11 +1,11 @@
 #include "ParticleObject.h"
 #include <Objects/Components/ParticleComponent.h>
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 #include <iostream>
 
 void ParticleObject::Begin()
 {
-	Properties.push_back(Objects::Property("Emitter", Type::E_STRING, &ParticleName));
+	Properties.push_back(Objects::Property("Emitter", Type::String, &ParticleName));
 	if (Particle) Detach(Particle);
 	Particle = new ParticleComponent();
 	Attach(Particle);

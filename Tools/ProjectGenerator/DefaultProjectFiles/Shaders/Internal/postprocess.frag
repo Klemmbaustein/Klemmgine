@@ -13,6 +13,7 @@ uniform sampler2D u_bloomtexture;
 uniform sampler2D u_ssaotexture;
 uniform sampler2D u_depth;
 uniform sampler2D u_ui;
+uniform sampler2D u_uialpha;
 uniform float u_gamma = 1;
 uniform float u_chrabbsize = 0;
 uniform float u_vignette = 1;
@@ -64,6 +65,7 @@ vec4 sampleUI()
 		for (int y = 0; y < 2; ++y)
 		{
 			vec4 newtex = texture(u_ui, v_uitexcoords + vec2(x, y) * texSize);
+			newtex.w = texture(u_uialpha, v_uitexcoords + vec2(x, y) * texSize).x;
 			UIsample.w += newtex.w;
 			if (newtex.w > 0.0)
 			{

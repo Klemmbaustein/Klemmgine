@@ -2,8 +2,8 @@
 #include "NativeFunctions.h"
 #include <CSharp/CSharpInterop.h>
 #include <Engine/EngineError.h>
-#include <World/Assets.h>
-#include <World/Graphics.h>
+#include <Engine/File/Assets.h>
+#include <Rendering/Graphics.h>
 #include <Engine/Log.h>
 #include <Engine/Scene.h>
 #include <Objects/Components/MeshComponent.h>
@@ -154,6 +154,8 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(UnloadSound);
 	REGISTER_FUNCTION(NativeRaycast);
 	REGISTER_FUNCTION(CallConsoleCommand);
+	REGISTER_FUNCTION(Vector3::GetScaledAxis);
+
 }
 
 #endif

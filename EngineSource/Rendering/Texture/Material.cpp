@@ -1,11 +1,12 @@
 #include <Rendering/Texture/Material.h>
 #include <fstream>
-#include <World/Assets.h>
+#include <Engine/File/Assets.h>
 #include <Engine/Log.h>
 #include <sstream>
 #include <map>
 #include <filesystem>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
+#include <Engine/EngineError.h>
 
 class MaterialException : public std::exception
 {
@@ -68,15 +69,12 @@ Material Material::LoadMaterialFile(std::string Name, bool IsTemplate)
 		Log::Print("Could not load material: " + Name, Log::LogColor::Yellow);
 		File = "../../EditorContent/Materials/EngineDefaultPhong.jsmat";
 #ifdef RELEASE
-		throw MaterialException("Model has invalid material assigned: \"" + Name + "\". Cannot fall back to default material");
+		ENGINE_ASSERT(std::filesystem::exists(File), "Could not load material: " + Name + ".\n\
+This is a fatal error on release builds.\n\
+Ensure that none of your models have a material assigned.");
 #endif
 	}
 
-	if (!std::filesystem::exists(File))
-	{
-		Log::Print("Error while loading material: " + Name + " does not exist!");
-		return Material();
-	}
 	Material OutMaterial;
 	OutMaterial.IsTemplate = IsTemplate;
 	std::ifstream In = std::ifstream(File);
@@ -87,15 +85,16 @@ Material Material::LoadMaterialFile(std::string Name, bool IsTemplate)
 	while (!In.eof())
 	{
 
-		Type::TypeEnum CurrentType = Type::E_NULL;
-		std::string CurrentName = "unkown";
+		Type::TypeEnum CurrentType = Type::Null;
+		std::string CurrentName = "";
 		std::string Value = "";
 
 		std::string CurrentLine;
 		In.getline(CurrentBuff, 100);
 		CurrentLine = CurrentBuff;
 
-		if (CurrentLine.substr(0, 2) == "//") continue;
+		if (CurrentLine.substr(0, 2) == "//")
+			continue;
 
 
 		std::stringstream CurrentLineStream = std::stringstream(CurrentLine);
@@ -113,7 +112,7 @@ Material Material::LoadMaterialFile(std::string Name, bool IsTemplate)
 					CurrentType = (Type::TypeEnum)((int)i);
 				}
 			}
-			if (CurrentType == Type::E_NULL)
+			if (CurrentType == Type::Null)
 			{
 				Log::Print("Error reading material: " + Type + " is not a valid type (" + CurrentLine + ")", Vector3(1, 0, 0));
 				return Material();
@@ -199,7 +198,7 @@ void Material::SaveMaterialFile(std::string Path, Material m, bool IsTemplate)
 	{
 		if (Uniform.Type >= 0 && !Uniform.UniformName.empty())
 		{
-			Out << Type::Types[Uniform.Type] << " " << Uniform.UniformName << " = " << Uniform.Value << "\n";
+			Out << Type::Types->at(Uniform.Type) << " " << Uniform.UniformName << " = " << Uniform.Value << "\n";
 		}
 	}
 	Out.close();

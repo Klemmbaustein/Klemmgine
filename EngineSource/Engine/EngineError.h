@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 
 #define __FILENAME__ FileUtil::GetFileNameFromPath(__FILE__)
 
@@ -19,4 +19,4 @@ namespace Engine
 }
 
 // Crashes everything if the condition evaluates to false.
-#define ENGINE_ASSERT(Cond, Description) Engine::Assert(Cond, Description + std::string("\nCondition: ") + #Cond + std::string(""), std::string("File: ") + __FILENAME__ + ", Line " + std::to_string(__LINE__))
+#define ENGINE_ASSERT(Cond, Description) Engine::Assert(Cond, Description + std::string("\nCondition: ") + #Cond + std::string(""), std::string(__FILENAME__) + ", " + std::string(__FUNCTION__) + ", Line " + std::to_string(__LINE__))

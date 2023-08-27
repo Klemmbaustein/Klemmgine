@@ -1,6 +1,6 @@
 #ifdef ENGINE_CSHARP
 #pragma once
-#include <GENERATED/GENERATED_CSharpObject.h>
+#include <GENERATED/CSharpObject.h>
 #include <Objects/WorldObject.h>
 #include <CSharp/CSharpInterop.h>
 

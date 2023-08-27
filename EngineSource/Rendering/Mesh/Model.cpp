@@ -8,9 +8,9 @@
 #include <Rendering/Utility/ShaderManager.h>
 #include <Engine/Log.h>
 #include <UI/EditorUI/MaterialFunctions.h>
-#include <World/Graphics.h>
-#include <World/Stats.h>
-#include <World/Assets.h>
+#include <Rendering/Graphics.h>
+#include <Engine/Stats.h>
+#include <Engine/File/Assets.h>
 #include <GL/glew.h>
 #include <Rendering/Texture/Material.h>
 #include <Rendering/Mesh/Mesh.h>
@@ -78,7 +78,7 @@ namespace CSM
 void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass)
 {
 	if (Visible
-		&& (Size.isOnFrustum(FrustumCulling::CurrentCameraFrustum, ModelTransform.Location, ModelTransform.Scale * NonScaledSize * 0.02)
+		&& (Size.isOnFrustum(FrustumCulling::CurrentCameraFrustum, ModelTransform.Location, ModelTransform.Scale * NonScaledSize * 0.02f)
 			|| !MainFrameBuffer))
 	{
 		if (TwoSided)
@@ -127,13 +127,13 @@ void Model::ConfigureVAO()
 		// vertex attributes
 		std::size_t vec4Size = sizeof(glm::vec4);
 		glEnableVertexAttribArray(4);
-		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)0);
+		glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * (GLsizei)vec4Size, (void*)0);
 		glEnableVertexAttribArray(5);
-		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(1 * vec4Size));
+		glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * (GLsizei)vec4Size, (void*)(1 * vec4Size));
 		glEnableVertexAttribArray(6);
-		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(2 * vec4Size));
+		glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * (GLsizei)vec4Size, (void*)(2 * vec4Size));
 		glEnableVertexAttribArray(7);
-		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (void*)(3 * vec4Size));
+		glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, 4 * (GLsizei)vec4Size, (void*)(3 * vec4Size));
 
 		glVertexAttribDivisor(4, 1);
 		glVertexAttribDivisor(5, 1);
@@ -147,7 +147,7 @@ void Model::ConfigureVAO()
 void Model::SimpleRender(Shader* UsedShader)
 {
 	if (!Visible) return;
-	if (Size.isOnFrustum(FrustumCulling::CurrentCameraFrustum, ModelTransform.Location, ModelTransform.Scale * NonScaledSize * 0.025))
+	if (Size.isOnFrustum(FrustumCulling::CurrentCameraFrustum, ModelTransform.Location, ModelTransform.Scale * NonScaledSize * 0.025f))
 	{
 		UsedShader->Bind();
 		if (TwoSided)

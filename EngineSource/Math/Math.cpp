@@ -63,7 +63,7 @@ int expression()
             result -= term();
     return result;
 }
-bool Maths::IsPointIn2DBox(Vector2 BoxA, Vector2 BoxB, Vector2 Point)
+bool Math::IsPointIn2DBox(Vector2 BoxA, Vector2 BoxB, Vector2 Point)
 {
 	if (BoxA.X > BoxB.X)
 	{
@@ -74,13 +74,13 @@ bool Maths::IsPointIn2DBox(Vector2 BoxA, Vector2 BoxB, Vector2 Point)
 		return (BoxA.X <= Point.X && BoxA.Y <= Point.Y && BoxB.X >= Point.X && BoxB.Y >= Point.Y);
 	}
 }
-int Maths::SolveExpr(std::string expr)
+int Math::SolveExpr(std::string expr)
 {
     expressionToParse = expr.c_str();
 	return expression();
 }
 
-bool Maths::NearlyEqual(float A, float B, float epsilon)
+bool Math::NearlyEqual(float A, float B, float epsilon)
 {
     return (fabs(A - B) < epsilon);
 }

@@ -1,8 +1,8 @@
 #pragma once
 #include <Rendering/Utility/ShaderManager.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <set>
-#include <World/Stats.h>
+#include <Engine/Stats.h>
 
 class UIBox;
 class UIRenderingException : public std::exception

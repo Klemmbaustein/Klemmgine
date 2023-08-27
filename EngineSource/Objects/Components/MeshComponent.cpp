@@ -1,7 +1,7 @@
 #include "MeshComponent.h"
 #include <Rendering/Mesh/Model.h>
-#include <World/Graphics.h>
-#include <World/Assets.h>
+#include <Rendering/Graphics.h>
+#include <Engine/File/Assets.h>
 #include <Rendering/Utility/Framebuffer.h>
 
 void MeshComponent::Begin()

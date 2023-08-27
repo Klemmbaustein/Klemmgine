@@ -1,7 +1,8 @@
 #pragma once
 #include <string>
 #include <vector>
-
+#include <filesystem>
+#include <set>
 
 namespace FileUtil
 {
@@ -22,4 +23,6 @@ namespace FileUtil
 	// Returns a vector containing all files in the folder. If ext != "", only 
 	// files with the given extension will be listed.
 	std::vector<std::string> GetAllFilesInFolder(std::string Folder, std::string ext = "");
+
+	std::filesystem::file_time_type GetLastWriteTimeOfFolder(std::string Folder, std::set<std::string> FoldersToIgnore);
 }

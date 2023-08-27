@@ -3,6 +3,7 @@
 in vec2 v_texcoords;
 in vec2 v_position;
 layout(location = 0) out vec4 f_color;
+layout(location = 1) out vec4 f_alpha;
 
 uniform vec3 selectedHue = vec3(1);
 uniform int mode = 0;
@@ -54,4 +55,5 @@ void main()
 			f_color = vec4(color, 1);
 		}
 	}
+	f_alpha = vec4(1);
 }

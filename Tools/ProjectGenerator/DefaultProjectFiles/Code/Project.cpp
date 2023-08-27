@@ -1,7 +1,7 @@
 #include <string>
 
 // This is the name of the current project
-char ProjectName[] = "New Project";
+const char* ProjectName = "Untitled";
 
 // This function returns the map that will be loaded when the game is opened
 std::string GetStartupScene()

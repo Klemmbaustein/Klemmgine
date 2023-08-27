@@ -35,24 +35,24 @@ class PreferenceTab : public EditorTab
 	{
 		SettingsCategory("Editor", 
 			{
-			SettingsCategory::Setting("UI:Light mode [Experimental]", Type::E_BOOL, "0", [](std::string NewValue)
+			SettingsCategory::Setting("UI:Light mode [Experimental]", Type::Bool, "0", [](std::string NewValue)
 			{
 				Editor::CurrentUI->SetUseLightMode(std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Save Button", Type::E_BOOL, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Save Button", Type::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Save", std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Wireframe Button", Type::E_BOOL, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Wireframe Button", Type::Bool, "1", [](std::string NewValue)
 			{	
 				Toolbar::ToolbarInstance->SetButtonVisibility("Wireframe", std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Build Button", Type::E_BOOL, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Build Button", Type::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Build", std::stoi(NewValue));
 			}),
 #ifdef ENGINE_CSHARP
-			SettingsCategory::Setting("Toolbar:Show run button", Type::E_BOOL, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show run button", Type::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Run", std::stoi(NewValue));
 			})
@@ -63,14 +63,17 @@ class PreferenceTab : public EditorTab
 		SettingsCategory("Project specific",
 			{
 #ifdef ENGINE_CSHARP
-				SettingsCategory::Setting("Run from editor:Launch arguments", Type::E_STRING, "", [](std::string NewValue)
+				SettingsCategory::Setting("Run from editor:Launch arguments", Type::String, "", [](std::string NewValue)
 				{
 					EditorUI::LaunchInEditorArgs = NewValue;
 				}),
-				SettingsCategory::Setting("Klemmgine.NET:Use C# in project (Requires restart)", Type::E_BOOL, "1", [](std::string NewValue)
+				SettingsCategory::Setting("Run from editor:Launch scene that is currently loaded in editor", Type::Bool, "1", [](std::string NewValue)
 				{
-					EditorUI::LaunchInEditorArgs = NewValue;
-				})
+					EditorUI::SetLaunchCurrentScene(NewValue == "1");
+				}),
+				SettingsCategory::Setting("Klemmgine.NET:Use C# in project (Requires restart)", Type::Bool, "1", [](std::string NewValue)
+				{
+				}),
 #endif
 			}
 		),

@@ -19,7 +19,7 @@
 #include <UI/EditorUI/Tabs/ParticleEditorTab.h>
 #include <UI/EditorUI/Tabs/CubemapTab.h>
 #include <UI/EditorUI/Tabs/PreferenceTab.h>
-#include <Engine/FileUtility.h>
+#include <Engine/Utility/FileUtility.h>
 
 
 Viewport* Viewport::ViewportInstance = nullptr;
@@ -52,6 +52,8 @@ Collision::Box ArrowBoxZ
 
 );
 
+UIBackground* TestCursor = nullptr;
+
 Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, 0, 2)
 {
 	ViewportInstance = this;
@@ -61,11 +63,10 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 	ArrowsBuffer = new FramebufferObject();
 	ArrowsBuffer->FramebufferCamera = Graphics::MainCamera;
 	ArrowsModel = new Model("../../EditorContent/Models/Arrows.jsm");
-	ArrowsModel->ModelTransform.Scale = Vector3(1, 1, -1);
-	ArrowsModel->ModelTransform.Rotation.Y = -M_PI_2;
+	ArrowsModel->ModelTransform.Scale = Vector3(1, 1, 1);
+	ArrowsModel->ModelTransform.Rotation.Y = -Math::PI_F / 2.0f;
 	ArrowsBuffer->Renderables.push_back(ArrowsModel);
 	TabBackground->IsVisible = false;
-
 	TabInstances =
 	{
 		// 00
@@ -84,7 +85,8 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 		new PreferenceTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText)
 	};
 
-	TabBox = new UIBackground(true, Position + Vector2(0, Scale.Y - 0.05), UIColors[1], Vector2(Scale.X, 0.05));
+	TabBox = new UIBackground(true, Position + Vector2(0, Scale.Y - 0.05f), UIColors[1], Vector2(Scale.X, 0.05f));
+
 	UpdateTabBar();
 }
 
@@ -123,7 +125,7 @@ void Viewport::Tick()
 		|| Tabs[SelectedTab].Index == 1
 		|| Tabs[SelectedTab].Index == 4
 		|| Tabs[SelectedTab].Index == 5;
-	Graphics::MainCamera->FOV = Maths::PI / 1.2;
+	Graphics::MainCamera->FOV = Math::PI_F / 1.2f;
 	UpdatePanel();
 
 	TabTexts[0]->SetText(ChangedScene ? "*Viewport " : " Viewport ");
@@ -183,11 +185,23 @@ void Viewport::Tick()
 		ClearSelectedObjects();
 	}
 
+	if (Input::IsKeyDown(SDLK_DELETE) && !TextInput::PollForText)
+	{
+		for (int i = 0; i < Objects::AllObjects.size(); i++)
+		{
+			if (Objects::AllObjects.at(i)->IsSelected)
+			{
+				Objects::DestroyObject(Objects::AllObjects[i]);
+				ChangedScene = true;
+			}
+		}
+	}
+
 	auto Viewport = Editor::CurrentUI->UIElements[4];
 	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Viewport->Position + (Viewport->Scale * 0.5));
 	Vector3 Rotation = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
-	if (Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation)
+	if (Math::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation)
 		&& !Dragging
 		&& TabHas3DView)
 	{
@@ -237,7 +251,7 @@ void Viewport::Tick()
 	if (Input::IsLMBDown && !PressedLMB && !TabInstances[Tabs[SelectedTab].Index])
 	{
 		PressedLMB = true;
-		if (TabHas3DView && Maths::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !UI::HoveredBox)
+		if (TabHas3DView && Math::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !UI::HoveredBox)
 		{
 			Vector3 DistanceScaleMultiplier;
 			if (SelectedObjects.size() > 0)
@@ -285,8 +299,9 @@ void Viewport::Tick()
 				InitialMousePosition = Input::MouseLocation;
 			}
 
-			Collision::HitResponse CollisionTest = Collision::LineTrace(Vector3::Vec3ToVector(Graphics::MainCamera->Position),
-				(Rotation * 50000.f) + Vector3::Vec3ToVector(Graphics::MainCamera->Position));
+			Collision::HitResponse CollisionTest = Collision::LineTrace(
+				Graphics::MainCamera->Position,
+				(Rotation * 50000.f) + Graphics::MainCamera->Position);
 			if (CollisionTest.Hit && !Hit)
 			{
 				if (!Input::IsKeyDown(SDLK_LSHIFT))
@@ -398,29 +413,29 @@ void Viewport::Tick()
 }
 void Viewport::UpdateTabBar()
 {
-	TabBox->SetPosition(Position + Vector2(0, Scale.Y - 0.05));
-	TabBox->SetMinSize(Vector2(Scale.X, 0.05));
-	TabBox->SetMaxSize(Vector2(Scale.X, 0.05));
+	TabBox->SetPosition(Position + Vector2(0, Scale.Y - 0.05f));
+	TabBox->SetMinSize(Vector2(Scale.X, 0.05f));
+	TabBox->SetMaxSize(Vector2(Scale.X, 0.05f));
 	TabTexts.clear();
 	TabBox->DeleteChildren();
 	for (size_t i = 0; i < Tabs.size(); i++)
 	{
-		auto NewText = new UIText(0.45, UIColors[2], FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText);
+		auto NewText = new UIText(0.45f, UIColors[2], FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText);
 		TabTexts.push_back(NewText);
-		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 3 : 1.5), this, i * 2))
-			->SetBorder(UIBox::E_ROUNDED, 0.4)
-			->SetPadding(0, 0, 0, 0.02)
-			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01, 0.05)))
+		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 3 : 1.5f), this, (int)i * 2))
+			->SetBorder(UIBox::E_ROUNDED, 0.4f)
+			->SetPadding(0, 0, 0, 0.02f)
+			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01f, 0.05f)))
 				->SetPadding(0))
 			->AddChild(NewText
-				->SetPadding(0.005, 0.005, 0.005, 0.005));
+				->SetPadding(0.005f, 0.005f, 0.005f, 0.005f));
 		elem->SetTryFill(true);
 		if (Tabs[i].CanBeClosed)
 		{
-			elem->AddChild((new UIButton(true, 0, UIColors[2], this, i * 2 + 1))
+			elem->AddChild((new UIButton(true, 0, UIColors[2], this, (int)i * 2 + 1))
 				->SetUseTexture(true, Editor::CurrentUI->Textures[4])
-				->SetMinSize(0.04)
-				->SetPadding(0.005)
+				->SetMinSize(0.04f)
+				->SetPadding(0.005f)
 				->SetSizeMode(UIBox::E_PIXEL_RELATIVE));
 		}
 		TabBox->AddChild(elem);

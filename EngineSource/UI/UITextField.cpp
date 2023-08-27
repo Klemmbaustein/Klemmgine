@@ -96,7 +96,7 @@ void UITextField::Tick()
 			IsEdited = true;
 			TextInput::PollForText = true;
 			TextInput::Text = EnteredText;
-			TextInput::TextIndex = Nearest;
+			TextInput::TextIndex = (int)Nearest;
 			TextFieldTimer = 0;
 			IsPressed = false;
 			RedrawUI();
@@ -148,7 +148,7 @@ void UITextField::Tick()
 		{
 			TextFieldTimer = 0;
 			IBeamPosition = NewPos;
-			IBeamScale = Vector2(0.002, 0.066) * TextSize;
+			IBeamScale = Vector2(0.002f, 0.066f) * TextSize;
 			UIBox::RedrawUI();
 		}
 		if (!ShowIBeam)
@@ -165,7 +165,7 @@ void UITextField::Tick()
 		}
 		ShowIBeam = false;
 	}
-	TextObject->SetColor(EnteredText.empty() && !IsEdited ? TextColor * Vector3(0.75) : TextColor);
+	TextObject->SetColor(EnteredText.empty() && !IsEdited ? TextColor * Vector3(0.75f) : TextColor);
 	TextObject->SetText(EnteredText.empty() && !IsEdited ? HintText : (IsEdited ? RendererdText : EnteredText));
 }
 
@@ -201,7 +201,7 @@ void UITextField::Edit()
 	TextInput::PollForText = true;
 	TextInput::Text = EnteredText;
 	IsPressed = false;
-	TextInput::TextIndex = TextInput::Text.size();
+	TextInput::TextIndex = (int)TextInput::Text.size();
 	RedrawUI();
 }
 
@@ -257,8 +257,8 @@ UITextField::UITextField(bool Horizontal, Vector2 Position, Vector3 Color, UICan
 	this->ParentUI = UI;
 	this->Color = Color;
 	TextObject = new UIText(0, Vector3(1), HintText, Renderer);
-	TextObject->SetTextSize(0.5);
-	TextObject->SetPadding(0.005);
+	TextObject->SetTextSize(0.5f);
+	TextObject->SetPadding(0.005f);
 	SetHorizontal(false);
 	this->Align = UIBox::E_REVERSE;
 	

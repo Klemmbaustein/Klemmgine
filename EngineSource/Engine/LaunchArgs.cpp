@@ -6,7 +6,7 @@
 #include <Engine/OS.h>
 #include <iostream>
 #include <Engine/Scene.h>
-#include <World/Graphics.h>
+#include <Rendering/Graphics.h>
 #include <Engine/Application.h>
 
 namespace LaunchArgs
@@ -26,8 +26,7 @@ namespace LaunchArgs
 		{
 			Log::Print("Unexpected arguments in -loadscene", Log::LogColor::Yellow);
 		}
-		Scene::LoadNewScene(AdditionalArgs[0]);
-		Scene::Tick();
+		Application::StartupSceneOverride = AdditionalArgs[0];
 	}
 
 	void NoVSync(std::vector<std::string> AdditionalArgs)
@@ -69,6 +68,11 @@ namespace LaunchArgs
 	};
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments)
 	{
+
+		for (auto& i : Arguments)
+		{
+			Log::Print(i);
+		}
 		std::vector<std::string> CommandArguments;
 		std::string CurrentCommand;
 		for (const std::string& arg : Arguments)

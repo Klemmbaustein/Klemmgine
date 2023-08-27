@@ -9,10 +9,11 @@
 
 StatusBar* CurrentStatusBar = nullptr;
 
-StatusBar::StatusBar(Vector3* Colors) : EditorPanel(Colors, Vector2(-1, 0.95), Vector2(2, 0.05), Vector2(2, 0.05), Vector2(2, 0.05))
+StatusBar::StatusBar(Vector3* Colors)
+	: EditorPanel(Colors, Vector2(-1, 0.95f), Vector2(2, 0.05f), Vector2(2, 0.05f), Vector2(2, 0.05f))
 {
 	CurrentStatusBar = this;
-	TabBackground->SetColor(UIColors[0] * 0.75);
+	TabBackground->SetColor(UIColors[0] * 0.75f);
 	TabBackground->SetBorder(UIBox::E_NONE, 0);
 
 	std::string VersionText = "Engine v" + std::string(VERSION_STRING);
@@ -21,16 +22,16 @@ StatusBar::StatusBar(Vector3* Colors) : EditorPanel(Colors, Vector2(-1, 0.95), V
 #endif
 
 	//Texts[0] = new UIText(0.6, UIColors[2], std::string(ProjectName) + " Editor", Editor::CurrentUI->EngineUIText);
-	//TabBackground->AddChild(Texts[0]->SetPadding(0.005, 0.005, 0.01, 0.025));
+	//TabBackground->AddChild(Texts[0]->SetPadding(0.005, 0.005, 0.01f, 0.025));
 
 	//Texts[1] = new UIText(0.6, UIColors[2], VersionText, Editor::CurrentUI->EngineUIText);
-	//TabBackground->AddChild(Texts[1]->SetPadding(0.005, 0.005, 0.01, 0.025));
+	//TabBackground->AddChild(Texts[1]->SetPadding(0.005, 0.005, 0.01f, 0.025));
 
-	Texts[2] = new UIText(0.6, UIColors[2], "FPS: ", Editor::CurrentUI->EngineUIText);
-	TabBackground->AddChild(Texts[2]->SetPadding(0.005, 0.005, 0.01, 0.025));
+	Texts[2] = new UIText(0.6f, UIColors[2], "FPS: ", Editor::CurrentUI->EngineUIText);
+	TabBackground->AddChild(Texts[2]->SetPadding(0.005f, 0.005f, 0.01f, 0.025f));
 
-	WindowButtonBox = (new UIBox(true, Vector2(0.75, 0.95)))
-		->SetMinSize(Vector2(0.25, 0.05));
+	WindowButtonBox = (new UIBox(true, Vector2(0.75f, 0.95f)))
+		->SetMinSize(Vector2(0.25f, 0.05f));
 	WindowButtonBox->Align = UIBox::E_REVERSE;
 }
 
@@ -40,7 +41,7 @@ bool StatusBar::IsHovered()
 	return CurrentStatusBar->TabBackground->IsHovered()
 		&& CurrentStatusBar->WindowButtonBox 
 		&& !CurrentStatusBar->WindowButtonBox->IsHovered() 
-		|| Vector3::NearlyEqual(Vector3(Input::MouseLocation, 0), Vector3(1), 0.02);
+		|| Vector3::NearlyEqual(Vector3(Input::MouseLocation, 0), Vector3(1), 0.02f);
 }
 
 void StatusBar::UpdateLayout()

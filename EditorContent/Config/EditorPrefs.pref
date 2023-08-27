@@ -1,6 +1,3 @@
-bool C#:Enabled = 1
-string Run_from_editor:Launch_arguments = -neverhideconsole
-string Run_in_editor:Launch_arguments = -fullscreen
 bool Toolbar:Show_Build_Button = 1
 bool Toolbar:Show_Save_Button = 1
 bool Toolbar:Show_Wireframe_Button = 1

@@ -11,8 +11,8 @@ struct FontVertex
 	Vector2 texCoords;
 	Vector3 color = 1;
 };
-//class ScrollObject;
-class Shader;
+struct Shader;
+
 class DrawableText
 {
 	friend class TextRenderer;
