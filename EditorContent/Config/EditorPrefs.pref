@@ -1,5 +1,0 @@
-bool Toolbar:Show_Build_Button = 1
-bool Toolbar:Show_Save_Button = 1
-bool Toolbar:Show_Wireframe_Button = 1
-bool Toolbar:Show_run_button = 1
-bool UI:Light_mode_[Experimental] = 0

@@ -237,7 +237,6 @@ namespace Util
 		}
 		catch (std::exception& e)
 		{
-			//Log::Print("Error while copying files: " + std::string(e.what()), Log::E_ERROR);
 			throw "Copy failed";
 		}
 	}

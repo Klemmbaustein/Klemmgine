@@ -73,8 +73,8 @@ int main(int argc, char** argv)
 		std::filesystem::copy(i, "Games/" + ProjectName);
 	}
 
-	std::string CppGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Code", ProjectName, "10.0", "v143");
-	std::string ShaderGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Shaders", "Shaders", "10.0", "v143");
+	std::string CppGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Code", ProjectName, "10.0", "v143", true);
+	std::string ShaderGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Shaders", "Shaders", "10.0", "v143", false);
 
 	std::cout << "Generating solution..." << std::endl;
 
