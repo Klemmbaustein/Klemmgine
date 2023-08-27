@@ -24,9 +24,9 @@ Write-Host "--- Finished building assimp ---"
 
 Write-Host "--- Configuring OpenAL ---"
 cd Dependencies\openal-soft
-cmake CMakeLists.txt -S . -B Build/
+cmake CMakeLists.txt
 Write-Host "--- Building OpenAL ---"
-msbuild Build/OpenAL.vcxproj -nologo /p:Configuration=Release /p:Platform=x64
+msbuild OpenAL.vcxproj -nologo /p:Configuration=Release /p:Platform=x64
 cd ..\..
 Write-Host "--- Finished building OpenAL ---"
 Write-Host "--- Finished setting up dependencies ---"
