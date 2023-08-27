@@ -8,9 +8,9 @@ Write-Host "--- Finished building SDL2 ---"
 
 Write-Host "--- Configuring glew ---"
 cd Dependencies\glew-cmake
-cmake -S . -B Build/
+cmake CMakeLists.
 Write-Host "--- Building glew ---"
-msbuild Build\libglew_static.vcxproj -nologo /p:Configuration=Release /p:Platform=x64
+msbuild libglew_static.vcxproj -nologo /p:Configuration=Release /p:Platform=x64
 cd ..\..
 Write-Host "--- Finished building glew ---"
 
