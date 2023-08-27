@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Klemmgine", "Klemmgine", "{
 		.gitignore = .gitignore
 		INSTALLATION.md = INSTALLATION.md
 		README.md = README.md
+		setup-deps.ps1 = setup-deps.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpCore", "CSharpCore\CSharpCore.csproj", "{FF4F9039-A754-4CFD-A452-650D43286015}"
@@ -23,14 +24,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "BuildTool", "Tools\BuildTool\BuildTool.vcxproj", "{8F068CEA-34ED-41B3-9FFE-0B32D8155D5A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ProjectGenerator", "Tools\ProjectGenerator\ProjectGenerator.vcxproj", "{E8120D43-2F56-409E-9718-8756DA2FD52E}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "Games\Test\Code\Test.vcxproj", "{E6F9A391-BC8D-4C3B-A89E-DC4D538FD280}"
-	ProjectSection(ProjectDependencies) = postProject
-		{87F55D1D-99B2-4042-ADD5-AAAE85B9A61B} = {87F55D1D-99B2-4042-ADD5-AAAE85B9A61B}
-		{FF4F9039-A754-4CFD-A452-650D43286015} = {FF4F9039-A754-4CFD-A452-650D43286015}
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0C9FA15E-1B04-4118-8B3D-CBA00E16F604}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,12 +56,6 @@ Global
 		{E8120D43-2F56-409E-9718-8756DA2FD52E}.Editor|x64.Build.0 = Editor|x64
 		{E8120D43-2F56-409E-9718-8756DA2FD52E}.Release|x64.ActiveCfg = Release|x64
 		{E8120D43-2F56-409E-9718-8756DA2FD52E}.Release|x64.Build.0 = Release|x64
-		{E6F9A391-BC8D-4C3B-A89E-DC4D538FD280}.Debug|x64.ActiveCfg = Debug|x64
-		{E6F9A391-BC8D-4C3B-A89E-DC4D538FD280}.Debug|x64.Build.0 = Debug|x64
-		{E6F9A391-BC8D-4C3B-A89E-DC4D538FD280}.Editor|x64.ActiveCfg = Editor|x64
-		{E6F9A391-BC8D-4C3B-A89E-DC4D538FD280}.Editor|x64.Build.0 = Editor|x64
-		{E6F9A391-BC8D-4C3B-A89E-DC4D538FD280}.Release|x64.ActiveCfg = Release|x64
-		{E6F9A391-BC8D-4C3B-A89E-DC4D538FD280}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
