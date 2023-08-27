@@ -133,7 +133,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		std::transform(UpperCaseName.begin(), UpperCaseName.end(), UpperCaseName.begin(), ::toupper);
 
 		auto DefGroup = XML("ItemDefinitionGroup");
-		Project.Add(DefGroup
+		DefGroup
 			.AddTag("Condition", "'$(Configuration)|$(Platform)'=='" + i + "|x64'")
 			.Add(XML("ClCompile")
 				.Add(XML("LanguageStandard", "stdcpp20"))
@@ -148,11 +148,16 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 				.Add(XML("AdditionalDependencies",
 					"assimp-vc143-mt.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)"))
 				.Add(XML("OutputFile", "$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)"))
-				.Add(XML("Subsystem", "Console"))));
+				.Add(XML("Subsystem", "Console")));
 
-		Project.Add(XML("PreBuildEvent")
+		if (WithBuildTool)
+		{
+			DefGroup.Add(XML("PreBuildEvent")
 				.Add(XML("Command",
 					"$(ProjectDir)../../../Tools/bin/BuildTool.exe in=../../../EngineSource/Objects in=./Objects out=../GeneratedIncludes")));
+		}
+
+		Project.Add(DefGroup);
 	}
 
 	Project.Add(XML("Import")
