@@ -16,9 +16,9 @@ Write-Host "--- Finished building glew ---"
 
 Write-Host "--- Configuring assimp ---"
 cd Dependencies\assimp
-cmake -S . -B Build/
+cmake CMakeLists.txt
 Write-Host "--- Building assimp ---"
-msbuild Build\assimp.vcxproj -nologo /p:Configuration=Release /p:Platform=x64
+msbuild code\assimp.vcxproj -nologo /p:Configuration=Release /p:Platform=x64
 cd ..\..
 Write-Host "--- Finished building assimp ---"
 
