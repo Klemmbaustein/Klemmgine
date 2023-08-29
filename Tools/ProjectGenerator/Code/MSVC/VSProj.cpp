@@ -13,7 +13,7 @@ int Run(std::string Command)
 	return system(Command.c_str());
 }
 
-std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string WinSdkVer, std::string PlatformToolset)
+std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string WinSdkVer, std::string PlatformToolset, bool WithBuildTool)
 {
 	std::cout << "Writing " << Name << ".vcxproj for windows SDK version " << WinSdkVer << " and platform toolset version " << PlatformToolset << std::endl;
 
@@ -41,7 +41,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 	{
 		"../../../lib",
 		"../../../CSharpCore/lib",
-		"../../../Dependencies/glew-cmake/lib/Release/x64",
+		"../../../Dependencies/glew-cmake/lib/Release",
 		"../../../Dependencies/assimp/lib/Release",
 		"../../../Dependencies/openal-soft/Release",
 		"../../../Dependencies/SDL/VisualC/SDL/x64/Release"
@@ -132,7 +132,8 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		std::string UpperCaseName = i;
 		std::transform(UpperCaseName.begin(), UpperCaseName.end(), UpperCaseName.begin(), ::toupper);
 
-		Project.Add(XML("ItemDefinitionGroup")
+		auto DefGroup = XML("ItemDefinitionGroup");
+		DefGroup
 			.AddTag("Condition", "'$(Configuration)|$(Platform)'=='" + i + "|x64'")
 			.Add(XML("ClCompile")
 				.Add(XML("LanguageStandard", "stdcpp20"))
@@ -145,12 +146,18 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 				.Add(XML("EnableCOMDATFolding", "true"))
 				.Add(XML("FavorSizeOrSpeed", "Speed"))
 				.Add(XML("AdditionalDependencies",
-					"assimp-vc143-mt.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew32s.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)"))
+					"assimp-vc143-mt.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)"))
 				.Add(XML("OutputFile", "$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)"))
-				.Add(XML("Subsystem", "Console")))
-			.Add(XML("PreBuildEvent")
+				.Add(XML("Subsystem", "Console")));
+
+		if (WithBuildTool)
+		{
+			DefGroup.Add(XML("PreBuildEvent")
 				.Add(XML("Command",
-					"$(ProjectDir)../../../Tools/bin/BuildTool.exe in=../../../EngineSource/Objects in=./Objects out=../GeneratedIncludes"))));
+					"$(ProjectDir)../../../Tools/bin/BuildTool.exe in=../../../EngineSource/Objects in=./Objects out=../GeneratedIncludes")));
+		}
+
+		Project.Add(DefGroup);
 	}
 
 	Project.Add(XML("Import")

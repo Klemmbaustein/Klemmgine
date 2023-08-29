@@ -5,7 +5,7 @@ namespace VSProj
 {
 	// Creates a .vcproj file in the given path with the given name. It will add all files in it's directory to the project.
 	// @returns The GUID of the new project.
-	std::string WriteVCXProj(std::string Path, std::string Name, std::string WinSdkVer, std::string PlatformToolset);
+	std::string WriteVCXProj(std::string Path, std::string Name, std::string WinSdkVer, std::string PlatformToolset, bool WithBuildTool);
 
 	// Creates a .csproj file in the given path with the given name. It will add all files in it's directory to the project.
 	// @returns The GUID of the new project.
