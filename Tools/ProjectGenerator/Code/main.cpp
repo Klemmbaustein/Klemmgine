@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 
 	if (std::filesystem::exists("Games/" + ProjectName))
 	{
-		std::cout << "Warning: Games/" << ProjectName << "Already exists. Replacing..." << std::endl;
+		std::cout << "Warning: Games/" << ProjectName << " already exists. Replacing..." << std::endl;
 		std::filesystem::remove_all("Games/" + ProjectName);
 	}
 
