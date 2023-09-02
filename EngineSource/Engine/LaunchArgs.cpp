@@ -68,11 +68,6 @@ namespace LaunchArgs
 	};
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments)
 	{
-
-		for (auto& i : Arguments)
-		{
-			Log::Print(i);
-		}
 		std::vector<std::string> CommandArguments;
 		std::string CurrentCommand;
 		for (const std::string& arg : Arguments)
