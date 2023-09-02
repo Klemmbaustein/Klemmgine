@@ -391,8 +391,8 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 	int rc = load_assembly_and_get_function_pointer(
 		dotnetlib_path.c_str(),
 		dotnet_type.c_str(),
-		string_t(Function.begin(), Function.end()).c_str() /*method_name*/,
-		(STR("Delegates+") + string_t(DelegateName.begin(), DelegateName.end()) + STR(", ") + string_t(Name.begin(), Name.end())).c_str() /*delegate_type_name*/,
+		string_t(Function.begin(), Function.end()).c_str(),
+		(STR("Delegates+") + string_t(DelegateName.begin(), DelegateName.end()) + STR(", ") + string_t(Name.begin(), Name.end())).c_str(),
 		nullptr,
 		(void**)&fCallback);
 

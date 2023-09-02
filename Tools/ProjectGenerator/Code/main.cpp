@@ -8,7 +8,7 @@
 std::vector<std::string> DependenyDlls =
 {
 	"Dependencies/assimp/bin/Release/assimp-vc143-mt.dll",
-	"Dependencies/openal-soft/build/Release/OpenAL32.dll",
+	"Dependencies/openal-soft/Release/OpenAL32.dll",
 	"Dependencies/SDL/VisualC/SDL/x64/Release/SDL2.dll",
 	"CSharpCore/lib/nethost.dll"
 };

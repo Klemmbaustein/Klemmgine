@@ -60,7 +60,7 @@ std::string Preprocessor::ParseGLSL(std::string Code, std::string Path)
 		if (!CurrentLine.eof())
 		{
 			Log::Print("--------------------------------------------------------------------------------", Log::LogColor::Red);
-			Log::Print("ShaderParseError: Unexpected arguments after " + Instruction, Log::LogColor::Red);
+			Log::Print("ShaderParseError: Unexpected arguments after '" + Instruction + "'", Log::LogColor::Red);
 			Log::Print(Line + std::string(" <--"), Log::LogColor::Red);
 			while (!CurrentLine.eof())
 			{
