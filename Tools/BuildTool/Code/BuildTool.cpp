@@ -122,8 +122,6 @@ void RecursiveSearch(std::string InLoc, std::vector<Object>& Objects, std::strin
 			std::string DirName = entry.path().filename().string();
 			if (DirName != "Components")
 			{
-				Log::Print(DirName);
-
 				RecursiveSearch(entry.path().string(), Objects, RelativePath + "/" + DirName);
 			}
 		}

@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 #ifdef EDITOR
 #define IS_IN_EDITOR true
 #else
@@ -9,6 +10,11 @@
 #else
 #define ENGINE_DEBUG true
 #endif
-extern const char* ProjectName;
+namespace Project
+{
+	std::string GetStartupScene();
+	void OnLaunch();
+	extern const char* ProjectName;
+}
 #define VERSION_STRING "1.4.0-Alpha"
 #define OPENGL_MIN_REQUIRED_VERSION "GL_VERSION_4_3"

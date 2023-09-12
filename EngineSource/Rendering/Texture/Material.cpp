@@ -198,7 +198,7 @@ void Material::SaveMaterialFile(std::string Path, Material m, bool IsTemplate)
 	{
 		if (Uniform.Type >= 0 && !Uniform.UniformName.empty())
 		{
-			Out << Type::Types[Uniform.Type] << " " << Uniform.UniformName << " = " << Uniform.Value << "\n";
+			Out << Type::Types.at(Uniform.Type) << " " << Uniform.UniformName << " = " << Uniform.Value << "\n";
 		}
 	}
 	Out.close();

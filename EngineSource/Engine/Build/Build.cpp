@@ -96,7 +96,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			int CompileResult = BuildCurrentSolution("Release");
 			if (!CompileResult)
 			{
-				std::filesystem::copy(GetProjectBuildName() + "-Release.exe", TargetFolder + ProjectName + std::string(".exe"));
+				std::filesystem::copy(GetProjectBuildName() + "-Release.exe", TargetFolder + Project::ProjectName + std::string(".exe"));
 			}
 			else
 			{

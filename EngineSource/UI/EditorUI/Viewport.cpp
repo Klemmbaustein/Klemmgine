@@ -121,7 +121,9 @@ void Viewport::UpdateLayout()
 }
 void Viewport::Tick()
 {
-	bool TabHas3DView = (!Editor::HoveringPopup	&& !TabInstances[Tabs[SelectedTab].Index]) 
+	CurrentTab = TabInstances[Tabs[SelectedTab].Index];
+
+	bool TabHas3DView = (!Editor::HoveringPopup	&& !CurrentTab)
 		|| Tabs[SelectedTab].Index == 1
 		|| Tabs[SelectedTab].Index == 4
 		|| Tabs[SelectedTab].Index == 5;
@@ -206,7 +208,7 @@ void Viewport::Tick()
 		&& TabHas3DView)
 	{
 
-		if (!Editor::CurrentUI->CurrentCursor && !TabInstances[Tabs[SelectedTab].Index]) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
+		if (!Editor::CurrentUI->CurrentCursor && !CurrentTab) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
 		{
 			Editor::CurrentUI->CurrentCursor = EditorUI::E_CROSS;
 		}
@@ -248,7 +250,7 @@ void Viewport::Tick()
 		Application::SetCursorPosition(InitialMousePosition);
 		ViewportLock = false;
 	}
-	if (Input::IsLMBDown && !PressedLMB && !TabInstances[Tabs[SelectedTab].Index])
+	if (Input::IsLMBDown && !PressedLMB && !CurrentTab)
 	{
 		PressedLMB = true;
 		if (TabHas3DView && Math::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !UI::HoveredBox)
@@ -261,8 +263,8 @@ void Viewport::Tick()
 			if (SelectedObjects.size() > 0)
 			{
 				float t = INFINITY;
-				Collision::HitResponse
-					CollisionTest = Collision::LineCheckForAABB((ArrowBoxZ * DistanceScaleMultiplier) + SelectedObjects.at(0)->GetTransform().Location,
+				Collision::HitResponse CollisionTest 
+					= Collision::LineCheckForAABB((ArrowBoxZ * DistanceScaleMultiplier) + SelectedObjects.at(0)->GetTransform().Location,
 						Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 				if (CollisionTest.Hit)
 				{

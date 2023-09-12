@@ -21,7 +21,6 @@ namespace Editor
 
 namespace Engine
 {
-	extern std::string CurrentProjectName;
 	extern std::string VersionString;
 }
 

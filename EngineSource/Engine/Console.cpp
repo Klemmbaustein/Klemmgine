@@ -147,7 +147,7 @@ void Console::InitializeConsole()
 
 	RegisterCommand(Command("version",
 		[]() {
-			Console::ConsoleLog(std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(ProjectName) + ")");
+			Console::ConsoleLog(std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(Project::ProjectName) + ")");
 		}, {}));
 
 	RegisterCommand(Command("info",
@@ -155,7 +155,7 @@ void Console::InitializeConsole()
 			void (*InfoPrintTypes[4])() =
 		{
 			[]() {
-				ConsoleLog("Version: " + std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(ProjectName) + ")");
+				ConsoleLog("Version: " + std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(Project::ProjectName) + ")");
 				ConsoleLog("OS: " + OS::GetOSString());
 			},
 			[]() {

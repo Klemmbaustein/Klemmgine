@@ -154,7 +154,7 @@ float ShadowCalculation(vec3 fragPosWorldSpace, vec3 v_modelnormal, float BakedS
 
 vec3 SampleLightMap()
 {
-	return texture(GiMap, (v_position / GiScale) + 0.5).xyz;
+	return texture(GiMap, (v_position / GiScale) + 0.5).xyz * 2;
 }
 
 vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, vec3 normal)

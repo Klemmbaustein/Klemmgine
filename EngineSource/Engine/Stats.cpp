@@ -4,7 +4,6 @@
 
 namespace Engine
 {
-	std::string CurrentProjectName = ProjectName;
 	std::string VersionString = VERSION_STRING + std::string(IS_IN_EDITOR ? "-Editor" : "-Build");
 }
 

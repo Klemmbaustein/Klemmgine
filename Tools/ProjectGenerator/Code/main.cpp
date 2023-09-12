@@ -21,7 +21,8 @@ int main(int argc, char** argv)
 		std::pair("toolset", "v143"),
 		std::pair("projectName", ""),
 		std::pair("includeEngine", "true"),
-		std::pair("includeCsharp", "true")
+		std::pair("includeCsharp", "true"),
+		std::pair("upgrade", "false")
 	};
 
 	std::string CurrentArg = "";
@@ -53,15 +54,25 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	if (std::filesystem::exists("Games/" + ProjectName))
+	if (std::filesystem::exists("Games/" + ProjectName) && LaunchArgs["upgrade"] == "false")
 	{
 		std::cout << "Warning: Games/" << ProjectName << " already exists. Replacing..." << std::endl;
 		std::filesystem::remove_all("Games/" + ProjectName);
 	}
+	else
+	{
+		if (std::filesystem::exists("Games/" + ProjectName + "/.vs"))
+		{
+			std::filesystem::remove_all("Games/" + ProjectName + "/.vs");
+		}
+		std::cout << "Upgrading project files of " << ProjectName << std::endl;
+	}
 
 	std::cout << "Copying project files" << std::endl;
 	std::filesystem::create_directories("Games/" + ProjectName + "/Code/Objects");
-	std::filesystem::copy("Tools/ProjectGenerator/DefaultProjectFiles", "Games/" + ProjectName, std::filesystem::copy_options::recursive);
+	std::filesystem::copy("Tools/ProjectGenerator/DefaultProjectFiles", "Games/" + ProjectName,
+		std::filesystem::copy_options::recursive
+		| std::filesystem::copy_options::overwrite_existing);
 
 	for (auto& i : DependenyDlls)
 	{
@@ -70,11 +81,10 @@ int main(int argc, char** argv)
 			std::cout << "Could not find " << i << ". Ensure you have the project setup correctly." << std::endl;
 			exit(1);
 		}
-		std::filesystem::copy(i, "Games/" + ProjectName);
+		std::filesystem::copy(i, "Games/" + ProjectName, std::filesystem::copy_options::overwrite_existing);
 	}
 
 	std::string CppGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Code", ProjectName, "10.0", "v143", true);
-	std::string ShaderGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Shaders", "Shaders", "10.0", "v143", false);
 
 	std::cout << "Generating solution..." << std::endl;
 
@@ -85,12 +95,6 @@ int main(int argc, char** argv)
 	CppProject.Path = "Code";
 	CppProject.GUID = CppGUID;
 	CppProject.Type = "vcxproj";
-
-	SLN::Project ShaderProject;
-	ShaderProject.Name = "Shaders";
-	ShaderProject.Path = "Shaders";
-	ShaderProject.GUID = ShaderGUID;
-	ShaderProject.Type = "vcxproj";
 
 	if (LaunchArgs["includeCsharp"] == "true")
 	{
@@ -125,6 +129,12 @@ int main(int argc, char** argv)
 		CppProject.Dependencies.push_back(EngineProject.GUID);
 	}
 	Projects.push_back(CppProject);
+	std::string ShaderGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Shaders", "Shaders", "10.0", "v143", false);
+	SLN::Project ShaderProject;
+	ShaderProject.Name = "Shaders";
+	ShaderProject.Path = "Shaders";
+	ShaderProject.GUID = ShaderGUID;
+	ShaderProject.Type = "vcxproj";
 	Projects.push_back(ShaderProject);
 
 	std::cout << "- Writing solution" << std::endl;

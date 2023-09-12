@@ -1,9 +1,10 @@
 #pragma once
 #include <string>
+#include <vector>
 
 namespace Type
 {
-	inline constexpr std::string Types[] =
+	inline const std::vector<std::string> Types =
 	{
 		"vector3",
 		"float",

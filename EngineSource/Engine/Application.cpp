@@ -31,6 +31,7 @@
 #include <Rendering/Camera/Camera.h>
 #include <Rendering/Camera/FrustumCulling.h>
 #include <Rendering/Graphics.h>
+#include <Rendering/Utility/PostProcess.h>
 
 #include <Math/Collision/Collision.h>
 
@@ -39,7 +40,6 @@
 // Library includes
 #include <GL/glew.h>
 #include <SDL.h>
-
 
 // STL includes
 #include <iostream>
@@ -59,7 +59,13 @@ Vector2 GetMousePosition()
 
 namespace Application
 {
+	PostProcess::Effect* UIMergeEffect = nullptr;
 	std::string StartupSceneOverride;
+	unsigned int BloomBuffer = 0, AOBuffer = 0;
+	unsigned int MainPostProcessBuffer = 0;
+	bool ShowStartupInfo = true;
+	bool RenderPostProcess = true;
+
 #if EDITOR
 	constexpr int MOUSE_GRAB_PADDING = 5;
 
@@ -142,7 +148,7 @@ namespace Application
 	EditorUI* EditorUserInterface = nullptr;
 #endif
 
-	float Timer::TimeSinceCreation()
+	float Timer::TimeSinceCreation() const
 	{
 		Uint64 PerfCounterFrequency = SDL_GetPerformanceFrequency();
 		Uint64 EndCounter = SDL_GetPerformanceCounter();
@@ -220,8 +226,6 @@ namespace LaunchArgs
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments);
 }
 
-std::string GetStartupScene();
-
 void GLAPIENTRY MessageCallback(
 	GLenum source,
 	GLenum type,
@@ -237,6 +241,7 @@ void GLAPIENTRY MessageCallback(
 		|| type == GL_DEBUG_TYPE_PORTABILITY)
 	{
 		Log::Print(message + std::string(" Status: ") + Debugging::EngineStatus);
+		SDL_Delay(15);
 	}
 }
 
@@ -595,52 +600,77 @@ void DrawPostProcessing()
 		ShouldSkip3D = true;
 	}
 #endif
-	unsigned int BloomTexture = 0;
 
-	unsigned int SSAOTexture = 0;
+
+	glViewport(0, 0, (int)Graphics::WindowResolution.X * 2, (int)Graphics::WindowResolution.Y * 2);
+	Application::UIMergeEffect->EffectShader->Bind();
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, UIBox::GetUITextures()[1]);
+	Application::UIMergeEffect->EffectShader->SetInt("u_alpha", 1);
+	unsigned int UIBuffer = Application::UIMergeEffect->Render(UIBox::GetUITextures()[0]);
+
+#if !EDITOR
+	for (const PostProcess::Effect* i : PostProcess::GetCurrentEffects())
+	{
+		if (i->UsedType == PostProcess::EffectType::UI)
+		{
+			UIBuffer = i->Render(UIBuffer);
+		}
+	}
+#endif
 
 	if (!ShouldSkip3D)
 	{
-		BloomTexture = Bloom::BlurFramebuffer(Graphics::MainFramebuffer->GetTextureID());
 
-		SSAOTexture = SSAO::Render(
+		Application::AOBuffer = SSAO::Render(
 			Graphics::MainFramebuffer->GetBuffer()->GetTextureID(2),
 			Graphics::MainFramebuffer->GetBuffer()->GetTextureID(3));
+
+		Application::MainPostProcessBuffer = Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0);
+
+		if (Application::RenderPostProcess)
+		{
+			for (const PostProcess::Effect* i : PostProcess::GetCurrentEffects())
+			{
+				if (i->UsedType == PostProcess::EffectType::World)
+				{
+					Application::MainPostProcessBuffer = i->Render(Application::MainPostProcessBuffer);
+				}
+			}
+		}
+		Application::BloomBuffer = Bloom::BlurFramebuffer(Application::MainPostProcessBuffer);
 	}
 
 	Vector2 ActualRes = Application::GetWindowSize();
 	glViewport(0, 0, (int)ActualRes.X, (int)ActualRes.Y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	Debugging::EngineStatus = "Rendering (Post process: Main)";
 
-	if (!ShouldSkip3D)
-	{
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0));
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, Application::MainPostProcessBuffer);
 #if EDITOR
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->OutlineBuffer->GetBuffer()->GetTextureID(1));
-		glActiveTexture(GL_TEXTURE3);
-		glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->ArrowsBuffer->GetBuffer()->GetTextureID(0));
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->OutlineBuffer->GetBuffer()->GetTextureID(1));
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->ArrowsBuffer->GetBuffer()->GetTextureID(0));
 #endif
-		glActiveTexture(GL_TEXTURE4);
-		glBindTexture(GL_TEXTURE_2D, BloomTexture);
-		glActiveTexture(GL_TEXTURE5);
-		glBindTexture(GL_TEXTURE_2D, SSAOTexture);
-		glActiveTexture(GL_TEXTURE6);
-		glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(1));
-	}
+	glActiveTexture(GL_TEXTURE4);
+	glBindTexture(GL_TEXTURE_2D, Application::BloomBuffer);
+	glActiveTexture(GL_TEXTURE5);
+	glBindTexture(GL_TEXTURE_2D, Application::AOBuffer);
+	glActiveTexture(GL_TEXTURE6);
+	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(1));
+
 	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, UIBox::GetUITextures()[0]);
-	glActiveTexture(GL_TEXTURE8);
-	glBindTexture(GL_TEXTURE_2D, UIBox::GetUITextures()[1]);
+	glBindTexture(GL_TEXTURE_2D, UIBuffer);
 	Application::PostProcessShader->Bind();
 	Application::PostProcessShader->SetFloat("u_gamma", Graphics::Gamma);
 #if EDITOR
-	auto ViewportTab = Application::EditorUserInterface->UIElements[4];
-	Vector2 ViewportPos = (ViewportTab->Position + ViewportTab->Scale * 0.5);
+	const auto ViewportTab = Application::EditorUserInterface->UIElements[4];
+	const Vector2 ViewportPos = (ViewportTab->Position + ViewportTab->Scale * 0.5);
 	Application::PostProcessShader->SetVector2("Position", ViewportPos);
-	Vector2 ViewportScale = ViewportTab->Scale;
+	const Vector2 ViewportScale = ViewportTab->Scale;
 	Application::PostProcessShader->SetVector2("Scale", ViewportScale);
 #endif
 	Application::PostProcessShader->SetInt("u_texture", 1);
@@ -648,6 +678,7 @@ void DrawPostProcessing()
 	Application::PostProcessShader->SetInt("u_enginearrows", 3);
 	Application::PostProcessShader->SetInt("u_ssaotexture", 5);
 	Application::PostProcessShader->SetInt("u_depth", 6);
+	Application::PostProcessShader->SetInt("u_hasUITexCoords", 1);
 	Application::PostProcessShader->SetInt("u_ui", 7);
 	Application::PostProcessShader->SetInt("u_uialpha", 8);
 	Application::PostProcessShader->SetFloat("u_time", Stats::Time);
@@ -670,8 +701,8 @@ void DrawPostProcessing()
 
 void ApplicationLoop()
 {
-	Application::Timer FrameTimer;
-	Application::Timer LogicTimer;
+	const Application::Timer FrameTimer;
+	const Application::Timer LogicTimer;
 	PollInput();
 	CameraShake::Tick();
 	Sound::Update();
@@ -683,7 +714,7 @@ void ApplicationLoop()
 	{
 		Graphics::MainCamera = Graphics::MainFramebuffer->FramebufferCamera;
 	}
-	Application::Timer RenderTimer;
+	const Application::Timer RenderTimer;
 	Debugging::EngineStatus = "Rendering (Framebuffer)";
 	for (FramebufferObject* Buffer : Graphics::AllFramebuffers)
 	{
@@ -731,7 +762,7 @@ void ApplicationLoop()
 	}
 #endif
 	Scene::Tick();
-	Application::Timer SwapTimer;
+	const Application::Timer SwapTimer;
 	SDL_GL_SetSwapInterval(0 - Graphics::VSync);
 	SDL_GL_SwapWindow(Application::Window);
 
@@ -782,12 +813,13 @@ int Initialize(int argc, char** argv)
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	int flags = SDL_WINDOW_OPENGL;
 
+
 	// Set Window resolution to the screens resolution * 0.75
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
 	Graphics::WindowResolution = Vector2((float)DM.w, (float)DM.h) / 1.5f;
 
-	std::string ApplicationTitle = ProjectName;
+	std::string ApplicationTitle = Project::ProjectName;
 	if (IsInEditor)
 	{
 		ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
@@ -857,11 +889,12 @@ int Initialize(int argc, char** argv)
 	SSAO::Init();
 	BakedLighting::Init();
 	Console::InitializeConsole();
+	Console::RegisterConVar(Console::Variable("post_process", Type::Bool, &Application::RenderPostProcess, nullptr));
 	Cubemap::RegisterCommands();
 	InitializeShaders();
-
 	UIBox::InitUI();
-
+	Application::UIMergeEffect = new PostProcess::Effect("Internal/uimerge.frag", PostProcess::EffectType::UI_Internal);
+	PostProcess::AddEffect(Application::UIMergeEffect);
 	if (argc > 1)
 	{
 		std::vector<std::string> LaunchArguments;
@@ -872,13 +905,15 @@ int Initialize(int argc, char** argv)
 		LaunchArgs::EvaluateLaunchArguments(LaunchArguments);
 	}
 
-	std::string Startup = GetStartupScene();
+
+	std::string Startup = Project::GetStartupScene();
 	if (!Application::StartupSceneOverride.empty())
 	{
 		Startup = Application::StartupSceneOverride;
 	}
 	Scene::LoadNewScene(Startup);
 	Scene::Tick();
+	Project::OnLaunch();
 
 #if EDITOR
 	// Initialize EditorUI
@@ -886,7 +921,10 @@ int Initialize(int argc, char** argv)
 #endif
 
 	Log::Print("Finished loading. (" + std::to_string(StartupTimer.TimeSinceCreation()) + " seconds)", Vector3(1.f, 0.75, 0.f));
-	Console::ExecuteConsoleCommand("info");
+	if (Application::ShowStartupInfo)
+	{
+		Console::ExecuteConsoleCommand("info");
+	}
 	if (!ENGINE_DEBUG && !IS_IN_EDITOR)
 	{
 		OS::SetConsoleWindowVisible(false);

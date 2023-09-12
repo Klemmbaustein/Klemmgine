@@ -2,6 +2,7 @@
 
 out vec2 v_texcoords;
 out vec2 v_uitexcoords;
+uniform bool u_hasUITexCoords = false;
 uniform vec2 Position = vec2(0);
 
 void main()
@@ -12,9 +13,16 @@ void main()
 	v_uitexcoords.x = (x + 1.0) * 0.5f;
 	v_uitexcoords.y = (y + 1.0) * 0.5f;
 	gl_Position = vec4(x, y, -1.f, 1);
-	v_texcoords = vec2(x, y);
-	v_texcoords -= Position;
-	v_texcoords.x = (v_texcoords.x + 1.0) * 0.5f;
-	v_texcoords.y = (v_texcoords.y + 1.0) * 0.5f;
-
+	if (u_hasUITexCoords)
+	{
+		v_texcoords = vec2(x, y);
+		v_texcoords -= Position;
+		v_texcoords.x = (v_texcoords.x + 1.0) * 0.5f;
+		v_texcoords.y = (v_texcoords.y + 1.0) * 0.5f;
+	}
+	else
+	{
+		v_texcoords = v_uitexcoords;
+		v_texcoords -= Position;
+	}
 }

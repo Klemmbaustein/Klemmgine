@@ -75,13 +75,14 @@ bool ChangedScene = false;
 
 
 #ifdef ENGINE_CSHARP
+
 std::string EditorUI::LaunchInEditorArgs;
+FILE* EditorUI::DebugProcess = nullptr;
+std::thread* EditorUI::DebugProcessIOThread = nullptr;
 
 void EditorUI::LaunchInEditor()
 {
 	std::string ProjectName = Build::GetProjectBuildName();
-	std::cout << std::filesystem::last_write_time(ProjectName + "-Debug.exe") << std::endl;
-	std::cout << FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }) << std::endl;
 	try
 	{
 		if (!std::filesystem::exists(ProjectName + "-Debug.exe")
@@ -107,19 +108,43 @@ void EditorUI::LaunchInEditor()
 	{
 		Args.append(" -scene " + FileUtil::GetFileNameFromPath(Scene::CurrentScene));
 	}
-	system((ProjectName + "-Debug.exe " + Args).c_str());
-
+	DebugProcess = _popen((ProjectName + "-Debug.exe " + Args).c_str(), "r");
+	DebugProcessIOThread = new std::thread(ReadProcessOutput);
 }
+
+void EditorUI::ReadProcessOutput()
+{
+	std::string CurrentMessage;
+	Log::Print("[Debug]: --------------------------------[Start of debugging session]--------------------------------", Log::LogColor::Blue);
+	while (!feof(DebugProcess))
+	{
+		char NewChar = (char)fgetc(DebugProcess);
+
+		if (NewChar == '\n')
+		{
+			Log::Print("[Debug]: " + CurrentMessage);
+			CurrentMessage.clear();
+		}
+		else
+		{
+			CurrentMessage.append({ NewChar });
+		}
+	}
+	Log::Print("[Debug]: ---------------------------------[End of debugging session]---------------------------------", Log::LogColor::Blue);
+}
+
 void EditorUI::RebuildAndHotReload()
 {
 	Log::Print("Rebuilding C# assembly...", Log::LogColor::Green);
 	system("cd Scripts && dotnet build");
 	Editor::CanHotreload = true;
 }
+
 void EditorUI::SetLaunchCurrentScene(bool NewLaunch)
 {
 	Editor::LaunchCurrentScene = NewLaunch;
 }
+
 #endif
 
 void EditorUI::SaveCurrentScene()
@@ -269,6 +294,10 @@ void EditorUI::OnLeave(void(*ReturnF)())
 			"Save changes to scene before quitting?",
 			{
 				DialogBox::Answer("Yes", []() {
+				if (Viewport::ViewportInstance->CurrentTab)
+				{
+					Viewport::ViewportInstance->CurrentTab->Save();
+				}
 				SaveCurrentScene();
 				QuitFunction(); }),
 				DialogBox::Answer("No", ReturnF),
@@ -277,6 +306,10 @@ void EditorUI::OnLeave(void(*ReturnF)())
 	}
 	else
 	{
+		if (Viewport::ViewportInstance->CurrentTab)
+		{
+			Viewport::ViewportInstance->CurrentTab->Save();
+		}
 		ReturnF();
 	}
 }

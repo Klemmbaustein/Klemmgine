@@ -57,6 +57,12 @@ namespace LaunchArgs
 		Application::SetFullScreen(true);
 	}
 
+	void NoStartupInfo(std::vector<std::string> AdditionalArgs)
+	{
+		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -fullscreen", Log::LogColor::Yellow);
+		Application::ShowStartupInfo = false;
+	}
+
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
 	{
 		std::pair("neverhideconsole", NeverHideConsole),
@@ -65,6 +71,7 @@ namespace LaunchArgs
 		std::pair("wireframe", Wireframe),
 		std::pair("version", GetVersion),
 		std::pair("fullscreen", FullScreen),
+		std::pair("nostartupinfo", NoStartupInfo)
 	};
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments)
 	{

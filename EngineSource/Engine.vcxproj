@@ -76,6 +76,7 @@
     <ClCompile Include="Rendering\Utility\Bloom.cpp" />
     <ClCompile Include="Rendering\Utility\CSM.cpp" />
     <ClCompile Include="Rendering\Utility\Framebuffer.cpp" />
+    <ClCompile Include="Rendering\Utility\PostProcess.cpp" />
     <ClCompile Include="Rendering\Utility\ShaderManager.cpp" />
     <ClCompile Include="Rendering\Utility\ShaderPreprocessor.cpp" />
     <ClCompile Include="Rendering\Utility\SSAO.cpp" />
@@ -178,6 +179,7 @@
     <ClInclude Include="Rendering\Utility\Bloom.h" />
     <ClInclude Include="Rendering\Utility\CSM.h" />
     <ClInclude Include="Rendering\Utility\Framebuffer.h" />
+    <ClInclude Include="Rendering\Utility\PostProcess.h" />
     <ClInclude Include="Rendering\Utility\ShaderManager.h" />
     <ClInclude Include="Rendering\Utility\ShaderPreprocessor.h" />
     <ClInclude Include="Rendering\Utility\SSAO.h" />

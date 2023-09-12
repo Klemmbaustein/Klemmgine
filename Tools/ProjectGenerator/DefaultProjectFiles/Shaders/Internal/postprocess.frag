@@ -13,7 +13,6 @@ uniform sampler2D u_bloomtexture;
 uniform sampler2D u_ssaotexture;
 uniform sampler2D u_depth;
 uniform sampler2D u_ui;
-uniform sampler2D u_uialpha;
 uniform float u_gamma = 1;
 uniform float u_chrabbsize = 0;
 uniform float u_vignette = 1;
@@ -65,8 +64,6 @@ vec4 sampleUI()
 		for (int y = 0; y < 2; ++y)
 		{
 			vec4 newtex = texture(u_ui, v_uitexcoords + vec2(x, y) * texSize);
-			newtex.w = texture(u_uialpha, v_uitexcoords + vec2(x, y) * texSize).x;
-			UIsample.w += newtex.w;
 			if (newtex.w > 0.0)
 			{
 				averageOpacity += newtex.w;
@@ -82,7 +79,7 @@ vec4 sampleUI()
 		UIsample.w /= 4;
 		UIsample.xyz /= averageOpacity;
 	}
-	UIsample.w = clamp(UIsample.w, 0, 1);
+	UIsample.w = clamp(averageOpacity, 0, 1);
 	return UIsample;
 }
 
@@ -95,8 +92,6 @@ void main()
 	vec3 outlinecolor = vec3(0.f);
 	float outlinelevel = LinearizeDepth(texture(u_outlines, v_texcoords).x);
 	vec4 uicolor = sampleUI();
-
-
 
 	if (u_editor)
 	{
@@ -150,6 +145,5 @@ void main()
 	f_color *= (rand(v_texcoords) / 50) + 0.95; // To combat color banding
 	f_color -= Vignette * u_vignette;
 	f_color.xyz = mix(clamp(f_color.xyz, 0, 1), uicolor.xyz, clamp(uicolor.w, 0, 1));
-	//f_color = uicolor;
 	f_color.w = 1;
 }

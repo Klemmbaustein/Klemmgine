@@ -4,6 +4,7 @@
 #include <Rendering/Utility/SSAO.h>
 #include <Rendering/Utility/CSM.h>
 #include <UI/UIBox.h>
+#include <Rendering/Utility/PostProcess.h>
 
 namespace Graphics
 {
@@ -28,6 +29,8 @@ namespace Graphics
 		{
 			return;
 		}
+
+
 		for (FramebufferObject* o : AllFramebuffers)
 		{
 			if (o->UseMainWindowResolution)
@@ -40,6 +43,11 @@ namespace Graphics
 		WindowResolution = NewResolution * ResolutionScale;
 		SSAO::ResizeBuffer((unsigned int)(NewResolution.X * ResolutionScale), (unsigned int)(NewResolution.Y * ResolutionScale));
 		Bloom::OnResized();
+		for (PostProcess::Effect* i : PostProcess::GetCurrentEffects())
+		{
+			i->UpdateSize();
+		}
+
 		UIBox::ForceUpdateUI();
 	}
 	float Gamma = 1;

@@ -42,6 +42,8 @@ public:
 	void OpenTab(size_t TabID, std::string File);
 	void OnButtonClicked(int Index);
 
+	EditorTab* CurrentTab = nullptr;
+
 	void UpdateTabBar();
 
 	FramebufferObject* OutlineBuffer = nullptr, *ArrowsBuffer = nullptr;

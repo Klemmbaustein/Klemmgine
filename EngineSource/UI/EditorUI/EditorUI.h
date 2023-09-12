@@ -79,6 +79,9 @@ class EditorUI : public UICanvas
 {
 public:
 #if ENGINE_CSHARP
+	static FILE* DebugProcess;
+	static void ReadProcessOutput();
+	static std::thread* DebugProcessIOThread;
 	static void LaunchInEditor();
 	static void RebuildAndHotReload();
 	static std::string LaunchInEditorArgs;

@@ -15,6 +15,8 @@ namespace Application
 	extern std::string StartupSceneOverride;
 	bool WindowHasFocus();
 
+	extern bool ShowStartupInfo;
+
 	extern float LogicTime, RenderTime, SyncTime;
 	extern SDL_Window* Window;
 	void Quit();
@@ -33,7 +35,7 @@ namespace Application
 	{
 		Timer();
 		void Reset();
-		float TimeSinceCreation();
+		float TimeSinceCreation() const;
 	private:
 		uint64_t Time = 0;
 	};

@@ -43,7 +43,7 @@ namespace Log
 		}
 		std::cout << "Log: ";
 		OS::SetConsoleColor(NearestColor);
-		std::cout << Text << "\n";
+		std::cout << Text << std::endl;
 		OS::SetConsoleColor(OS::ConsoleColor::Gray);
 	}
 
