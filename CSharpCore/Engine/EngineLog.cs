@@ -19,6 +19,6 @@ public static class EngineLog
 	{
 		// Allow the program to crash here of 'PrintFunction' is null
 		// If PrintFunction is null, this means that something is wrong anyways.
-		PrintFunction(Message);
+		PrintFunction!(Message);
 	}
 }

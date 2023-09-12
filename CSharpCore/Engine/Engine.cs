@@ -78,7 +78,7 @@ internal static class Engine
 			return;
 		}
 
-		WorldObjectType?.GetMethod("LoadGetObjectFunction")?.Invoke(null, new object[] { GetObjectFromID });
+		WorldObjectType?.GetMethod("LoadGetObjectFunction")?.Invoke(null, new object[] { (object)GetObjectFromID });
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{

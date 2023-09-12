@@ -16,7 +16,7 @@ public static class CoreNativeFunction
 		{
 			return;
 		}
-		Engine.LoadTypeFromAssembly("NativeFunction").GetMethod("RegisterNativeFunction").Invoke(null, new object[] { Name, FunctionPtr });
+		Engine.LoadTypeFromAssembly("NativeFunction")!.GetMethod("RegisterNativeFunction")!.Invoke(null, new object[] { Name, FunctionPtr });
 		LoadedNativeFunctions.Add(Name, FunctionPtr);
 	}
 
