@@ -130,13 +130,14 @@ int main(int argc, char** argv)
 	}
 	Projects.push_back(CppProject);
 	std::string ShaderGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Shaders", "Shaders", "10.0", "v143", false);
+#if 1
 	SLN::Project ShaderProject;
 	ShaderProject.Name = "Shaders";
 	ShaderProject.Path = "Shaders";
-	ShaderProject.GUID = ShaderGUID;
+	ShaderProject.GUID = "91315EA7-5B25-4D8E-A732-C66EB73E510E";
 	ShaderProject.Type = "vcxproj";
 	Projects.push_back(ShaderProject);
-
+#endif
 	std::cout << "- Writing solution" << std::endl;
 	SLN::WriteSolution("Games/" + ProjectName, ProjectName, Projects);
 	std::cout << "- Finished writing solution: Games/" << ProjectName << "/" << ProjectName << ".sln" << std::endl;
