@@ -112,7 +112,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 			.Add(XML("ShowAllFiles", "true"))
 			.Add(XML("VCProjectVersion", "16.0"))
 			.Add(XML("WindowsTargetPlatformVersion", WinSdkVer))
-			.Add(XML("ProjectGuid", GUID))
+			.Add(XML("ProjectGuid", "{" + GUID + "}"))
 			.Add(XML("Keyword", "Win32Proj"))
 			.Add(XML("PlatformToolset", PlatformToolset)))
 		.Add(XML("Import")

@@ -93,8 +93,9 @@ int main(int argc, char** argv)
 	SLN::Project CppProject;
 	CppProject.Name = ProjectName;
 	CppProject.Path = "Code";
-	CppProject.GUID = CppGUID;
+	CppProject.GUID = "A2BEFDE1-9019-4A47-839E-545ACCF559F2";
 	CppProject.Type = "vcxproj";
+	Projects.push_back(CppProject);
 
 	if (LaunchArgs["includeCsharp"] == "true")
 	{
@@ -128,7 +129,6 @@ int main(int argc, char** argv)
 		Projects.push_back(EngineFolder);
 		CppProject.Dependencies.push_back(EngineProject.GUID);
 	}
-	Projects.push_back(CppProject);
 	std::string ShaderGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Shaders", "Shaders", "10.0", "v143", false);
 #if 1
 	SLN::Project ShaderProject;
