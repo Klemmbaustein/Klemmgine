@@ -46,6 +46,7 @@ uniform bool u_ssao_reverse = true;
 uniform samplerCube Skybox;
 uniform sampler3D GiMap;
 uniform int GiRes;
+uniform bool GiEnabled;
 uniform vec3 GiScale;
 
 layout (std140, binding = 0) uniform LightSpaceMatrices
@@ -163,6 +164,10 @@ vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, v
 	vec3 reflection = reflect(u_directionallight.Direction, normal);
 	float shadow = 1;
 	float LightmapShadow = SampleLightMap().x;
+	if (GiEnabled)
+	{
+		LightmapShadow = 1;
+	}
 	if (u_shadows == 1)
 	{
 		shadow = 1 - ShadowCalculation(v_position, normal, LightmapShadow); //ShadowCalculation is expensive because of PCF
@@ -181,11 +186,17 @@ vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, v
 	float Intensity = max(dot(normal, light), 0.f);
 
 	vec3 DirectionalLightColor = Intensity * (color * u_directionallight.Intensity) * (1 - u_directionallight.AmbientIntensity) * u_directionallight.SunColor;
-	vec3 ambient = color
-	* u_directionallight.AmbientIntensity
-	* (mix(LightmapShadow, 1.0, 0.5))
-	* mix(u_directionallight.AmbientColor, vec3(1), LightmapShadow);
+	vec3 ambient = color * u_directionallight.AmbientIntensity;
+	if (GiEnabled)
+	{
+		ambient *= (mix(LightmapShadow, 1.0, 0.5))
+			* mix(u_directionallight.AmbientColor, vec3(1), LightmapShadow);
 
+	}
+	else
+	{
+		ambient *= u_directionallight.AmbientColor;
+	}
 	if (specularstrength > 0)
 	{
 		vec3 I = normalize(v_position - u_cameraposition);

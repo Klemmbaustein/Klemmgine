@@ -19,6 +19,7 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
 	ShaderToApply->SetInt("shadowMap", 1);
 	ShaderToApply->SetInt("GiMap", 3);
 	ShaderToApply->SetInt("GiRes", (int)BakedLighting::GetLightTextureSize());
+	ShaderToApply->SetInt("GiEnabled", (int)BakedLighting::GetLightTextureSize());
 	ShaderToApply->SetVector3("GiScale", BakedLighting::GetLightMapScale());
 	ShaderToApply->SetInt("Skybox", 2);
 	ShaderToApply->SetFloat("u_biasmodifier", Vector3::Dot(
