@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Security.Cryptography;
-#nullable enable
 
 [StructLayout(LayoutKind.Sequential)]
 public struct EngineVector
@@ -83,7 +82,7 @@ internal static class Engine
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{
-			if (i.IsSubclassOf(WorldObjectType))
+			if (i.IsSubclassOf(WorldObjectType!))
 			{
 				WorldObjectTypes.Add(i);
 			}
@@ -99,7 +98,7 @@ internal static class Engine
 		{
 			if (ObjectType.Name == obj)
 			{
-				object? NewObject = Activator.CreateInstance(ObjectType);
+				object NewObject = Activator.CreateInstance(ObjectType)!;
 				if (NewObject == null)
 				{
 					return 0;
@@ -111,7 +110,7 @@ internal static class Engine
 				{
 					HashCode = -1;
 				}
-				Set(ref NewObject, "NativeObject", NativeObject);
+				Set(ref NewObject!, "NativeObject", NativeObject);
 
 				WorldObjects.Add(HashCode, NewObject);
 				SetVectorFieldOfObject(HashCode, "Position", t.Position);
@@ -183,7 +182,7 @@ internal static class Engine
 		var obj = WorldObjects[ID];
 		var pos = Get(obj, Field);
 
-		return new EngineVector((float)Get(pos, "X"), (float)Get(pos, "Y"), (float)Get(pos, "Z"));
+		return new EngineVector((float)Get(pos!, "X")!, (float)Get(pos!, "Y")!, (float)Get(pos!, "Z")!);
 	}
 
 	public static void SetVectorFieldOfObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string Field, EngineVector NewValue)
