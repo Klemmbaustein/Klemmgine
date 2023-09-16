@@ -7,7 +7,6 @@
 #include <UI/UITextField.h>
 #include <UI/UIText.h>
 #include <UI/EditorUI/EditorPanel.h>
-#include <UI/EditorUI/Tabs/MaterialTemplateTab.h>
 #include "Tabs/MeshTab.h"
 #include "Tabs/ParticleEditorTab.h"
 #include <Engine/TypeEnun.h>
@@ -38,7 +37,6 @@ namespace Editor
 	{
 		std::pair("dir", Vector3(0.8f, 0.5f, 0)),
 		std::pair("jsmat", Vector3(0, 0.7f, 0)),
-		std::pair("jsmtmp", Vector3(0.1f, 0.4f, 0)),
 		std::pair("jsm", Vector3(0, 0, 0.75f)),
 		std::pair("jscn", Vector3(1.0f, 0.4f, 0.4f)),
 		std::pair("png", Vector3(0.3f, 0, 1)),
@@ -54,7 +52,6 @@ namespace Editor
 	{
 		std::pair("dir", 5),
 		std::pair("jsmat", 9),
-		std::pair("jsmtmp", 10),
 		std::pair("jsm", 11),
 		std::pair("jscn", 7),
 		std::pair("png", 18),

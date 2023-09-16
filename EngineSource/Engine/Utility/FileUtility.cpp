@@ -1,6 +1,8 @@
 #include "FileUtility.h"
 #include <iostream>
 #include <algorithm>
+#include <fstream>
+#include <sstream>
 
 #if _WIN32
 #include <Windows.h>
@@ -75,6 +77,13 @@ namespace FileUtil
 			return FileName;
 		}
 		return "";
+	}
+	std::string GetFileContent(std::string FilePath)
+	{
+		std::ifstream in = std::ifstream(FilePath);
+		std::stringstream instr;
+		instr << in.rdbuf();
+		return instr.str();
 	}
 	std::vector<std::string> GetAllFilesInFolder(std::string Folder, std::string ext)
 	{

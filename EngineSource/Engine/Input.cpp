@@ -5,10 +5,16 @@ namespace Input
 	Vector2 MouseLocation = Vector2(-2);
 	bool CursorVisible = false;
 	bool Keys[351];
+	bool BlockInputConsole = false;
+	bool BlockInput = false;
 }
 
 bool Input::IsKeyDown(int Key)
 {
+	if (BlockInput || BlockInputConsole)
+	{
+		return false;
+	}
 	if (!(Key < 128))
 	{
 		Key -= 1073741755;
@@ -26,6 +32,7 @@ namespace Input
 
 namespace TextInput
 {
+	bool BlockInput = false;
 	bool PollForText = false;
 	std::string Text;
 	int TextIndex = 0u;

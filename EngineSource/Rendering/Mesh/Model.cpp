@@ -7,7 +7,6 @@
 #include <filesystem>
 #include <Rendering/Utility/ShaderManager.h>
 #include <Engine/Log.h>
-#include <UI/EditorUI/MaterialFunctions.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Stats.h>
 #include <Engine/File/Assets.h>
@@ -29,7 +28,7 @@ Model::Model(std::string Filename)
 		for (size_t i = 0; i < ModelMeshData.Elements.size(); i++)
 		{
 			Mesh* NewMesh = new Mesh(ModelMeshData.Elements[i].Vertices, ModelMeshData.Elements[i].Indices, 
-				Material::LoadMaterialFile(ModelMeshData.Elements[i].ElemMaterial, false));
+				Material::LoadMaterialFile(ModelMeshData.Elements[i].ElemMaterial));
 			Meshes.push_back(NewMesh);
 		}
 		HasCollision = ModelMeshData.HasCollision;
@@ -49,7 +48,7 @@ Model::Model(ModelGenerator::ModelData Data)
 	TwoSided = Data.TwoSided;
 	for (auto& i : Data.Elements)
 	{
-		Material mat = Material::LoadMaterialFile(i.ElemMaterial, false);
+		Material mat = Material::LoadMaterialFile(i.ElemMaterial);
 		Mesh* NewMesh = new Mesh(i.Vertices, i.Indices, mat);
 		Meshes.push_back(NewMesh);
 	}

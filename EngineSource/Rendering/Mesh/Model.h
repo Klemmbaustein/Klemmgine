@@ -3,7 +3,6 @@
 #include <string>
 #include "Rendering/Camera/Camera.h"
 #include "Math/Collision/CollisionBox.h"
-#include <UI/EditorUI/MaterialFunctions.h>
 #include <Rendering/Renderable.h>
 #include <Rendering/Camera/FrustumCulling.h>
 #include <Rendering/Mesh/ModelGenerator.h>

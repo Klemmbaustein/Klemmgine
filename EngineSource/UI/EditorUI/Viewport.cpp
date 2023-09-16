@@ -15,7 +15,6 @@
 #include <Rendering/Mesh/Model.h>
 #include <UI/EditorUI/Tabs/MeshTab.h>
 #include <UI/EditorUI/Tabs/MaterialTab.h>
-#include <UI/EditorUI/Tabs/MaterialTemplateTab.h>
 #include <UI/EditorUI/Tabs/ParticleEditorTab.h>
 #include <UI/EditorUI/Tabs/CubemapTab.h>
 #include <UI/EditorUI/Tabs/PreferenceTab.h>
@@ -74,9 +73,9 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 		// 01
 		new MeshTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
 		// 02
-		new MaterialTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[12]),
+		new MaterialTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
 		// 03
-		new MaterialTemplateTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4]),
+		nullptr,
 		// 04
 		new ParticleEditorTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4], Editor::CurrentUI->Textures[12]),
 		// 05
@@ -454,6 +453,10 @@ void Viewport::OnButtonClicked(int Index)
 			TabInstances[Tabs[SelectedTab].Index]->TabBackground->IsVisible = false;
 			UIBox::RedrawUI();
 			SelectedTab--;
+		}
+		if (TabInstances[Tabs[SelectedTab].Index])
+		{
+			TabInstances[Tabs[SelectedTab].Index]->Load(Tabs[SelectedTab].Name);
 		}
 		Tabs.erase(Tabs.begin() + Index / 2);
 		UpdateLayout();

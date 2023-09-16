@@ -297,7 +297,7 @@ void UITextField::Draw()
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	if (ShowIBeam)
 	{
-		ButtonShader->SetVector4("u_color", Vector4(1));
+		ButtonShader->SetVector4("u_color", Vector4(TextColor, 1));
 		ButtonShader->SetInt("u_borderType", UIBox::E_NONE);
 		glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_transform"), IBeamPosition.X, IBeamPosition.Y, IBeamScale.X, IBeamScale.Y);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

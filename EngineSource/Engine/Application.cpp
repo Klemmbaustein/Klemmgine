@@ -240,7 +240,7 @@ void GLAPIENTRY MessageCallback(
 		|| type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR
 		|| type == GL_DEBUG_TYPE_PORTABILITY)
 	{
-		Log::Print(message + std::string(" Status: ") + Debugging::EngineStatus);
+		Log::Print(std::string(message)  + " - " + Debugging::EngineStatus);
 		SDL_Delay(15);
 	}
 }
@@ -257,14 +257,6 @@ void TickObjects()
 #endif
 }
 
-std::string GetConsoleInput()
-{
-	std::string in;
-	std::cin >> in;
-	return in;
-}
-
-
 void DrawFramebuffer(FramebufferObject* Buffer)
 {
 	if (!Buffer->FramebufferCamera) return;
@@ -280,7 +272,7 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 
 	Buffer->FramebufferCamera->Update();
 
-	if (!Buffer->Renderables.size() && !Buffer->ParticleEmitters.size())
+	if ((!Buffer->Renderables.size() && !Buffer->ParticleEmitters.size()) || !Buffer->Active)
 	{
 		Buffer->GetBuffer()->Bind();
 		glClearColor(0.f, 0.f, 0.f, 1.f);
@@ -347,9 +339,8 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	auto Matrices = CSM::getLightSpaceMatrices();
 	for (auto& s : Shaders)
 	{
-		Renderable::ApplyDefaultUniformsToShader(s.second.UsedShader);
+		Renderable::ApplyDefaultUniformsToShader(s.second.UsedShader, Buffer == Graphics::MainFramebuffer);
 		CSM::BindLightSpaceMatricesToShader(Matrices, s.second.UsedShader);
-		s.second.UsedShader->SetInt("u_useLightMap", Buffer == Graphics::MainFramebuffer ? BakedLighting::LoadedLightmap : 0);
 		for (int i = 0; i < 8; i++)
 		{
 			std::string CurrentLight = "u_lights[" + std::to_string(i) + "]";

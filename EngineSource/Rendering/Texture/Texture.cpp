@@ -34,7 +34,10 @@ namespace Texture
 				TextureFile = Assets::GetAsset(File + ".png");
 			}
 
-
+			if (!std::filesystem::exists(TextureFile))
+			{
+				return 0;
+			}
 
 			int TextureWidth = 0;
 			int TextureHeigth = 0;

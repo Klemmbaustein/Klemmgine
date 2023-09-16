@@ -24,6 +24,7 @@ public:
 	UIText* SetColor(Vector3 NewColor);
 	UIText* SetOpacity(float NewOpacity);
 	UIText* SetTextSize(float Size);
+	UIText* SetWrapDistance(float Distance);
 	float GetTextSize();
 	UIText* SetTextWidthOverride(float NewTextWidthOverride);
 

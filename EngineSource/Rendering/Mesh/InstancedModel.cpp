@@ -20,7 +20,7 @@ InstancedModel::InstancedModel(std::string Filename)
 		for (size_t i = 0; i < ModelData.Elements.size(); i++)
 		{
 			InstancedMesh* NewMesh = new InstancedMesh(ModelData.Elements[i].Vertices, ModelData.Elements[i].Indices,
-				Material::LoadMaterialFile(ModelData.Elements[i].ElemMaterial, false));
+				Material::LoadMaterialFile(ModelData.Elements[i].ElemMaterial));
 			Meshes.push_back(NewMesh);
 		}
 		NonScaledSize = ModelData.CollisionBox;

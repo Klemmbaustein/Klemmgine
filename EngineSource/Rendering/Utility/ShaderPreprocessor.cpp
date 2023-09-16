@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <Engine/Log.h>
 #include <Engine/Build/Pack.h>
+#include <map>
+#include <Engine/Utility/StringUtility.h>
 
 namespace Preprocessor
 {
@@ -20,33 +22,199 @@ namespace Preprocessor
 		}
 		return "\n";
 	}
+
+	std::map<std::string, Type::TypeEnum> GLSLTypes =
+	{
+		std::pair("int", Type::Int),
+		std::pair("vec3", Type::Vector3),
+		std::pair("float", Type::Float),
+		std::pair("sampler2D", Type::GL_Texture),
+		std::pair("bool", Type::Bool),
+	};
 }
 
-std::string Preprocessor::ParseGLSL(std::string Code, std::string Path)
+Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, std::string Path)
 {
 	std::stringstream CodeStream;
 	CodeStream << Code;
-	unsigned int LineInt = 0;
 	size_t StringPos = 0;
+	bool ReadingParameters = false;
+
+	std::vector<Material::Param> Params;
+
+	std::string Description;
+	std::string Category;
+
 	if (CodeStream.eof()) Log::Print(Code, Log::LogColor::Red);
 	while (!CodeStream.eof())
 	{
-		LineInt++;
-		char Line[256];
-		CodeStream.getline(Line, 256);
+		char Line[4096];
+		CodeStream.getline(Line, 4096);
 		std::stringstream CurrentLine;
-		CurrentLine << Line;
+		std::string LineString = Line;
+		StrReplace::ReplaceChar(LineString, '=', " = ");
+		CurrentLine << LineString;
 		StringPos += CurrentLine.str().size();
 		std::string LineStart;
 		CurrentLine >> LineStart;
+		std::string NextWord;
+		CurrentLine >> NextWord;
+		// Dies the line start with a #params instruction?
+		if (LineStart.substr(0, 2) == "//")
+		{
+			if (NextWord == "#params")
+			{
+				CurrentLine >> NextWord;
+				Category = NextWord;
 
-		// Does the line start with a preprocessor instruction?
+				if (Category == "#params")
+				{
+					Category.clear();
+				}
+
+				ReadingParameters = true;
+				continue;
+			}
+
+			else if (ReadingParameters)
+			{
+				Description = CurrentLine.str().substr(2);
+			}
+		}
+		else if (LineStart == "//#params")
+		{
+			Category = NextWord;
+			ReadingParameters = true;
+			continue;
+		}
+		else if (std::strspn(LineStart.c_str(), "	 ") == LineStart.size())
+		{
+			ReadingParameters = false;
+		}
+		else if (ReadingParameters)
+		{
+			if (LineStart != "uniform")
+			{
+				Log::Print("--------------------------------------------------------------------------------", Log::LogColor::Red);
+				Log::Print("ShaderParseError: expected a uniform in parameter list.", Log::LogColor::Red);
+				Log::Print(Line + std::string(" <--"), Log::LogColor::Red);
+				throw "ShaderParseError";
+
+			}
+			if (NextWord.empty() || !GLSLTypes.contains(NextWord))
+			{
+				Log::Print("--------------------------------------------------------------------------------", Log::LogColor::Red);
+				Log::Print("ShaderParseError: expected a valid type.", Log::LogColor::Red);
+				Log::Print(Line + std::string(" <--"), Log::LogColor::Red);
+				Log::Print("Possible Types: ", Log::LogColor::Red);
+				for (auto& i : GLSLTypes)
+				{
+					Log::Print("    " + i.first, Log::LogColor::Red);
+				}
+				throw "ShaderParseError";
+			}
+			Type::TypeEnum ParamType = GLSLTypes[NextWord];
+			//Params.push_back(Material::Param(CurrentLine.str(), ));
+			std::string Name;
+			CurrentLine >> Name;
+			StrReplace::ReplaceChar(Name, ';', "");
+
+			std::string Default;
+			CurrentLine >> Default;
+			if (Default == "=")
+			{
+				switch (ParamType)
+				{
+				case Type::Vector3:
+				{
+					// xy = vec3(1, 2, 3);
+					LineString = LineString.substr(LineString.find_first_of("=") + 1);
+					// vec3(1, 2, 3);
+					StrReplace::ReplaceChar(LineString, '(', " ");
+					StrReplace::ReplaceChar(LineString, ')', " ");
+					StrReplace::ReplaceChar(LineString, ',', " ");
+					StrReplace::ReplaceChar(LineString, ';', "");
+					// vec3 1 2 3
+
+
+					std::stringstream VecStream;
+					VecStream << LineString;
+					std::string OutString;
+					VecStream >> OutString;
+					// VecStream: 1, 2, 3, OutString = vec3
+					if (OutString != "vec3")
+					{
+						Default.clear();
+						break;
+					}
+
+					OutString.clear();
+
+					std::string VecString;
+					size_t Values = 0;
+
+					while (!VecStream.eof())
+					{
+						VecString.append(OutString + " ");
+						VecStream >> OutString;
+						Values++;
+					}
+					if (Values == 2)
+					{
+						VecString = VecString + VecString + VecString;
+					}
+					Default = VecString;
+
+				}
+					break;
+				case Type::Float:
+				case Type::Int:
+				{
+					CurrentLine >> Default;
+					StrReplace::ReplaceChar(Default, ';', "");
+				}
+					break;
+				case Type::GL_Texture:
+					Default.clear();
+					break;
+				case Type::Bool:
+				{
+					CurrentLine >> Default;
+					StrReplace::ReplaceChar(Default, ';', "");
+					if (Default == "true")
+					{
+						Default = "1";
+					}
+					else if (Default == "false")
+					{
+						Default = "0";
+					}
+					else
+					{
+						Log::Print(Default);
+						Default.clear();
+					}
+				}
+					break;
+				default:
+					break;
+				}
+			}
+			else
+			{
+				Default.clear();
+			}
+
+			Params.push_back(Material::Param(Name, ParamType, Default, Category + "#" + Description));
+			Description.clear();
+		}
+
+		// Does the line start with a preprocessor include instruction?
 		if (LineStart.substr(0, 11) != "//!#include")
 		{
 			if (LineStart == "//!")
 			{
-				CurrentLine >> LineStart;
-				if (LineStart.substr(0, 8) != "#include")
+				if (NextWord.substr(0, 8) != "#include")
 				{
 					continue;
 				}
@@ -72,7 +240,7 @@ std::string Preprocessor::ParseGLSL(std::string Code, std::string Path)
 		}
 #endif
 
-		std::string FileToParse = RemoveQuotesFromString(Instruction);
+		const std::string FileToParse = RemoveQuotesFromString(Instruction);
 		if (FileToParse == "\n")
 		{
 			Log::Print("--------------------------------------------------------------------------------", Log::LogColor::Red);
@@ -98,10 +266,14 @@ std::string Preprocessor::ParseGLSL(std::string Code, std::string Path)
 		// close file handlers
 		IncludeFile.close();
 		// convert stream into string
-		std::string IncludeString = ParseGLSL(IncludeStream.str(), Path);
+		auto ParseResult = ParseGLSL(IncludeStream.str(), Path);
 #else
-		std::string IncludeString = ParseGLSL(Pack::GetFile(FileToParse), Path);
+		auto ParseResult = ParseGLSL(Pack::GetFile(FileToParse), Path);
 #endif
+		ReadingParameters = false;
+		Params.clear();
+
+		const std::string& IncludeString = ParseResult.Code;
 
 		std::string NewCode = CodeStream.str().substr(0, StringPos - CurrentLine.str().size());
 		NewCode.append(IncludeString);
@@ -109,5 +281,9 @@ std::string Preprocessor::ParseGLSL(std::string Code, std::string Path)
 		CodeStream = std::stringstream();
 		CodeStream << NewCode;
 	}
-	return CodeStream.str();
+
+	ProcessedShader ReturnValue;
+	ReturnValue.Code = CodeStream.str();
+	ReturnValue.ShaderParams = Params;
+	return ReturnValue;
 }

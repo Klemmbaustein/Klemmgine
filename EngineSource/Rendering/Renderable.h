@@ -48,7 +48,7 @@ public:
 
 	};
 
-	static void ApplyDefaultUniformsToShader(Shader* ShaderToApply);
+	static void ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFramebuffer);
 
 	bool CastShadow = true;
 };

@@ -108,7 +108,11 @@ void EditorUI::LaunchInEditor()
 	{
 		Args.append(" -scene " + FileUtil::GetFileNameFromPath(Scene::CurrentScene));
 	}
-	DebugProcess = _popen((ProjectName + "-Debug.exe " + Args).c_str(), "r");
+#if _WIN32
+	DebugProcess = _popen((ProjectName + "-Debug.exe -nostartupinfo" + Args).c_str(), "r");
+#else
+	DebugProcess = popen(("./" + ProjectName + "-Debug -nostartupinfo" + Args).c_str(), "r");
+#endif
 	DebugProcessIOThread = new std::thread(ReadProcessOutput);
 }
 

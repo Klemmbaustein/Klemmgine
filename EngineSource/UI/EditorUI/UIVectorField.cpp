@@ -121,7 +121,7 @@ void UIVectorField::Generate()
 		ColorDisplay->AddChild(ColorText->SetPadding(0));
 		AddChild(ColorDisplay);
 		ColorDisplay->SetTryFill(true);
-		ColorDisplay->SetMinSize(Vector2(0.2675f, 0.03f));
+		ColorDisplay->SetMinSize(Vector2(0.26f, 0.03f));
 		ColorDisplay->SetBorder(E_ROUNDED, 0.25f);
 		ColorDisplay->SetPadding(0);
 	}

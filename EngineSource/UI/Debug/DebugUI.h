@@ -13,6 +13,8 @@ class DebugUI : public UICanvas
 	UITextField* LogPrompt = nullptr;
 	UIText* DebugTexts[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
 
+	bool ConsoleReadInput(int Key);
+
 	UIBackground* LogBackground = nullptr;
 public:
 	static DebugUI* CurrentDebugUI;

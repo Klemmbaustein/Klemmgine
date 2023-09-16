@@ -20,6 +20,8 @@ namespace FileUtil
 
 	std::string GetExtension(std::string FileName);
 
+	std::string GetFileContent(std::string FilePath);
+
 	// Returns a vector containing all files in the folder. If ext != "", only 
 	// files with the given extension will be listed.
 	std::vector<std::string> GetAllFilesInFolder(std::string Folder, std::string ext = "");

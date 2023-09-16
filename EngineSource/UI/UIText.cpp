@@ -51,6 +51,13 @@ UIText* UIText::SetTextSize(float Size)
 	return this;
 }
 
+UIText* UIText::SetWrapDistance(float Distance)
+{
+	WrapDistance = Distance;
+	Wrap = true;
+	return this;
+}
+
 float UIText::GetTextSize()
 {
 	return TextSize;

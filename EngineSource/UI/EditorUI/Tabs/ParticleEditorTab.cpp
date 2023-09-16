@@ -47,6 +47,7 @@ ParticleEditorTab::ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsi
 void ParticleEditorTab::Tick()
 {
 	ParticleFramebufferObject->FramebufferCamera = Graphics::MainCamera;
+	ParticleFramebufferObject->Active = TabBackground->IsVisible;
 	ParticleViewport->SetUseTexture(true, ParticleFramebufferObject->GetTextureID());
 	ParticleViewport->IsVisible = TabBackground->IsVisible;
 
@@ -101,7 +102,7 @@ void ParticleEditorTab::Load(std::string File)
 			auto ParticleData = Particles::ParticleEmitter::LoadParticleFile(File, ElementMaterials);
 			for (unsigned int i = 0; i < ParticleData.size(); i++)
 			{
-				Particle->AddElement(ParticleData[i], Material::LoadMaterialFile(ElementMaterials[i], false));
+				Particle->AddElement(ParticleData[i], Material::LoadMaterialFile(ElementMaterials[i]));
 			}
 		}
 	}
@@ -303,7 +304,7 @@ void ParticleEditorTab::OnButtonClicked(int Index)
 	{
 		if (Index == 0)
 		{
-			Particle->AddElement(Particles::ParticleElement(), Material::LoadMaterialFile("NONE", false));
+			Particle->AddElement(Particles::ParticleElement(), Material::LoadMaterialFile("NONE"));
 			ElementMaterials.push_back("");
 			Generate();
 			return;
@@ -359,7 +360,7 @@ void ParticleEditorTab::OnButtonClicked(int Index)
 		}
 		if (Index == 106)
 		{
-			Particle->SetMaterial(SelectedElement, Material::LoadMaterialFile(((UITextField*)Button)->GetText(), false));
+			Particle->SetMaterial(SelectedElement, Material::LoadMaterialFile(((UITextField*)Button)->GetText()));
 			ElementMaterials[SelectedElement] = ((UITextField*)Button)->GetText();
 			Generate();
 			return;

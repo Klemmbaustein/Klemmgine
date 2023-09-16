@@ -25,9 +25,22 @@ Shader* ReferenceShader(std::string VertexShader, std::string FragmentShader)
 	auto FoundShader = Shaders.find(ShaderToFind);
 	if (!Shaders.contains(ShaderToFind))
 	{
-		Shader* NewShader = new Shader(VertexShader.c_str(), FragmentShader.c_str());
-		Shaders.insert(std::make_pair(ShaderToFind, ShaderElement(NewShader, 1)));
-		return NewShader;
+		try
+		{
+			Shader* NewShader = new Shader(VertexShader.c_str(), FragmentShader.c_str());
+			Shaders.insert(std::make_pair(ShaderToFind, ShaderElement(NewShader, 1)));
+			return NewShader;
+		}
+		catch (const char* err)
+		{
+			Log::Print("-- " + std::string(err) + " --");
+
+			Shader* FallbackShader = new Shader("Shaders/basic.vert", "Shaders/basic.frag");
+
+			Shaders.insert(std::make_pair(ShaderToFind, ShaderElement(FallbackShader, 1)));
+
+			return FallbackShader;
+		}
 	}
 	else
 	{

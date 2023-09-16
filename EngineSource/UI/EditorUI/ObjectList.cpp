@@ -91,7 +91,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 	{
 		UIButton* ElementButton = (new UIButton(true,
 			0,
-			(ListIterator++ % 2) ? 0.15f : 0.2f,
+			(ListIterator++ % 2) ? UIColors[0] : Vector3::Lerp(UIColors[0], 0.5f, 0.2f),
 			this,
 			Object.Object ? Object.ListIndex : -1 - Object.ListIndex));
 
@@ -124,13 +124,13 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 
 		if (!Object.Object && !Object.IsScene)
 		{
-			ElementButton->AddChild((new UIBackground(true, 0, 1, 0.03f))
+			ElementButton->AddChild((new UIBackground(true, 0, UIColors[2], 0.03f))
 				->SetUseTexture(true, Editor::CurrentUI->Textures[13ull + (size_t)Object.IsCollapsed])
 				->SetPadding(0, 0.01f, Depth - 0.04f / Graphics::AspectRatio + 0.005f, 0.001f)
 				->SetSizeMode(UIBox::E_PIXEL_RELATIVE));
 		}
 
-		auto Icon = (new UIBackground(true, 0, 1, 0.04f))
+		auto Icon = (new UIBackground(true, 0, UIColors[2], 0.04f))
 			->SetUseTexture(true, Editor::CurrentUI->Textures[ElemIcon])
 			->SetPadding(0, 0, 0, 0.005f)
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE);

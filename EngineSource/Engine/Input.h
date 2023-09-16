@@ -11,6 +11,7 @@ namespace Input
 	extern bool IsRMBDown;
 	extern bool CursorVisible;
 	extern Vector2 MouseLocation;
+	extern bool BlockInput;
 }
 
 namespace TextInput

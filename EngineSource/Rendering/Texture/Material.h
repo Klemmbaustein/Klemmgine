@@ -10,11 +10,13 @@ struct Material
 		std::string UniformName;
 		Type::TypeEnum Type;
 		std::string Value;
-		Param(std::string UniformName, Type::TypeEnum Type, std::string Value)
+		std::string Description;
+		Param(std::string UniformName, Type::TypeEnum Type, std::string Value, std::string Description = "")
 		{
 			this->UniformName = UniformName;
 			this->Type = Type;
 			this->Value = Value;
+			this->Description = Description;
 		}
 	};
 
@@ -25,6 +27,6 @@ struct Material
 	bool UseShadowCutout = false, IsTranslucent = false;
 
 	static void SetPredefinedMaterialValue(std::string Value, char* ptr, std::string Name);
-	static Material LoadMaterialFile(std::string Name, bool IsTemplate);
-	static void SaveMaterialFile(std::string Path, Material m, bool IsTemplate);
+	static Material LoadMaterialFile(std::string Name);
+	static void SaveMaterialFile(std::string Path, Material m);
 };

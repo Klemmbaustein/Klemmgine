@@ -151,8 +151,8 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 		vShaderFile.close();
 		fShaderFile.close();
 		// convert stream into string
-		vertexCode = Preprocessor::ParseGLSL(vShaderStream.str(), Paths[0]);
-		fragmentCode = Preprocessor::ParseGLSL(fShaderStream.str(), Paths[1]);
+		vertexCode = Preprocessor::ParseGLSL(vShaderStream.str(), Paths[0]).Code;
+		fragmentCode = Preprocessor::ParseGLSL(fShaderStream.str(), Paths[1]).Code;
 		// if geometry shader path is present, also load a geometry shader
 		if (GeometryShader != nullptr)
 		{
@@ -160,17 +160,17 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 			std::stringstream gShaderStream;
 			gShaderStream << gShaderFile.rdbuf();
 			gShaderFile.close();
-			geometryCode = Preprocessor::ParseGLSL(gShaderStream.str(), Paths[2]);
+			geometryCode = Preprocessor::ParseGLSL(gShaderStream.str(), Paths[2]).Code;
 		}
 	}
 	else
 	{
-		vertexCode = Preprocessor::ParseGLSL(Pack::GetFile(VertexShader), Paths[0]);
-		fragmentCode = Preprocessor::ParseGLSL(Pack::GetFile(FragmentShader), Paths[1]);
+		vertexCode = Preprocessor::ParseGLSL(Pack::GetFile(VertexShader), Paths[0]).Code;
+		fragmentCode = Preprocessor::ParseGLSL(Pack::GetFile(FragmentShader), Paths[1]).Code;
 		// if geometry shader path is present, also load a geometry shader
 		if (GeometryShader != nullptr)
 		{
-			geometryCode = Preprocessor::ParseGLSL(Pack::GetFile(GeometryShader), Paths[2]);
+			geometryCode = Preprocessor::ParseGLSL(Pack::GetFile(GeometryShader), Paths[2]).Code;
 		}
 	}
 	const char* vShaderCode = vertexCode.c_str();

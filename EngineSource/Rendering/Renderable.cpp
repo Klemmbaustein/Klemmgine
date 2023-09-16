@@ -8,8 +8,10 @@
 #include "Utility/ShaderManager.h"
 #include <Rendering/Utility/BakedLighting.h>
 #include <Engine/EngineError.h>
+#include <Engine/Log.h>
+#include "Utility/ShaderPreprocessor.h"
 
-void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
+void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFramebuffer)
 {
 	ShaderToApply->Bind();
 	glActiveTexture(GL_TEXTURE1);
@@ -19,7 +21,7 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply)
 	ShaderToApply->SetInt("shadowMap", 1);
 	ShaderToApply->SetInt("GiMap", 3);
 	ShaderToApply->SetInt("GiRes", (int)BakedLighting::GetLightTextureSize());
-	ShaderToApply->SetInt("GiEnabled", (int)BakedLighting::GetLightTextureSize());
+	ShaderToApply->SetInt("GiEnabled", (int)(BakedLighting::LoadedLightmap && MainFramebuffer));
 	ShaderToApply->SetVector3("GiScale", BakedLighting::GetLightMapScale());
 	ShaderToApply->SetInt("Skybox", 2);
 	ShaderToApply->SetFloat("u_biasmodifier", Vector3::Dot(
@@ -53,8 +55,15 @@ ObjectRenderContext::ObjectRenderContext(Material m)
 {
 	this->Mat = m;
 	ContextShader = ReferenceShader("Shaders/" + m.VertexShader, "Shaders/" + m.FragmentShader);
-	ENGINE_ASSERT(ContextShader, "Failed to load shader: " + m.VertexShader + ", " + m.FragmentShader);
+	if (!ContextShader)
+	{
+#if RELEASE
+		ENGINE_ASSERT(ContextShader, "Failed to load shader - " + m.VertexShader + ", " + m.FragmentShader);
+#endif
+		ContextShader = ReferenceShader("Shaders/basic.vert", "Shaders/basic.frag");
 
+		m.Uniforms = Preprocessor::ParseGLSL(FileUtil::GetFileContent("Shaders/basic.frag"), "Shaders/").ShaderParams;
+	}
 	for (auto& i : m.Uniforms)
 	{
 		LoadUniform(i);
@@ -67,7 +76,6 @@ ObjectRenderContext::ObjectRenderContext()
 
 ObjectRenderContext::~ObjectRenderContext()
 {
-
 }
 
 void ObjectRenderContext::Bind()
@@ -87,6 +95,7 @@ void ObjectRenderContext::BindWithShader(Shader* s)
 		}
 		switch (Uniforms.at(i).Type)
 		{
+		case Type::Bool:
 		case Type::Int:
 			s->SetInt(Uniforms.at(i).Name, *static_cast<int*>(Uniforms.at(i).Content));
 			break;
@@ -141,6 +150,7 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 		switch (u.Type)
 		{
 		case Type::Int:
+		case Type::Bool:
 			Uniforms[UniformIndex].Content = new int(std::stoi(u.Value));
 			break;
 		case Type::Float:
@@ -162,6 +172,7 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 		switch (u.Type)
 		{
 		case Type::Int:
+		case Type::Bool:
 			Uniforms[UniformIndex].Content = new int(0);
 			break;
 		case Type::Float:
@@ -191,6 +202,7 @@ void ObjectRenderContext::Unload()
 		switch (u.Type)
 		{
 		case Type::Int:
+		case Type::Bool:
 			delete reinterpret_cast<int*>(u.Content);
 			break;
 		case Type::Float:

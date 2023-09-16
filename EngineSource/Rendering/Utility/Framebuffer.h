@@ -30,6 +30,7 @@ protected:
 class FramebufferObject
 {
 public:
+	bool Active = true;
 	bool UseMainWindowResolution = true;
 	Vector2 CustomFramebufferResolution = Vector2(800, 600);
 	FramebufferObject();

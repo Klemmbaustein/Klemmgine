@@ -3,36 +3,44 @@
 #include <UI/UITextField.h>
 #include <UI/EditorUI/Tabs/EditorTab.h>
 #include <UI/EditorUI/UIVectorField.h>
-#include "MaterialTemplateTab.h"
+#include <Rendering/Texture/Material.h>
+
+class FramebufferObject;
+class Model;
+class Camera;
 
 class MaterialTab : public EditorTab
 {
 public:
 	virtual void OnButtonClicked(int Index) override;
 
-	MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int ReloadTexture);
+	MaterialTab(Vector3* UIColors, TextRenderer* Text);
 
 
 	void Tick() override; //Render and Update
 	void Load(std::string File) override;
-	void LoadTemplate(std::string Template);
-	void FetchTemplate(std::string Template);
 	void UpdateLayout() override;
 	void Save();
 	void GenerateUI();
 	void GenerateMaterialProperties();
+	void UpdateModel();
 private:
+	int RedrawFrames = 0;
+	UIBackground* PreviewWindow = nullptr;
+	FramebufferObject* PreviewBuffer = nullptr;
+	Model* PreviewModel = nullptr;
+	Camera* PreviewCamera;
+
+	std::vector<unsigned int> PreviewTextures;
 	UITextField* ShaderTextFields[2];
 	std::vector<UIBox*> TextFields;
 	UIText* TabName = nullptr;
 	UIBox* Rows[2];
-	unsigned int ReloadTexture = 0;
 	TextRenderer* Renderer;
 	std::string Filepath;
 
 	Material LoadedMaterial;
 
-	UITextField* ParentTemplateText;
 	UIBox* RightRow;
 	UIText* CutoutText = nullptr, *TranslucencyText = nullptr;
 	UIText* ShaderTexts[2];

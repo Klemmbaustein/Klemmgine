@@ -11,6 +11,11 @@
 #include <Engine/Input.h>
 #include <Engine/Log.h>
 
+namespace Input
+{
+	extern bool BlockInputConsole;
+}
+
 DebugUI* DebugUI::CurrentDebugUI = nullptr;
 
 DebugUI::DebugUI()
@@ -33,6 +38,17 @@ DebugUI::DebugUI()
 	LogPrompt->SetTextSize(0.6f);
 	LogBackground = new UIBackground(false, Vector2(-1, -0.94f), 0.05f, Vector2(2, 0.8f));
 	LogBackground->SetOpacity(0.9f);
+}
+
+bool DebugUI::ConsoleReadInput(int Key)
+{
+	bool PrevBlockInput = false;
+	std::swap<bool>(Input::BlockInput, PrevBlockInput);
+	Input::BlockInputConsole = false;
+	bool KeyVal = Input::IsKeyDown(Key);
+	std::swap(Input::BlockInput, PrevBlockInput);
+	Input::BlockInputConsole = LogPrompt->GetIsEdited();
+	return KeyVal;
 }
 
 void DebugUI::Tick()
@@ -58,12 +74,12 @@ void DebugUI::Tick()
 		StatsRedrawTimer += Performance::DeltaTime;
 	}
 	FPS++;
-	if (Input::IsKeyDown(SDLK_RETURN) && !LogPrompt->GetIsEdited() && !IsEditingText)
+	if (ConsoleReadInput(SDLK_RETURN) && !LogPrompt->GetIsEdited() && !IsEditingText)
 	{
 		IsEditingText = 5;
 		LogPrompt->Edit();
 	}
-	if (!Input::IsKeyDown(SDLK_RETURN) && IsEditingText)
+	if (!ConsoleReadInput(SDLK_RETURN) && IsEditingText)
 	{
 		IsEditingText--;
 	}
@@ -86,7 +102,7 @@ void DebugUI::OnButtonClicked(int Index)
 {
 	if (Index == 0)
 	{
-		if (Input::IsKeyDown(SDLK_RETURN) && LogPrompt->GetText().size())
+		if (ConsoleReadInput(SDLK_RETURN) && LogPrompt->GetText().size())
 		{
 			Log::Print("> " + LogPrompt->GetText(), Vector3(0.3f, 0.6f, 1));
 			Console::ExecuteConsoleCommand(LogPrompt->GetText());

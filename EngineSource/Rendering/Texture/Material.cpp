@@ -43,13 +43,13 @@ void Material::SetPredefinedMaterialValue(std::string Value, char* ptr, std::str
 	}
 }
 
-Material Material::LoadMaterialFile(std::string Name, bool IsTemplate)
+Material Material::LoadMaterialFile(std::string Name)
 {
 	std::string File;
 	std::string Ext;
 	if (FileUtil::GetExtension(Name).empty())
 	{
-		Ext = (IsTemplate ? ".jsmtmp" : ".jsmat");
+		Ext = ".jsmat";
 	}
 
 	if (!std::filesystem::exists(Name + Ext))
@@ -76,7 +76,6 @@ Ensure that none of your models have a material assigned.");
 	}
 
 	Material OutMaterial;
-	OutMaterial.IsTemplate = IsTemplate;
 	std::ifstream In = std::ifstream(File);
 	
 	char CurrentBuff[100];
@@ -105,7 +104,7 @@ Ensure that none of your models have a material assigned.");
 
 			std::string Type;
 			CurrentLineStream >> Type;
-			for (unsigned int i = 0; i < 6; i++)
+			for (unsigned int i = 0; i < 8; i++)
 			{
 				if (Type::Types[i] == Type)
 				{
@@ -171,7 +170,7 @@ Ensure that none of your models have a material assigned.");
 			}
 			else
 			{
-				OutMaterial.Uniforms.push_back(Param(CurrentName, CurrentType, Value));
+				OutMaterial.Uniforms.push_back(Param(CurrentName, CurrentType, Value, ""));
 			}
 		}
 	}
@@ -179,19 +178,15 @@ Ensure that none of your models have a material assigned.");
 	return OutMaterial;
 }
 
-void Material::SaveMaterialFile(std::string Path, Material m, bool IsTemplate)
+void Material::SaveMaterialFile(std::string Path, Material m)
 {
 	std::ofstream Out = std::ofstream(Path);
 
 	Out << "// Default material parameters:\n";
 	Out << "string VertexShader = " << m.VertexShader << "\n";
 	Out << "string FragmentShader = " << m.FragmentShader << "\n";
-	if (!IsTemplate)
-	{
-		Out << "int UseShadowCutout = " << std::to_string(m.UseShadowCutout) << "\n";
-		Out << "int IsTranslucent = " << std::to_string(m.IsTranslucent) << "\n";
-		Out << "string Template = " << m.Template << "\n";
-	}
+	Out << "int UseShadowCutout = " << std::to_string(m.UseShadowCutout) << "\n";
+	Out << "int IsTranslucent = " << std::to_string(m.IsTranslucent) << "\n";
 	Out << "// Material specific parameters:\n";
 
 	for (const auto& Uniform : m.Uniforms)

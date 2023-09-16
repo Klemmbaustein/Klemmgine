@@ -101,7 +101,6 @@
     <ClCompile Include="UI\EditorUI\Tabs\CubemapTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\EditorTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\MaterialTab.cpp" />
-    <ClCompile Include="UI\EditorUI\Tabs\MaterialTemplateTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\MeshTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\ParticleEditorTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\PreferenceTab.cpp" />
@@ -206,7 +205,6 @@
     <ClInclude Include="UI\EditorUI\Tabs\CubemapTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\EditorTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\MaterialTab.h" />
-    <ClInclude Include="UI\EditorUI\Tabs\MaterialTemplateTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\MeshTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\ParticleEditorTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\PreferenceTab.h" />

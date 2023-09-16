@@ -87,22 +87,6 @@ std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 		CurrentParent->SubItems.push_back(NewItem);
 	}
 
-	// Debug view to display 'folder structure'
-	// its very basic and only goes 3 levels deep
-	// 
-	/*for (const auto& i : RootPath.SubItems)
-	{
-		Log::Print(i.Name);
-		for (const auto& j : i.SubItems)
-		{
-			Log::Print("   " + j.Name);
-			for (const auto& k : j.SubItems)
-			{
-				Log::Print("      " + k.Name);
-			}
-		}
-	}*/
-
 #ifdef ENGINE_CSHARP
 	for (auto& i : CSharp::GetAllClasses())
 	{
@@ -204,7 +188,7 @@ void ItemBrowser::UpdateLayout()
 
 	ContentBox->AddChild((new UIBackground(true, 0, UIColors[1], Vector2(Scale.X, 0.1f)))
 		->SetPadding(0)
-		->AddChild((new UIButton(true, 0, 1, this, -2))
+		->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
 			->SetUseTexture(true, Editor::CurrentUI->Textures[8])
 			->SetMinSize(Vector2(0.06f))
 			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
@@ -408,11 +392,6 @@ void ItemBrowser::Tick()
 				EditorUI::DropdownItem("Material", []()
 				{
 					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Material", "jsmat");
-					Editor::CurrentUI->UIElements[3]->UpdateLayout();
-				}),
-				EditorUI::DropdownItem("Material Template", []()
-				{
-					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "MaterialTemplate", "jsmtmp");
 					Editor::CurrentUI->UIElements[3]->UpdateLayout();
 				}),
 				EditorUI::DropdownItem("Scene", []()
@@ -668,10 +647,6 @@ void ItemBrowser::OnButtonClicked(int Index)
 		if (Ext == "jsmat")
 		{
 			Viewport::ViewportInstance->OpenTab(2, CurrentFiles[Index].Name);
-		}
-		if (Ext == "jsmtmp")
-		{
-			Viewport::ViewportInstance->OpenTab(3, CurrentFiles[Index].Name);
 		}
 		if (Ext == "jspart")
 		{

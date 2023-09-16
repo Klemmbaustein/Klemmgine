@@ -10,7 +10,11 @@
 #include <UI/UIText.h>
 #include <UI/UIScrollBox.h>
 #include <Engine/Utility/FileUtility.h>
-
+#include <Rendering/Utility/ShaderPreprocessor.h>
+#include <UI/EditorUI/EditorUI.h>
+#include <Rendering/Texture/Texture.h>
+#include <cmath>
+#include <Rendering/Mesh/Model.h>
 
 void MaterialTab::OnButtonClicked(int Index)
 {
@@ -18,26 +22,22 @@ void MaterialTab::OnButtonClicked(int Index)
 	{
 		return;
 	}
-	if (Index == -2)
-	{
-		if (LoadedMaterial.Template != ParentTemplateText->GetText())
-		{
-			if (std::filesystem::exists(Assets::GetAsset(ParentTemplateText->GetText() + ".jsmtmp")))
-			{
-				LoadedMaterial.Template = ParentTemplateText->GetText();
-				LoadTemplate(LoadedMaterial.Template);
-			}
-		}
-	}
-	else if (Index == -3)
+	if (Index == -3)
 	{
 		Save();
 	}
 	else if (Index == -4)
 	{
-		FetchTemplate(LoadedMaterial.Template);
-		Log::Print("Fetched Template " + LoadedMaterial.Template + " for File " + Filepath);
-		GenerateMaterialProperties();
+		if (LoadedMaterial.VertexShader != ShaderTextFields[0]->GetText())
+		{
+			LoadedMaterial.VertexShader = ShaderTextFields[0]->GetText();
+			GenerateUI();
+		}
+		if (LoadedMaterial.FragmentShader != ShaderTextFields[1]->GetText())
+		{
+			LoadedMaterial.FragmentShader = ShaderTextFields[1]->GetText();
+			GenerateUI();
+		}
 	}
 	else if (Index == -5)
 	{
@@ -51,21 +51,37 @@ void MaterialTab::OnButtonClicked(int Index)
 	}
 	else if (Index >= 0)
 	{
-		if (LoadedMaterial.Uniforms.at(Index).Type != Type::Vector3)
+		if (TextFields[Index] == nullptr)
 		{
-			LoadedMaterial.Uniforms.at(Index).Value = ((UITextField*)TextFields[Index])->GetText();
+			return;
 		}
-		else
+
+		auto& Value = LoadedMaterial.Uniforms.at(Index).Value;
+
+		switch (LoadedMaterial.Uniforms.at(Index).Type)
 		{
-			LoadedMaterial.Uniforms.at(Index).Value = ((UIVectorField*)TextFields[Index])->GetValue().ToString();
+		case Type::Int:
+		case Type::Float:
+		case Type::GL_Texture:
+			Value = ((UITextField*)TextFields[Index])->GetText();
+			break;
+		case Type::Vector3:
+		case Type::Vector3Color:
+			Value = ((UIVectorField*)TextFields[Index])->GetValue().ToString();
+			break;
+		case Type::Bool:
+			Value = (Value == "1") ? "0" : "1";
+			break;
+		default:
+			break;
 		}
+		GenerateUI();
 	}
 }
 
-MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int ReloadTexture) : EditorTab(UIColors)
+MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text) : EditorTab(UIColors)
 {
 	Renderer = Text;
-	this->ReloadTexture = ReloadTexture;
 
 	TabBackground->Align = UIBox::E_REVERSE;
 	TabName = new UIText(1, UIColors[2], "Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
@@ -83,23 +99,78 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text, unsigned int Rel
 
 	RightRow = new UIBox(false, 0.3f);
 
+	if (!PreviewBuffer)
+	{
+		PreviewBuffer = new FramebufferObject();
+		PreviewBuffer->UseMainWindowResolution = true;
+		PreviewCamera = new Camera(1.7f, 1600, 900);
+		PreviewCamera->Position = Vector3(-6, 8, 6);
+		PreviewCamera->yaw = -45;
+		PreviewCamera->pitch = -45;
+		PreviewBuffer->FramebufferCamera = PreviewCamera;
+
+		UpdateModel();
+	}
 
 	GenerateUI();
 }
+
 void MaterialTab::Tick()
 {
 	RightRow->IsVisible = TabBackground->IsVisible;
+	PreviewCamera->ReInit(1.7f, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+	if (!PreviewWindow)
+	{
+		return;
+	}
+	PreviewWindow->SetUseTexture(true, PreviewBuffer->GetTextureID());
+	if (RedrawFrames)
+	{
+		RedrawFrames--;
+		if (RedrawFrames == 0)
+		{
+			UIBox::RedrawUI();
+		}
+	}
 }
 
 
 void MaterialTab::Load(std::string File)
 {
+
 	Filepath = File;
 	LoadedMaterial = Material();
 	try
 	{
 		TabName->SetText("Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath));
-		LoadedMaterial = Material::LoadMaterialFile(Filepath, false);
+		LoadedMaterial = Material::LoadMaterialFile(Filepath);
+
+		std::string Path = "Shaders/" + LoadedMaterial.FragmentShader;
+		Path = Path.substr(0, Path.find_last_of("/\\"));
+
+		std::vector<Material::Param> ShaderUniforms = Preprocessor::ParseGLSL(FileUtil::GetFileContent("Shaders/" + LoadedMaterial.FragmentShader), Path).ShaderParams;
+		for (size_t i = 0; i < std::max(ShaderUniforms.size(), LoadedMaterial.Uniforms.size()); i++)
+		{
+			if (ShaderUniforms.size() <= i)
+			{
+				LoadedMaterial.Uniforms.erase(LoadedMaterial.Uniforms.begin() + i, LoadedMaterial.Uniforms.end());
+				break;
+			}
+			if (LoadedMaterial.Uniforms.size() <= i)
+			{
+				LoadedMaterial.Uniforms.push_back(ShaderUniforms[i]);
+			}
+			else if (LoadedMaterial.Uniforms[i].UniformName != ShaderUniforms[i].UniformName
+					|| LoadedMaterial.Uniforms[i].Type != ShaderUniforms[i].Type)
+			{
+				LoadedMaterial.Uniforms[i] = ShaderUniforms[i];
+			}
+			else
+			{
+				LoadedMaterial.Uniforms[i].Description = ShaderUniforms[i].Description;
+			}
+		}
+
 		GenerateUI();
 	}
 	catch (std::exception& e)
@@ -107,216 +178,169 @@ void MaterialTab::Load(std::string File)
 		Log::Print(e.what(), Vector3(0.8f, 0.f, 0.f));
 	}
 }
-
-void MaterialTab::LoadTemplate(std::string Template)
-{
-	LoadedMaterial = Material();	
-	Material LoadedTemplate = Material::LoadMaterialFile(Template, true);
-
-	LoadedMaterial = LoadedTemplate;
-	LoadedMaterial.Template = Template;
-
-	GenerateUI();
-}
-
-void MaterialTab::FetchTemplate(std::string Template)
-{
-	Template = Template + ".jsmtmp";
-	Template = Assets::GetAsset(Template);
-	if (std::filesystem::exists(Template))
-	{
-		auto FetchedTemplate = Material::LoadMaterialFile(Template, true);
-		
-		for (auto& i : FetchedTemplate.Uniforms)
-		{
-			for (auto& j : LoadedMaterial.Uniforms)
-			{
-				if (i.UniformName == j.UniformName && i.Type == j.Type)
-				{
-					i.Value = j.Value;
-				}
-			}
-		}
-
-		LoadedMaterial.Uniforms = FetchedTemplate.Uniforms;
-		LoadedMaterial.FragmentShader = FetchedTemplate.FragmentShader;
-		LoadedMaterial.VertexShader = FetchedTemplate.VertexShader;
-		Save();
-	}
-	GenerateUI();
-}
-
 void MaterialTab::UpdateLayout()
 {
-	Rows[0]->SetMinSize(Vector2(TabBackground->GetMinSize().X / 1.5f, TabBackground->GetMinSize().Y - 0.275f));
-	Rows[0]->SetMaxSize(Vector2(TabBackground->GetMinSize().X / 1.5f, TabBackground->GetMinSize().Y - 0.275f));
+	Rows[0]->SetMinSize(Vector2(TabBackground->GetMinSize().X / 1.75f, TabBackground->GetMinSize().Y - 0.275f));
+	Rows[0]->SetMaxSize(Vector2(TabBackground->GetMinSize().X / 1.75f, TabBackground->GetMinSize().Y - 0.275f));
 	GenerateMaterialProperties();
-
 }
 
 void MaterialTab::Save()
 {
-	Material::SaveMaterialFile(Filepath, LoadedMaterial, false);
+	Material::SaveMaterialFile(Filepath, LoadedMaterial);
 }
 
 void MaterialTab::GenerateUI()
 {
-	GenerateMaterialProperties();
-	int ButtonIndex = 0;
 	Rows[0]->DeleteChildren();
 	TextFields.clear();
+	for (unsigned int i : PreviewTextures)
+	{
+		Texture::UnloadTexture(i);
+	}
+	PreviewTextures.clear();
 
-	TranslucencyText->SetText(LoadedMaterial.IsTranslucent ? "true" : "false");
-	CutoutText->SetText(LoadedMaterial.UseShadowCutout ? "true" : "false");
-
-	Rows[0]->AddChild(new UIText(0.8f, UIColors[2], "Parent template", Renderer));
-	ParentTemplateText = new UITextField(true, 0, UIColors[1], this, -2, Renderer);
-	ParentTemplateText->HintText = "Parent Template";
-	ParentTemplateText->SetMinSize(Vector2(0.3f, 0.075f));
-	ParentTemplateText->SetMaxSize(Vector2(0.3f, 0.075f));
-	ParentTemplateText->SetText(LoadedMaterial.Template);
-	Rows[0]->AddChild(ParentTemplateText);
-
-	Rows[0]->AddChild(new UIText(0.675f, UIColors[2], "Uniforms", Renderer));
-	auto ElementBox = new UIBackground(true, 0, UIColors[1] * 1.25f, Vector2(0.725f, 0));
-
-	auto ElementNameText = new UIText(0.5f, UIColors[2], "Uniform name", Renderer);
-	ElementNameText->SetPadding(0.02f, 0.02f, 0.02f, 0.01f);
-	ElementNameText->SetTextWidthOverride(0.27f);
-
-	auto ElementTypeText = new UIText(0.5f, UIColors[2], "Type", Renderer);
-	ElementTypeText->SetPadding(0.02f, 0.02f, 0, 0.01f);
-	ElementTypeText->SetTextWidthOverride(0.09f);
-
-	UIText* ElementDefaultText = new UIText(0.5, UIColors[2], "Default value", Renderer);
-	ElementDefaultText->SetPadding(0.02f, 0.02f, 0, 0.01f);
-	ElementDefaultText->SetTextWidthOverride(0.3f);
-
-	ElementBox->AddChild(ElementNameText);
-	ElementBox->AddChild(ElementTypeText);
-	ElementBox->AddChild(ElementDefaultText);
-	Rows[0]->AddChild(ElementBox);
+	int Index = 0;
 	for (auto& i : LoadedMaterial.Uniforms)
 	{
-		ElementBox = new UIBackground(true, 0, UIColors[1] * 1.25f, Vector2(0.725f, 0.09f));
+		auto ParamBox = new UIBackground(true, 0, UIColors[1]);
 
-		auto ElementNameBox = new UIBox(true, 0);
-		auto ElementName = new UIText(0.5f, UIColors[2], i.UniformName, Renderer);
-		ElementNameBox->SetMinSize(Vector2(0.3f, 0.075f));
-		ElementNameBox->AddChild(ElementName);
-		ElementNameBox->SetPadding(0);
-		ElementName->SetPadding(0, 0.02f, 0.02f, 0.01f);
-		ElementName->SetMaxSize(Vector2(0.3f, 0.075f));
+		size_t CategorySeperator = i.Description.find_first_of("#");
 
-		auto ElementTypeBox = new UIBox(true, 0);
-		auto ElementType = new UIText(0.5, UIColors[2], Type::Types[i.Type], Renderer);
-		ElementTypeBox->SetMinSize(Vector2(0.1f, 0.075f));
-		ElementType->SetPadding(0, 0.02f, 0, 0.01f);
-		ElementTypeBox->SetPadding(0);
-		ElementType->SetMaxSize(Vector2(0.3f, 0.075f));
-		ElementTypeBox->AddChild(ElementType);
+		std::string Category = i.Description.substr(0, CategorySeperator - 1);
+		std::string Description = i.Description.substr(CategorySeperator + 1);
 
-		UIBox* ElementDefaultValue = nullptr;
-		if (i.Type != Type::Vector3)
+		auto TextBox = (new UIBox(false, 0));
+
+		ParamBox->AddChild(TextBox
+			->SetMinSize(Vector2(0.3f, 0.1f))
+			->SetPadding(0.005f)
+			->AddChild((new UIText(0.5f, UIColors[2], i.UniformName, Renderer))
+				->SetWrapDistance(0.6f)
+				->SetPadding(0.005f))
+			->AddChild((new UIText(0.4f, Vector3::Lerp(UIColors[2], 0.5f, 0.25f), Description, Renderer))
+				->SetWrapDistance(0.8f)
+				->SetPadding(0.005f)));
+		TextBox->Align = UIBox::E_REVERSE;
+
+		UIBox* NewField = nullptr;
+
+		switch (i.Type)
 		{
-			ElementDefaultValue = new UITextField(true, 0, UIColors[1], this, ButtonIndex, Renderer);
-			((UITextField*)ElementDefaultValue)->SetText(i.Value);
-			((UITextField*)ElementDefaultValue)->HintText = "Default value";
-			ElementDefaultValue->SetPadding(0, 0, 0, 0.01f);
-			ElementDefaultValue->SetMinSize(Vector2(0.265f, 0.075f));
-			ElementDefaultValue->SetMaxSize(Vector2(0.265f, 0.075f));
-			ElementDefaultValue->SetBorder(UIBox::E_ROUNDED, 0.5f);
-			ElementDefaultValue->SetPadding(0.0125f, 0.0125f, 0, 0.01f);
+		case Type::Vector3:
+		{	
+			NewField = (new UIVectorField(0, Vector3::stov(i.Value), this, Index, Renderer))
+				->SetValueType(UIVectorField::VecType::rgb);
+			break;
 		}
-		else
+		case Type::Float:
+		case Type::Int:
 		{
-			ElementDefaultValue = (new UIVectorField(0, Vector3::stov(i.Value), this, ButtonIndex, Renderer))->SetValueType(UIVectorField::VecType::rgb);
-			ElementDefaultValue->SetPadding(0, 0.01f, 0, 0.01f);
+			NewField = (new UITextField(true, 0, UIColors[0], this, Index, Renderer))
+				->SetText(i.Value)
+				->SetMinSize(Vector2(0.26f, 0.05f));
+			break;
 		}
-
-		ElementBox->AddChild(ElementNameBox);
-		ElementBox->AddChild(ElementTypeBox);
-		ElementBox->AddChild(ElementDefaultValue);
-		TextFields.push_back(ElementDefaultValue);
-		Rows[0]->AddChild(ElementBox);
-		ButtonIndex++;
+		case Type::Bool:
+		{
+			NewField = new UIButton(true, 0, 0.75f, this, Index);
+			NewField->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+			NewField->SetMinSize(0.04f);
+			NewField->SetBorder(UIBox::E_ROUNDED, 0.3f);
+			NewField->SetPadding(0.03f, 0.03f, 0.02f, 0.01f);
+			if (i.Value == "1")
+			{
+				((UIButton*)NewField)->SetUseTexture(true, Editor::CurrentUI->Textures[16]);
+			}
+			break;
+		}
+		case Type::GL_Texture:
+		{
+			unsigned int NewTexture = Texture::LoadTexture(i.Value);
+			NewField = (new UITextField(true, 0, UIColors[0], this, Index, Renderer))
+				->SetText(i.Value)
+				->SetPadding(0.02f, 0.02f, 0, 0)
+				->SetMinSize(Vector2(0.2f, 0.05f));
+			ParamBox->AddChild((new UIBackground(true, 0, 1, 0.15f))
+				->SetUseTexture(true, NewTexture)
+				->SetSizeMode(UIBox::E_PIXEL_RELATIVE));
+			TextBox->SetMinSize(Vector2(0.3f, 0.15f));
+			PreviewTextures.push_back(NewTexture);
+			break;
+		}
+		default:
+			break;
+		}
+		Index++;
+		if (NewField)
+		{
+			ParamBox->AddChild(NewField);
+		}
+		TextFields.push_back(NewField);
+		
+		Rows[0]->AddChild(ParamBox
+			->SetMinSize(Vector2(0.65f, 0))
+			->SetPadding(0.005f));
 	}
+
+	if (LoadedMaterial.Uniforms.empty())
+	{
+		Rows[0]->AddChild((new UIText(0.5f, UIColors[2], "No parameters in shader.", Renderer))
+			->SetPadding(0.005f));
+		Rows[0]->AddChild((new UIText(0.5f, UIColors[2], "Add parameters using // #params", Renderer))
+			->SetPadding(0.005f));
+	}
+
+	UpdateModel();
 }
 
 void MaterialTab::GenerateMaterialProperties()
 {
-
-
 	Rows[1]->DeleteChildren();
-	Rows[1]->AddChild((new UIText(0.8f, UIColors[2], "Properties", Renderer)));
-	Rows[1]->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6f, TabBackground->GetMinSize().Y - 0.275f));
-	Rows[1]->SetPadding(0);
-	UIBox* OptionBoxes[2];
-	OptionBoxes[0] = new UIBox(true, 0);
-	OptionBoxes[1] = new UIBox(true, 0);
-	auto NewText = new UIText(0.6f, UIColors[2], "Use shadow cutout:", Renderer);
-	OptionBoxes[0]->AddChild(NewText);
-	NewText->SetPadding(0);
-	auto NewButton = new UIButton(true, 0, UIColors[0] * 2, this, -5);
-	OptionBoxes[0]->AddChild(NewButton);
-	OptionBoxes[0]->SetPadding(0, 0, 0.01f, 0);
+	PreviewWindow = new UIBackground(true, 0, 1, 0.3f);
+	Rows[1]->AddChild(PreviewWindow
+		->SetUseTexture(PreviewBuffer->GetTextureID()));
 
-	NewButton->SetPadding(0.005f, 0, 0.01f, 0);
-	NewButton->SetBorder(UIBox::E_ROUNDED, 0.5f);
+	Rows[1]->AddChild(new UIText(0.6f, 1, "Shader files", Renderer));
 
-	CutoutText = new UIText(0.5f, UIColors[2], LoadedMaterial.UseShadowCutout ? "true " : "false", Renderer);
-	CutoutText->SetPadding(0.005f);
-	NewButton->AddChild(CutoutText);
+	ShaderTextFields[0] = new UITextField(true, 0, UIColors[0], this, -4, Renderer);
+	ShaderTextFields[1] = new UITextField(true, 0, UIColors[0], this, -4, Renderer);
 
+	Rows[1]->AddChild(ShaderTextFields[0]
+		->SetText(LoadedMaterial.VertexShader)
+		->SetPadding(0.005f, 0.005f, 0.02f, 0.02f)
+		->SetMinSize(Vector2(0.2f, 0)));
 
-	NewText = new UIText(0.6f, UIColors[2], "Is translucent:   ", Renderer);
-	OptionBoxes[1]->AddChild(NewText);
-	NewText->SetPadding(0);
+	Rows[1]->AddChild(ShaderTextFields[1]
+		->SetText(LoadedMaterial.FragmentShader)
+		->SetPadding(0.005f, 0.005f, 0.02f, 0.02f)
+		->SetMinSize(Vector2(0.2f, 0)));
+}
 
-	NewButton = new UIButton(true, 0, UIColors[0] * 2, this, -6);
-	OptionBoxes[1]->AddChild(NewButton);
-	OptionBoxes[1]->SetPadding(0, 0, 0.01f, 0);
-	NewButton->SetPadding(0.005f, 0, 0.01f, 0);
-	NewButton->SetBorder(UIBox::E_ROUNDED, 0.5f);
+void MaterialTab::UpdateModel()
+{
+	Save();
+	PreviewBuffer->ClearContent();
+	PreviewModel = nullptr;
 
-	TranslucencyText = new UIText(0.5f, UIColors[2], LoadedMaterial.IsTranslucent ? "true " : "false", Renderer);
-	TranslucencyText->SetPadding(0.005f);
-	NewButton->AddChild(TranslucencyText);
-
-
-	auto NewBox = new UIBox(true, 0);
-	NewBox->SetPadding(0, 0.1f, 0, 0);
-	NewButton = new UIButton(true, 0, 1, this, -4);
-	NewButton->SetMinSize(0.05f);
-	NewButton->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
-
-	NewText = new UIText(0.6f, UIColors[2], " Reload template: ", Renderer);
-	NewText->SetPadding(0);
-	NewButton->SetPadding(0.01f, 0, 0.02f, 0);
-	NewButton->SetUseTexture(true, ReloadTexture);
-
-	NewBox->AddChild(NewText);
-	NewBox->AddChild(NewButton);
-
-	Rows[1]->AddChild(OptionBoxes[0]);
-	Rows[1]->AddChild(OptionBoxes[1]);
-	Rows[1]->AddChild(NewBox);
-
-	Rows[1]->IsVisible = TabBackground->IsVisible;
-
-	std::string TemplateTexts[] =
+	if (!std::filesystem::exists(Filepath))
 	{
-		"Template properties:",
-		"Vertex Shader            : " + LoadedMaterial.VertexShader,
-		"Fragment (Pixel) Shader  : " + LoadedMaterial.FragmentShader,
-		"Number of uniforms       : " + std::to_string(LoadedMaterial.Uniforms.size())
-	};
-
-	for (auto& i : TemplateTexts)
-	{
-		Rows[1]->AddChild((new UIText(0.5f, UIColors[2] * 0.8f, i, Renderer))
-			->SetPadding(0, 0, 0.025f, 0));
+		return;
 	}
+
+	ModelGenerator::ModelData m;
+	m.Elements.push_back(ModelGenerator::ModelData::Element());
+	auto& elem = m.Elements[m.Elements.size() - 1];
+	elem.MakeCube(30, 0);
+	elem.ElemMaterial = Filepath;
+	elem.GenerateNormals();
+	m.TwoSided = false;
+
+	PreviewModel = new Model(m);
+	PreviewModel->ModelTransform.Rotation.X = Math::PI_F;
+	PreviewBuffer->UseWith(PreviewModel);
+	PreviewModel->UpdateTransform();
+	RedrawFrames = 2;
 }
 
 #endif

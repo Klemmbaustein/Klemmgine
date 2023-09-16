@@ -48,6 +48,8 @@ void CubemapTab::Tick()
 		PreviewWindow->IsVisible = TabBackground->IsVisible;
 		CubemapSidesBox->IsVisible = TabBackground->IsVisible;
 		PreviewBuffer->FramebufferCamera = Graphics::MainCamera;
+		PreviewBuffer->Active = TabBackground->IsVisible;
+		PreviewBuffer->ClearContent();
 		PreviewWindow->SetUseTexture(true, PreviewBuffer->GetTextureID());
 		Transform PreviousCameraTransform;
 		PreviousCameraTransform.Location = Graphics::MainCamera->Position;
