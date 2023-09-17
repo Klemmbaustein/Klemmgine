@@ -463,7 +463,6 @@ void Viewport::OnButtonClicked(int Index)
 		}
 		Tabs.erase(Tabs.begin() + Index / 2);
 		UpdateLayout();
-		std::cout << SelectedTab << ": " << Index / 2 << std::endl;
 		return;
 	}
 	else
