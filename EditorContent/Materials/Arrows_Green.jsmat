@@ -7,9 +7,7 @@ int IsTranslucent = 0
 
 // Material specific parameters:
 vector3 u_diffuse = 0 0 0
-float u_specularsize = 0
-float u_specularstrength = 0
-int u_ssao = 1
-int u_ssao_reverse = 1
+float u_specularSize = 0
+float u_specularStrength = 0
 vector3 u_emissive = 0 1 0
-int u_usetexture = 0
+int u_useTexture = 0
