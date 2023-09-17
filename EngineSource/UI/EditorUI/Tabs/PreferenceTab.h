@@ -33,7 +33,7 @@ class PreferenceTab : public EditorTab
 
 	std::vector<SettingsCategory> Preferences =
 	{
-		SettingsCategory("Editor", 
+		SettingsCategory("Editor",
 			{
 			SettingsCategory::Setting("UI:Light mode [Experimental]", Type::Bool, "0", [](std::string NewValue)
 			{
@@ -44,7 +44,7 @@ class PreferenceTab : public EditorTab
 				Toolbar::ToolbarInstance->SetButtonVisibility("Save", std::stoi(NewValue));
 			}),
 			SettingsCategory::Setting("Toolbar:Show Wireframe Button", Type::Bool, "1", [](std::string NewValue)
-			{	
+			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Wireframe", std::stoi(NewValue));
 			}),
 			SettingsCategory::Setting("Toolbar:Show Build Button", Type::Bool, "1", [](std::string NewValue)
@@ -70,6 +70,10 @@ class PreferenceTab : public EditorTab
 				SettingsCategory::Setting("Run from editor:Launch scene that is currently loaded in editor", Type::Bool, "1", [](std::string NewValue)
 				{
 					EditorUI::SetLaunchCurrentScene(NewValue == "1");
+				}),
+				SettingsCategory::Setting("Run from editor:Save current scene before launch", Type::Bool, "0", [](std::string NewValue)
+				{
+					EditorUI::SetSaveSceneOnLaunch(NewValue == "1");
 				}),
 				SettingsCategory::Setting("Klemmgine.NET:Use C# in project (Requires restart)", Type::Bool, "1", [](std::string NewValue)
 				{

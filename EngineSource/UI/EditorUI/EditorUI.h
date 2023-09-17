@@ -76,14 +76,15 @@ class EditorUI : public UICanvas
 {
 public:
 #if ENGINE_CSHARP
+	static void RebuildAndHotReload();
+#endif
 	static FILE* DebugProcess;
 	static void ReadProcessOutput();
 	static std::thread* DebugProcessIOThread;
 	static void LaunchInEditor();
-	static void RebuildAndHotReload();
+	static void SetSaveSceneOnLaunch(bool NewValue);
 	static std::string LaunchInEditorArgs;
 	static void SetLaunchCurrentScene(bool NewLaunch);
-#endif
 	static void SaveCurrentScene();
 	static void OpenScene(std::string NewScene);
 	static bool GetUseLightMode();

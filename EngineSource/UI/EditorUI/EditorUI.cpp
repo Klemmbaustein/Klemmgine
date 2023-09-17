@@ -39,6 +39,7 @@ namespace Editor
 	bool IsSavingScene = false;
 	bool IsBakingScene = false;
 	bool LaunchCurrentScene = false;
+	bool SaveSceneOnLaunch = false;
 
 	Vector3 NewUIColors[EditorUI::NumUIColors] =
 	{
@@ -73,9 +74,6 @@ namespace UI
 
 bool ChangedScene = false;
 
-
-#ifdef ENGINE_CSHARP
-
 std::string EditorUI::LaunchInEditorArgs;
 FILE* EditorUI::DebugProcess = nullptr;
 std::thread* EditorUI::DebugProcessIOThread = nullptr;
@@ -103,17 +101,33 @@ void EditorUI::LaunchInEditor()
 		return;
 	}
 
+	if (Editor::SaveSceneOnLaunch)
+	{
+		SaveCurrentScene();
+	}
+
 	std::string Args = LaunchInEditorArgs;
 	if (Editor::LaunchCurrentScene)
 	{
 		Args.append(" -scene " + FileUtil::GetFileNameFromPath(Scene::CurrentScene));
 	}
 #if _WIN32
-	DebugProcess = _popen((ProjectName + "-Debug.exe -nostartupinfo" + Args).c_str(), "r");
+	std::string CommandLine = ProjectName + "-Debug.exe -nostartupinfo " + Args;
 #else
-	DebugProcess = popen(("./" + ProjectName + "-Debug -nostartupinfo" + Args).c_str(), "r");
+	std::string CommandLine = "./" + ProjectName + "-Debug -nostartupinfo " + Args;
+#endif
+	Log::Print("[Debug]: Starting process: " + CommandLine, Log::LogColor::Blue);
+#if _WIN32
+	DebugProcess = _popen(CommandLine.c_str(), "r");
+#else
+	DebugProcess = popen(CommandLine.c_str(), "r");
 #endif
 	DebugProcessIOThread = new std::thread(ReadProcessOutput);
+}
+
+void EditorUI::SetSaveSceneOnLaunch(bool NewValue)
+{
+	Editor::SaveSceneOnLaunch = NewValue;
 }
 
 void EditorUI::ReadProcessOutput()
@@ -135,21 +149,25 @@ void EditorUI::ReadProcessOutput()
 		}
 	}
 	Log::Print("[Debug]: ---------------------------------[End of debugging session]---------------------------------", Log::LogColor::Blue);
+	fclose(DebugProcess);
+	DebugProcess = nullptr;
 }
 
+#ifdef ENGINE_CSHARP
 void EditorUI::RebuildAndHotReload()
 {
 	Log::Print("Rebuilding C# assembly...", Log::LogColor::Green);
 	system("cd Scripts && dotnet build");
 	Editor::CanHotreload = true;
 }
+#endif
 
 void EditorUI::SetLaunchCurrentScene(bool NewLaunch)
 {
 	Editor::LaunchCurrentScene = NewLaunch;
 }
 
-#endif
+
 
 void EditorUI::SaveCurrentScene()
 {
@@ -328,6 +346,14 @@ void EditorUI::Tick()
 		Editor::CanHotreload = false;
 	}
 #endif
+
+	if (!DebugProcess && DebugProcessIOThread)
+	{
+		DebugProcessIOThread->join();
+		delete DebugProcessIOThread;
+		DebugProcessIOThread = nullptr;
+	}
+
 
 	Editor::HoveringPopup = Editor::PrevHoveringPopup;
 	Editor::PrevHoveringPopup = false;
