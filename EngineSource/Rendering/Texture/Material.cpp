@@ -164,10 +164,6 @@ Ensure that none of your models have a material assigned.");
 			{
 				OutMaterial.FragmentShader = Value;
 			}
-			else if (CurrentName == "Template")
-			{
-				OutMaterial.Template = Value;
-			}
 			else
 			{
 				OutMaterial.Uniforms.push_back(Param(CurrentName, CurrentType, Value, ""));

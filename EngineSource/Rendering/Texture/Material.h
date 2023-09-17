@@ -20,10 +20,8 @@ struct Material
 		}
 	};
 
-	bool IsTemplate = false;
-
 	std::vector<Param> Uniforms;
-	std::string VertexShader = "basic.vert", FragmentShader = "basic.frag", Template;
+	std::string VertexShader = "basic.vert", FragmentShader = "basic.frag";
 	bool UseShadowCutout = false, IsTranslucent = false;
 
 	static void SetPredefinedMaterialValue(std::string Value, char* ptr, std::string Name);
