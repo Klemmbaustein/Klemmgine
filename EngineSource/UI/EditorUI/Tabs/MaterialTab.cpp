@@ -83,7 +83,7 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text) : EditorTab(UICo
 {
 	Renderer = Text;
 
-	TabBackground->Align = UIBox::E_REVERSE;
+	TabBackground->SetAlign(UIBox::Align::Reverse);
 	TabName = new UIText(1, UIColors[2], "Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
 	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	TabBackground->AddChild(TabName);
@@ -91,13 +91,12 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text) : EditorTab(UICo
 	TabBackground->AddChild(RowBox);
 	Rows[0] = new UIScrollBox(false, 0, true);
 	RowBox->AddChild(Rows[0]);
-	Rows[0]->Align = UIBox::E_REVERSE;
+	Rows[0]->SetAlign(UIBox::Align::Reverse);
 
 	Rows[1] = new UIBackground(false, 0, UIColors[1]);
-	Rows[1]->Align = UIBox::E_REVERSE;
+	Rows[1]->SetAlign(UIBox::Align::Reverse);
 	RowBox->AddChild(Rows[1]);
 
-	RightRow = new UIBox(false, 0.3f);
 
 	if (!PreviewBuffer)
 	{
@@ -117,12 +116,12 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text) : EditorTab(UICo
 
 void MaterialTab::Tick()
 {
-	RightRow->IsVisible = TabBackground->IsVisible;
 	PreviewCamera->ReInit(1.7f, Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
 	if (!PreviewWindow)
 	{
 		return;
 	}
+	PreviewBuffer->Active = TabBackground->IsVisible;
 	PreviewWindow->SetUseTexture(true, PreviewBuffer->GetTextureID());
 	if (RedrawFrames)
 	{
@@ -215,13 +214,13 @@ void MaterialTab::GenerateUI()
 		ParamBox->AddChild(TextBox
 			->SetMinSize(Vector2(0.3f, 0.1f))
 			->SetPadding(0.005f)
+			->SetAlign(UIBox::Align::Reverse)
 			->AddChild((new UIText(0.5f, UIColors[2], i.UniformName, Renderer))
-				->SetWrapDistance(0.6f)
+				->SetWrapEnabled(true, 0.6f, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0.005f))
 			->AddChild((new UIText(0.4f, Vector3::Lerp(UIColors[2], 0.5f, 0.25f), Description, Renderer))
-				->SetWrapDistance(0.8f)
+				->SetWrapEnabled(true, 0.8f, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0.005f)));
-		TextBox->Align = UIBox::E_REVERSE;
 
 		UIBox* NewField = nullptr;
 
@@ -244,9 +243,9 @@ void MaterialTab::GenerateUI()
 		case Type::Bool:
 		{
 			NewField = new UIButton(true, 0, 0.75f, this, Index);
-			NewField->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+			NewField->SetSizeMode(UIBox::SizeMode::PixelRelative);
 			NewField->SetMinSize(0.04f);
-			NewField->SetBorder(UIBox::E_ROUNDED, 0.3f);
+			NewField->SetBorder(UIBox::BorderType::Rounded, 0.3f);
 			NewField->SetPadding(0.03f, 0.03f, 0.02f, 0.01f);
 			if (i.Value == "1")
 			{
@@ -263,7 +262,7 @@ void MaterialTab::GenerateUI()
 				->SetMinSize(Vector2(0.2f, 0.05f));
 			ParamBox->AddChild((new UIBackground(true, 0, 1, 0.15f))
 				->SetUseTexture(true, NewTexture)
-				->SetSizeMode(UIBox::E_PIXEL_RELATIVE));
+				->SetSizeMode(UIBox::SizeMode::PixelRelative));
 			TextBox->SetMinSize(Vector2(0.3f, 0.15f));
 			PreviewTextures.push_back(NewTexture);
 			break;

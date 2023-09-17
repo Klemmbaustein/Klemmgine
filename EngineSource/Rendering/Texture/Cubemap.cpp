@@ -18,7 +18,7 @@ unsigned int Cubemap::LoadCubemapFile(std::string File)
 
 		for (size_t i = 0; i < Cubenames.size(); i++)
 		{
-			CubemapFiles[i] = SaveFile.GetPropterty(Cubenames[i]).Value;
+			CubemapFiles[i] = SaveFile.GetProperty(Cubenames[i]).Value;
 		}
 		return Texture::LoadCubemapTexture(CubemapFiles);
 	}

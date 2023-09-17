@@ -14,7 +14,7 @@ StatusBar::StatusBar(Vector3* Colors)
 {
 	CurrentStatusBar = this;
 	TabBackground->SetColor(UIColors[0] * 0.75f);
-	TabBackground->SetBorder(UIBox::E_NONE, 0);
+	TabBackground->SetBorder(UIBox::BorderType::None, 0);
 
 	std::string VersionText = "Engine v" + std::string(VERSION_STRING);
 #if ENGINE_CSHARP
@@ -32,7 +32,7 @@ StatusBar::StatusBar(Vector3* Colors)
 
 	WindowButtonBox = (new UIBox(true, Vector2(0.75f, 0.95f)))
 		->SetMinSize(Vector2(0.25f, 0.05f));
-	WindowButtonBox->Align = UIBox::E_REVERSE;
+	WindowButtonBox->SetAlign(UIBox::Align::Reverse);
 }
 
 

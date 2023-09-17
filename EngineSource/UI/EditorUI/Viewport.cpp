@@ -207,9 +207,9 @@ void Viewport::Tick()
 		&& TabHas3DView)
 	{
 
-		if (!Editor::CurrentUI->CurrentCursor && !CurrentTab) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
+		if (!(int)Editor::CurrentUI->CurrentCursor && !CurrentTab) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
 		{
-			Editor::CurrentUI->CurrentCursor = EditorUI::E_CROSS;
+			Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Cross;
 		}
 
 		if (Input::IsRMBDown && !ViewportLock)
@@ -424,7 +424,7 @@ void Viewport::UpdateTabBar()
 		auto NewText = new UIText(0.45f, UIColors[2], FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText);
 		TabTexts.push_back(NewText);
 		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 3 : 1.5f), this, (int)i * 2))
-			->SetBorder(UIBox::E_ROUNDED, 0.4f)
+			->SetBorder(UIBox::BorderType::Rounded, 0.4f)
 			->SetPadding(0, 0, 0, 0.02f)
 			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01f, 0.05f)))
 				->SetPadding(0))
@@ -437,7 +437,7 @@ void Viewport::UpdateTabBar()
 				->SetUseTexture(true, Editor::CurrentUI->Textures[4])
 				->SetMinSize(0.04f)
 				->SetPadding(0.005f)
-				->SetSizeMode(UIBox::E_PIXEL_RELATIVE));
+				->SetSizeMode(UIBox::SizeMode::PixelRelative));
 		}
 		TabBox->AddChild(elem);
 	}

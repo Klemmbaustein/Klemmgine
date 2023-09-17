@@ -24,7 +24,7 @@ DebugUI::DebugUI()
 	Text = new TextRenderer();
 
 	UIBox* DebugTextBackground = new UIBox(false, Vector2(-0.99f, 0.7f));
-	DebugTextBackground->Align = UIBox::E_REVERSE;
+	DebugTextBackground->SetAlign(UIBox::Align::Reverse);
 
 	for (auto& i : DebugTexts)
 	{

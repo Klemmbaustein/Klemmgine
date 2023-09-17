@@ -30,12 +30,12 @@ float rand(vec2 co){
 	return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
 
-
 float LinearizeDepth(float depth)
 {
 	float z = depth * 2.0 - 1.0; // Back to NDC 
 	return (2.0 * 0.1f * DEPTH_MAX) / (DEPTH_MAX + 0.1f - z * (DEPTH_MAX - 0.1f));
 }
+
 float blurssao()
 {
 	vec2 texelSize = 1.f / vec2(textureSize(u_ssaotexture, 0));

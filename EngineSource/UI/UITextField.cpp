@@ -260,7 +260,7 @@ UITextField::UITextField(bool Horizontal, Vector2 Position, Vector3 Color, UICan
 	TextObject->SetTextSize(0.5f);
 	TextObject->SetPadding(0.005f);
 	SetHorizontal(false);
-	this->Align = UIBox::E_REVERSE;
+	SetAlign(UIBox::Align::Reverse);
 	
 	HasMouseCollision = true;
 
@@ -290,15 +290,15 @@ void UITextField::Draw()
 	glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_color"),
 		ButtonColorMultiplier * Color.X, ButtonColorMultiplier * Color.Y, ButtonColorMultiplier * Color.Z, 1.f);
 	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_opacity"), 1.0);
-	glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_usetexture"), 0);
-	ButtonShader->SetInt("u_borderType", BorderType);
+	glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_useTexture"), 0);
+	ButtonShader->SetInt("u_borderType", (int)BoxBorder);
 	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_borderScale"), BorderRadius / 20.0f);
 	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	if (ShowIBeam)
 	{
 		ButtonShader->SetVector4("u_color", Vector4(TextColor, 1));
-		ButtonShader->SetInt("u_borderType", UIBox::E_NONE);
+		ButtonShader->SetInt("u_borderType", (int)UIBox::BorderType::None);
 		glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_transform"), IBeamPosition.X, IBeamPosition.Y, IBeamScale.X, IBeamScale.Y);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}

@@ -127,17 +127,18 @@ void UIBackground::Draw()
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	BoxVertexBuffer->Bind();
 	ScrollTick(BackgroundShader);
+	glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_texture"), 0);
 	glUniform4f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_color"), Color.X, Color.Y, Color.Z, 1.f);
 	glUniform4f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_transform"), OffsetPosition.X, OffsetPosition.Y, Size.X, Size.Y);
 	glUniform1f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_opacity"), Opacity);
-	glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_borderType"), BorderType);
+	glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_borderType"), (int)BoxBorder);
 	glUniform1f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_borderScale"), BorderRadius / 20.0f);
 	glUniform1f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
 
 	if (UseTexture)
-		glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_usetexture"), 1);
+		glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_useTexture"), 1);
 	else
-		glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_usetexture"), 0);
+		glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_useTexture"), 0);
 	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

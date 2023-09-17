@@ -16,7 +16,7 @@ ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edi
 {
 	BackgroundBox = new UIScrollBox(false, 0, true);
 	BackgroundBox->SetPadding(0.01f);
-	BackgroundBox->Align = UIBox::E_REVERSE;
+	BackgroundBox->SetAlign(UIBox::Align::Reverse);
 	UpdateLayout();
 }
 
@@ -26,7 +26,7 @@ UITextField* ContextMenu::GenerateTextField(std::string Content, int Index)
 	((UITextField*)NewElement)->SetText(Content);
 	((UITextField*)NewElement)->SetTextSize(0.4f);
 	NewElement->SetPadding(0.005f, 0.005f, 0.02f, 0.005f);
-	NewElement->SetBorder(UIBox::E_ROUNDED, 0.5f);
+	NewElement->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 	NewElement->SetMinSize(Vector2(0.265f, 0.04f));
 	NewElement->SetMaxSize(Vector2(0.3f, 0.04f));
 	return NewElement;
@@ -94,9 +94,9 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 			break;
 		case Type::Bool:
 			NewElement = new UIButton(true, 0, 0.75f, this, ElemIndex);
-			NewElement->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+			NewElement->SetSizeMode(UIBox::SizeMode::PixelRelative);
 			NewElement->SetMinSize(0.04f);
-			NewElement->SetBorder(UIBox::E_ROUNDED, 0.3f);
+			NewElement->SetBorder(UIBox::BorderType::Rounded, 0.3f);
 			NewElement->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
 			if (*((bool*)i.Variable))
 			{

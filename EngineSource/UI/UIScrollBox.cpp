@@ -52,8 +52,8 @@ UIScrollBox* UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 		{
 			ScrollBarBackground = new UIButton(false, 0, 0.25f, nullptr, 0);
 			ScrollBarBackground->ParentOverride = this;
-			ScrollBarBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
-			ScrollBarBackground->Align = UIBox::E_REVERSE;
+			ScrollBarBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
+			ScrollBarBackground->SetAlign(UIBox::Align::Reverse);
 			ScrollBarBackground->SetPosition(OffsetPosition + Vector2(Size.X - ScrollBarBackground->GetUsedSize().X, 0));
 #if EDITOR
 			ScrollBar = new UIBackground(true, 0, 0.4f, Vector2(0.01f, 0.1f));
@@ -61,7 +61,7 @@ UIScrollBox* UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 			ScrollBar = new UIBackground(true, 0, 0.75f, Vector2(0.01f, 0.1f));
 #endif
 			ScrollBarBackground->AddChild(ScrollBar);
-			ScrollBar->SetBorder(UIBox::E_ROUNDED, 0.25);
+			ScrollBar->SetBorder(UIBox::BorderType::Rounded, 0.25);
 			ScrollBar->SetPadding(0);
 		}
 		else if (ScrollBar)

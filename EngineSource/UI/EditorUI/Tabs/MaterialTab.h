@@ -41,7 +41,6 @@ private:
 
 	Material LoadedMaterial;
 
-	UIBox* RightRow;
 	UIText* CutoutText = nullptr, *TranslucencyText = nullptr;
 	UIText* ShaderTexts[2];
 };

@@ -12,18 +12,18 @@ RenameBox::RenameBox(std::string FileToRename, Vector2 Position)
 	File = FileToRename;
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
-	TabBackground->Align = UIBox::E_DEFAULT;
+	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
+	TabBackground->SetAlign(UIBox::Align::Default);
 	TabBackground->AddChild(ButtonBackground);
 
 	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
 		->SetPadding(0.01f)
-		->SetBorder(UIBox::E_ROUNDED, 0.2f)
+		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
 		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Confirm", Editor::CurrentUI->EngineUIText))
 			->SetPadding(0.005f)))
 	->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
 		->SetPadding(0.01f)
-		->SetBorder(UIBox::E_ROUNDED, 0.2f)
+		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
 		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Editor::CurrentUI->EngineUIText))
 			->SetPadding(0.005f)));
 

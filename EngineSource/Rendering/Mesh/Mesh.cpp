@@ -44,11 +44,11 @@ void Mesh::SimpleRender(Shader* UsedShader)
 	if (RenderContext.Mat.UseShadowCutout)
 	{
 		RenderContext.BindWithShader(UsedShader);
-		UsedShader->SetInt("u_usetexture", 1);
+		UsedShader->SetInt("u_useTexture", 1);
 	}
 	else
 	{
-		UsedShader->SetInt("u_usetexture", 0);
+		UsedShader->SetInt("u_useTexture", 0);
 	}
 	MeshVertexBuffer->Draw();
 }

@@ -6,7 +6,7 @@ layout(location = 0) out vec4 f_color;
 layout (location = 1) out vec4 f_alpha;  
 
 uniform vec4 u_color;
-uniform int u_usetexture;
+uniform int u_useTexture;
 uniform sampler2D u_texture;
 uniform vec3 u_offset; // Scroll bar: X = scrolled distance; Y = MaxDistance; Z MinDistance
 uniform float u_opacity;
@@ -45,7 +45,7 @@ void main()
 	{
 		discard;
 	}
-	if(u_usetexture == 1)
+	if(u_useTexture == 1)
 	{
 		vec4 tex = texture(u_texture, v_texcoords);
 		opacity *= tex.w;

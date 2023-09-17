@@ -5,6 +5,14 @@
 #include <sstream>
 #include <iostream>
 
+class InvalidTypeException : public std::exception
+{
+public:
+	const char* what() const override
+	{
+		return "Loaded invalid type from file.";
+	};
+};
 
 SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolder)
 {
@@ -98,7 +106,7 @@ SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolde
 	}
 }
 
-SaveGame::SaveProperty SaveGame::GetPropterty(std::string Name)
+SaveGame::SaveProperty SaveGame::GetProperty(std::string Name)
 {
 	auto FoundIndex = Properties.find(Name);
 	if (FoundIndex != Properties.end())
@@ -108,7 +116,7 @@ SaveGame::SaveProperty SaveGame::GetPropterty(std::string Name)
 	return SaveProperty();
 }
 
-void SaveGame::SetPropterty(SaveProperty S)
+void SaveGame::SetProperty(SaveProperty S)
 {
 	if (Properties.find(S.Name) != Properties.end())
 	{
@@ -121,10 +129,82 @@ void SaveGame::SetPropterty(SaveProperty S)
 	}
 }
 
+SaveGame::SaveProperty SaveGame::GetPropertyOfType(std::string Name, Type::TypeEnum PropertyType)
+{
+	auto P = GetProperty(Name);
+	if (P.Type != PropertyType)
+	{
+		Log::Print("Incorrect property - Expected " + Type::Types[PropertyType] + ", found: " + Type::Types[P.Type], Log::LogColor::Red);
+		throw InvalidTypeException();
+	}
+	return P;
+}
+
+int SaveGame::GetInt(std::string Name)
+{
+	try
+	{
+		return std::stoi(GetPropertyOfType(Name, Type::Int).Value);
+	}
+	catch (std::exception&)
+	{
+		return 0;
+	}
+}
+
+bool SaveGame::GetBool(std::string Name)
+{
+	try
+	{
+		return std::stoi(GetPropertyOfType(Name, Type::Bool).Value);
+	}
+	catch (std::exception&)
+	{
+		return 0;
+	}
+}
+
+std::string SaveGame::GetString(std::string Name)
+{
+	try
+	{
+		return GetPropertyOfType(Name, Type::String).Value;
+	}
+	catch (std::exception&)
+	{
+		return "";
+	}
+}
+
+float SaveGame::GetFloat(std::string Name)
+{
+	try
+	{
+		return std::stof(GetPropertyOfType(Name, Type::Float).Value);
+	}
+	catch (std::exception&)
+	{
+		return 0;
+	}
+}
+
+
+Vector3 SaveGame::GetVector(std::string Name)
+{
+	try
+	{
+		return Vector3::stov(GetPropertyOfType(Name, Type::Vector3).Value);
+	}
+	catch (std::exception&)
+	{
+		return 0;
+	}
+}
+
 SaveGame::~SaveGame()
 {
 	std::ofstream OutFile = std::ofstream(OpenedSave, std::ios::out);
-	//loop through all the properties and write them to the "OpenedSave" variable
+	// loop through all the properties and write them to the "OpenedSave" file
 	for (const auto& p : Properties)
 	{
 		OutFile << Type::Types[p.second.Type];

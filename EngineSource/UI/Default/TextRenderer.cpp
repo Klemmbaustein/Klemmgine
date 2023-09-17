@@ -18,11 +18,6 @@ namespace _TextRenderer
 	std::vector<TextRenderer*> Renderers;
 }
 
-//void TextRenderer::OnWindowResized()
-//{
-//	_TextRenderer::projection = glm::ortho(-450 * Graphics::AspectRatio, 450 * Graphics::AspectRatio, 450.0f, -450.f);
-//}
-
 size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale, Vector2& LetterOutLocation)
 {
 	float originalScale = Scale;
@@ -56,8 +51,6 @@ size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, fl
 			numVertices += 6;
 			if (q.x0 / 1800 / Graphics::AspectRatio * Scale > Dist)
 			{
-				//std::cout << q.x0 / 225 / Application::AspectRatio;
-
 				LetterOutLocation = Vector2(PrevMaxDepth, 0) / Vector2(1800 * Graphics::AspectRatio, 1800) * Scale;
 				return i;
 			}
@@ -118,33 +111,58 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 	float originalScale = Scale;
 	Scale /= CharacterSizeInPixels;
 	Scale *= 60.0f;
-	LengthBeforeWrap *= 1350;
+	LengthBeforeWrap *= 1350 * Graphics::AspectRatio / (16.0f / 9.0f);
 	stbtt_bakedchar* cdata = (stbtt_bakedchar*)cdatapointer;
-	std::string TextString = TextSegment::CombineToString(Text);
+	FontVertex* vData = fontVertexBufferData;
 	float MaxHeight = 0.0f;
 	float x = 0.f, y = 0.f;
+	float MaxX = 0.0f;
 	Uint32 numVertices = 0;
-	for (auto& c : TextString)
+	size_t Wraps = 0;
+	for (auto& seg : Text)
 	{
-		bool IsTab = false;
-		if (c == '	')
+		size_t LastWordIndex = SIZE_MAX;
+		size_t LastWrapIndex = 0;
+		Uint32 LastWordNumVertices = 0;
+		FontVertex* LastWordVDataPtr = nullptr;
+		for (size_t i = 0; i < seg.Text.size(); i++)
 		{
-			c = ' ';
-			IsTab = true;
-		}
-		if (c >= 32 && c < 128)
-		{
-			stbtt_aligned_quad q;
-			for (int i = 0; i < (IsTab ? 4 : 1); i++)
+			bool IsTab = seg.Text[i] == '	';
+			if (IsTab)
 			{
-				stbtt_GetBakedQuad(cdata, 2048, 2048, c - 32, &x, &y, &q, 1);
+				seg.Text[i] = ' ';
 			}
-			MaxHeight = std::max(q.y1 - q.y0, MaxHeight);
-			numVertices += 6;
-			if (x > LengthBeforeWrap / CharacterSizeInPixels * 150 && Wrapped)
+			if (seg.Text[i] >= 32 && seg.Text[i] < 128)
 			{
-				x = 0;
-				y += CharacterSizeInPixels;
+				stbtt_aligned_quad q;
+				for (int txIt = 0; txIt < (IsTab ? 4 : 1); txIt++)
+				{
+					stbtt_GetBakedQuad(cdata, 2048, 2048, seg.Text[i] - 32, &x, &y, &q, 1);
+				}
+				if (seg.Text[i] == ' ')
+				{
+					LastWordIndex = i;
+					LastWordNumVertices = numVertices;
+					LastWordVDataPtr = vData;
+				}
+
+				MaxHeight = std::max(q.y1 - q.y0, MaxHeight);
+				vData += 6;
+				numVertices += 6;
+				MaxX = std::max(MaxX, x);
+				if (x > LengthBeforeWrap / CharacterSizeInPixels * 150 && Wrapped)
+				{
+					Wraps++;
+					if (LastWordIndex != SIZE_MAX && LastWordIndex != LastWrapIndex)
+					{
+						i = LastWordIndex;
+						LastWrapIndex = i;
+						vData = LastWordVDataPtr;
+						numVertices = LastWordNumVertices;
+					}
+					x = 0;
+					y += CharacterSizeInPixels;
+				}
 			}
 		}
 	}
@@ -173,7 +191,7 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(FontVertex), (const void*)offsetof(FontVertex, color));
 	glBindVertexArray(0);
 
-	LengthBeforeWrap *= 1350;
+	LengthBeforeWrap *= 1350 * Graphics::AspectRatio / (16.0f / 9.0f);
 	float originalScale = Scale;
 	Scale /= 2.f;
 	Scale /= CharacterSizeInPixels;
@@ -196,6 +214,10 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 	Uint32 numVertices = 0;
 	for (auto& seg : Text)
 	{
+		size_t LastWordIndex = SIZE_MAX;
+		size_t LastWrapIndex = 0;
+		Uint32 LastWordNumVertices = 0;
+		FontVertex* LastWordVDataPtr = nullptr;
 		for (size_t i = 0; i < seg.Text.size(); i++)
 		{
 			if (seg.Text[i] >= 32 && seg.Text[i] < 128)
@@ -213,12 +235,25 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 				vData[2].color = seg.Color;		vData[3].color = seg.Color;
 				vData[4].color = seg.Color;		vData[5].color = seg.Color;
 
+				if (seg.Text[i] == ' ')
+				{
+					LastWordIndex = i;
+					LastWordNumVertices = numVertices;
+					LastWordVDataPtr = vData;
+				}
 
 				MaxHeight = std::max(q.y1 - q.y0, MaxHeight);
 				vData += 6;
 				numVertices += 6;
 				if (x > LengthBeforeWrap / CharacterSizeInPixels * 150)
 				{
+					if (LastWordIndex != SIZE_MAX && LastWordIndex != LastWrapIndex)
+					{
+						i = LastWordIndex;
+						LastWrapIndex = i;
+						vData = LastWordVDataPtr;
+						numVertices = LastWordNumVertices;
+					}
 					x = 0;
 					y += CharacterSizeInPixels;
 				}

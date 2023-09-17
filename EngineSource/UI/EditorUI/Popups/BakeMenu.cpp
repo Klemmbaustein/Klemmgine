@@ -22,18 +22,18 @@ BakeMenu::BakeMenu()
 	BakeMenuActive = true;
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
-	TabBackground->Align = UIBox::E_DEFAULT;
+	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
+	TabBackground->SetAlign(UIBox::Align::Default);
 	TabBackground->AddChild(ButtonBackground);
 
 	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
 		->SetPadding(0.01f)
-		->SetBorder(UIBox::E_ROUNDED, 0.2f)
+		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
 		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Bake", Editor::CurrentUI->EngineUIText))
 			->SetPadding(0.005f)))
 		->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
 			->SetPadding(0.01f)
-			->SetBorder(UIBox::E_ROUNDED, 0.2f)
+			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
 			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Editor::CurrentUI->EngineUIText))
 				->SetPadding(0.005f)));
 
@@ -107,7 +107,7 @@ void BakeMenu::Tick()
 			IsFinished = true;
 			TabBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
 				->SetPadding(0.01f)
-				->SetBorder(UIBox::E_ROUNDED, 0.2f)
+				->SetBorder(UIBox::BorderType::Rounded, 0.2f)
 				->AddChild((new UIText(0.45f, 1 - UIColors[2], "Close", Editor::CurrentUI->EngineUIText))
 					->SetPadding(0.005f)));
 		}
@@ -143,7 +143,7 @@ void BakeMenu::StartBake()
 	TabBackground->DeleteChildren();
 	ButtonBackground = nullptr;
 	
-	TabBackground->Align = UIBox::E_REVERSE;
+	TabBackground->SetAlign(UIBox::Align::Reverse);
 
 	TabBackground->AddChild((new UIText(0.6f, UIColors[2], "Baking lighting...", Editor::CurrentUI->EngineUIText))
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.005f));
@@ -155,7 +155,7 @@ void BakeMenu::StartBake()
 	LogScrollBox = new UIScrollBox(false, 0, true);
 	LogScrollBox->SetMinSize(Vector2(0.45f, 0.35f));
 	LogScrollBox->SetMaxSize(Vector2(0.45f, 0.35f));
-	LogScrollBox->Align = UIBox::E_REVERSE;
+	LogScrollBox->SetAlign(UIBox::Align::Reverse);
 	LogScrollBox->SetPadding(0);
 
 	TabBackground->AddChild((new UIBackground(true, 0, UIColors[1], 0))

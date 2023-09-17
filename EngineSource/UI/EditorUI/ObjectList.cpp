@@ -16,12 +16,12 @@ ObjectList::ObjectList(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edito
 	TabBackground->SetHorizontal(false);
 	ObjectListBox = new UIScrollBox(false, 0, true);
 	HeaderBox = new UIBackground(false, 0, Vector3(UIColors[0]), 0);
-	HeaderBox->SetBorder(UIBox::E_DARKENED_EDGE, 0.25);
+	HeaderBox->SetBorder(UIBox::BorderType::DarkenedEdge, 0.25);
 	ObjectListBox
 		->SetPadding(0.005f, 0.005f, 0.005f / Graphics::AspectRatio, 0.005f / Graphics::AspectRatio)
 		->SetMinSize(Vector2(Scale.X - (0.005f / Graphics::AspectRatio), Scale.Y - Editor::CurrentUI->UIElements[2]->Scale.Y - 0.01f))
 		->SetMaxSize(Vector2(Scale.X - (0.005f / Graphics::AspectRatio), Scale.Y - Editor::CurrentUI->UIElements[2]->Scale.Y - 0.01f));
-	TabBackground->Align = UIBox::E_REVERSE;
+	TabBackground->SetAlign(UIBox::Align::Reverse);
 	TabBackground
 		->AddChild(HeaderBox
 			->SetPadding(0)
@@ -76,7 +76,7 @@ void ObjectList::UpdateLayout()
 		->SetMaxSize(Vector2(Scale.X, Editor::CurrentUI->UIElements[2]->Scale.Y));
 
 	ObjectListBox->DeleteChildren();
-	ObjectListBox->Align = UIBox::E_REVERSE;
+	ObjectListBox->BoxAlign = UIBox::Align::Reverse;
 	ListIterator = 0;
 
 	auto ObjectList = Editor::CurrentUI->GetObjectList();
@@ -127,13 +127,13 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 			ElementButton->AddChild((new UIBackground(true, 0, UIColors[2], 0.03f))
 				->SetUseTexture(true, Editor::CurrentUI->Textures[13ull + (size_t)Object.IsCollapsed])
 				->SetPadding(0, 0.01f, Depth - 0.04f / Graphics::AspectRatio + 0.005f, 0.001f)
-				->SetSizeMode(UIBox::E_PIXEL_RELATIVE));
+				->SetSizeMode(UIBox::SizeMode::PixelRelative));
 		}
 
 		auto Icon = (new UIBackground(true, 0, UIColors[2], 0.04f))
 			->SetUseTexture(true, Editor::CurrentUI->Textures[ElemIcon])
 			->SetPadding(0, 0, 0, 0.005f)
-			->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+			->SetSizeMode(UIBox::SizeMode::PixelRelative);
 		ElementButton->AddChild(Icon);
 
 		if (Object.Object)
@@ -148,7 +148,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 		if (v && v->SelectedObjects.size() && Object.Object == v->SelectedObjects[0])
 		{
 			ElementButton->SetColor(ElementButton->GetColor() * 3 * Vector3(1, 0.75f, 0));
-			ElementButton->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
+			ElementButton->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
 		}
 
 		if (Object.Object)

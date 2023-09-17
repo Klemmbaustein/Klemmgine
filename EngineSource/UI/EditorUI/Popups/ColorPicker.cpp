@@ -104,9 +104,9 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 {
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
+	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
 	TabBackground->AddChild(ButtonBackground);
-	TabBackground->Align = UIBox::E_DEFAULT;
+	TabBackground->SetAlign(UIBox::Align::Default);
 	std::vector<std::string> Answers =
 	{
 		"Apply",
@@ -118,7 +118,7 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 		ButtonBackground->AddChild(
 			(new UIButton(true, 0, UIColors[2], this, (int)i))
 			->SetPadding(0.01f)
-			->SetBorder(UIBox::E_ROUNDED, 0.2f)
+			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
 			->AddChild((new UIText(0.45f, 1 - UIColors[2], Answers[i], Editor::CurrentUI->EngineUIText))
 				->SetPadding(0.005f)));
 	}
@@ -137,7 +137,7 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 	ColorPickerShaders[1]->Bind();
 
 	ColorPickerBackgrounds[0] = new UIBackground(true, 0, 1, 0.3f, ColorPickerShaders[0]);
-	ColorPickerBackgrounds[0]->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+	ColorPickerBackgrounds[0]->SetSizeMode(UIBox::SizeMode::PixelRelative);
 	ColorPickerBackgrounds[0]->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
 	ColorPickerBackgrounds[1] = new UIBackground(true, 0, 1, Vector2(0.025f, 0.3f), ColorPickerShaders[1]);
 	ColorPickerBackgrounds[1]->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
@@ -145,11 +145,11 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 
 	RGBBox = new UIBox(false, 0);
 	RGBBox->SetPadding(0);
-	RGBBox->Align = UIBox::E_REVERSE;
+	RGBBox->SetAlign(UIBox::Align::Reverse);
 	auto PreviewBox = new UIBox(false, 0);
 	PreviewBox->SetPadding(0);
 	PreviewBox->AddChild(RGBBox);
-	PreviewBox->Align = UIBox::E_REVERSE;
+	PreviewBox->SetAlign(UIBox::Align::Reverse);
 	PreviewBox->AddChild(ColorPickerBackgrounds[2]);
 	PickerBackground->AddChild(ColorPickerBackgrounds[0]);
 	PickerBackground->AddChild(ColorPickerBackgrounds[1]);
@@ -208,7 +208,7 @@ void ColorPicker::Tick()
 			SV = RelativeMousePosition;
 			UpdateColors();
 		}
-		Editor::CurrentUI->CurrentCursor = EditorUI::E_CROSS;
+		Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Cross;
 	}
 
 	if (ColorPickerBackgrounds[1]->IsHovered())
@@ -220,7 +220,7 @@ void ColorPicker::Tick()
 			SelectedHue = RelativeMousePosition.Y;
 			UpdateColors();
 		}
-		Editor::CurrentUI->CurrentCursor = EditorUI::E_CROSS;
+		Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Cross;
 	}
 }
 void ColorPicker::OnButtonClicked(int Index)
@@ -263,7 +263,7 @@ void ColorPicker::GenerateRGBDisplay()
 		RGBTexts[i]
 			->SetTextSize(0.4f)
 			->SetMinSize(Vector2(0.06f, 0.04f))
-			->SetBorder(UIBox::E_ROUNDED, 0.5f);
+			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		RGBTexts[i]->SetText(EditorUI::ToShortString(SelectedColor[(int)i]));
 		RGBBox->AddChild((new UIBox(true, 0))
 				->SetPadding(0)

@@ -1,5 +1,7 @@
 //! #include "shared.frag"
-uniform vec3 u_skycolor = vec3(0.3f, 0.6f, 1.f);
+
+// #params colors
+uniform vec3 u_skycolor = vec3(0.3, 0.6, 1);
 uniform vec3 u_horizoncolor = vec3(0.7, 0.8, 1);
 
 void main()

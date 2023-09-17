@@ -348,21 +348,21 @@ void EditorUI::Tick()
 
 	if (dynamic_cast<UIButton*>(UI::HoveredBox))
 	{
-		CurrentCursor = E_GRAB;
+		CurrentCursor = CursorType::Grab;
 	}
 	if (dynamic_cast<UITextField*>(UI::HoveredBox))
 	{
-		CurrentCursor = E_TEXT_HOVER;
+		CurrentCursor = CursorType::TextHover;
 	}
 	if (UIScrollBox::IsDraggingScrollBox)
 	{
-		CurrentCursor = E_DEFAULT;
+		CurrentCursor = CursorType::Default;
 	}
-	if (CurrentCursor < E_LAST_CURSOR && CurrentCursor >= 0)
+	if (CurrentCursor < CursorType::End && (int)CurrentCursor >= 0)
 	{
-		SDL_SetCursor(Cursors[CurrentCursor]);
+		SDL_SetCursor(Cursors[(int)CurrentCursor]);
 	}
-	CurrentCursor = Editor::DraggingTab ? (Editor::TabDragHorizontal ? E_RESIZE_WE : E_RESIZE_NS) : E_DEFAULT;
+	CurrentCursor = Editor::DraggingTab ? (Editor::TabDragHorizontal ? CursorType::Resize_WE : CursorType::Resize_NS) : CursorType::Default;
 
 	if (Input::IsLMBDown && Dropdown && !Dropdown->IsHovered())
 	{
@@ -405,8 +405,8 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 
 	CurrentDropdown = Menu;
 	Dropdown = new UIBackground(false, Position, UIColors[0] * 2);
-	Dropdown->Align = UIBox::E_REVERSE;
-	Dropdown->SetBorder(UIBox::E_ROUNDED, 0.4f);
+	Dropdown->SetAlign(UIBox::Align::Reverse);
+	Dropdown->SetBorder(UIBox::BorderType::Rounded, 0.4f);
 	for (size_t i = 0; i < Menu.size(); i++)
 	{
 		UIBox* NewElement = nullptr;
@@ -420,7 +420,7 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 			NewElement = new UIButton(true, 0, UIColors[0] * 2, this, (int)i);
 			Menu[i].Title = "   " + Menu[i].Title;
 		}
-		NewElement->SetBorder(UIBox::E_ROUNDED, 0.4f);
+		NewElement->SetBorder(UIBox::BorderType::Rounded, 0.4f);
 		NewElement->SetMinSize(Vector2(0.16f, 0));
 		NewElement->SetPadding(0);
 		NewElement->AddChild((new UIText(0.45f, UIColors[2], Menu[i].Title, EngineUIText))

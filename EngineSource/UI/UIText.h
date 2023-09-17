@@ -15,6 +15,7 @@ class UIText : public UIBox
 	DrawableText* Text = nullptr;
 	float TextWidthOverride = 0;
 	float Opacity = 1.f;
+	SizeMode WrapSizeMode = SizeMode::ScreenRelative;
 public:
 
 	void Tick() override;
@@ -24,9 +25,9 @@ public:
 	UIText* SetColor(Vector3 NewColor);
 	UIText* SetOpacity(float NewOpacity);
 	UIText* SetTextSize(float Size);
-	UIText* SetWrapDistance(float Distance);
 	float GetTextSize();
 	UIText* SetTextWidthOverride(float NewTextWidthOverride);
+	UIText* SetWrapEnabled(bool WrapEnabled, float WrapDistance, SizeMode WrapSizeMode);
 
 	size_t GetNearestLetterAtLocation(Vector2 Location, Vector2& LetterOutLocation);
 	Vector2 GetLetterLocation(size_t Index);

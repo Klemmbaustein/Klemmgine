@@ -9,28 +9,29 @@ class UIBox
 {
 public:
 	bool IsVisible = true;
-	enum E_UIAlign
+	enum class Align
 	{
-		E_DEFAULT,
-		E_CENTERED,
-		E_REVERSE
+		Default,
+		Centered,
+		Reverse
 	};
-	enum E_BorderType
+	enum class BorderType
 	{
-		E_NONE = 0,
-		E_ROUNDED = 1,
-		E_DARKENED_EDGE = 2
-	};
-	enum E_SizeMode
-	{
-		E_SCREEN_RELATIVE = 0,
-		E_PIXEL_RELATIVE = 1
+		None = 0,
+		Rounded = 1,
+		DarkenedEdge = 2
 	};
 
-	UIBox* SetSizeMode(E_SizeMode NewMode);
-	E_BorderType BorderType = E_NONE;
+	enum class SizeMode
+	{
+		ScreenRelative = 0,
+		PixelRelative = 1
+	};
+
+	UIBox* SetSizeMode(SizeMode NewMode);
+	BorderType BoxBorder = BorderType::None;
 	float BorderRadius = 0;
-	E_UIAlign Align = E_DEFAULT;
+	Align BoxAlign = Align::Default;
 
 	UIBox(bool Horizontal, Vector2 Position);
 	virtual ~UIBox();
@@ -38,6 +39,7 @@ public:
 	void InvalidateLayout();
 	UIBox* AddChild(UIBox* NewChild);
 	UIBox* GetAbsoluteParent();
+	UIBox* SetAlign(Align NewAlign);
 	static void DrawAllUIElements();
 	void DrawThisAndChildren();
 	void DeleteChildren();
@@ -58,7 +60,7 @@ public:
 	bool GetTryFill();
 	friend UIScrollBox;
 	virtual void OnChildClicked(int Index);
-	UIBox* SetBorder(UIBox::E_BorderType Type, float Size);
+	UIBox* SetBorder(UIBox::BorderType Type, float Size);
 	static void ForceUpdateUI();
 	static void InitUI();
 	static unsigned int* GetUITextures();
@@ -90,7 +92,7 @@ protected:
 	float RightPadding = 0.02f;
 	float LeftPadding = 0.02f;
 	Vector2 Size;
-	E_SizeMode SizeMode = E_SCREEN_RELATIVE;
+	SizeMode BoxSizeMode = SizeMode::ScreenRelative;
 
 	std::vector<UIBox*> Children;
 	UIBox* Parent = nullptr;

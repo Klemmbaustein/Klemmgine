@@ -252,14 +252,14 @@ void UIButton::Draw()
 	glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_color"),
 		ButtonColorMultiplier * Color.X, ButtonColorMultiplier * Color.Y, ButtonColorMultiplier * Color.Z, 1.f);
 	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_opacity"), Opacity);
-	glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_borderType"), BorderType);
+	glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_borderType"), (int)BoxBorder);
 	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_borderScale"), BorderRadius / 20.0f);
 	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
 
 	if (UseTexture)
-		glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_usetexture"), 1);
+		glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_useTexture"), 1);
 	else
-		glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_usetexture"), 0);
+		glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_useTexture"), 0);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	ButtonVertexBuffer->Unbind();
 }

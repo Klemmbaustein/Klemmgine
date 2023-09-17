@@ -22,11 +22,11 @@ namespace UI
 	unsigned int UITextures[2] = {0, 0};
 }
 
-UIBox* UIBox::SetSizeMode(E_SizeMode NewMode)
+UIBox* UIBox::SetSizeMode(SizeMode NewMode)
 {
-	if (SizeMode != NewMode)
+	if (BoxSizeMode != NewMode)
 	{
-		SizeMode = NewMode;
+		BoxSizeMode = NewMode;
 		InvalidateLayout();
 	}
 	return this;
@@ -117,11 +117,11 @@ void UIBox::OnChildClicked(int Index)
 {
 }
 
-UIBox* UIBox::SetBorder(E_BorderType Type, float Size)
+UIBox* UIBox::SetBorder(BorderType Type, float Size)
 {
-	if (BorderType != Type || Size != BorderRadius)
+	if (BoxBorder != Type || Size != BorderRadius)
 	{
-		BorderType = Type;
+		BoxBorder = Type;
 		BorderRadius = Size;
 		InvalidateLayout();
 	}
@@ -374,7 +374,7 @@ void UIBox::UpdateScale()
 
 	Vector2 AdjustedMinSize = MinSize;
 	Vector2 AdjustedMaxSize = MaxSize;
-	if (SizeMode == E_PIXEL_RELATIVE)
+	if (BoxSizeMode == SizeMode::PixelRelative)
 	{
 		AdjustedMinSize.X /= Graphics::AspectRatio;
 		AdjustedMaxSize.X /= Graphics::AspectRatio;
@@ -398,7 +398,7 @@ void UIBox::UpdatePosition()
 
 	float ChildrenSize = 0;
 
-	if (Align == E_CENTERED)
+	if (BoxAlign == Align::Centered)
 	{
 		for (auto c : Children)
 		{
@@ -409,7 +409,7 @@ void UIBox::UpdatePosition()
 
 	for (auto c : Children)
 	{
-		if (Align == E_CENTERED)
+		if (BoxAlign == Align::Centered)
 		{
 			if (ChildrenHorizontal)
 			{
@@ -426,7 +426,7 @@ void UIBox::UpdatePosition()
 		{
 			if (ChildrenHorizontal)
 			{
-				if (Align == E_REVERSE)
+				if (BoxAlign == Align::Reverse)
 				{
 					c->OffsetPosition = OffsetPosition + Vector2(Size.X - Offset - c->Size.X - c->RightPadding, c->DownPadding);
 				}
@@ -438,7 +438,7 @@ void UIBox::UpdatePosition()
 			}
 			else
 			{
-				if (Align == E_REVERSE)
+				if (BoxAlign == Align::Reverse)
 				{
 					c->OffsetPosition = OffsetPosition + Vector2(c->LeftPadding, Size.Y - Offset - c->Size.Y - c->UpPadding);
 				}
@@ -507,6 +507,12 @@ UIBox* UIBox::GetAbsoluteParent()
 	{
 		return Parent->GetAbsoluteParent();
 	}
+	return this;
+}
+
+UIBox* UIBox::SetAlign(Align NewAlign)
+{
+	BoxAlign = NewAlign;
 	return this;
 }
 

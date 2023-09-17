@@ -32,7 +32,7 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 {
 	this->Renderer = Renderer;
 
-	TabBackground->Align = UIBox::E_REVERSE;
+	TabBackground->SetAlign(UIBox::Align::Reverse);
 	TabName = new UIText(1, UIColors[2], "Model: ", Renderer);
 	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	if (!PreviewBuffer)
@@ -51,10 +51,10 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 	RowBox->AddChild(Rows[0]);
 	PreviewWindow = new UIBackground(true, 0, 1, 0.5f);
 	Rows[0]->AddChild(PreviewWindow);
-	PreviewWindow->SetBorder(UIBox::E_ROUNDED, 1);
+	PreviewWindow->SetBorder(UIBox::BorderType::Rounded, 1);
 
 	Rows[1] = new UIScrollBox(false, 0, true);
-	Rows[1]->Align = UIBox::E_REVERSE;
+	Rows[1]->SetAlign(UIBox::Align::Reverse);
 	Rows[1]->SetMinSize(Vector2(0, 1));
 	Rows[1]->SetMaxSize(Vector2(1, 1));
 	RowBox->AddChild(Rows[1]);
@@ -164,7 +164,7 @@ void MeshTab::Generate()
 		NewButton->SetPadding(0, 0, 0.01f, 0);
 		NewText->SetPadding(0);
 		auto ButtonText = new UIText(0.5f, UIColors[2], *OptionVariables[std::abs(Index) - 1] ? "true " : "false", Renderer);
-		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5);
+		NewButton->SetBorder(UIBox::BorderType::Rounded, 0.5);
 		ButtonText->SetPadding(0.01f);
 		NewButton->AddChild(ButtonText);
 		Rows[0]->AddChild(OptionBox);
@@ -178,13 +178,13 @@ void MeshTab::Generate()
 		auto NewTextInput = new UITextField(true, 0, UIColors[1], this, 1, Renderer);
 		NewTextInput->SetMinSize(Vector2(0.4f, 0.075f));
 		NewTextInput->SetText(i.ElemMaterial);
-		NewTextInput->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewTextInput->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Rows[1]->AddChild(NewTextInput);
 		MaterialTextFields.push_back(NewTextInput);
 	}
 	PreviewWindow = new UIBackground(true, 0, 1, 0.5f);
 	Rows[0]->AddChild(PreviewWindow);
-	PreviewWindow->SetBorder(UIBox::E_ROUNDED, 1);
+	PreviewWindow->SetBorder(UIBox::BorderType::Rounded, 1);
 	UIBox::DrawAllUIElements();
 	UIBox::RedrawUI();
 	Rows[1]->SetMinSize(Rows[0]->GetUsedSize());

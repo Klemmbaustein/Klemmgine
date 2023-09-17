@@ -8,8 +8,8 @@ DialogBox::DialogBox(std::string Title, Vector2 Position, std::string Message, s
 {
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5);
 	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
-	TabBackground->Align = UIBox::E_DEFAULT;
+	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
+	TabBackground->SetAlign(UIBox::Align::Default);
 	TabBackground->AddChild(ButtonBackground);
 	this->Answers = Answers;
 	for (size_t i = 0; i < Answers.size(); i++)
@@ -17,7 +17,7 @@ DialogBox::DialogBox(std::string Title, Vector2 Position, std::string Message, s
 		ButtonBackground->AddChild(
 			(new UIButton(true, 0, UIColors[2], this, (int)i))
 			->SetPadding(0.01f)
-			->SetBorder(UIBox::E_ROUNDED, 0.2f)
+			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
 			->AddChild((new UIText(0.45f, 1 - UIColors[2], Answers[i].Name, Editor::CurrentUI->EngineUIText))
 				->SetPadding(0.005f)));
 	}

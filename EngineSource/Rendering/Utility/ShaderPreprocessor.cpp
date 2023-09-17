@@ -205,6 +205,11 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 				Default.clear();
 			}
 
+			auto DescFirstNonWhitespace = Description.find_first_not_of(" ");
+			if (DescFirstNonWhitespace != std::string::npos)
+			{
+				Description = Description.substr(DescFirstNonWhitespace);
+			}
 			Params.push_back(Material::Param(Name, ParamType, Default, Category + "#" + Description));
 			Description.clear();
 		}
@@ -274,6 +279,7 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 		Params.clear();
 
 		const std::string& IncludeString = ParseResult.Code;
+
 
 		std::string NewCode = CodeStream.str().substr(0, StringPos - CurrentLine.str().size());
 		NewCode.append(IncludeString);

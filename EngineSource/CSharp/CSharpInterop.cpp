@@ -287,7 +287,7 @@ bool CSharp::GetUseCSharp()
 		}
 		else
 		{
-			UseCSharp = g.GetPropterty("Klemmgine.NET:Use_C#_in_project_(Requires_restart)").Value == "1";
+			UseCSharp = g.GetProperty("Klemmgine.NET:Use_C#_in_project_(Requires_restart)").Value == "1";
 		}
 #endif
 		return UseCSharp;

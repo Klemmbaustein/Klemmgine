@@ -166,7 +166,7 @@ ItemBrowser::ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edi
 {
 	CPPClasses = GetEditorUIClasses();
 	TabBackground->SetHorizontal(false);
-	TabBackground->Align = UIBox::E_REVERSE;
+	TabBackground->SetAlign(UIBox::Align::Reverse);
 	ContentBox = new UIBox(false, 0);
 	TabBackground->AddChild(ContentBox->SetPadding(0));
 
@@ -182,7 +182,7 @@ void ItemBrowser::UpdateLayout()
 	BrowserScrollBox = new UIScrollBox(false, Scale - Vector2(0, 0.1f), true);
 	BrowserScrollBox->SetMinSize(Vector2(TabBackground->GetMinSize().X, 1.675f));
 	BrowserScrollBox->SetMaxSize(Vector2(MaxSize.X, 1.675f));
-	BrowserScrollBox->Align = UIBox::E_REVERSE;
+	BrowserScrollBox->SetAlign(UIBox::Align::Reverse);
 	ContentBox->AddChild(BrowserScrollBox
 		->SetPadding(0));
 
@@ -191,7 +191,7 @@ void ItemBrowser::UpdateLayout()
 		->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
 			->SetUseTexture(true, Editor::CurrentUI->Textures[8])
 			->SetMinSize(Vector2(0.06f))
-			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
+			->SetSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetPadding(0.01f))
 		->AddChild((new UITextField(true, 0, UIColors[0], this, -3, Editor::CurrentUI->EngineUIText))
 			->SetTextColor(UIColors[2])
@@ -199,7 +199,7 @@ void ItemBrowser::UpdateLayout()
 			->SetTextSize(0.4f)
 			->SetMinSize(Vector2(Scale.X / 1.2f - 0.12f / Graphics::AspectRatio, 0.08f))
 			->SetMaxSize(Vector2(Scale.X / 1.2f - 0.12f / Graphics::AspectRatio, 0.08f))
-			->SetBorder(UIBox::E_ROUNDED, 0.5f)
+			->SetBorder(UIBox::BorderType::Rounded, 0.5f)
 			->SetPadding(0.01f)));
 
 
@@ -209,9 +209,9 @@ void ItemBrowser::UpdateLayout()
 	for (auto& i : Tabs)
 	{
 		auto NewButton = new UIButton(true, 0, UIColors[0] * (ButtonIndex == SelectedTab ? 1.5f : 1.0f), this, -5 - ((int)ButtonIndex));
-		NewButton->Align = UIBox::E_CENTERED;
+		NewButton->SetAlign(UIBox::Align::Centered);
 		TabBox->AddChild(NewButton
-			->SetBorder(UIBox::E_DARKENED_EDGE, 0.25f)
+			->SetBorder(UIBox::BorderType::DarkenedEdge, 0.25f)
 			->SetPadding(0)
 			->SetMinSize(Vector2(Scale.X / Tabs.size(), 0.05f))
 			->AddChild((new UIText(0.45f, UIColors[2], i, Editor::CurrentUI->EngineUIText))
@@ -220,7 +220,7 @@ void ItemBrowser::UpdateLayout()
 	}
 
 	ContentBox->AddChild((new UIButton(true, 0, Vector3(0.2f, 0.7f, 0), this, -1))
-		->SetBorder(UIBox::E_ROUNDED, 0.25f)
+		->SetBorder(UIBox::BorderType::Rounded, 0.25f)
 		->SetPadding(0.02f, 0.02f, Scale.X / 2.0f - 0.0575f, 0.02f)
 		->AddChild((new UIText(0.5f, 0, "Import", Editor::CurrentUI->EngineUIText))));
 
@@ -295,18 +295,18 @@ void ItemBrowser::UpdateLayout()
 		Buttons.push_back(NewBackground);
 		NewBackground->SetCanBeDragged(true);
 		NewBackground->SetMinSize(Vector2(0.14f, 0.19f));
-		NewBackground->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+		NewBackground->SetSizeMode(UIBox::SizeMode::PixelRelative);
 		NewBackground->SetPadding(0.005f * Graphics::AspectRatio, 0.005f * Graphics::AspectRatio, 0.005f, 0.005f);
-		NewBackground->Align = UIBox::E_REVERSE;
-		NewBackground->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewBackground->SetAlign(UIBox::Align::Reverse);
+		NewBackground->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		NewBackground->SetNeedsToBeSelected(true);
 		UIBackground* ItemImage = new UIBackground(true, 0, 1, Vector2(0.12f));
-		ItemImage->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+		ItemImage->SetSizeMode(UIBox::SizeMode::PixelRelative);
 		ItemImage->SetUseTexture(true, Editor::CurrentUI->Textures[TextureID]);
 		ItemImage->SetPadding(0);
 		NewBackground->AddChild((new UIBackground(true, 0, Color, 0.1f))
-			->SetBorder(UIBox::E_ROUNDED, 0.5f)
-			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
+			->SetBorder(UIBox::BorderType::Rounded, 0.5f)
+			->SetSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetPadding(0.0025f * Graphics::AspectRatio, 0, 0.005f, 0.005f)
 			->AddChild(ItemImage));
 
@@ -538,7 +538,7 @@ void ItemBrowser::OnButtonDragged(int Index)
 	}
 
 	auto DragBox = new UIBackground(true, Input::MouseLocation, 1, 0.12f);
-	DragBox->SetSizeMode(UIBox::E_PIXEL_RELATIVE);
+	DragBox->SetSizeMode(UIBox::SizeMode::PixelRelative);
 	DragBox->SetUseTexture(true, Editor::CurrentUI->Textures[TextureID]);
 
 	Editor::CurrentUI->DraggedItem = DragBox;

@@ -64,7 +64,7 @@ EditorPanel::EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vec
 	this->MaxSize = MaxSize;
 
 	TabBackground = new UIBackground(true, Position, UIColors[0], Scale);
-	TabBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
+	TabBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
 	TabBackground->HasMouseCollision = true;
 	this->Position = Position;
 	this->Scale = Scale;
@@ -81,7 +81,7 @@ EditorPanel::EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vec
 		TitleBackground->AddChild(TitleText);
 		MainBackground->AddChild(TitleBackground);
 		TabBackground->SetHorizontal(false);
-		TabBackground->Align = UIBox::E_REVERSE;
+		TabBackground->SetAlign(UIBox::Align::Reverse);
 		TabBackground->SetPadding(0);
 		TitleBackground->SetPadding(0);
 		TitleBackground->HasMouseCollision = true;
@@ -179,7 +179,7 @@ void EditorPanel::UpdatePanel()
 				IsDragHorizontal = true;
 				IsDraggingAll = false;
 			}
-			Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_WE;
+			Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Resize_WE;
 		}
 		if (VerticalOverride || (!HorizontalOverride && !Math::IsPointIn2DBox(Position + BorderScale * Vector2(0, 1),
 			Position + Scale - BorderScale * Vector2(0, 1), ClampedMousePosition)))
@@ -199,13 +199,13 @@ void EditorPanel::UpdatePanel()
 				IsDragged = true;
 				IsDraggingAll = false;
 			}
-			Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_NS;
+			Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Resize_NS;
 
 		}
 	}
 	if (IsPopup && TitleBackground->IsHovered() && !IsDragged)
 	{
-		Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_ALL;
+		Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Resize_All;
 		if (Input::IsLMBDown)
 		{
 			IsDragged = true;
@@ -228,11 +228,11 @@ void EditorPanel::UpdatePanel()
 	{
 		if (IsDraggingAll)
 		{
-			Editor::CurrentUI->CurrentCursor = EditorUI::E_RESIZE_ALL;
+			Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Resize_All;
 		}
 		else
 		{
-			Editor::CurrentUI->CurrentCursor = IsDragHorizontal ? EditorUI::E_RESIZE_WE : EditorUI::E_RESIZE_NS;
+			Editor::CurrentUI->CurrentCursor = IsDragHorizontal ? EditorUI::CursorType::Resize_WE : EditorUI::CursorType::Resize_NS;
 		}
 	}
 

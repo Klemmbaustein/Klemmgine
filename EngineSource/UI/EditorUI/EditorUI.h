@@ -111,17 +111,17 @@ public:
 	};
 	TextRenderer* EngineUIText = new TextRenderer("Font.ttf", 90);
 
-	enum CursorType
+	enum class CursorType
 	{
-		E_DEFAULT = 0,
-		E_GRAB = 1,
-		E_CROSS = 2,
-		E_LOADING = 3,
-		E_RESIZE_WE = 4,
-		E_RESIZE_NS = 5,
-		E_RESIZE_ALL = 6,
-		E_TEXT_HOVER = 7,
-		E_LAST_CURSOR
+		Default = 0,
+		Grab = 1,
+		Cross = 2,
+		Loading = 3,
+		Resize_WE = 4,
+		Resize_NS = 5,
+		Resize_All = 6,
+		TextHover = 7,
+		End
 	};
 
 	struct DropdownItem
@@ -134,12 +134,12 @@ public:
 
 	EditorPanel* UIElements[7] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
-	CursorType CurrentCursor = E_DEFAULT;
+	CursorType CurrentCursor = CursorType::Default;
 	std::vector<unsigned int> Textures;
 	std::string CurrentPath = "Content";
 
 protected:
-	SDL_Cursor* Cursors[E_LAST_CURSOR];
+	SDL_Cursor* Cursors[(int)CursorType::End];
 	std::vector<DropdownItem> CurrentDropdown;
 
 public:

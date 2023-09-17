@@ -4,6 +4,7 @@
 #include <UI/EditorUI/UIVectorField.h>
 #include <Engine/Log.h>
 #include <CSharp/CSharpInterop.h>
+#include <filesystem>
 
 void PreferenceTab::GenerateUI()
 {
@@ -11,21 +12,21 @@ void PreferenceTab::GenerateUI()
 
 	TabBackground->DeleteChildren();
 	auto SettingsCategoryBox = new UIBackground(false, 0, UIColors[0] * 1.2f, Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
-	SettingsCategoryBox->Align = UIBox::E_REVERSE;
+	SettingsCategoryBox->SetAlign(UIBox::Align::Reverse);
 	TabBackground->AddChild(SettingsCategoryBox);
 
 	for (size_t i = 0; i < Preferences.size(); i++)
 	{
 		SettingsCategoryBox->AddChild(
 			(new UIButton(true, 0, UIColors[1] + (float)(i == SelectedSetting) / 8.f, this, (int)i))
-			->SetPadding(0.005f, 0.005f, 0.01f, 0.01f)->SetBorder(UIBox::E_ROUNDED, 0.5f)
+			->SetPadding(0.005f, 0.005f, 0.01f, 0.01f)->SetBorder(UIBox::BorderType::Rounded, 0.5f)
 			->AddChild((new UIText(0.5f, UIColors[2], Preferences[i].Name, Renderer))
 				->SetTextWidthOverride(0.2f)
 				->SetPadding(0.01f)));
 	}
 
 	auto SettingsBox = new UIBox(false, 0);
-	SettingsBox->Align = UIBox::E_REVERSE;
+	SettingsBox->SetAlign(UIBox::Align::Reverse);
 	SettingsBox->SetMinSize(Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
 	TabBackground->AddChild(SettingsBox);
 
@@ -106,7 +107,7 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 			->SetText(Value)
 			->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6f, 0.05f))
 			->SetPadding(0.02f, 0.02f, 0.05f, 0.02f)
-			->SetBorder(UIBox::E_ROUNDED, 0.5f);
+			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
 		break;
 	case Type::Vector3:
@@ -123,10 +124,10 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 		}
 		Element = (new UIButton(true, 0, 1, this, Index))
 			->SetUseTexture(std::stoi(Value), Editor::CurrentUI->Textures[16])
-			->SetSizeMode(UIBox::E_PIXEL_RELATIVE)
+			->SetSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetMinSize(0.05f)
 			->SetPadding(0.02f, 0.02f, 0.05f, 0.02f)
-			->SetBorder(UIBox::E_ROUNDED, 0.5f);
+			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
 		break;
 	default:
@@ -217,9 +218,9 @@ void PreferenceTab::Load(std::string File)
 				}
 				NameCopy[Space] = '_';
 			}
-			if (UsedSave.GetPropterty(NameCopy).Type != Type::Null)
+			if (UsedSave.GetProperty(NameCopy).Type != Type::Null)
 			{
-				i.Value = UsedSave.GetPropterty(NameCopy).Value;
+				i.Value = UsedSave.GetProperty(NameCopy).Value;
 				i.OnChanged(i.Value);
 			}
 		}
@@ -228,6 +229,7 @@ void PreferenceTab::Load(std::string File)
 
 void PreferenceTab::Save()
 {
+	std::filesystem::create_directories("../../EditorContent/Config");
 	SaveGame Pref = SaveGame("../../EditorContent/Config/EditorPrefs", "pref", false);
 	SaveGame Proj = SaveGame(Build::GetProjectBuildName(), "keproj", false);
 	for (auto& cat : Preferences)
@@ -244,7 +246,7 @@ void PreferenceTab::Save()
 				}
 				i.Name[Space] = '_';
 			}
-			UsedSave.SetPropterty(SaveGame::SaveProperty(i.Name, i.Value, i.Type));
+			UsedSave.SetProperty(SaveGame::SaveProperty(i.Name, i.Value, i.Type));
 		}
 	}
 }

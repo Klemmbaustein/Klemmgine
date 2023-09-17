@@ -138,7 +138,7 @@ void ParticleEditorTab::Generate()
 		auto ButtonBox = new UIBox(true, TabBackground->GetPosition() + Vector2(0.05f, TabBackground->GetUsedSize().Y - 0.2f - (i / 10.f)));
 		auto NewButton = new UIButton(true, 0, Color, this, 200 + i);
 		NewButton->SetMinSize(Vector2(0.2f, 0));
-		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewButton->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		ButtonBox->AddChild(NewButton);
 		NewButton->SetPadding(0, 0, 0, 0.01f);
 		auto RemoveButton = new UIButton(true, 0, UIColors[2], this, 300 + i);
@@ -164,7 +164,7 @@ void ParticleEditorTab::Generate()
 			UIColors[2], 
 			this, 
 			0);
-		NewButton->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewButton->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		GeneratedUI.push_back(NewButton);
 		NewButton->SetMinSize(Vector2(0.2f, 0));
 		NewButton->AddChild(new UIText(0.5f, 1 - UIColors[2], "Add element", TabText));
@@ -179,7 +179,7 @@ void ParticleEditorTab::Generate()
 	for (auto& i : ScrollBoxes)
 	{
 		i = new UIBox(false, 0);
-		i->Align = UIBox::E_REVERSE;
+		i->SetAlign(UIBox::Align::Reverse);
 		i->SetPadding(0);
 		i->SetMinSize(Vector2(0.3f, ScrollSize));
 		i->SetMaxSize(Vector2(0.3f, ScrollSize));
@@ -209,7 +209,7 @@ void ParticleEditorTab::Generate()
 		stream << std::fixed << std::setprecision(2) << SelectedParticle.Size;
 		NewTextField->SetText(stream.str());
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
-		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewTextField->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		SettingsButtons.push_back(NewTextField);
 
 		NewText = (new UIText(0.7f, UIColors[2], "Lifetime", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
@@ -219,7 +219,7 @@ void ParticleEditorTab::Generate()
 		stream = std::stringstream();
 		stream << std::fixed << std::setprecision(2) << SelectedParticle.LifeTime;
 		NewTextField->SetText(stream.str());
-		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewTextField->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
 		SettingsButtons.push_back(NewTextField);
 
@@ -231,7 +231,7 @@ void ParticleEditorTab::Generate()
 		stream << std::fixed << std::setprecision(2) << SelectedParticle.SpawnDelay;
 		NewTextField->SetText(stream.str());
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
-		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewTextField->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		SettingsButtons.push_back(NewTextField);
 
 		NewText = (new UIText(0.7f, UIColors[2], "Spawn loops", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
@@ -240,7 +240,7 @@ void ParticleEditorTab::Generate()
 		ScrollBoxes[1]->AddChild(NewTextField);
 		NewTextField->SetText(std::to_string(SelectedParticle.NumLoops));
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
-		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewTextField->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		SettingsButtons.push_back(NewTextField);
 
 		NewText = (new UIText(0.7f, UIColors[2], "Material", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
@@ -249,7 +249,7 @@ void ParticleEditorTab::Generate()
 		ScrollBoxes[1]->AddChild(NewTextField);
 		NewTextField->SetText(ElementMaterials[SelectedElement]);
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
-		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewTextField->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		SettingsButtons.push_back(NewTextField);
 		
 		NewText = (new UIText(0.7f, UIColors[2], "Position Random", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
@@ -272,7 +272,7 @@ void ParticleEditorTab::Generate()
 		ScrollBoxes[1]->AddChild(NewTextField);
 		NewTextField->SetText(stream.str());
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
-		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewTextField->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		SettingsButtons.push_back(NewTextField);
 
 		NewText = new UIText(0.7f, UIColors[2], "End scale", TabText);
@@ -283,7 +283,7 @@ void ParticleEditorTab::Generate()
 		ScrollBoxes[1]->AddChild(NewTextField);
 		NewTextField->SetText(stream.str());
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
-		NewTextField->SetBorder(UIBox::E_ROUNDED, 0.5f);
+		NewTextField->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		SettingsButtons.push_back(NewTextField);
 	}
 	for (auto* elem : SettingsButtons)

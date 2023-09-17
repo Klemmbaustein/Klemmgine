@@ -11,7 +11,7 @@ EditorTab::EditorTab(Vector3* UIColors)
 	this->UIColors = UIColors;
 	TabBackground = new UIBackground(false, Viewport::ViewportInstance->Position, UIColors[0], Viewport::ViewportInstance->Scale);
 	TabBackground->SetMaxSize(Viewport::ViewportInstance->Scale);
-	TabBackground->SetBorder(UIBox::E_DARKENED_EDGE, 0.2f);
+	TabBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
 	TabBackground->IsVisible = false;
 }
 #endif

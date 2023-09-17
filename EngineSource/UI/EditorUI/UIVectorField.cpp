@@ -116,13 +116,13 @@ void UIVectorField::Generate()
 	{
 		ColorDisplay = new UIButton(true, 0, Value, nullptr, 3);
 		ColorDisplay->ParentOverride = this;
-		ColorDisplay->Align = UIBox::E_CENTERED;
+		ColorDisplay->SetAlign(UIBox::Align::Centered);
 		ColorText = new UIText(0.35f, std::max(Value.Length(), 0.0f) < 0.2f ? 1.0f : 0.0f, "Color picker", Renderer);
 		ColorDisplay->AddChild(ColorText->SetPadding(0));
 		AddChild(ColorDisplay);
 		ColorDisplay->SetTryFill(true);
 		ColorDisplay->SetMinSize(Vector2(0.26f, 0.03f));
-		ColorDisplay->SetBorder(E_ROUNDED, 0.25f);
+		ColorDisplay->SetBorder(BorderType::Rounded, 0.25f);
 		ColorDisplay->SetPadding(0);
 	}
 	AddChild(FieldBox);
@@ -133,8 +133,8 @@ void UIVectorField::Generate()
 		NewItemColor->SetMinSize(Vector2(0, 0.04f));
 		auto ItemName = new UIText(0.4f, 1, DimensionStrings[(int)Type][i], Renderer);
 		ItemName->SetPadding(0.0075f, 0.005f, 0.005f, 0.005f);
-		NewItemColor->Align = UIBox::E_REVERSE;
-		NewItemColor->SetBorder(UIBox::E_ROUNDED, 0.25f);
+		NewItemColor->SetAlign(UIBox::Align::Reverse);
+		NewItemColor->SetBorder(UIBox::BorderType::Rounded, 0.25f);
 		auto NewTextField = new UITextField(true, 0, Vector3(0.2f), nullptr, i, Renderer);
 		FieldBox->AddChild(NewItemColor);
 		NewItemColor->AddChild(ItemName);
@@ -142,7 +142,7 @@ void UIVectorField::Generate()
 		NewTextField->SetPadding(0);
 		NewTextField->SetMinSize(Vector2(0.07f, 0.04f));
 		NewTextField->SetMaxSize(Vector2(0.07f, 0.04f));
-		NewTextField->SetBorder(UIBox::E_DARKENED_EDGE, 0.25f);
+		NewTextField->SetBorder(UIBox::BorderType::DarkenedEdge, 0.25f);
 		NewTextField->SetTextSize(0.4f);
 		NewTextField->ParentOverride = this;
 		std::stringstream stream;
