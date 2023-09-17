@@ -192,17 +192,26 @@ void EditorUI::OpenScene(std::string NewScene)
 		EditorSceneToOpen = NewScene;
 		new DialogBox(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), 0, "Scene has unsaved changes. Save?",
 			{
-				DialogBox::Answer("Yes", []() {SaveCurrentScene(); ChangedScene = false; Scene::LoadNewScene(EditorSceneToOpen);
-				Viewport::ViewportInstance->ClearSelectedObjects();
-				Scene::Tick();
-				Editor::CurrentUI->UIElements[5]->UpdateLayout();
-				Editor::CurrentUI->UIElements[6]->UpdateLayout(); }),
+				DialogBox::Answer("Yes", []()
+				{
+					SaveCurrentScene(); 
+					ChangedScene = false;
+					Scene::LoadNewScene(EditorSceneToOpen);
+					Viewport::ViewportInstance->ClearSelectedObjects();
+					Scene::Tick();
+					Editor::CurrentUI->UIElements[5]->UpdateLayout();
+					Editor::CurrentUI->UIElements[6]->UpdateLayout();
+				}),
 
-				DialogBox::Answer("No", []() {ChangedScene = false; Scene::LoadNewScene(EditorSceneToOpen);
-				Viewport::ViewportInstance->ClearSelectedObjects();
-				Scene::Tick();
-				Editor::CurrentUI->UIElements[5]->UpdateLayout();
-				Editor::CurrentUI->UIElements[6]->UpdateLayout(); }),
+				DialogBox::Answer("No", []() 
+				{
+					ChangedScene = false;
+					Scene::LoadNewScene(EditorSceneToOpen);
+					Viewport::ViewportInstance->ClearSelectedObjects();
+					Scene::Tick();
+					Editor::CurrentUI->UIElements[5]->UpdateLayout();
+					Editor::CurrentUI->UIElements[6]->UpdateLayout();
+				}),
 
 				DialogBox::Answer("Cancel", nullptr)
 			});
