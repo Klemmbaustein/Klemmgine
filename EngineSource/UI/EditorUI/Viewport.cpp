@@ -452,6 +452,9 @@ void Viewport::OnButtonClicked(int Index)
 			TabInstances[Tabs[SelectedTab].Index]->Save();
 			TabInstances[Tabs[SelectedTab].Index]->TabBackground->IsVisible = false;
 			UIBox::RedrawUI();
+		}
+		if (SelectedTab >= Index / 2)
+		{
 			SelectedTab--;
 		}
 		if (TabInstances[Tabs[SelectedTab].Index])
@@ -460,6 +463,7 @@ void Viewport::OnButtonClicked(int Index)
 		}
 		Tabs.erase(Tabs.begin() + Index / 2);
 		UpdateLayout();
+		std::cout << SelectedTab << ": " << Index / 2 << std::endl;
 		return;
 	}
 	else

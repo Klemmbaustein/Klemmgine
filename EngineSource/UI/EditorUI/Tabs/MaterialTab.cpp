@@ -41,12 +41,12 @@ void MaterialTab::OnButtonClicked(int Index)
 	}
 	else if (Index == -5)
 	{
-		LoadedMaterial.UseShadowCutout = !LoadedMaterial.UseShadowCutout;
+		LoadedMaterial.IsTranslucent = !LoadedMaterial.IsTranslucent;
 		GenerateMaterialProperties();
 	}
 	else if (Index == -6)
 	{
-		LoadedMaterial.IsTranslucent = !LoadedMaterial.IsTranslucent;
+		LoadedMaterial.UseShadowCutout = !LoadedMaterial.UseShadowCutout;
 		GenerateMaterialProperties();
 	}
 	else if (Index >= 0)
@@ -181,6 +181,7 @@ void MaterialTab::UpdateLayout()
 {
 	Rows[0]->SetMinSize(Vector2(TabBackground->GetMinSize().X / 1.75f, TabBackground->GetMinSize().Y - 0.275f));
 	Rows[0]->SetMaxSize(Vector2(TabBackground->GetMinSize().X / 1.75f, TabBackground->GetMinSize().Y - 0.275f));
+	Rows[1]->SetMinSize(Vector2(0, TabBackground->GetMinSize().Y - 0.275f));
 	GenerateMaterialProperties();
 }
 
@@ -312,8 +313,34 @@ void MaterialTab::GenerateMaterialProperties()
 
 	Rows[1]->AddChild(ShaderTextFields[1]
 		->SetText(LoadedMaterial.FragmentShader)
-		->SetPadding(0.005f, 0.005f, 0.02f, 0.02f)
+		->SetPadding(0.005f, 0.02f, 0.02f, 0.02f)
 		->SetMinSize(Vector2(0.2f, 0)));
+
+	std::vector<std::pair<std::string, bool>> Options =
+	{
+		std::pair("Is transparent   ", LoadedMaterial.IsTranslucent),
+		std::pair("Use shadow cutout", LoadedMaterial.UseShadowCutout),
+	};
+
+	int it = 0;
+	for (const auto& i : Options)
+	{
+		auto NewField = new UIButton(true, 0, 0.75f, this, -5 - it++);
+		NewField->SetSizeMode(UIBox::SizeMode::PixelRelative);
+		NewField->SetMinSize(0.04f);
+		NewField->SetBorder(UIBox::BorderType::Rounded, 0.3f);
+		NewField->SetPadding(0, 0, 0.03f, 0);
+		if (i.second)
+		{
+			((UIButton*)NewField)->SetUseTexture(true, Editor::CurrentUI->Textures[16]);
+		}
+
+		Rows[1]->AddChild((new UIBox(true, 0))
+			->SetPadding(0.01f, 0.00, 0.02f, 0.02f)
+			->AddChild((new UIText(0.5f, UIColors[2], i.first, Renderer))
+				->SetPadding(0))
+			->AddChild(NewField));
+	}
 }
 
 void MaterialTab::UpdateModel()

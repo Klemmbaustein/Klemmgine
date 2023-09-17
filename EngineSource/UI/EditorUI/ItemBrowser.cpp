@@ -291,7 +291,7 @@ void ItemBrowser::UpdateLayout()
 			Color = Editor::ItemColors[ext];
 		}
 
-		auto NewBackground = new UIButton(false, 0, UIColors[0] * 1.2f, this, (int)i);
+		auto NewBackground = new UIButton(false, 0, UIColors[0] * 1.5f, this, (int)i);
 		Buttons.push_back(NewBackground);
 		NewBackground->SetCanBeDragged(true);
 		NewBackground->SetMinSize(Vector2(0.14f, 0.19f));
@@ -319,7 +319,7 @@ void ItemBrowser::UpdateLayout()
 
 		auto ItemText = new UIText(0.35f, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
 		ItemText->Wrap = true;
-		ItemText->WrapDistance = 0.21f;
+		ItemText->WrapDistance = 0.2f;
 		ItemText->SetTextWidthOverride(0.0f);
 		NewBackground->AddChild(ItemText
 			->SetPadding(0.002f));
