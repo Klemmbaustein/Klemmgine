@@ -124,7 +124,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			}
 #endif
 
-			Log::Print("[Build]: Complete", Vector3(0, 1, 0));
+			Log::Print("[Build]: Complete", Log::LogColor::Green);
 			return "Sucess";
 		}
 		Log::Print("[Build]: Cannot find folder", Vector3(1, 0, 0));
@@ -154,13 +154,13 @@ int Build::BuildCurrentSolution(std::string Configuration)
 		Log::Print("[Build]: Build system is 'msvc' but there is no .sln file in the main folder", Vector3(1, 0, 0));
 		return 1;
 	}
-	Log::Print("[Build]: Found .sln file: " + SolutionName, Vector3(0.5, 1, 0.5));
+	Log::Print("[Build]: Found .sln file: " + SolutionName, Log::LogColor::Green);
 
 	std::string Command = "\"" + VSInstallPath + "\" " + std::string(SolutionName) + ".sln /Build " + Configuration;
 
 	Log::Print("[Build]: Running command: " + Command + " (This can take a while)", Vector3(0.5));
 	int ret = system(Command.c_str());
-	Log::Print("[Build]: Built project for configuration: " + Configuration, Vector3(0.5, 1, 0.5));
+	Log::Print("[Build]: Built project for configuration: " + Configuration, Log::LogColor::Green);
 	return ret;
 }
 #endif

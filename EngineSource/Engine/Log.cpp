@@ -7,12 +7,12 @@ namespace Log
 {
 	std::map<OS::ConsoleColor, Vector3> ConsoleColors =
 	{
-		std::pair(OS::ConsoleColor::White, Vector3(1)),
-		std::pair(OS::ConsoleColor::Gray, Vector3(0.5)),
-		std::pair(OS::ConsoleColor::Red, Vector3(1, 0, 0)),
-		std::pair(OS::ConsoleColor::Green, Vector3(0, 1, 0)),
-		std::pair(OS::ConsoleColor::Blue, Vector3(0, 0, 1)),
-		std::pair(OS::ConsoleColor::Yellow, Vector3(1, 1, 0)),
+		std::pair(OS::ConsoleColor::White, Log::LogColor::White),
+		std::pair(OS::ConsoleColor::Gray, Log::LogColor::Gray),
+		std::pair(OS::ConsoleColor::Red, Log::LogColor::Red),
+		std::pair(OS::ConsoleColor::Green, Log::LogColor::Green),
+		std::pair(OS::ConsoleColor::Blue, Log::LogColor::Blue),
+		std::pair(OS::ConsoleColor::Yellow, Log::LogColor::Yellow),
 	};
 	std::vector<Message> Messages;
 	void Print(std::string Text, Vector3 Color)
@@ -34,11 +34,14 @@ namespace Log
 		}
 		OS::SetConsoleColor(OS::ConsoleColor::Gray);
 		OS::ConsoleColor NearestColor = OS::ConsoleColor::White;
+		float NearestValue = 15;
 		for (const auto& c : ConsoleColors)
 		{
-			if (Vector3::NearlyEqual(c.second, Color, 0.35f))
+			float Difference = (c.second - Color).Length();
+			if (NearestValue > Difference)
 			{
 				NearestColor = c.first;
+				NearestValue = Difference;
 			}
 		}
 		std::cout << "Log: ";

@@ -141,10 +141,6 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 		UniformIndex = Uniforms.size() - 1;
 	}
 
-	if (u.Value.empty() && u.Type != Type::Bool)
-	{
-		return;
-	}
 	try
 	{
 		switch (u.Type)
@@ -161,8 +157,18 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 			Uniforms[UniformIndex].Content = new Vector3(Vector3::stov(u.Value));
 			break;
 		case Type::GL_Texture:
-			Uniforms[UniformIndex].Content = (void*)new unsigned int(Texture::LoadTexture(u.Value));
+		{
+			unsigned int Texture = Texture::LoadTexture(u.Value);
+			if (Texture)
+			{
+				Uniforms[UniformIndex].Content = (void*)new unsigned int(Texture);
+			}
+			else
+			{
+				Uniforms[UniformIndex].Content = (void*)new unsigned int();
+			}
 			break;
+		}
 		default:
 			break;
 		}

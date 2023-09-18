@@ -10,6 +10,7 @@
 #include <Objects/Components/CollisionComponent.h>
 #include <Objects/Components/CameraComponent.h>
 #include <Objects/Components/ParticleComponent.h>
+#include <Objects/Components/MoveComponent.h>
 #include <Objects/CSharpObject.h>
 #include <Rendering/Camera/CameraShake.h>
 #include <Engine/Input.h>
@@ -52,6 +53,23 @@ namespace NativeFunctions
 		Parent->Attach(Particle);
 		Particle->LoadParticle(ParticleFile);
 		return Particle;
+	}
+
+	MoveComponent* NewMoveComponent(WorldObject* Parent)
+	{
+		MoveComponent* Movement = new MoveComponent();
+		Parent->Attach(Movement);
+		return Movement;
+	}
+
+	void MovementComponentJump(MoveComponent* Target)
+	{
+		Target->Jump();
+	}
+
+	void MovementComponentAddMovementInput(Vector3 Direction, MoveComponent* Target)
+	{
+		Target->AddMovementInput(Direction);
 	}
 
 	void UseCamera(CameraComponent* Cam)
@@ -136,12 +154,15 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(NewCollisionComponent);
 	REGISTER_FUNCTION(NewCameraComponent);
 	REGISTER_FUNCTION(NewParticleComponent);
+	REGISTER_FUNCTION(NewMoveComponent);
 
 	REGISTER_FUNCTION(DestroyComponent);
 	REGISTER_FUNCTION(SetComponentTransform);
 	REGISTER_FUNCTION(GetComponentTransform);
 
 	REGISTER_FUNCTION(UseCamera);
+	REGISTER_FUNCTION(MovementComponentAddMovementInput);
+	REGISTER_FUNCTION(MovementComponentJump);
 
 	REGISTER_FUNCTION(IsKeyDown);
 	REGISTER_FUNCTION(GetMouseMovement);

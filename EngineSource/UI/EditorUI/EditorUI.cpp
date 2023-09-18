@@ -89,6 +89,7 @@ void EditorUI::LaunchInEditor()
 			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
 			Build::BuildCurrentSolution("Debug");
 		}
+
 		if (!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll") 
 			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
 		{

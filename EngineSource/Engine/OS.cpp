@@ -189,7 +189,7 @@ namespace OS
 		std::pair(ConsoleColor::Gray, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED),
 		std::pair(ConsoleColor::Red, FOREGROUND_RED | FOREGROUND_INTENSITY),
 		std::pair(ConsoleColor::Green, FOREGROUND_GREEN | FOREGROUND_INTENSITY),
-		std::pair(ConsoleColor::Blue, FOREGROUND_BLUE | FOREGROUND_INTENSITY),
+		std::pair(ConsoleColor::Blue, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY),
 		std::pair(ConsoleColor::Yellow, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY),
 	};
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);

@@ -238,6 +238,7 @@ void MaterialTab::GenerateUI()
 		{
 			NewField = (new UITextField(true, 0, UIColors[0], this, Index, Renderer))
 				->SetText(i.Value)
+				->SetTextColor(UIColors[2])
 				->SetMinSize(Vector2(0.26f, 0.05f));
 			break;
 		}
@@ -258,6 +259,7 @@ void MaterialTab::GenerateUI()
 		{
 			unsigned int NewTexture = Texture::LoadTexture(i.Value);
 			NewField = (new UITextField(true, 0, UIColors[0], this, Index, Renderer))
+				->SetTextColor(UIColors[2])
 				->SetText(i.Value)
 				->SetPadding(0.02f, 0.02f, 0, 0)
 				->SetMinSize(Vector2(0.2f, 0.05f));

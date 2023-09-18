@@ -125,7 +125,13 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 		{
 			
 			ButtonCategory::Button("Settings", Editor::CurrentUI->Textures[20], []() { Viewport::ViewportInstance->OpenTab(6, "Settings.setting"); }),
-			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { new std::thread(Build::TryBuildProject, "Build/"); })
+			ButtonCategory::Button("Build", Editor::CurrentUI->Textures[3], []() { new std::thread(Build::TryBuildProject, "Build/"); }),
+			ButtonCategory::Button("Run", Editor::CurrentUI->Textures[21], []()
+				{
+					new std::thread([]() {
+						EditorUI::LaunchInEditor();
+					});
+				})
 		}));
 
 #ifdef ENGINE_CSHARP
@@ -133,12 +139,6 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 		{
 			ButtonCategory::Button("Reload C#", Editor::CurrentUI->Textures[12], []() 
 				{ new std::thread(EditorUI::RebuildAndHotReload); }),
-			ButtonCategory::Button("Run", Editor::CurrentUI->Textures[21], []()
-				{
-					new std::thread([]() {
-						EditorUI::LaunchInEditor();
-					});
-				})
 		}));
 #endif
 
