@@ -299,7 +299,11 @@ void ParticleEditorTab::Generate()
 void ParticleEditorTab::OnButtonClicked(int Index)
 {
 	if (!TabBackground->IsVisible) return;
-	const UIBox* Button = SettingsButtons[(size_t)Index - 100];
+	UIBox* Button = nullptr;
+	if (Index >= 100)
+	{
+		Button = SettingsButtons[(size_t)Index - 100];
+	}
 	try
 	{
 		if (Index == 0)

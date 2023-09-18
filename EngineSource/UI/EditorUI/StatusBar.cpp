@@ -21,12 +21,6 @@ StatusBar::StatusBar(Vector3* Colors)
 	VersionText.append("-C#");
 #endif
 
-	//Texts[0] = new UIText(0.6, UIColors[2], std::string(ProjectName) + " Editor", Editor::CurrentUI->EngineUIText);
-	//TabBackground->AddChild(Texts[0]->SetPadding(0.005, 0.005, 0.01f, 0.025));
-
-	//Texts[1] = new UIText(0.6, UIColors[2], VersionText, Editor::CurrentUI->EngineUIText);
-	//TabBackground->AddChild(Texts[1]->SetPadding(0.005, 0.005, 0.01f, 0.025));
-
 	Texts[2] = new UIText(0.6f, UIColors[2], "FPS: ", Editor::CurrentUI->EngineUIText);
 	TabBackground->AddChild(Texts[2]->SetPadding(0.005f, 0.005f, 0.01f, 0.025f));
 
@@ -62,8 +56,6 @@ void StatusBar::Tick()
 			+ "     Delta: " + std::to_string((int)(1.0f / DisplayedFPS * 1000))
 			+ "ms     Memory used: " + std::to_string(OS::GetMemUsage() / 1000ull / 1000ull) + "mb";
 		Texts[2]->SetText(StatsText);
-		//Texts[1]->SetColor(UIColors[2] * 0.8);
-		//Texts[2]->SetColor(UIColors[2] * 0.8);
 		FPSUpdateTimer = 0;
 		DisplayedFPS = 0;
 	}

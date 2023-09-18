@@ -564,12 +564,20 @@ void PollInput()
 		}
 		else if (Event.type == SDL_MOUSEWHEEL)
 		{
-			for (ScrollObject* s : Graphics::UI::ScrollObjects)
+			Sint32 ScrollDistance = Event.wheel.y;
+			while (ScrollDistance)
 			{
-				if (Event.wheel.y < 0)
-					s->ScrollUp();
+				for (ScrollObject* s : Graphics::UI::ScrollObjects)
+				{
+					if (Event.wheel.y < 0)
+						s->ScrollUp();
+					else
+						s->ScrollDown();
+				}
+				if (ScrollDistance < 0)
+					ScrollDistance++;
 				else
-					s->ScrollDown();
+					ScrollDistance--;
 			}
 		}
 	}
