@@ -208,7 +208,7 @@ namespace CSM
 		float SnapSize = farPlane / 10;
 
 		center = Vector3::SnapToGrid(center, SnapSize);
-		auto lightView = glm::lookAt(center + (glm::vec3)Graphics::WorldSun.Direction, center, glm::vec3(0.0f, 1.0f, 0.0f));
+		auto lightView = glm::lookAt(center + (glm::vec3)Vector3::GetForwardVector(Graphics::WorldSun.Rotation), center, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		float minX = std::numeric_limits<float>::max();
 		float maxX = std::numeric_limits<float>::min();

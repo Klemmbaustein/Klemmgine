@@ -32,12 +32,11 @@ void Toolbar::GenerateButtons()
 		{
 			continue;
 		}
-		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.2f)))
+		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.11f)))
 			->SetPadding(0.01f, 0.01f, 0.02f, 0.01f));
 		auto Elem = new UIBox(false, 0);
 		Elem->SetAlign(UIBox::Align::Reverse);
-		Elem->SetPadding(0.0f, 0.0f, 0, 0);
-		Elem->AddChild((new UIText(0.4f, UIColors[2] * 0.7f, Buttons[i].Name, Editor::CurrentUI->EngineUIText))->SetPadding(0));
+		Elem->SetPadding(0.0f);
 		TabBackground->AddChild(Elem);
 
 		UIBox* ButtonBackground = new UIBox(true, 0);
@@ -52,20 +51,21 @@ void Toolbar::GenerateButtons()
 				j++;
 				continue;
 			}
-			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[3], Vector2(0.1f)))
-				->SetBorder(UIBox::BorderType::Rounded, 0.5f)
+			ButtonBackground->AddChild((new UIBackground(false, 0, UIColors[3], Vector2(0.0f)))
+				->SetPadding(0.015f)
+				->SetBorder(UIBox::BorderType::Rounded, 0.25f)
 				->SetSizeMode(UIBox::SizeMode::PixelRelative)
 				->AddChild((new UIText(0.4f, UIColors[2], btn.Name, Editor::CurrentUI->EngineUIText))
 					->SetPadding(0.005f))
 				->AddChild((new UIButton(true, 0, 1, this, (int)i * MAX_CATEGORY_BUTTONS + (int)j))
 					->SetUseTexture(true, btn.Texture)
-					->SetMinSize(0.075f)
-					->SetPadding(0.015f)
+					->SetMinSize(0.055f)
+					->SetPadding(0.01f, 0.01f, 0.02f, 0.02f)
 					->SetSizeMode(UIBox::SizeMode::PixelRelative)));
 			j++;
 		}
 	}
-	TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.2f)))
+	TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.11f)))
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.01f));
 }
 
@@ -105,7 +105,7 @@ void Toolbar::SetButtonVisibility(std::string Name, bool IsVisible)
 }
 
 
-Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.8f, 0.22f), Vector2(2, 0.45f))
+Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.8f, 0.15f), Vector2(2, 0.25f))
 {
 	ToolbarInstance = this;
 	RegisterNewButtonCategory(ButtonCategory("Scene", 

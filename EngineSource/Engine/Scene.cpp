@@ -123,7 +123,7 @@ namespace Scene
 			Input.read((char*)&SunProperties, sizeof(SunProperties));
 			Input.read((char*)&FogProperties, sizeof(FogProperties));
 			// Read the sun's properties
-			Graphics::WorldSun.Direction = SunProperties[0];
+			Graphics::WorldSun.Rotation = SunProperties[0];
 			Graphics::WorldSun.SunColor = SunProperties[1];
 			Graphics::WorldSun.AmbientColor = SunProperties[2];
 			Graphics::WorldSun.Intensity = SunProperties[3].X;
@@ -197,7 +197,7 @@ namespace Scene
 			// Save global scene properties
 			Vector3 SunProperties[4] =
 			{
-				Graphics::WorldSun.Direction,
+				Graphics::WorldSun.Rotation,
 				Graphics::WorldSun.SunColor,
 				Graphics::WorldSun.AmbientColor,
 				Vector3(Graphics::WorldSun.Intensity, Graphics::WorldSun.AmbientIntensity, 0)

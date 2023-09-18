@@ -31,12 +31,14 @@ void MaterialTab::OnButtonClicked(int Index)
 		if (LoadedMaterial.VertexShader != ShaderTextFields[0]->GetText())
 		{
 			LoadedMaterial.VertexShader = ShaderTextFields[0]->GetText();
-			GenerateUI();
+			Save();
+			Load(Filepath);
 		}
 		if (LoadedMaterial.FragmentShader != ShaderTextFields[1]->GetText())
 		{
 			LoadedMaterial.FragmentShader = ShaderTextFields[1]->GetText();
-			GenerateUI();
+			Save();
+			Load(Filepath);
 		}
 	}
 	else if (Index == -5)

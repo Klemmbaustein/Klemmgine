@@ -42,7 +42,6 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 	SeperatorArrow->SetPadding(0, 0, 0.01f, 0);
 	SeperatorArrow->SetUseTexture(true,
 		Editor::CurrentUI->CollapsedItems.contains(Prefix + Name) ? Editor::CurrentUI->Textures[14] : Editor::CurrentUI->Textures[13]);
-	//SeperatorArrow->SetTryFill(true);
 	SeperatorBorder->AddChild(SeperatorArrow);
 
 	auto SeperatorText = new UIText(0.5f, 0, Name, Editor::CurrentUI->EngineUIText);
@@ -69,7 +68,7 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 		UIVectorField::VecType VectorType = UIVectorField::VecType::xyz;
 		switch (i.Type)
 		{
-			// Vector3_Colors and Vector3s both use VectorFields, so we basically treat them the same
+			// Vector3_Colors and Vector3s both use VectorFields, so we treat them the same
 		case Type::Vector3Color:
 			VectorType = UIVectorField::VecType::rgb;
 		case Type::Vector3Rotation:
@@ -251,7 +250,7 @@ void ContextMenu::UpdateLayout()
 			->SetPadding(0.01f));
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::WorldSun.Direction, Type::Vector3Rotation, "Direction", true),
+				ContextMenuSection(&Graphics::WorldSun.Rotation, Type::Vector3Rotation, "Rotation"),
 				ContextMenuSection(&Graphics::WorldSun.SunColor, Type::Vector3Color, "Color"),
 				ContextMenuSection(&Graphics::WorldSun.Intensity, Type::Float, "Intensity")
 			},

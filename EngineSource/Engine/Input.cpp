@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "Log.h"
 
 namespace Input
 {
@@ -11,15 +12,16 @@ namespace Input
 
 bool Input::IsKeyDown(int Key)
 {
-	if (BlockInput || BlockInputConsole)
-	{
-		return false;
-	}
 	if (!(Key < 128))
 	{
 		Key -= 1073741755;
 	}
 	bool Test = Input::Keys[Key];
+	if (BlockInput || BlockInputConsole)
+	{
+		Test = false;
+	}
+
 	return Test;
 }
 

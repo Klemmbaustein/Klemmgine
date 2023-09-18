@@ -293,9 +293,9 @@ EditorUI::EditorUI()
 
 	UIElements[0] = new StatusBar(UIColors);
 	UIElements[1] = new LogUI(UIColors, Vector2(-0.7f, -1), Vector2(1.4f, 0.4f));
-	UIElements[2] = new Toolbar(UIColors, Vector2(-0.7f, 0.73f), Vector2(1.4f, 0.22f));
+	UIElements[2] = new Toolbar(UIColors, Vector2(-0.7f, 0.8f), Vector2(1.4f, 0.15f));
 	UIElements[3] = new ItemBrowser(UIColors, Vector2(-1, -1), Vector2(0.3f, 1.95f));
-	UIElements[4] = new Viewport(UIColors, Vector2(-0.7f, -0.6f), Vector2(1.4f, 1.33f));
+	UIElements[4] = new Viewport(UIColors, Vector2(-0.7f, -0.6f), Vector2(1.4f, 1.4f));
 	UIElements[5] = new ObjectList(UIColors, Vector2(0.7f, -0.2f), Vector2(0.3f, 1.15f));
 	UIElements[6] = new ContextMenu(UIColors, Vector2(0.7f, -1), Vector2(0.3f, 0.8f));
 

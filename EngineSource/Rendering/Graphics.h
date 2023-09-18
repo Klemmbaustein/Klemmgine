@@ -30,7 +30,7 @@ namespace Graphics
 	{
 		float Intensity = 1.5f;
 		float AmbientIntensity = 0.3f;
-		Vector3 Direction = Vector3(0.5f, 0.5f, 0.7f);
+		Vector3 Rotation = Vector3(45.0f, 0.0f, 0.0f);
 		Vector3 SunColor = Vector3(1.0f, 1.0f, 0.9f);
 		Vector3 AmbientColor = Vector3(0.7f, 0.7f, 1.f);
 	};

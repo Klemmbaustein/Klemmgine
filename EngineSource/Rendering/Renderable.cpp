@@ -26,7 +26,7 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFr
 	ShaderToApply->SetInt("Skybox", 2);
 	ShaderToApply->SetFloat("u_biasmodifier", Vector3::Dot(
 		Vector3::GetForwardVector(Graphics::MainCamera->Rotation),
-		Graphics::WorldSun.Direction.Normalize()));
+		Vector3::GetForwardVector(Graphics::WorldSun.Rotation)));
 	ShaderToApply->SetVector3("u_cameraforward", Vector3::GetForwardVector(Graphics::MainCamera->Rotation));
 	ShaderToApply->SetVector3("u_cameraposition", Graphics::MainFramebuffer->FramebufferCamera->Position);
 	ShaderToApply->SetInt("u_shadowQuality", Graphics::PCFQuality);
@@ -36,7 +36,7 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFr
 	ShaderToApply->SetFloat("FogMaxDensity", Graphics::WorldFog.MaxDensity);
 	ShaderToApply->SetVector3("FogColor", Graphics::WorldFog.FogColor);
 
-	ShaderToApply->SetVector3("u_directionallight.Direction", Graphics::WorldSun.Direction);
+	ShaderToApply->SetVector3("u_directionallight.Direction", Vector3::GetForwardVector(Graphics::WorldSun.Rotation));
 	ShaderToApply->SetFloat("u_directionallight.Intensity", Graphics::WorldSun.Intensity);
 	ShaderToApply->SetFloat("u_directionallight.AmbientIntensity", Graphics::WorldSun.AmbientIntensity);
 	ShaderToApply->SetVector3("u_directionallight.SunColor", Graphics::WorldSun.SunColor);

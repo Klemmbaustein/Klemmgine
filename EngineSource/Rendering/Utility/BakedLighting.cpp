@@ -134,6 +134,8 @@ namespace Bake
 
 namespace Bake
 {
+	glm::vec3 SunDirection = glm::vec3(0, -1, 0);
+
 	inline Collision::HitResponse BakeRayTrace(const glm::vec3& orig, const glm::vec3& end, const glm::vec3& A, const glm::vec3& B, const glm::vec3& C)
 	{
 		glm::vec3 E1 = C - A;
@@ -209,7 +211,6 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	const float TraceDistance = 2500;
 	glm::vec3 StartPos = glm::vec3((float)x, (float)y, (float)z);
 	StartPos = StartPos + glm::vec3(Bake::BakeScale / (float)LightmapResolution / 2);
-	glm::vec3 Direction = (glm::vec3)Graphics::WorldSun.Direction;
 	Collision::HitResponse r;
 	r.t = 0;
 	
@@ -231,7 +232,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 		TotalLightIntensity += glm::clamp(NewIntensity, 0.0f, 4.0f);
 	}
 
-	r = Bake::BakeLine(StartPos, StartPos + Direction * TraceDistance, false);
+	r = Bake::BakeLine(StartPos, StartPos + Bake::SunDirection * TraceDistance, false);
 
 
 	float LightInt = r.Hit ? 1 - std::min(r.t * TraceDistance / 12.0f, 1.0f) : 1;
@@ -334,7 +335,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 
 		Bake::BakeScale = std::max(Bake::BakeScale.X, std::max(Bake::BakeScale.Y, Bake::BakeScale.Z)) * LightmapScaleMultiplier;
 		BakeLog("Baking with scale: " + std::to_string(Bake::BakeScale.X));
-
+		Bake::SunDirection = (glm::vec3)Vector3::GetForwardVector(Graphics::WorldSun.Rotation);
 		size_t Thread3DArraySize = Bake::NUM_CHUNK_SPLITS;
 
 		size_t ThreadID = 0;
