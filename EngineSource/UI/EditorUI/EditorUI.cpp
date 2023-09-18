@@ -98,7 +98,7 @@ void EditorUI::LaunchInEditor()
 	}
 	catch (std::exception& e)
 	{
-		Log::Print("Exception thrown trying to check for rebuild. " + std::string(e.what()));
+		Log::Print("Exception thrown when trying to check for rebuild. " + std::string(e.what()));
 		return;
 	}
 
