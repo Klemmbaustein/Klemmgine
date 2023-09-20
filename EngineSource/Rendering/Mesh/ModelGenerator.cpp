@@ -264,6 +264,10 @@ namespace ModelGenerator
 
 	void ModelData::Element::GenerateNormals()
 	{
+		for (auto& i : Vertices)
+		{
+			i.Normal = glm::vec3(0);
+		}
 		for (size_t i = 0; i < Indices.size(); i += 3) // <- Flat shading
 		{
 			size_t A = Indices[i], B = Indices[i + 1], C = Indices[i + 2];
@@ -277,6 +281,21 @@ namespace ModelGenerator
 			v.Normal = glm::normalize(v.Normal);
 		}
 	}
+
+	void ModelData::Element::RemoveDuplicateVertices()
+	{
+		for (size_t i = 0; i < Indices.size(); i++)
+		{
+			for (size_t j = 0; j < Indices.size(); j++)
+			{
+				if (Vector3::NearlyEqual(Vertices[Indices[i]].Position, Vertices[Indices[j]].Position, 1))
+				{
+					Indices[j] = Indices[i];
+				}
+			}
+		}
+	}
+
 	void ModelData::Element::MakeCube(int32_t Resolution, Vector3 Offset)
 	{
 		Vector3 CubeDirections[6] =

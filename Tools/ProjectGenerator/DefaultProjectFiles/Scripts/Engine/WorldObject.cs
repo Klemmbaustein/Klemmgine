@@ -5,16 +5,36 @@ using System.Runtime.InteropServices;
 
 public abstract class WorldObject
 {
-	public Vector3 Position;
-	public Vector3 Rotation;
-	public Vector3 Scale;
-
 	public IntPtr NativeObject = new();
 
 	private delegate Int32 NewCSObjectDelegate(string TypeName, Transform t);
 	private delegate Int32 DestroyObjectDelegate(IntPtr ObjPtr);
+	private delegate void SetTransformDelegate(Transform NewTransform, IntPtr NativeObjectPtr);
+	private delegate Transform GetTransformDelegate(IntPtr NativeObjectPtr);
 
 	private static Delegate? GetCSObjectDelegate;
+
+	public Vector3 GetPosition()
+	{
+		return GetTransform().Position;
+	}
+
+	public void SetPosition(Vector3 NewPosition)
+	{
+		Transform NewTransform = GetTransform();
+		NewTransform.Position = NewPosition;
+		SetTransform(NewTransform);
+	}
+
+	public Transform GetTransform()
+	{
+		return (Transform)NativeFunction.CallNativeFunction("GetObjectTransform", typeof(GetTransformDelegate), new object[] { NativeObject })!;
+	}
+
+	public void SetTransform(Transform NewTransform)
+	{
+		NativeFunction.CallNativeFunction("SetObjectTransform", typeof(SetTransformDelegate), new object[] { NewTransform, NativeObject });
+	}
 
 	List<ObjectComponent> AttachedComponents = new List<ObjectComponent>();
 

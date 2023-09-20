@@ -45,8 +45,6 @@ public struct Vector3
 	{
 		return string.Format("{0} {1} {2}", X, Y, Z);
 	}
-
-
 	public static Vector3 operator+(Vector3 a, Vector3 b)
 	{
 		return new Vector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
@@ -69,7 +67,7 @@ public struct Vector3
 		return new Vector3(val, val, val);
 	}
 
-	private static bool _nearlyequal(float a, float b, float t)
+	private static bool NearlyEqual(float a, float b, float t)
 	{
 		return a > b - t && a < b + t;
 	}
@@ -89,13 +87,28 @@ public struct Vector3
 			new object[] 
 			{ 
 				Rot / 180 * MathF.PI,
-				(uint)Dir 
+				(UInt32)Dir 
 			});
+	}
+
+	public static Vector3 GetForwardVector(Vector3 Rotation)
+	{
+		return GetScaledAxis(Rotation, Axis.Z);
+	}
+
+	public static Vector3 GetRightVector(Vector3 Rotation)
+	{
+		return GetScaledAxis(Rotation, Axis.X);
+	}
+
+	public static Vector3 GetUpVector(Vector3 Rotation)
+	{
+		return GetScaledAxis(Rotation, Axis.Y);
 	}
 
 	public static bool NearlyEqual(Vector3 a, Vector3 b, float Threshold)
 	{
-		return _nearlyequal(a.X, b.X, Threshold) && _nearlyequal(a.Y, b.Y, Threshold) && _nearlyequal(a.Z, b.Z, Threshold);
+		return NearlyEqual(a.X, b.X, Threshold) && NearlyEqual(a.Y, b.Y, Threshold) && NearlyEqual(a.Z, b.Z, Threshold);
 	}
 }
 

@@ -17,19 +17,6 @@ void CSharpObject::Tick()
 	CSharp::ExectuteFunctionOnObject(CS_Obj, "TickComponents");
 #if !EDITOR
 	CSharp::ExectuteFunctionOnObject(CS_Obj, "Tick");
-	Transform NewTransform;
-	NewTransform.Location = CSharp::GetObjectVectorField(CS_Obj, "Position");
-	NewTransform.Rotation = CSharp::GetObjectVectorField(CS_Obj, "Rotation");
-	NewTransform.Scale = CSharp::GetObjectVectorField(CS_Obj, "Scale");
-	if (NewTransform != CSharpTransform)
-	{
-		SetTransform(NewTransform);
-		CSharpTransform = NewTransform;
-	}
-#else
-	CSharp::SetObjectVectorField(CS_Obj, "Position", GetTransform().Location);
-	CSharp::SetObjectVectorField(CS_Obj, "Rotation", GetTransform().Rotation);
-	CSharp::SetObjectVectorField(CS_Obj, "Scale", GetTransform().Scale);
 #endif
 }
 

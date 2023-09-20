@@ -55,7 +55,7 @@ void DebugUI::Tick()
 {
 	if (StatsRedrawTimer >= 1)
 	{
-		DebugTexts[0]->SetText("FPS: " + std::to_string(FPS));
+		DebugTexts[0]->SetText("FPS: " + std::to_string(FPS - 1));
 		DebugTexts[1]->SetText("Delta: " + std::to_string(1000 / FPS) + "ms");
 
 		std::string DeltaString;

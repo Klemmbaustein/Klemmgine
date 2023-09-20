@@ -139,6 +139,16 @@ namespace NativeFunctions
 		Log::Print(cmd);
 		return Console::ExecuteConsoleCommand(cmd, true);
 	}
+
+	Transform GetObjectTransform(WorldObject* TargetObject)
+	{
+		return TargetObject->GetTransform();
+	}
+
+	void SetObjectTransform(Transform NewTransform, WorldObject* TargetObject)
+	{
+		TargetObject->SetTransform(NewTransform);
+	}
 }
 
 #define REGISTER_FUNCTION(func) CSharp::RegisterNativeFunction(# func, func)
@@ -156,6 +166,10 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(NewParticleComponent);
 	REGISTER_FUNCTION(NewMoveComponent);
 
+	REGISTER_FUNCTION(GetObjectTransform);
+	REGISTER_FUNCTION(SetObjectTransform);
+	REGISTER_FUNCTION(DestroyObject);
+
 	REGISTER_FUNCTION(DestroyComponent);
 	REGISTER_FUNCTION(SetComponentTransform);
 	REGISTER_FUNCTION(GetComponentTransform);
@@ -168,7 +182,6 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(GetMouseMovement);
 	REGISTER_FUNCTION(PlayDefaultCameraShake);
 	REGISTER_FUNCTION(NewCSObject);
-	REGISTER_FUNCTION(DestroyObject);
 	REGISTER_FUNCTION(LoadScene);
 	REGISTER_FUNCTION(LoadSound);
 	REGISTER_FUNCTION(PlaySound);

@@ -49,7 +49,6 @@ void CubemapTab::Tick()
 		CubemapSidesBox->IsVisible = TabBackground->IsVisible;
 		PreviewBuffer->FramebufferCamera = Graphics::MainCamera;
 		PreviewBuffer->Active = TabBackground->IsVisible;
-		PreviewBuffer->ClearContent();
 		PreviewWindow->SetUseTexture(true, PreviewBuffer->GetTextureID());
 		Transform PreviousCameraTransform;
 		PreviousCameraTransform.Location = Graphics::MainCamera->Position;
@@ -154,8 +153,9 @@ void CubemapTab::UpdatePreviewModel()
 	ModelGenerator::ModelData m;
 	m.Elements.push_back(ModelGenerator::ModelData::Element());
 	auto& elem = m.Elements[m.Elements.size() - 1];
-	elem.MakeCube(30, 0);
+	elem.MakeCube(8, 0);
 	elem.Sphereize(150);
+	elem.RemoveDuplicateVertices();
 	elem.GenerateNormals();
 	m.TwoSided = false;
 	elem.ElemMaterial = "../../EditorContent/Materials/Reflective";

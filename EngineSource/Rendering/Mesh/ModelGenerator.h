@@ -14,6 +14,7 @@ namespace ModelGenerator
 			std::vector<unsigned int> Indices;
 			std::string ElemMaterial;
 			void GenerateNormals();
+			void RemoveDuplicateVertices();
 			void MakeCube(int32_t Resolution, Vector3 Offset);
 			void AddFace(int32_t Resolution, Vector3 Normal, Vector3 Offset);
 
