@@ -136,7 +136,6 @@ namespace NativeFunctions
 
 	bool CallConsoleCommand(const char* cmd)
 	{
-		Log::Print(cmd);
 		return Console::ExecuteConsoleCommand(cmd, true);
 	}
 
