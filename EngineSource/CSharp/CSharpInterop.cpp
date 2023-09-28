@@ -12,6 +12,7 @@
 #include <Objects/CSharpObject.h>
 #include <Engine/Build/Build.h>
 #include <Engine/File/Save.h>
+#include <Engine/Console.h>
 
 #include <Utility/DotNet/nethost.h>
 #include <Utility/DotNet/coreclr_delegates.h>
@@ -214,7 +215,7 @@ void WriteCSProj(std::string Name)
 	std::ofstream out = std::ofstream(Name);
 	out << "<Project Sdk=\"Microsoft.NET.Sdk\">\n\
 	<PropertyGroup>\n\
-		<TargetFramework>net6.0</TargetFramework>\n\
+		<TargetFramework>net7.0</TargetFramework>\n\
 		<EnableDynamicLoading>true</EnableDynamicLoading>\n\
 	</PropertyGroup>\n\
 	<PropertyGroup>\n\
@@ -236,9 +237,16 @@ void CSharp::Init()
 	{
 		return;
 	}
+
+	Console::RegisterCommand(Console::Command("makecsproj", []() 
+		{
+			CSharpLog("Rebuilding project csproj file...", CS_Log_Build);
+			WriteCSProj("Scripts/CSharpAssembly.csproj");
+		}, {}));
+
 	if (!std::filesystem::exists("Scripts/CSharpAssembly.csproj"))
 	{
-		WriteCSProj("Scripts/CSharpAssembly.csproj");
+		Console::ExecuteConsoleCommand("makecsproj");
 	}
 	CSharp::LoadRuntime();
 	void* LogRegister = CSharp::LoadCSharpFunction("LoadLogFunction", "EngineLog", "LoadFunctionDelegate");
@@ -384,7 +392,7 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 	StaticFunction fCallback = nullptr;
 
 	const string_t dotnetlib_path = string_t(CSHARP_LIBRARY_PATH) + STR(".dll");
-	std::string Name = std::string(CSHARP_LIBRARY_NAME);
+	std::string Name = CSHARP_LIBRARY_NAME;
 
 	string_t dotnet_type = string_t(Namespace.begin(), Namespace.end()) + STR(", ") + string_t(Name.begin(), Name.end());
 
