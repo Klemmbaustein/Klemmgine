@@ -10,11 +10,12 @@ namespace Type
 		"float",
 		"int",
 		"string",
-		"vector3_color",
+		"color",
 		"texture",
 		"byte",
 		"bool",
-		"rotation"
+		"rotation",
+		"list"
 	};
 
 	enum TypeEnum
@@ -28,6 +29,7 @@ namespace Type
 		GL_Texture = 5,
 		Byte = 6,
 		Bool = 7,
-		Vector3Rotation = 8
+		Vector3Rotation = 8,
+		List = 9
 	};
 }

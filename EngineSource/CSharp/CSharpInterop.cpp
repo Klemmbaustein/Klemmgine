@@ -419,7 +419,7 @@ void CSharp::LoadAssembly()
 	if (!std::filesystem::exists(AssemblyPath))
 	{
 		CSharpLog("Could not find C# assembly. Attempting rebuild.", CS_Log_Runtime, CS_Log_Warn);
-		CSharpLog("-----------------------------------------------", CS_Log_Runtime, CS_Log_Warn);
+		CSharpLog("------------------------------------------------", CS_Log_Runtime, CS_Log_Warn);
 		system("cd Scripts && dotnet build");
 	}
 	if (!std::filesystem::exists(AssemblyPath))

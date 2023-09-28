@@ -10,7 +10,7 @@ class InvalidTypeException : public std::exception
 public:
 	const char* what() const override
 	{
-		return "Loaded invalid type from file.";
+		return "Loaded invalid type from file";
 	};
 };
 
@@ -29,81 +29,169 @@ SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolde
 		SaveName.append("." + Extension);
 	}
 	OpenedSave = SaveName;
+	IsNew = !std::filesystem::exists(SaveName) || std::filesystem::is_empty(SaveName);
 
-	//if a save does not exist yet, it will be created on deconstruction.
-	if (std::filesystem::exists(SaveName))
+	//if the file does not exist yet, it will be created on deconstruction.
+	if (IsNew)
 	{
-		IsNew = std::filesystem::is_empty(SaveName);
-		std::ifstream InFile = std::ifstream(SaveName, std::ios::in);
-		char CurrentBuff[100];
+		return;
+	}
+	std::ifstream InFile = std::ifstream(SaveName, std::ios::in);
+	std::string NewLine;
 
-		//iterate through all lines which (hopefully) contain save values
-		while (!InFile.eof())
+	SaveProperty NewProperty;
+
+	bool InVec = false;
+	bool InString = false;
+	bool NewLineIsString = false;
+
+	uint8_t ReadingState = 0;
+
+	size_t LineCounter = 1;
+	std::string CurrentLine;
+
+	bool IsReadingComment = false;
+
+	while (true)
+	{
+		char NewChar;
+		InFile.read(&NewChar, 1);
+
+		CurrentLine.append({ NewChar });
+		
+		if (NewChar == '\n')
 		{
+			LineCounter++;
+			IsReadingComment = false;
+		}
+		else if (IsReadingComment)
+		{
+			continue;
+		}
 
-			Type::TypeEnum CurrentType = Type::Null;
-			std::string CurrentName = "";
-			std::string Value = "";
-
-			std::string CurrentLine;
-			InFile.getline(CurrentBuff, 100);
-			CurrentLine = CurrentBuff;
-
-			if (CurrentLine.substr(0, 2) == "//") continue;
-
-
-			std::stringstream CurrentLineStream = std::stringstream(CurrentLine);
-
-			//if the current line is empty, we ignore it
-			if (!CurrentLine.empty())
+		if ((NewChar == ' ' || NewChar == '\n' || NewChar == '	' || InFile.eof())
+			&& !InVec
+			&& !InString)
+		{
+			if (!NewLine.empty() || NewLineIsString)
 			{
-
-				std::string Type;
-				CurrentLineStream >> Type;
-				for (unsigned int i = 0; i < 8; i++)
+				NewLineIsString = false;
+				switch (ReadingState++)
 				{
-					if (Type::Types[i] == Type)
+				case 0:
+					for (size_t i = 0; i < Type::Types.size(); i++)
 					{
-						CurrentType = (Type::TypeEnum)((int)i);
+						if (Type::Types[i] == NewLine)
+						{
+							NewProperty.Type = (Type::TypeEnum)i;
+						}
 					}
+					if (NewProperty.Type == Type::Null)
+					{
+						CurrentLine.pop_back();
+						Log::PrintMultiLine("Loading error: expected a valid type:\n"
+							+ CurrentLine + " <- HERE\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+							Log::LogColor::Red,
+							"[Error: " + SaveName + "]: ");
+						Properties.clear();
+						return;
+					}
+					break;
+				case 1:
+					NewProperty.Name = NewLine;
+					break;
+				case 2:
+					if (NewLine != "=")
+					{
+						CurrentLine.pop_back();
+						Log::PrintMultiLine("Loading error: expected a '=':\n" 
+							+ CurrentLine + " <- HERE\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+							Log::LogColor::Red, 
+							"[Error: " + SaveName + "]: ");
+						Properties.clear();
+						return;
+					}
+					break;
+				case 3:
+					NewProperty.Value = NewLine;
+					ReadingState = 0;
+					Properties.insert(std::pair(NewProperty.Name, NewProperty));
+					NewProperty = SaveProperty();
+					CurrentLine.clear();
+					break;
+				default:
+					break;
 				}
-				if (CurrentType == Type::Null)
-				{
-					Log::Print("Error reading save file: " + Type + " is not a valid type (" + CurrentLine + ")", Vector3(1, 0, 0));
-				}
-				std::string Equals;
+			}
 
-				CurrentLineStream >> CurrentName;
-				CurrentLineStream >> Equals;
+			NewLine.clear();
 
-				if (Equals != "=")
-				{
-					Log::Print("Error reading save file: expected = sign (" + CurrentLine + ")", Vector3(1, 0, 0));
-				}
-				//the rest of the stream is the value of the save item
-				while (!CurrentLineStream.eof())
-				{
-					std::string ValueToAppend;
-					CurrentLineStream >> ValueToAppend;
-					Value.append(ValueToAppend + " ");
-				}
-				const auto strBegin = Value.find_first_not_of(" ");
+			if (InFile.eof())
+			{
+				break;
+			}
+			continue;
+		}
+		else if (InFile.eof())
+		{
+			CurrentLine.pop_back();
+			if (InString)
+			{
+				Log::PrintMultiLine("Loading error: expected closing '\"':\n"
+					+ CurrentLine + " <- HERE\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+					Log::LogColor::Red,
+					"[Error: " + SaveName + "]: ");
+			}
+			else
+			{
+				Log::PrintMultiLine("Loading error: expected closing '>':\n"
+					+ CurrentLine + " <- HERE\n^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+					Log::LogColor::Red,
+					"[Error: " + SaveName + "]: ");
+			}
+			Properties.clear();
+			return;
+		}
 
-				const auto strEnd = Value.find_last_not_of(" ");
-				const auto strRange = strEnd - strBegin + 1;
-				if (strBegin != std::string::npos)
-				{
-					Value = Value.substr(strBegin, strRange);
-				}
-				else
-				{
-					Value = "";
-				}
-				Properties.insert(std::pair(CurrentName, SaveProperty(CurrentName, Value, CurrentType)));
+		if (!InString && NewLine.size() && NewLine[NewLine.size() - 1] == '/' && NewChar == '/')
+		{
+			IsReadingComment = true;
+			NewLine.clear();
+			continue;
+		}
+
+		if (!InString && !InVec)
+		{
+			if (NewLine.empty() && NewChar == '"')
+			{
+				NewLineIsString = true;
+				InString = true;
+				continue;
+			}
+			if (NewLine.empty() && NewChar == '<')
+			{
+				InVec = true;
+				continue;
 			}
 		}
-		InFile.close();
+		else
+		{
+			if (InString && NewChar == '"' && (!NewLine.size() || NewLine[NewLine.size() - 1] != '\\'))
+			{
+				NewLineIsString = true;
+				InString = false;
+				continue;
+			}
+			if (InVec && NewChar == '>')
+			{
+				InVec = false;
+				continue;
+			}
+		}
+
+		NewLine.append({ NewChar });
 	}
+
 }
 
 SaveGame::SaveProperty SaveGame::GetProperty(std::string Name)
@@ -211,7 +299,25 @@ SaveGame::~SaveGame()
 		OutFile << " ";
 		OutFile << p.second.Name;
 		OutFile << " = ";
-		OutFile << p.second.Value;
+		switch (p.second.Type)
+		{
+		case Type::Int:
+		case Type::Float:
+		case Type::Byte:
+		case Type::Bool:
+			OutFile << p.second.Value;
+			break;
+		case Type::String:
+			OutFile << "\"" << p.second.Value << "\"";
+			break;
+		case Type::Vector3:
+		case Type::Vector3Color:
+		case Type::Vector3Rotation:
+			OutFile << "<" << p.second.Value << ">";
+			break;
+		default:
+			break;
+		}
 		OutFile << std::endl;
 
 	}
