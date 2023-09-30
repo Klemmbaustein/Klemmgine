@@ -351,8 +351,12 @@ void EditorUI::Tick()
 #ifdef ENGINE_CSHARP
 	if (Editor::CanHotreload == true)
 	{
-		Log::Print("Finished building assembly. Hotreloading .dll file...", Log::LogColor::Yellow);
+		Log::Print("Finished building assembly. Hotreloading .dll file.", Log::LogColor::Yellow);
 		CSharp::ReloadCSharpAssembly();
+		ItemBrowser* Browser = dynamic_cast<ItemBrowser*>(UIElements[3]);
+		Browser->CPPClasses = Browser->GetEditorUIClasses();
+		Browser->UpdateLayout();
+
 		Editor::CanHotreload = false;
 	}
 #endif

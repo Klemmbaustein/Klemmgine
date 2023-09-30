@@ -14,7 +14,7 @@ struct EditorClassesItem
 
 class ItemBrowser : public EditorPanel
 {
-
+	UITextField* PathField = nullptr;
 	struct FileEntry
 	{
 		std::string Name;

@@ -186,6 +186,8 @@ void ItemBrowser::UpdateLayout()
 	ContentBox->AddChild(BrowserScrollBox
 		->SetPadding(0));
 
+	PathField = new UITextField(true, 0, UIColors[0], this, -3, Editor::CurrentUI->EngineUIText);
+
 	ContentBox->AddChild((new UIBackground(true, 0, UIColors[1], Vector2(Scale.X, 0.1f)))
 		->SetPadding(0)
 		->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
@@ -193,9 +195,9 @@ void ItemBrowser::UpdateLayout()
 			->SetMinSize(Vector2(0.06f))
 			->SetSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetPadding(0.01f))
-		->AddChild((new UITextField(true, 0, UIColors[0], this, -3, Editor::CurrentUI->EngineUIText))
+		->AddChild(PathField
 			->SetTextColor(UIColors[2])
-			->SetText(SelectedTab == 0 ? Editor::CurrentUI->CurrentPath + "/" : GetCurrentCPPPathString())
+			->SetText(SelectedTab == 0 ? Editor::CurrentUI->CurrentPath : GetCurrentCPPPathString())
 			->SetTextSize(0.4f)
 			->SetMinSize(Vector2(Scale.X / 1.2f - 0.12f / Graphics::AspectRatio, 0.08f))
 			->SetMaxSize(Vector2(Scale.X / 1.2f - 0.12f / Graphics::AspectRatio, 0.08f))
@@ -596,6 +598,18 @@ void ItemBrowser::OnButtonClicked(int Index)
 		UpdateLayout();
 		return;
 	}
+	if (Index == -3)
+	{
+		if (SelectedTab == 0)
+		{
+			if (std::filesystem::exists(PathField->GetText()))
+			{
+				Editor::CurrentUI->CurrentPath = PathField->GetText();
+			}
+		}
+		UpdateLayout();
+		return;
+	}
 
 	if (Index >= 0 && IsDraggingButton)
 	{
@@ -619,7 +633,11 @@ void ItemBrowser::OnButtonClicked(int Index)
 	{
 		if (CurrentFiles[Index].IsDirectory)
 		{
-			Editor::CurrentUI->CurrentPath.append("/" + FileUtil::GetFileNameFromPath(CurrentFiles[Index].Name));
+			if (Editor::CurrentUI->CurrentPath.at(Editor::CurrentUI->CurrentPath.size() - 1) != '/')
+			{
+				Editor::CurrentUI->CurrentPath.append("/");
+			}
+			Editor::CurrentUI->CurrentPath.append(FileUtil::GetFileNameFromPath(CurrentFiles[Index].Name));
 			UpdateLayout();
 			return;
 		}

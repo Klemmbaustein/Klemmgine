@@ -69,7 +69,7 @@ protected:
 	std::string TypeName;
 	uint32_t TypeID = 0;
 	std::vector<Component*> Components;
-	std::string Name = "Empty Object";
+	std::string Name = "Object";
 	friend EditorUI;
 	friend class ContextMenu;
 	Transform ObjectTransform;
