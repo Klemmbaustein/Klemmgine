@@ -154,7 +154,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		{
 			DefGroup.Add(XML("PreBuildEvent")
 				.Add(XML("Command",
-					"$(ProjectDir)../../../Tools/bin/BuildTool.exe in=../../../EngineSource/Objects in=./Objects out=../GeneratedIncludes")));
+					"\"$(ProjectDir)../../../Tools/bin/BuildTool.exe\" in=../../../EngineSource/Objects in=./Objects out=../GeneratedIncludes")));
 		}
 
 		Project.Add(DefGroup);
