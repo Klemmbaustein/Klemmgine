@@ -56,7 +56,7 @@ UIScrollBox* UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 			ScrollBarBackground->SetAlign(UIBox::Align::Reverse);
 			ScrollBarBackground->SetPosition(OffsetPosition + Vector2(Size.X - ScrollBarBackground->GetUsedSize().X, 0));
 #if EDITOR
-			ScrollBar = new UIBackground(true, 0, 0.4f, Vector2(0.01f, 0.1f));
+			ScrollBar = new UIBackground(true, 0, 0.55f, Vector2(0.01f, 0.1f));
 #else
 			ScrollBar = new UIBackground(true, 0, 0.75f, Vector2(0.01f, 0.1f));
 #endif
