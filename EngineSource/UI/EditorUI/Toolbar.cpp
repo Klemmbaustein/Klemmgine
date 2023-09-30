@@ -33,7 +33,7 @@ void Toolbar::GenerateButtons()
 			continue;
 		}
 		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.11f)))
-			->SetPadding(0.01f, 0.01f, 0.02f, 0.01f));
+			->SetPadding(0.015f, 0.015f, 0.02f, 0.01f));
 		auto Elem = new UIBox(false, 0);
 		Elem->SetAlign(UIBox::Align::Reverse);
 		Elem->SetPadding(0.0f);
@@ -66,7 +66,7 @@ void Toolbar::GenerateButtons()
 		}
 	}
 	TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.11f)))
-		->SetPadding(0.01f, 0.01f, 0.02f, 0.01f));
+		->SetPadding(0.015f, 0.015f, 0.02f, 0.01f));
 }
 
 void Toolbar::RemoveButton(std::string Name)
@@ -110,14 +110,17 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 	ToolbarInstance = this;
 	RegisterNewButtonCategory(ButtonCategory("Scene", 
 		{
-			ButtonCategory::Button("Save", Editor::CurrentUI->Textures[2], []() {
+			ButtonCategory::Button("Save", Editor::CurrentUI->Textures[2], []() 
+				{
 					EditorUI::SaveCurrentScene();
 				}),
-			ButtonCategory::Button("Wireframe", Editor::CurrentUI->Textures[1], []() {
+			ButtonCategory::Button("Wireframe", Editor::CurrentUI->Textures[1], []()
+				{
 					Log::Print("Toggled wireframe", Vector3(0.3f, 0.4f, 1));
 					Graphics::IsWireframe = !Graphics::IsWireframe;
 				}),
-			ButtonCategory::Button("Bake", Editor::CurrentUI->Textures[3], []() {
+			ButtonCategory::Button("Bake", Editor::CurrentUI->Textures[27], []() 
+				{
 					new BakeMenu();
 				})
 		}));

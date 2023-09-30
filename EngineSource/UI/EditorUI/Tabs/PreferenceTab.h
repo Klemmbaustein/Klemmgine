@@ -43,6 +43,10 @@ class PreferenceTab : public EditorTab
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Save", std::stoi(NewValue));
 			}),
+			SettingsCategory::Setting("Toolbar:Show Bake button", Type::Bool, "1", [](std::string NewValue)
+			{
+				Toolbar::ToolbarInstance->SetButtonVisibility("Bake", std::stoi(NewValue));
+			}),
 			SettingsCategory::Setting("Toolbar:Show Wireframe Button", Type::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Wireframe", std::stoi(NewValue));
@@ -51,12 +55,10 @@ class PreferenceTab : public EditorTab
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Build", std::stoi(NewValue));
 			}),
-#ifdef ENGINE_CSHARP
 			SettingsCategory::Setting("Toolbar:Show run button", Type::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Run", std::stoi(NewValue));
-			})
-#endif
+			}),
 			}
 		),
 
