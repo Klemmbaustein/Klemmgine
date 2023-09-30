@@ -339,12 +339,13 @@ DrawableText::DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumV
 	this->Color = Color;
 }
 
-void DrawableText::Draw(ScrollObject* CurrentScrollObject)
+void DrawableText::Draw(ScrollObject* CurrentScrollObject, float Depth)
 {
 	glBindVertexArray(VAO);
 	Graphics::TextShader->Bind();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture);
+	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_depth"), Depth);
 	glUniform1i(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_texture"), 0);
 	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "textColor"), Color.X, Color.Y, Color.Z);
 	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);

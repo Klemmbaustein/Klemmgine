@@ -16,6 +16,7 @@ class UIText : public UIBox
 	float TextWidthOverride = 0;
 	float Opacity = 1.f;
 	SizeMode WrapSizeMode = SizeMode::ScreenRelative;
+	virtual bool GetRenderHighResMode();
 public:
 
 	void Tick() override;
@@ -31,6 +32,7 @@ public:
 
 	size_t GetNearestLetterAtLocation(Vector2 Location, Vector2& LetterOutLocation);
 	Vector2 GetLetterLocation(size_t Index);
+
 
 	void SetText(ColoredText NewText);
 	void SetText(std::string NewText);

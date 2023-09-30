@@ -148,7 +148,7 @@ void UITextField::Tick()
 		{
 			TextFieldTimer = 0;
 			IBeamPosition = NewPos;
-			IBeamScale = Vector2(0.002f, 0.066f) * TextSize;
+			IBeamScale = Vector2(0.0015f, 0.066f) * TextSize;
 			UIBox::RedrawUI();
 		}
 		if (!ShowIBeam)

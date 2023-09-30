@@ -184,10 +184,8 @@ vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, v
 	float specular = 1 * pow(max(dot(reflection, view), 0.01), specularsize * 35) * specularstrength;
 	vec3 light = (u_directionallight.Direction);
 
-	//Cel shading (wow, very cool)
 	//int Intensity = int(ceil(max(dot(normal, light), 0.f)));
 
-	//Phong shading (wow, also very cool)
 	float Intensity = max(dot(normal, light), 0.f);
 
 	vec3 DirectionalLightColor = Intensity * (color * u_directionallight.Intensity) * (1 - u_directionallight.AmbientIntensity) * u_directionallight.SunColor;

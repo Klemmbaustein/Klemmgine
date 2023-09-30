@@ -55,32 +55,7 @@ float blurssao()
 
 vec4 sampleUI()
 {
-	vec4 UIsample = vec4(0);
-	vec2 texSize = 1.f / textureSize(u_ui, 0);
-	int divs = 0;
-	float averageOpacity = 0;
-	for (int x = 0; x < 2; ++x)
-	{
-		for (int y = 0; y < 2; ++y)
-		{
-			vec4 newtex = texture(u_ui, v_uitexcoords + vec2(x, y) * texSize);
-			if (newtex.w > 0.0)
-			{
-				averageOpacity += newtex.w;
-				UIsample.xyz += newtex.xyz;
-				++divs;
-			}
-		}
-	}
-	if (divs != 0)
-	{
-		UIsample.xyz /= divs;
-		averageOpacity /= divs;
-		UIsample.w /= 4;
-		UIsample.xyz /= averageOpacity;
-	}
-	UIsample.w = clamp(averageOpacity, 0, 1);
-	return UIsample;
+	return texture(u_ui, v_uitexcoords);
 }
 
 void main()
@@ -142,8 +117,9 @@ void main()
 	f_color = pow(vec4(color.xyz + outlinecolor, color.w), vec4(u_gamma));
 
 	f_color = mix(f_color, enginearrows, length(enginearrows.rgb));
-	f_color *= (rand(v_texcoords) / 50) + 0.95; // To combat color banding
+	//f_color += (rand(v_texcoords) / 50) - (1 / 25); // To combat color banding
 	f_color -= Vignette * u_vignette;
-	f_color.xyz = mix(clamp(f_color.xyz, 0, 1), uicolor.xyz, clamp(uicolor.w, 0, 1));
+	f_color.xyz = mix(clamp(f_color.xyz, 0, 1), clamp(uicolor.xyz, 0, 1), clamp(uicolor.w, 0, 1));
+	//f_color.xyz = vec3(uicolor.w);
 	f_color.w = 1;
 }

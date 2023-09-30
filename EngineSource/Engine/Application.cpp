@@ -601,11 +601,17 @@ void DrawPostProcessing()
 #endif
 
 
-	glViewport(0, 0, (int)Graphics::WindowResolution.X * 2, (int)Graphics::WindowResolution.Y * 2);
+	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 	Application::UIMergeEffect->EffectShader->Bind();
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, UIBox::GetUITextures()[1]);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, UIBox::GetHighResUITextures()[0]);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, UIBox::GetHighResUITextures()[1]);
 	Application::UIMergeEffect->EffectShader->SetInt("u_alpha", 1);
+	Application::UIMergeEffect->EffectShader->SetInt("u_hr", 2);
+	Application::UIMergeEffect->EffectShader->SetInt("u_hrAlpha", 3);
 	unsigned int UIBuffer = Application::UIMergeEffect->Render(UIBox::GetUITextures()[0]);
 
 #if !EDITOR
@@ -653,6 +659,12 @@ void DrawPostProcessing()
 	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->OutlineBuffer->GetBuffer()->GetTextureID(1));
 	glActiveTexture(GL_TEXTURE3);
 	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->ArrowsBuffer->GetBuffer()->GetTextureID(0));
+#else
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
 #endif
 	glActiveTexture(GL_TEXTURE4);
 	glBindTexture(GL_TEXTURE_2D, Application::BloomBuffer);

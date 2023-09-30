@@ -146,12 +146,17 @@ Vector2 UIText::GetLetterLocation(size_t Index)
 	return Vector2(Renderer->GetTextSize({ TextSegment(Text.substr(0, Index), 1) }, TextSize * 2, false, 999999).X, 0) + OffsetPosition;
 }
 
+bool UIText::GetRenderHighResMode()
+{
+	return true;
+}
+
 void UIText::Draw()
 {
 	if (Text)
 	{
 		Text->Opacity = Opacity;
-		Text->Draw(CurrentScrollObject);
+		Text->Draw(CurrentScrollObject, GetCurrentUIDepth());
 	}
 }
 

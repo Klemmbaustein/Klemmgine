@@ -14,6 +14,7 @@ uniform int u_borderType = 0;
 uniform float u_borderScale = 0.05;
 uniform vec4 u_transform;
 uniform float u_aspectratio = 16.0/9.0;
+uniform float u_depth = 0;
 
 void main()
 {
@@ -55,5 +56,5 @@ void main()
 	{
 		f_color = vec4(drawnColor.xyz, opacity);
 	}
-	f_alpha = vec4(vec3(1), opacity);
+	f_alpha = vec4(vec3(1, u_depth, 0), opacity);
 }

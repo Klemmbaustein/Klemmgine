@@ -41,7 +41,6 @@ public:
 	UIBox* GetAbsoluteParent();
 	UIBox* SetAlign(Align NewAlign);
 	static void DrawAllUIElements();
-	void DrawThisAndChildren();
 	void DeleteChildren();
 
 	bool IsVisibleInHierarchy();
@@ -64,6 +63,7 @@ public:
 	static void ForceUpdateUI();
 	static void InitUI();
 	static unsigned int* GetUITextures();
+	static unsigned int* GetHighResUITextures();
 	static void RedrawUI();
 	static void ClearUI();
 	bool IsHovered();
@@ -74,6 +74,7 @@ public:
 	bool HasMouseCollision = false;
 
 protected:
+	virtual bool GetRenderHighResMode();
 	bool ShouldBeTicked = true;
 	bool TryFill = false;
 	virtual void Update();
@@ -94,12 +95,15 @@ protected:
 	Vector2 Size;
 	SizeMode BoxSizeMode = SizeMode::ScreenRelative;
 
+	float GetCurrentUIDepth();
+
 	std::vector<UIBox*> Children;
 	UIBox* Parent = nullptr;
 	void UpdateSelfAndChildren();
 	void UpdateScale();
 	void UpdatePosition();
 private:
+	void DrawThisAndChildren(bool HighResMode);
 	bool ChildrenHorizontal = true;
 	bool PrevIsVisible = true;
 };

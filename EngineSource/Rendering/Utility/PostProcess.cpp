@@ -39,8 +39,8 @@ PostProcess::Effect::Effect(std::string FragmentShader, EffectType UsedType)
 
 	if (UsedType == EffectType::UI || UsedType == EffectType::UI_Internal)
 	{
-		SizeX *= 2;
-		SizeY *= 2;
+	//	SizeX *= 2;
+	//	SizeY *= 2;
 	}
 
 	glTexImage2D(
@@ -76,8 +76,8 @@ void PostProcess::Effect::UpdateSize()
 
 	if (UsedType == EffectType::UI || UsedType == EffectType::UI_Internal)
 	{
-		SizeX *= 2;
-		SizeY *= 2;
+	//	SizeX *= 2;
+	//	SizeY *= 2;
 	}
 
 	glTexImage2D(

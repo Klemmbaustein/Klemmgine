@@ -56,6 +56,11 @@ void UIBackground::MakeGLBuffers(bool InvertTextureCoordinates)
 	BoxVertexBuffer = new VertexBuffer(Vertices, {0, 1, 2, 1, 2, 3});
 }
 
+bool UIBackground::GetRenderHighResMode()
+{
+	return UseTexture;
+}
+
 UIBackground* UIBackground::SetOpacity(float NewOpacity)
 {
 	if (NewOpacity != Opacity)
@@ -130,10 +135,11 @@ void UIBackground::Draw()
 	glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_texture"), 0);
 	glUniform4f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_color"), Color.X, Color.Y, Color.Z, 1.f);
 	glUniform4f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_transform"), OffsetPosition.X, OffsetPosition.Y, Size.X, Size.Y);
-	glUniform1f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_opacity"), Opacity);
-	glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_borderType"), (int)BoxBorder);
-	glUniform1f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_borderScale"), BorderRadius / 20.0f);
-	glUniform1f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
+	BackgroundShader->SetFloat("u_opacity", Opacity);
+	BackgroundShader->SetInt("u_borderType", (int)BoxBorder);
+	BackgroundShader->SetFloat("u_borderScale", BorderRadius / 20.0f);
+	BackgroundShader->SetFloat("u_aspectratio", Graphics::AspectRatio);
+	BackgroundShader->SetFloat("u_depth", GetCurrentUIDepth());
 
 	if (UseTexture)
 		glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_useTexture"), 1);

@@ -147,6 +147,11 @@ void UIButton::Tick()
 	}
 }
 
+bool UIButton::GetRenderHighResMode()
+{
+	return UseTexture;
+}
+
 
 bool UIButton::GetUseTexture()
 {
@@ -251,10 +256,11 @@ void UIButton::Draw()
 	glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_transform"), OffsetPosition.X, OffsetPosition.Y, Size.X, Size.Y);
 	glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_color"),
 		ButtonColorMultiplier * Color.X, ButtonColorMultiplier * Color.Y, ButtonColorMultiplier * Color.Z, 1.f);
-	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_opacity"), Opacity);
-	glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_borderType"), (int)BoxBorder);
-	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_borderScale"), BorderRadius / 20.0f);
-	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
+	ButtonShader->SetFloat("u_opacity", Opacity);
+	ButtonShader->SetInt("u_borderType", (int)BoxBorder);
+	ButtonShader->SetFloat("u_borderScale", BorderRadius / 20.0f);
+	ButtonShader->SetFloat("u_aspectratio", Graphics::AspectRatio);
+	ButtonShader->SetFloat("u_depth", GetCurrentUIDepth());
 
 	if (UseTexture)
 		glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_useTexture"), 1);
