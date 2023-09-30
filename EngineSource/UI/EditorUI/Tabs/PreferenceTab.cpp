@@ -5,15 +5,24 @@
 #include <Engine/Log.h>
 #include <CSharp/CSharpInterop.h>
 #include <filesystem>
+#include <UI/UIScrollBox.h>
 
 void PreferenceTab::GenerateUI()
 {
 	float SegmentSize = TabBackground->GetMinSize().X - 0.5f;
 
-	TabBackground->DeleteChildren();
-	auto SettingsCategoryBox = new UIBackground(false, 0, UIColors[0] * 1.2f, Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
-	SettingsCategoryBox->SetAlign(UIBox::Align::Reverse);
-	TabBackground->AddChild(SettingsCategoryBox);
+	if (!SettingsBox)
+	{
+		SettingsCategoryBox = new UIBackground(false, 0, UIColors[0] * 1.2f, Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
+		SettingsCategoryBox->SetAlign(UIBox::Align::Reverse);
+		TabBackground->AddChild(SettingsCategoryBox);
+
+		SettingsBox = new UIScrollBox(false, 0, true);
+		SettingsBox->SetAlign(UIBox::Align::Reverse);
+		TabBackground->AddChild(SettingsBox);
+	}
+	SettingsBox->DeleteChildren();
+	SettingsCategoryBox->DeleteChildren();
 
 	for (size_t i = 0; i < Preferences.size(); i++)
 	{
@@ -25,10 +34,11 @@ void PreferenceTab::GenerateUI()
 				->SetPadding(0.01f)));
 	}
 
-	auto SettingsBox = new UIBox(false, 0);
-	SettingsBox->SetAlign(UIBox::Align::Reverse);
-	SettingsBox->SetMinSize(Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
-	TabBackground->AddChild(SettingsBox);
+	SettingsBox->SetMinSize(Vector2(1.2f, TabBackground->GetUsedSize().Y - 0.2f));
+	SettingsBox->SetMaxSize(Vector2(1.2f, TabBackground->GetUsedSize().Y - 0.2f));
+	SettingsCategoryBox->SetMinSize(Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
+	SettingsCategoryBox->SetMaxSize(Vector2(2, TabBackground->GetUsedSize().Y - 0.2f));
+	SettingsCategoryBox->SetColor(UIColors[0] * 1.2f);
 
 	SettingsBox->AddChild((new UIText(1, UIColors[2], "Settings/" + Preferences[SelectedSetting].Name, Renderer))
 		->SetPadding(0, 0, 0, 0));
@@ -72,7 +82,7 @@ void PreferenceTab::GenerateUI()
 			(new UIButton(true, 0, UIColors[1], this, -400 + CurentCategory))
 				->SetPadding(0.01f, 0.01f, 0, 0)
 				->SetMinSize(Vector2(SegmentSize, 0))
-				->AddChild((new UIText(0.7f, UIColors[2], "> " + cat.first, Renderer))
+				->AddChild((new UIText(0.6f, UIColors[2], "> " + cat.first, Renderer))
 					->SetPadding(0.01f)));
 
 		for (size_t i = 0; i < cat.second.size(); i++)
@@ -94,7 +104,7 @@ void PreferenceTab::GenerateUI()
 
 void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value)
 {
-	Parent->AddChild((new UIText(0.7f, UIColors[2], Name, Renderer))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
+	Parent->AddChild((new UIText(0.6f, UIColors[2], Name, Renderer))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
 	UIBox* Element;
 	switch (SectionType)
 	{
@@ -106,7 +116,7 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 		Element = (new UITextField(true, 0, UIColors[1], this, Index, Renderer))
 			->SetText(Value)
 			->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6f, 0.05f))
-			->SetPadding(0.02f, 0.02f, 0.05f, 0.02f)
+			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
 		break;
@@ -114,7 +124,7 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 	case Type::Vector3Color:
 		Element = (new UIVectorField(0, Vector3::stov(Value), this, Index, Renderer))
 			->SetValueType(SectionType == Type::Vector3 ? UIVectorField::VecType::xyz : UIVectorField::VecType::rgb)
-			->SetPadding(0.02f, 0.02f, 0.05f, 0.02f);
+			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f);
 		Parent->AddChild(Element);
 		break;
 	case Type::Bool:
@@ -126,7 +136,7 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 			->SetUseTexture(std::stoi(Value), Editor::CurrentUI->Textures[16])
 			->SetSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetMinSize(0.05f)
-			->SetPadding(0.02f, 0.02f, 0.05f, 0.02f)
+			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
 		break;

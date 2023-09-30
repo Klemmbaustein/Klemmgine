@@ -841,12 +841,7 @@ int Initialize(int argc, char** argv)
 
 	SDL_GL_CreateContext(Application::Window);
 	SDL_SetWindowResizable(Application::Window, SDL_TRUE);
-
-#if EDITOR
-	//SDL_SetWindowBordered(Application::Window, SDL_FALSE);
-	SDL_SetHint(SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "0");
-	SDL_SetWindowHitTest(Application::Window, Application::HitTestCallback, 0);
-#endif
+	
 
 	std::cout << "- Starting GLEW - ";
 	if (glewInit() != GLEW_OK)
@@ -883,9 +878,6 @@ int Initialize(int argc, char** argv)
 #if ENGINE_CSHARP
 	CSharp::Init();
 #endif
-	CSM::Init();
-	Bloom::Init();
-	SSAO::Init();
 	BakedLighting::Init();
 	Console::InitializeConsole();
 	Console::RegisterConVar(Console::Variable("post_process", Type::Bool, &Application::RenderPostProcess, nullptr));
@@ -894,6 +886,9 @@ int Initialize(int argc, char** argv)
 	UIBox::InitUI();
 	Application::UIMergeEffect = new PostProcess::Effect("Internal/uimerge.frag", PostProcess::EffectType::UI_Internal);
 	PostProcess::AddEffect(Application::UIMergeEffect);
+	CSM::Init();
+	Bloom::Init();
+	SSAO::Init();
 	if (argc > 1)
 	{
 		std::vector<std::string> LaunchArguments;

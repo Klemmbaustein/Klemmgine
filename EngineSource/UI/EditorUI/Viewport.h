@@ -35,6 +35,7 @@ public:
 	std::vector<EditorTab*> TabInstances;
 	static Viewport* ViewportInstance;
 	WorldObject* PreviousSelectedObject = nullptr;
+	size_t PreviousSelectedObjectSize = 0;
 	std::vector<WorldObject*> SelectedObjects;
 
 	Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale);

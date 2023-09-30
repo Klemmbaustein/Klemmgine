@@ -46,7 +46,7 @@ namespace Scene
 
 	bool ShouldLoadNewScene = false;
 	std::string NewLoadedScene;
-	Camera* DefaultCamera = new Camera(1.8f, 1600, 900, false);
+	Camera* DefaultCamera = new Camera(2.5f, 1600, 900, false);
 
 	std::string CurrentScene = "Content/NewScene";
 	void LoadSceneInternally(std::string FilePath)

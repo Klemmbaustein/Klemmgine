@@ -164,8 +164,10 @@ public:
 			this->Object = Object;
 			if (Object) this->Name = Object->GetName();
 			this->ListIndex = ListIndex;
+			IsSelected = Object->IsSelected;
 		}
 
+		bool IsSelected = false;
 		bool IsCollapsed = false;
 		std::vector<ObjectListItem> Children;
 		std::string Name;

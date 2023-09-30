@@ -10,6 +10,7 @@
 #ifdef ENGINE_CSHARP
 #include <Objects/CSharpObject.h>
 #endif
+#include <Engine/Input.h>
 
 ObjectList::ObjectList(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2f, 0.5f), Vector2(0.8f, 1.25f))
 {
@@ -44,10 +45,13 @@ void ObjectList::OnButtonClicked(int Index)
 {
 	if (Index >= 0)
 	{
-		for (auto o : Objects::AllObjects)
+		if (!Input::IsKeyDown(SDLK_LSHIFT))
 		{
-			o->IsSelected = false;
-		};
+			for (auto o : Objects::AllObjects)
+			{
+				o->IsSelected = false;
+			};
+		}
 		Objects::AllObjects[Index]->IsSelected = true;
 	}
 	if (Index < 0)
@@ -145,7 +149,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 			->SetPadding(0.005f, 0.005f, 0, 0));
 
 		auto v = dynamic_cast<Viewport*>(Editor::CurrentUI->UIElements[4]);
-		if (v && v->SelectedObjects.size() && Object.Object == v->SelectedObjects[0])
+		if (Object.IsSelected)
 		{
 			ElementButton->SetColor(ElementButton->GetColor() * 3 * Vector3(1, 0.75f, 0));
 			ElementButton->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);

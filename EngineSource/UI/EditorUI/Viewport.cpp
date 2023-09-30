@@ -180,6 +180,12 @@ void Viewport::Tick()
 		Editor::CurrentUI->UIElements[5]->UpdateLayout();
 		Editor::CurrentUI->UIElements[6]->UpdateLayout();
 	}
+	else if (PreviousSelectedObjectSize != SelectedObjects.size())
+	{
+		PreviousSelectedObjectSize = SelectedObjects.size();
+		Editor::CurrentUI->UIElements[5]->UpdateLayout();
+		Editor::CurrentUI->UIElements[6]->UpdateLayout();
+	}
 
 	if (Input::IsKeyDown(SDLK_ESCAPE))
 	{

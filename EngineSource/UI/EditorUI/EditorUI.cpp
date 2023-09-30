@@ -624,6 +624,10 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 		{
 			CurrentList->Children.push_back(ObjectListItem(o, (int)ListIndex));
 		}
+		else if (CurrentList && o->IsSelected)
+		{
+			CurrentList->IsSelected = true;
+		}
 		ListIndex++;
 	}
 	return ObjectList;

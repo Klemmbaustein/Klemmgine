@@ -5,6 +5,7 @@
 #include <UI/EditorUI/Toolbar.h>
 #include <Engine/Log.h>
 #include <Engine/EngineProperties.h>
+#include <Engine/Application.h>
 
 class PreferenceTab : public EditorTab
 {
@@ -28,7 +29,8 @@ class PreferenceTab : public EditorTab
 
 	size_t SelectedSetting = 0;
 	TextRenderer* Renderer;
-
+	UIScrollBox* SettingsBox = nullptr;
+	UIBackground* SettingsCategoryBox;
 	std::vector<SettingsCategory::Setting> LoadedSettings;
 
 	std::vector<SettingsCategory> Preferences =
@@ -58,6 +60,13 @@ class PreferenceTab : public EditorTab
 			SettingsCategory::Setting("Toolbar:Show run button", Type::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Run", std::stoi(NewValue));
+			}),
+			SettingsCategory::Setting("Editor:Start in fullscreen", Type::Bool, "1", [](std::string NewValue)
+			{
+				if (Stats::Time == 0)
+				{
+					Application::SetFullScreen(std::stoi(NewValue));
+				}
 			}),
 			}
 		),
