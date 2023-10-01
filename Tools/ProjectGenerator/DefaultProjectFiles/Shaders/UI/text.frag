@@ -23,7 +23,7 @@ void main()
 		discard;
 	}
 	float sampled = texture(u_texture, TexCoords).a;
-	f_alpha.xyz = vec3(1, u_depth, 0);
+	f_alpha.xyz = vec3(1, u_depth * u_opacity, 0);
 	f_alpha.w = sampled * u_opacity;
 	color = vec4(v_color, f_alpha.w);
 }  

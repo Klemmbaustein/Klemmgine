@@ -18,7 +18,6 @@ BakeMenu::BakeMenu()
 	{
 		return;
 	}
-	TabBackground->SetOpacity(0.5);
 	BakeMenuActive = true;
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);

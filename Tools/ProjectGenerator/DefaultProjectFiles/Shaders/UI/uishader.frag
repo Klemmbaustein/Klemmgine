@@ -56,5 +56,5 @@ void main()
 	{
 		f_color = vec4(drawnColor.xyz, opacity);
 	}
-	f_alpha = vec4(vec3(1, u_depth, 0), opacity);
+	f_alpha = vec4(vec3(1, u_depth * opacity, 0), opacity);
 }
