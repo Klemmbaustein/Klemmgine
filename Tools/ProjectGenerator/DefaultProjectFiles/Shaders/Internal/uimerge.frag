@@ -11,11 +11,15 @@ out vec4 f_color;
 * This shader merges a High res (hr) and normal UI framebuffer together.
 *
 * TODO: Un-break
-*	This is a bad idea. It should instead render high res graphics 
+*	This is a bad idea. It should instead render high res graphics
 *	into a small buffer per rendered object, then put it into the main
 *	buffer immediately, not merging the 2 buffers at post processing.
 *	This way completely breaks when transparency gets involved.
 *	There's probably going to be performance issues using that method...
+*	
+*	Another option is just to rewrite the text renderer to work
+*	with "normal" resolutions. Without high res, right now text
+*	will look really bad when it's too small.
 *
 *	Until then: Do *not* render transparent UI over text or images.
 */
