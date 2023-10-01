@@ -266,6 +266,8 @@ void UIButton::Draw()
 		glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_useTexture"), 1);
 	else
 		glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_useTexture"), 0);
+	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, attachments);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	ButtonVertexBuffer->Unbind();
 }

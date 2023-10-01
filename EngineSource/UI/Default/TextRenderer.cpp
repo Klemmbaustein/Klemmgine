@@ -358,6 +358,8 @@ void DrawableText::Draw(ScrollObject* CurrentScrollObject, float Depth)
 	}
 	else
 		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
+	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+	glDrawBuffers(2, attachments);
 	glDrawArrays(GL_TRIANGLES, 0, NumVerts);
 }
 

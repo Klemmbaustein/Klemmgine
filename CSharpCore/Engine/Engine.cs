@@ -47,8 +47,8 @@ internal static class Engine
 	static Int64 CurrentObjectIndex = 0;
 	static Type? StatsObject = null;
 
-	static Dictionary<Int32, Object> WorldObjects = new Dictionary<Int32, Object>();
-	static List<Type> WorldObjectTypes = new List<Type>();
+	static readonly Dictionary<Int32, Object> WorldObjects = new();
+	static readonly List<Type> WorldObjectTypes = new();
 
 	public static object? GetObjectFromID(Int32 Id)
 	{
