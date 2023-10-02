@@ -61,6 +61,12 @@ class PreferenceTab : public EditorTab
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Run", std::stoi(NewValue));
 			}),
+#ifdef ENGINE_CSHARP
+			SettingsCategory::Setting("Toolbar:Show reload C# button", Type::Bool, "1", [](std::string NewValue)
+			{
+				Toolbar::ToolbarInstance->SetButtonVisibility("Reload C#", std::stoi(NewValue));
+			}),
+#endif
 			SettingsCategory::Setting("Editor:Start in fullscreen", Type::Bool, "1", [](std::string NewValue)
 			{
 				if (Stats::Time == 0)
@@ -86,7 +92,7 @@ class PreferenceTab : public EditorTab
 				{
 					EditorUI::SetSaveSceneOnLaunch(NewValue == "1");
 				}),
-				SettingsCategory::Setting("Klemmgine.NET:Use C# in project (Requires restart)", Type::Bool, "1", [](std::string NewValue)
+				SettingsCategory::Setting("C#:Use C# in project (Requires restart)", Type::Bool, "1", [](std::string NewValue)
 				{
 				}),
 #endif

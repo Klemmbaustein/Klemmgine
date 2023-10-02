@@ -145,7 +145,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 			Icon->SetPadding(0, 0, Depth, 0.005f);
 		}
 
-		ElementButton->AddChild((new UIText(0.5f, UIColors[2], Object.Name, Renderer))
+		ElementButton->AddChild((new UIText(0.4f, UIColors[2], Object.Name, Renderer))
 			->SetPadding(0.005f, 0.005f, 0, 0));
 
 		auto v = dynamic_cast<Viewport*>(Editor::CurrentUI->UIElements[4]);

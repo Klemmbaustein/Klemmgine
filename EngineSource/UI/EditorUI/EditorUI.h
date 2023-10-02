@@ -110,7 +110,7 @@ public:
 		Vector3(1),						//Highlight color
 		Vector3(0.2f),					//Brighter background
 	};
-	TextRenderer* EngineUIText = new TextRenderer("Font.ttf", 90);
+	TextRenderer* EngineUIText = new TextRenderer("Font.ttf");
 
 	enum class CursorType
 	{

@@ -74,8 +74,7 @@ void UITextField::Tick()
 	ButtonColorMultiplier = 1.f;
 	if (UI::HoveredBox == this)
 	{
-		Vector2 OutLoc;
-		size_t Nearest = TextObject->GetNearestLetterAtLocation(Input::MouseLocation, OutLoc);
+		size_t Nearest = TextObject->GetNearestLetterAtLocation(Input::MouseLocation);
 		if (!IsHovered)
 		{
 			RedrawUI();

@@ -19,7 +19,12 @@ namespace OS
 {
 	bool ConsoleCanBeHidden = true;
 }
+void OS::SetConsoleCanBeHidden(bool NewConsoleCanBeHidden)
+{
+	ConsoleCanBeHidden = NewConsoleCanBeHidden;
+}
 
+#if _WIN32
 size_t OS::GetMemUsage()
 {
 	PROCESS_MEMORY_COUNTERS_EX pmc;
@@ -27,14 +32,26 @@ size_t OS::GetMemUsage()
 	return pmc.WorkingSetSize;
 }
 
-void OS::SetConsoleCanBeHidden(bool NewConsoleCanBeHidden)
+std::wstring OS::Utf8ToWstring(std::string utf8)
 {
-	ConsoleCanBeHidden = NewConsoleCanBeHidden;
+	int wchars_num = MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, NULL, 0);
+	wchar_t* wstr = new wchar_t[wchars_num];
+	MultiByteToWideChar(CP_UTF8, 0, utf8.c_str(), -1, wstr, wchars_num);
+	// do whatever with wstr
+	std::wstring str = wstr;
+	delete[] wstr;
+	return str;
 }
 
-#if _WIN32
+
 void OS::SetConsoleWindowVisible(bool Visible)
 {
+	// Set console code page to UTF-8 so console known how to interpret string data
+	SetConsoleOutputCP(CP_UTF8);
+
+	// Enable buffering to prevent VS from chopping up UTF-8 byte sequences
+	setvbuf(stdout, nullptr, _IOFBF, 1000);
+
 	if (ConsoleCanBeHidden)
 	{
 		::ShowWindow(::GetConsoleWindow(), Visible ? SW_SHOW : SW_HIDE);
@@ -43,6 +60,15 @@ void OS::SetConsoleWindowVisible(bool Visible)
 #endif
 
 #if __linux__
+size_t OS::GetMemUsage()
+{
+	return 0;
+}
+
+std::wstring OS::Utf8ToWstring(std::string utf8)
+{
+	return L"";
+}
 void OS::SetConsoleWindowVisible(bool Visible)
 {
 	//Clearing the Console is usually a bad idea on linux

@@ -93,11 +93,11 @@ void UIText::SetText(ColoredText NewText)
 			{
 				WrapDistance /= Graphics::AspectRatio;
 			}
-			Vector2 s = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, Distance)
-				/ ((30 + Renderer->CharacterSizeInPixels / 2) * 60.f);
+			/*Vector2 s = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, Distance)
+				/ (15.0f * 60.f);
 
 			if (s.X < WrapDistance)
-			{
+			*/{
 				Update();
 				RedrawUI();
 				return;
@@ -107,10 +107,9 @@ void UIText::SetText(ColoredText NewText)
 	}
 }
 
-size_t UIText::GetNearestLetterAtLocation(Vector2 Location, Vector2& LetterOutLocation)
+size_t UIText::GetNearestLetterAtLocation(Vector2 Location)
 {
-	size_t Depth = Renderer->GetCharacterIndexADistance(RenderedText, Location.X - OffsetPosition.X, TextSize * 2, LetterOutLocation);
-	LetterOutLocation = LetterOutLocation + OffsetPosition;
+	size_t Depth = Renderer->GetCharacterIndexADistance(RenderedText, Location.X - OffsetPosition.X, TextSize * 2);
 	return Depth;
 }
 
@@ -144,11 +143,6 @@ Vector2 UIText::GetLetterLocation(size_t Index)
 {
 	std::string Text = TextSegment::CombineToString(RenderedText);
 	return Vector2(Renderer->GetTextSize({ TextSegment(Text.substr(0, Index), 1) }, TextSize * 2, false, 999999).X, 0) + OffsetPosition;
-}
-
-bool UIText::GetRenderHighResMode()
-{
-	return true;
 }
 
 void UIText::Draw()

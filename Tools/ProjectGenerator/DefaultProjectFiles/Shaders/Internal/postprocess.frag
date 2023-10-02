@@ -26,7 +26,8 @@ uniform vec3 u_borderColor = vec3(1);
 
 #define DEPTH_MAX 10000
 
-float rand(vec2 co){
+float rand(vec2 co)
+{
 	return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453);
 }
 

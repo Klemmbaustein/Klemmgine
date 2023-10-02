@@ -19,9 +19,7 @@ namespace UI
 	std::vector<UIBox*> UIElements;
 	bool RequiresRedraw = true;
 	unsigned int UIBuffer = 0;
-	unsigned int HighResUIBuffer = 0;
 	unsigned int UITextures[2] = {0, 0};
-	unsigned int HighResUITexures[2] = { 0, 0 };
 
 	float CurrentUIDepth = 0;
 }
@@ -139,13 +137,7 @@ void UIBox::ForceUpdateUI()
 		glDeleteFramebuffers(1, &UI::UIBuffer);
 		glDeleteTextures(2, UI::UITextures);
 	}
-	if (UI::HighResUIBuffer)
-	{
-		glDeleteFramebuffers(1, &UI::HighResUIBuffer);
-		glDeleteTextures(2, UI::HighResUITexures);
-	}
 	UI::UIBuffer = 0;
-	UI::HighResUIBuffer = 0;
 	InitUI();
 	for (auto i : UI::UIElements)
 	{
@@ -184,48 +176,12 @@ void UIBox::InitUI()
 			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, UI::UITextures[i], 0
 		);
 	}
-
-	glGenFramebuffers(1, &UI::HighResUIBuffer);
-	// create floating point color buffer
-	glGenTextures(2, UI::HighResUITexures);
-	glBindFramebuffer(GL_FRAMEBUFFER, UI::HighResUIBuffer);
-
-	for (unsigned int i = 0; i < 2; i++)
-	{
-		glBindTexture(GL_TEXTURE_2D, UI::HighResUITexures[i]);
-		glTexImage2D(GL_TEXTURE_2D,
-			0,
-			GL_RGBA16F,
-			(size_t)Graphics::WindowResolution.X * 2,
-			(size_t)Graphics::WindowResolution.Y * 2,
-			0,
-			GL_RGBA,
-			GL_FLOAT,
-			NULL);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		// attach texture to framebuffer
-		glFramebufferTexture2D(
-			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, UI::HighResUITexures[i], 0
-		);
-	}
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	
 }
 
 unsigned int* UIBox::GetUITextures()
 {
 	return UI::UITextures;
 }
-
-unsigned int* UIBox::GetHighResUITextures()
-{
-	return UI::HighResUITexures;
-}
-
 void UIBox::RedrawUI()
 {
 	UI::RequiresRedraw = true;
@@ -380,11 +336,6 @@ UIBox* UIBox::SetHorizontal(bool IsHorizontal)
 bool UIBox::GetTryFill()
 {
 	return TryFill;
-}
-
-bool UIBox::GetRenderHighResMode()
-{
-	return false;
 }
 
 void UIBox::Update()
@@ -608,19 +559,7 @@ void UIBox::DrawAllUIElements()
 		{
 			if (!elem->Parent)
 			{
-				elem->DrawThisAndChildren(false);
-			}
-		}
-		glViewport(0, 0, (size_t)Graphics::WindowResolution.X * 2, (size_t)Graphics::WindowResolution.Y * 2);
-		UI::CurrentUIDepth = 0;
-		glBindFramebuffer(GL_FRAMEBUFFER, UI::HighResUIBuffer);
-		glClearColor(0, 0, 0, 0);
-		glClear(GL_COLOR_BUFFER_BIT);
-		for (UIBox* elem : UI::UIElements)
-		{
-			if (!elem->Parent)
-			{
-				elem->DrawThisAndChildren(true);
+				elem->DrawThisAndChildren();
 			}
 		}
 		glClearColor(0, 0, 0, 1);
@@ -628,7 +567,7 @@ void UIBox::DrawAllUIElements()
 	}
 }
 
-void UIBox::DrawThisAndChildren(bool HighResMode)
+void UIBox::DrawThisAndChildren()
 {
 	for (auto c : Children)
 	{
@@ -636,14 +575,11 @@ void UIBox::DrawThisAndChildren(bool HighResMode)
 	}
 	if (IsVisible)
 	{
-		if (HighResMode == GetRenderHighResMode())
-		{
-			Draw();
-		}
+		Draw();
 		UI::CurrentUIDepth += 0.1f;
 		for (auto c : Children)
 		{
-			c->DrawThisAndChildren(HighResMode);
+			c->DrawThisAndChildren();
 		}
 	}
 }

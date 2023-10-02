@@ -63,7 +63,6 @@ public:
 	static void ForceUpdateUI();
 	static void InitUI();
 	static unsigned int* GetUITextures();
-	static unsigned int* GetHighResUITextures();
 	static void RedrawUI();
 	static void ClearUI();
 	bool IsHovered();
@@ -74,7 +73,6 @@ public:
 	bool HasMouseCollision = false;
 
 protected:
-	virtual bool GetRenderHighResMode();
 	bool ShouldBeTicked = true;
 	bool TryFill = false;
 	virtual void Update();
@@ -103,7 +101,7 @@ protected:
 	void UpdateScale();
 	void UpdatePosition();
 private:
-	void DrawThisAndChildren(bool HighResMode);
+	void DrawThisAndChildren();
 	bool ChildrenHorizontal = true;
 	bool PrevIsVisible = true;
 };

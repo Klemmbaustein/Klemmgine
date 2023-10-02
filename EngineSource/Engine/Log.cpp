@@ -32,7 +32,6 @@ namespace Log
 		{
 			Messages.push_back(Message(Text, Color));
 		}
-		OS::SetConsoleColor(OS::ConsoleColor::Gray);
 		OS::ConsoleColor NearestColor = OS::ConsoleColor::White;
 		float NearestValue = 15;
 		for (const auto& c : ConsoleColors)
@@ -44,7 +43,9 @@ namespace Log
 				NearestValue = Difference;
 			}
 		}
+		OS::SetConsoleColor(OS::ConsoleColor::Gray);
 		std::cout << "Log: ";
+		std::fflush(stdout);
 		OS::SetConsoleColor(NearestColor);
 		std::cout << Text << std::endl;
 		OS::SetConsoleColor(OS::ConsoleColor::Gray);

@@ -12,10 +12,9 @@
 void LogUI::UpdateLogBoxSize()
 {
 	LogPrompt->SetColor(UIColors[1] * 0.5f);
-	LogPrompt->SetTryFill(true);
 	LogScrollBox->SetMinSize((Scale - Vector2(0.2f, 0.1f)).Clamp(Vector2(0.7f, 0.1f), Vector2(1.4f, 1.0f)));
 	LogScrollBox->SetMaxSize((Scale - Vector2(0.2f, 0.1f)).Clamp(Vector2(0.7f, 0.1f), Vector2(1.4f, 1.0f)));
-
+	LogPrompt->SetMinSize(Vector2(LogScrollBox->GetMinSize().X, 0));
 }
 
 LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(UIColors, Position, Scale, Vector2(0.8f, 0.35f), Vector2(2, 0.6f))
@@ -80,7 +79,7 @@ void LogUI::Tick()
 			{
 				Text.append(" (x" + std::to_string(Log::Messages[i].Amount + 1) + ")");
 			}
-			LogTexts.push_back((new UIText(0.425f, Log::Messages[i].Color, Text, Editor::CurrentUI->EngineUIText)));
+			LogTexts.push_back((new UIText(0.38f, Log::Messages[i].Color, Text, Editor::CurrentUI->EngineUIText)));
 			LogScrollBox->AddChild(LogTexts[LogTexts.size() - 1]
 				->SetPadding(-0.003f));
 		}

@@ -23,6 +23,8 @@ namespace OS
 
 	size_t GetMemUsage();
 
+	std::wstring Utf8ToWstring(std::string utf8);
+
 	void SetConsoleCanBeHidden(bool ConsoleCanBeHidden);
 	void SetConsoleWindowVisible(bool Visible);
 	std::string ShowOpenFileDialog();

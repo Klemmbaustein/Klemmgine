@@ -16,7 +16,6 @@ class UIBackground : public UIBox
 	bool UseTexture = false;
 	unsigned int TextureID = 0;
 	float Opacity = 1;
-	virtual bool GetRenderHighResMode() override;
 public:
 	UIBackground* SetOpacity(float NewOpacity);
 	float GetOpacity();

@@ -147,12 +147,6 @@ void UIButton::Tick()
 	}
 }
 
-bool UIButton::GetRenderHighResMode()
-{
-	return UseTexture;
-}
-
-
 bool UIButton::GetUseTexture()
 {
 	return UseTexture;

@@ -56,11 +56,6 @@ void UIBackground::MakeGLBuffers(bool InvertTextureCoordinates)
 	BoxVertexBuffer = new VertexBuffer(Vertices, {0, 1, 2, 1, 2, 3});
 }
 
-bool UIBackground::GetRenderHighResMode()
-{
-	return UseTexture;
-}
-
 UIBackground* UIBackground::SetOpacity(float NewOpacity)
 {
 	if (NewOpacity != Opacity)

@@ -319,9 +319,9 @@ void ItemBrowser::UpdateLayout()
 			ItemName = ItemName.substr(0, MAX_ITEM_NAME_LENGTH - 3).append("...");
 		}
 
-		auto ItemText = new UIText(0.35f, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
+		auto ItemText = new UIText(0.325f, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
 		ItemText->Wrap = true;
-		ItemText->WrapDistance = 0.2f;
+		ItemText->WrapDistance = 0.13f;
 		ItemText->SetTextWidthOverride(0.0f);
 		NewBackground->AddChild(ItemText
 			->SetPadding(0.002f));

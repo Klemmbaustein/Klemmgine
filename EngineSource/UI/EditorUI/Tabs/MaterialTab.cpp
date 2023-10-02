@@ -219,10 +219,10 @@ void MaterialTab::GenerateUI()
 			->SetPadding(0.005f)
 			->SetAlign(UIBox::Align::Reverse)
 			->AddChild((new UIText(0.5f, UIColors[2], i.UniformName, Renderer))
-				->SetWrapEnabled(true, 0.6f, UIBox::SizeMode::ScreenRelative)
+				->SetWrapEnabled(true, 0.4f, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0.005f))
 			->AddChild((new UIText(0.4f, Vector3::Lerp(UIColors[2], 0.5f, 0.25f), Description, Renderer))
-				->SetWrapEnabled(true, 0.8f, UIBox::SizeMode::ScreenRelative)
+				->SetWrapEnabled(true, 0.5f, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0.005f)));
 
 		UIBox* NewField = nullptr;

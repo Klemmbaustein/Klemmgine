@@ -34,19 +34,28 @@ class TextRenderer
 {
 	friend class DrawableText;
 private:
-	void* cdatapointer;
 	unsigned int fontTexture;
 	unsigned int fontVao;
 	unsigned int fontVertexBufferId;
+	float CharacterSize = 0;
 	FontVertex* fontVertexBufferData = 0;
 	uint32_t fontVertexBufferCapacity;
 public:
-	std::string Filename; float CharacterSizeInPixels;
-	size_t GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale, Vector2& LetterOutLocation);
-	TextRenderer(std::string filename = "Font.ttf", float CharacterSizeInPixels = 150);
+	struct Glyph
+	{
+		Vector2 Size;
+		Vector2 Offset;
+		Vector2 TotalSize;
+		Vector2 TexCoordStart;
+		Vector2 TexCoordOffset;
+	};
+	std::vector<Glyph> LoadedGlyphs;
+
+	std::string Filename;
+	size_t GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale);
+	TextRenderer(std::string filename = "Font.ttf");
 	Vector2 GetTextSize(ColoredText Text, float Scale, bool Wrapped, float LengthBeforeWrap);
 	DrawableText* MakeText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap);
-	void Reinit();
 	~TextRenderer();
 
 };

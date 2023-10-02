@@ -605,10 +605,6 @@ void DrawPostProcessing()
 	Application::UIMergeEffect->EffectShader->Bind();
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, UIBox::GetUITextures()[1]);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, UIBox::GetHighResUITextures()[0]);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, UIBox::GetHighResUITextures()[1]);
 	Application::UIMergeEffect->EffectShader->SetInt("u_alpha", 1);
 	Application::UIMergeEffect->EffectShader->SetInt("u_hr", 2);
 	Application::UIMergeEffect->EffectShader->SetInt("u_hrAlpha", 3);

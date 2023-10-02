@@ -34,8 +34,8 @@ void PreferenceTab::GenerateUI()
 				->SetPadding(0.01f)));
 	}
 
-	SettingsBox->SetMinSize(Vector2(1.2f, TabBackground->GetUsedSize().Y - 0.2f));
-	SettingsBox->SetMaxSize(Vector2(1.2f, TabBackground->GetUsedSize().Y - 0.2f));
+	SettingsBox->SetMinSize(Vector2(1.0f, TabBackground->GetUsedSize().Y - 0.2f));
+	SettingsBox->SetMaxSize(Vector2(1.0f, TabBackground->GetUsedSize().Y - 0.2f));
 	SettingsCategoryBox->SetMinSize(Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
 	SettingsCategoryBox->SetMaxSize(Vector2(2, TabBackground->GetUsedSize().Y - 0.2f));
 	SettingsCategoryBox->SetColor(UIColors[0] * 1.2f);

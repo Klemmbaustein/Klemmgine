@@ -107,7 +107,7 @@ int main(int argc, char** argv)
 		CSProject.Path = "Scripts";
 		CSProject.GUID = CsGUID;
 		CSProject.Type = "csproj";
-		CppProject.Dependencies.push_back(CsGUID);
+		Projects[0].Dependencies.push_back(CsGUID);
 		Projects.push_back(CSProject);
 	}
 
@@ -127,7 +127,7 @@ int main(int argc, char** argv)
 		EngineFolder.Dependencies = { EngineProject.GUID };
 		EngineFolder.Type = "folder";
 		Projects.push_back(EngineFolder);
-		CppProject.Dependencies.push_back(EngineProject.GUID);
+		Projects[0].Dependencies.push_back(EngineProject.GUID);
 	}
 	std::string ShaderGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Shaders", "Shaders", "10.0", "v143", false);
 #if 1
@@ -138,6 +138,7 @@ int main(int argc, char** argv)
 	ShaderProject.Type = "vcxproj";
 	Projects.push_back(ShaderProject);
 #endif
+
 	std::cout << "- Writing solution" << std::endl;
 	SLN::WriteSolution("Games/" + ProjectName, ProjectName, Projects);
 	std::cout << "- Finished writing solution: Games/" << ProjectName << "/" << ProjectName << ".sln" << std::endl;
