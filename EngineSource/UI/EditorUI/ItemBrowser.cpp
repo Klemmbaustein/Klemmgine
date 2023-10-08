@@ -19,6 +19,7 @@
 #include <Engine/Importers/ModelConverter.h>
 #include <UI/EditorUI/Popups/RenameBox.h>
 #include <Engine/File/Assets.h>
+#include <UI/EditorUI/Popups/ClassCreator.h>
 #ifdef ENGINE_CSHARP
 #include <CSharp/CSharpInterop.h>
 #include <Objects/CSharpObject.h>
@@ -223,8 +224,8 @@ void ItemBrowser::UpdateLayout()
 
 	ContentBox->AddChild((new UIButton(true, 0, Vector3(0.2f, 0.7f, 0), this, -1))
 		->SetBorder(UIBox::BorderType::Rounded, 0.25f)
-		->SetPadding(0.02f, 0.02f, Scale.X / 2.0f - 0.0575f, 0.02f)
-		->AddChild((new UIText(0.5f, 0, "Import", Editor::CurrentUI->EngineUIText))));
+		->SetPadding(0.02f, 0.02f, Scale.X / 2.0f - 0.04f, 0.02f)
+		->AddChild((new UIText(0.4f, 0, SelectedTab ? "Create" : "Import", Editor::CurrentUI->EngineUIText))));
 
 	ScanForAssets();
 	Buttons.clear();
@@ -556,18 +557,25 @@ void ItemBrowser::OnButtonClicked(int Index)
 	}
 	if (Index == -1)
 	{
-		std::string file = OS::ShowOpenFileDialog();
-		if (std::filesystem::exists(file))
+		if (SelectedTab)
 		{
-			if (Editor::ModelFileExtensions.contains(FileUtil::GetExtension(file)))
+			new ClassCreator();
+		}
+		else
+		{
+			std::string file = OS::ShowOpenFileDialog();
+			if (std::filesystem::exists(file))
 			{
-				ModelImporter::Import(file, Editor::CurrentUI->CurrentPath);
+				if (Editor::ModelFileExtensions.contains(FileUtil::GetExtension(file)))
+				{
+					ModelImporter::Import(file, Editor::CurrentUI->CurrentPath);
+				}
+				else
+				{
+					Importer::Import(file, Editor::CurrentUI->CurrentPath);
+				}
+				UpdateLayout();
 			}
-			else
-			{
-				Importer::Import(file, Editor::CurrentUI->CurrentPath);
-			}
-			UpdateLayout();
 		}
 		return;
 	}

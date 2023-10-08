@@ -15,6 +15,8 @@ class DebugUI : public UICanvas
 
 	bool ConsoleReadInput(int Key);
 
+	int LastLogMessageAmount = 0;
+
 	UIBackground* LogBackground = nullptr;
 public:
 	static DebugUI* CurrentDebugUI;

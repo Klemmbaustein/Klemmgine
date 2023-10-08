@@ -717,10 +717,6 @@ void ApplicationLoop()
 	WorldObject::DestroyMarkedObjects();
 	TickObjects();
 	float LogicTime = LogicTimer.TimeSinceCreation();
-	if (Graphics::MainFramebuffer)
-	{
-		Graphics::MainCamera = Graphics::MainFramebuffer->FramebufferCamera;
-	}
 	const Application::Timer RenderTimer;
 	Debugging::EngineStatus = "Rendering (Framebuffer)";
 	for (FramebufferObject* Buffer : Graphics::AllFramebuffers)

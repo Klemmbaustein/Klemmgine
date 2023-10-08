@@ -94,6 +94,7 @@
     <ClCompile Include="UI\EditorUI\MaterialFunctions.cpp" />
     <ClCompile Include="UI\EditorUI\ObjectList.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\BakeMenu.cpp" />
+    <ClCompile Include="UI\EditorUI\Popups\ClassCreator.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\ColorPicker.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\DialogBox.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\RenameBox.cpp" />
@@ -198,6 +199,7 @@
     <ClInclude Include="UI\EditorUI\MaterialFunctions.h" />
     <ClInclude Include="UI\EditorUI\ObjectList.h" />
     <ClInclude Include="UI\EditorUI\Popups\BakeMenu.h" />
+    <ClInclude Include="UI\EditorUI\Popups\ClassCreator.h" />
     <ClInclude Include="UI\EditorUI\Popups\ColorPicker.h" />
     <ClInclude Include="UI\EditorUI\Popups\DialogBox.h" />
     <ClInclude Include="UI\EditorUI\Popups\RenameBox.h" />

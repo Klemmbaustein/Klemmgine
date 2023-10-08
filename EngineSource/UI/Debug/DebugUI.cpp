@@ -86,8 +86,13 @@ void DebugUI::Tick()
 
 	LogPrompt->IsVisible = LogPrompt->GetIsEdited();
 	LogBackground->IsVisible = LogPrompt->GetIsEdited();
-	if (Log::Messages.size() != LogLength)
+	// TODO: Check for changes in the amount of the last log message
+	if (Log::Messages.size() != LogLength || (!Log::Messages.empty() && LastLogMessageAmount != Log::Messages[Log::Messages.size() - 1].Amount))
 	{
+		if (!Log::Messages.empty())
+		{
+			LastLogMessageAmount = Log::Messages[Log::Messages.size() - 1].Amount;
+		}
 		LogLength = Log::Messages.size();
 		GenerateLog();
 	}
@@ -114,7 +119,7 @@ void DebugUI::GenerateLog()
 {
 	LogBackground->DeleteChildren();
 
-	for (int64_t i = Log::Messages.size() - 1; i > std::max(0ll, (int64_t)Log::Messages.size() - 21); i--)
+	for (int64_t i = Log::Messages.size() - 1; i >= std::max(0ll, (int64_t)Log::Messages.size() - 21); i--)
 	{
 		std::string str = Log::Messages[i].Text;
 		if (Log::Messages[i].Amount >= 1)

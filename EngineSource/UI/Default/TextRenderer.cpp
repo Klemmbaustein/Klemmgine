@@ -197,7 +197,7 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 	Scale *= 2.5f;
 	FontVertex* vData = fontVertexBufferData;
 	float x = 0.f, y = CharacterSize;
-	Uint32 numVertices = 0;
+	float MaxX = 0.0f;
 	size_t Wraps = 0;
 	for (auto& seg : Text)
 	{
@@ -206,7 +206,6 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 		Uint32 LastWordNumVertices = 0;
 		std::wstring UTFString = OS::Utf8ToWstring(seg.Text);
 
-		FontVertex* LastWordVDataPtr = nullptr;
 		for (size_t i = 0; i < UTFString.size(); i++)
 		{
 			// TODO: Correct handling of tabs like in the standalone ui library
@@ -227,12 +226,11 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 			if (UTFString[i] == ' ')
 			{
 				LastWordIndex = i;
-				LastWordNumVertices = numVertices;
-				LastWordVDataPtr = vData;
 			}
 
+			MaxX = std::max(x, MaxX);
+
 			vData += 6;
-			numVertices += 6;
 			if (x * Scale / 450 > LengthBeforeWrap && Wrapped)
 			{
 				Wraps++;
@@ -240,9 +238,59 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 				{
 					i = LastWordIndex;
 					LastWrapIndex = i;
-					vData = LastWordVDataPtr;
-					numVertices = LastWordNumVertices;
 				}
+				x = 0;
+				y += CharacterSize;
+			}
+		}
+	}
+	return (Vector2(MaxX / Graphics::AspectRatio / 450, y / 450 * 5)) * Scale;
+}
+
+Vector2 TextRenderer::GetLetterPosition(ColoredText Text, float Scale, bool Wrapped, float LengthBeforeWrap)
+{
+	float originalScale = Scale;
+	Scale *= 2.5f;
+	float x = 0.f, y = CharacterSize;
+	size_t Wraps = 0;
+	for (auto& seg : Text)
+	{
+		size_t LastWordIndex = SIZE_MAX;
+		size_t LastWrapIndex = 0;
+		Uint32 LastWordNumVertices = 0;
+		std::wstring UTFString = OS::Utf8ToWstring(seg.Text);
+
+		for (size_t i = 0; i < UTFString.size(); i++)
+		{
+			// TODO: Correct handling of tabs like in the standalone ui library
+			//for (int txIt = 0; txIt < (IsTab ? 4 : 1); txIt++)
+			{
+				int GlyphIndex = (int)UTFString[i] - 32;
+				if (GlyphIndex < 0)
+				{
+					continue;
+				}
+				if (GlyphIndex > FONT_MAX_UNICODE_CHARS)
+				{
+					GlyphIndex = FONT_MAX_UNICODE_CHARS - 31;
+				}
+				Glyph g = LoadedGlyphs[GlyphIndex];
+				x += g.TotalSize.X;
+			}
+			if (UTFString[i] == ' ')
+			{
+				LastWordIndex = i;
+			}
+
+			if (x * Scale / 450 > LengthBeforeWrap && Wrapped)
+			{
+				Wraps++;
+				if (LastWordIndex != SIZE_MAX && LastWordIndex != LastWrapIndex)
+				{
+					i = LastWordIndex;
+					LastWrapIndex = i;
+				}
+				std::cout << x << std::endl;
 				x = 0;
 				y += CharacterSize;
 			}

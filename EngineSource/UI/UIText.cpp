@@ -93,11 +93,11 @@ void UIText::SetText(ColoredText NewText)
 			{
 				WrapDistance /= Graphics::AspectRatio;
 			}
-			/*Vector2 s = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, Distance)
-				/ (15.0f * 60.f);
+			Vector2 s = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, Distance)
+				/ (15.0f * 60.0f);
 
 			if (s.X < WrapDistance)
-			*/{
+			{
 				Update();
 				RedrawUI();
 				return;
@@ -141,8 +141,13 @@ UIText::~UIText()
 
 Vector2 UIText::GetLetterLocation(size_t Index)
 {
+	float Distance = WrapDistance;
+	if (WrapSizeMode == SizeMode::PixelRelative)
+	{
+		WrapDistance /= Graphics::AspectRatio;
+	}
 	std::string Text = TextSegment::CombineToString(RenderedText);
-	return Vector2(Renderer->GetTextSize({ TextSegment(Text.substr(0, Index), 1) }, TextSize * 2, false, 999999).X, 0) + OffsetPosition;
+	return Vector2(Renderer->GetLetterPosition({ TextSegment(Text.substr(0, Index), 1) }, TextSize * 2, Wrap, WrapDistance).X, 0) + OffsetPosition;
 }
 
 void UIText::Draw()

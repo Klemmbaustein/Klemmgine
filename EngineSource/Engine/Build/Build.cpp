@@ -88,7 +88,8 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			Debugging::EngineStatus = "Build: Copying assets";
 			Log::Print("[Build]: Copying assets");
 			const auto copyOptions = std::filesystem::copy_options::recursive;
-			std::filesystem::copy("Content", TargetFolder + "/Assets/Content", copyOptions);
+			std::cout << std::filesystem::current_path() << std::endl;
+			std::filesystem::copy("Content/", TargetFolder + "Assets/Content", copyOptions);
 			std::filesystem::copy("Fonts", TargetFolder + "Assets/");
 			Debugging::EngineStatus = "Building C++ solution";
 #if _WIN32
@@ -160,7 +161,10 @@ int Build::BuildCurrentSolution(std::string Configuration)
 
 	Log::Print("[Build]: Running command: " + Command + " (This can take a while)", Vector3(0.5));
 	int ret = system(Command.c_str());
-	Log::Print("[Build]: Built project for configuration: " + Configuration, Log::LogColor::Green);
+	if (ret)
+	{
+		Log::Print("[Build]: Built project for configuration: " + Configuration, Log::LogColor::Green);
+	}
 	return ret;
 }
 #endif

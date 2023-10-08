@@ -8,9 +8,9 @@ namespace Console
 	// Initialized default ConVars and Commands
 	void InitializeConsole();
 
-	// Executes the given command string. If verbose, additional info will be displayed.
+	// Executes the given command string.
 	// This function will return true if the command string was evaluated successfully. Otherwise it will return false.
-	bool ExecuteConsoleCommand(std::string Command, bool Verbose = false);
+	bool ExecuteConsoleCommand(std::string Command);
 
 	// ConVar struct.
 	struct Variable

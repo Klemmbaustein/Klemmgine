@@ -136,7 +136,7 @@ namespace NativeFunctions
 
 	bool CallConsoleCommand(const char* cmd)
 	{
-		return Console::ExecuteConsoleCommand(cmd, true);
+		return Console::ExecuteConsoleCommand(cmd);
 	}
 
 	Transform GetObjectTransform(WorldObject* TargetObject)

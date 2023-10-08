@@ -65,7 +65,7 @@ void UITextField::Tick()
 
 	if (Size.X != 0)
 	{
-		TextObject->WrapDistance = std::max(Size.X * 2, 0.1f);
+		TextObject->WrapDistance = std::max(Size.X * 1.5f, 0.1f);
 	}
 	else
 	{
@@ -256,7 +256,7 @@ UITextField::UITextField(bool Horizontal, Vector2 Position, Vector3 Color, UICan
 	this->ParentUI = UI;
 	this->Color = Color;
 	TextObject = new UIText(0, Vector3(1), HintText, Renderer);
-	TextObject->SetTextSize(0.5f);
+	TextObject->SetTextSize(0.4f);
 	TextObject->SetPadding(0.005f);
 	SetHorizontal(false);
 	SetAlign(UIBox::Align::Reverse);

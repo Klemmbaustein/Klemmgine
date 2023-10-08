@@ -348,10 +348,13 @@ void Console::ConsoleLog(std::string Message, ConsoleLogType Severity)
 	Log::Print("[Console]: " + Message, (std::vector<Vector3>{ Log::LogColor::White, Log::LogColor::Yellow, Log::LogColor::Red })[Severity]);
 }
 
-bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
+bool Console::ExecuteConsoleCommand(std::string Command)
 {
 	std::vector<std::string> CommandVec = SeperateToStringArray(Command);
-	if (!CommandVec.size()) return false;
+	if (!CommandVec.size())
+	{
+		return false;
+	}
 
 	if (CommandVec.size() == 1 && ConVars.contains(CommandVec[0]))
 	{
@@ -440,6 +443,7 @@ bool Console::ExecuteConsoleCommand(std::string Command, bool Verbose)
 	// Check if the first part of the command is a registered command
 	if (Commands.contains(CommandVec[0]))
 	{
+		// If any part of the command arguments is a convar, we replace it with it's value
 		for (auto& i : CommandVec)
 		{
 			if (!ConVars.contains(i))

@@ -22,7 +22,8 @@ int main(int argc, char** argv)
 		std::pair("projectName", ""),
 		std::pair("includeEngine", "true"),
 		std::pair("includeCsharp", "true"),
-		std::pair("upgrade", "false")
+		std::pair("upgrade", "false"),
+		std::pair("onlyBuildFiles", "false")
 	};
 
 	std::string CurrentArg = "";
@@ -30,6 +31,18 @@ int main(int argc, char** argv)
 	{
 		if (argv[i][0] == '-')
 		{
+			if (!CurrentArg.empty())
+			{
+				auto Arg = LaunchArgs.find(CurrentArg);
+				if (Arg != LaunchArgs.end())
+				{
+					Arg->second = "true";
+				}
+				else
+				{
+					std::cout << "Unknown argument: " << CurrentArg << std::endl;
+				}
+			}
 			CurrentArg = std::string(argv[i] + 1);
 		}
 		else if (CurrentArg.size())
@@ -43,6 +56,19 @@ int main(int argc, char** argv)
 			{
 				std::cout << "Unknown argument: " << CurrentArg << std::endl;
 			}
+			CurrentArg.clear();
+		}
+	}
+	if (!CurrentArg.empty())
+	{
+		auto Arg = LaunchArgs.find(CurrentArg);
+		if (Arg != LaunchArgs.end())
+		{
+			Arg->second = "true";
+		}
+		else
+		{
+			std::cout << "Unknown argument: " << CurrentArg << std::endl;
 		}
 	}
 
@@ -54,34 +80,36 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
-	if (std::filesystem::exists("Games/" + ProjectName) && LaunchArgs["upgrade"] == "false")
+	if (LaunchArgs["onlyBuildFiles"] == "false")
 	{
-		std::cout << "Warning: Games/" << ProjectName << " already exists. Replacing..." << std::endl;
-		std::filesystem::remove_all("Games/" + ProjectName);
-	}
-	else
-	{
-		if (std::filesystem::exists("Games/" + ProjectName + "/.vs"))
+		if (std::filesystem::exists("Games/" + ProjectName) && LaunchArgs["upgrade"] == "false")
 		{
-			std::filesystem::remove_all("Games/" + ProjectName + "/.vs");
+			std::cout << "Warning: Games/" << ProjectName << " already exists. Replacing..." << std::endl;
+			std::filesystem::remove_all("Games/" + ProjectName);
 		}
-		std::cout << "Upgrading project files of " << ProjectName << std::endl;
-	}
-
-	std::cout << "Copying project files" << std::endl;
-	std::filesystem::create_directories("Games/" + ProjectName + "/Code/Objects");
-	std::filesystem::copy("Tools/ProjectGenerator/DefaultProjectFiles", "Games/" + ProjectName,
-		std::filesystem::copy_options::recursive
-		| std::filesystem::copy_options::overwrite_existing);
-
-	for (auto& i : DependenyDlls)
-	{
-		if (!std::filesystem::exists(i))
+		else
 		{
-			std::cout << "Could not find " << i << ". Ensure you have the project setup correctly." << std::endl;
-			exit(1);
+			if (std::filesystem::exists("Games/" + ProjectName + "/.vs"))
+			{
+				std::filesystem::remove_all("Games/" + ProjectName + "/.vs");
+			}
+			std::cout << "Upgrading project files of " << ProjectName << std::endl;
 		}
-		std::filesystem::copy(i, "Games/" + ProjectName, std::filesystem::copy_options::overwrite_existing);
+
+		std::cout << "Copying project files" << std::endl;
+		std::filesystem::create_directories("Games/" + ProjectName + "/Code/Objects");
+		std::filesystem::copy("Tools/ProjectGenerator/DefaultProjectFiles", "Games/" + ProjectName,
+			std::filesystem::copy_options::recursive
+			| std::filesystem::copy_options::overwrite_existing);
+		for (auto& i : DependenyDlls)
+		{
+			if (!std::filesystem::exists(i))
+			{
+				std::cout << "Could not find " << i << ". Ensure you have the project setup correctly." << std::endl;
+				exit(1);
+			}
+			std::filesystem::copy(i, "Games/" + ProjectName, std::filesystem::copy_options::overwrite_existing);
+		}
 	}
 
 	std::string CppGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Code", ProjectName, "10.0", "v143", true);
@@ -139,8 +167,10 @@ int main(int argc, char** argv)
 	Projects.push_back(ShaderProject);
 #endif
 
-	std::cout << "- Writing solution" << std::endl;
-	SLN::WriteSolution("Games/" + ProjectName, ProjectName, Projects);
-	std::cout << "- Finished writing solution: Games/" << ProjectName << "/" << ProjectName << ".sln" << std::endl;
-	
+	if (LaunchArgs["onlyBuildFiles"] == "false")
+	{
+		std::cout << "- Writing solution" << std::endl;
+		SLN::WriteSolution("Games/" + ProjectName, ProjectName, Projects);
+		std::cout << "- Finished writing solution: Games/" << ProjectName << "/" << ProjectName << ".sln" << std::endl;
+	}
 }
