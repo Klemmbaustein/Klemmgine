@@ -420,19 +420,19 @@ void Viewport::Tick()
 }
 void Viewport::UpdateTabBar()
 {
-	TabBox->SetPosition(Position + Vector2(0, Scale.Y - 0.05f));
-	TabBox->SetMinSize(Vector2(Scale.X, 0.05f));
-	TabBox->SetMaxSize(Vector2(Scale.X, 0.05f));
+	TabBox->SetPosition(Position + Vector2(0, Scale.Y - 0.045f));
+	TabBox->SetMinSize(Vector2(Scale.X, 0.045f));
+	TabBox->SetMaxSize(Vector2(Scale.X, 0.045f));
 	TabTexts.clear();
 	TabBox->DeleteChildren();
 	for (size_t i = 0; i < Tabs.size(); i++)
 	{
-		auto NewText = new UIText(0.45f, UIColors[2], FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText);
+		auto NewText = new UIText(0.4f, UIColors[2], FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText);
 		TabTexts.push_back(NewText);
 		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 3 : 1.5f), this, (int)i * 2))
-			->SetBorder(UIBox::BorderType::Rounded, 0.4f)
+			->SetBorder(UIBox::BorderType::Rounded, 0.25f)
 			->SetPadding(0, 0, 0, 0.02f)
-			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01f, 0.05f)))
+			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01f, 0.045f)))
 				->SetPadding(0))
 			->AddChild(NewText
 				->SetPadding(0.005f, 0.005f, 0.005f, 0.005f));
@@ -441,7 +441,7 @@ void Viewport::UpdateTabBar()
 		{
 			elem->AddChild((new UIButton(true, 0, UIColors[2], this, (int)i * 2 + 1))
 				->SetUseTexture(true, Editor::CurrentUI->Textures[4])
-				->SetMinSize(0.04f)
+				->SetMinSize(0.035f)
 				->SetPadding(0.005f)
 				->SetSizeMode(UIBox::SizeMode::PixelRelative));
 		}

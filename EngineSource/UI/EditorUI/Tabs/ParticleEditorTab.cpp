@@ -13,6 +13,10 @@
 #include <UI/UIScrollBox.h>
 #include <Rendering/Mesh/Mesh.h>
 
+/*
+* TODO: Rewrite - This code is bad.
+* The current UI is bad and very ugly.
+*/
 void ParticleEditorTab::UpdateLayout()
 {
 	ParticleViewport->SetPosition(TabBackground->GetPosition());

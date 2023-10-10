@@ -16,6 +16,11 @@
 #include <cmath>
 #include <Rendering/Mesh/Model.h>
 
+/*
+* TODO: Rewrite:
+* The current UI for this is very ugly.
+*/
+
 void MaterialTab::OnButtonClicked(int Index)
 {
 	if (!TabBackground->IsVisible)

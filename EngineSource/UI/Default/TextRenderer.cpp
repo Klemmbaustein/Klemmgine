@@ -15,6 +15,8 @@
 #include <Engine/EngineError.h>
 #include <Engine/OS.h>
 
+// TODO: Correct handling of tabs like in the standalone ui library
+
 namespace _TextRenderer
 {
 	std::vector<TextRenderer*> Renderers;
@@ -208,7 +210,6 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 
 		for (size_t i = 0; i < UTFString.size(); i++)
 		{
-			// TODO: Correct handling of tabs like in the standalone ui library
 			//for (int txIt = 0; txIt < (IsTab ? 4 : 1); txIt++)
 			{
 				int GlyphIndex = (int)UTFString[i] - 32;
@@ -262,7 +263,6 @@ Vector2 TextRenderer::GetLetterPosition(ColoredText Text, float Scale, bool Wrap
 
 		for (size_t i = 0; i < UTFString.size(); i++)
 		{
-			// TODO: Correct handling of tabs like in the standalone ui library
 			//for (int txIt = 0; txIt < (IsTab ? 4 : 1); txIt++)
 			{
 				int GlyphIndex = (int)UTFString[i] - 32;

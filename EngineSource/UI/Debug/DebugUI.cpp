@@ -86,7 +86,6 @@ void DebugUI::Tick()
 
 	LogPrompt->IsVisible = LogPrompt->GetIsEdited();
 	LogBackground->IsVisible = LogPrompt->GetIsEdited();
-	// TODO: Check for changes in the amount of the last log message
 	if (Log::Messages.size() != LogLength || (!Log::Messages.empty() && LastLogMessageAmount != Log::Messages[Log::Messages.size() - 1].Amount))
 	{
 		if (!Log::Messages.empty())

@@ -551,7 +551,7 @@ void PollInput()
 				!(SDL_GetModState() & KMOD_CTRL &&
 					(Event.text.text[0] == 'c' || Event.text.text[0] == 'C' || Event.text.text[0] == 'v' || Event.text.text[0] == 'V')))
 			{
-				if (Event.text.text[0] >= 32 && Event.text.text[0] <= 128)
+				if (Event.text.text[0] >= 32)
 				{
 					if (TextInput::Text.size() < TextInput::TextIndex)
 					{
