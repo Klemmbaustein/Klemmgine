@@ -91,7 +91,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		}
 	}
 
-	Project.AddTag("DefaultTargets", Name)
+	Project.AddTag("DefaultTargets", "Build")
 		.AddTag("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
 
 	XML ProjectConfigGroup = XML("ItemGroup")
