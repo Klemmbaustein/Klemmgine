@@ -22,7 +22,6 @@ cppinfo.txt
 CSharpCore/obj
 CSharpCore/Build
 *.lastcodeanalysissucceeded
-CSharpCore/NetRuntime
 /EngineRelease
 /EditorContent/Config/EditorPrefs.pref
 /lib

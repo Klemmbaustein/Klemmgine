@@ -215,7 +215,7 @@ void WriteCSProj(std::string Name)
 	std::ofstream out = std::ofstream(Name);
 	out << "<Project Sdk=\"Microsoft.NET.Sdk\">\n\
 	<PropertyGroup>\n\
-		<TargetFramework>net6.0</TargetFramework>\n\
+		<TargetFramework>net7.0</TargetFramework>\n\
 		<EnableDynamicLoading>true</EnableDynamicLoading>\n\
 	</PropertyGroup>\n\
 	<PropertyGroup>\n\
