@@ -125,11 +125,7 @@ void UIButton::Tick()
 			if (!NeedsToBeSelected || IsSelected)
 #endif
 			{
-				if (ParentUI) Application::ButtonEvents.insert(ButtonEvent(nullptr, ParentUI, ButtonIndex));
-				if (Parent || ParentOverride)
-				{
-					Application::ButtonEvents.insert(ButtonEvent(ParentOverride ? ParentOverride : Parent, nullptr, ButtonIndex));
-				}
+				OnClicked();
 				IsPressed = false;
 				IsSelected = false;
 				RedrawUI();
@@ -264,4 +260,16 @@ void UIButton::Draw()
 	glDrawBuffers(2, attachments);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	ButtonVertexBuffer->Unbind();
+}
+
+void UIButton::OnClicked()
+{
+	if (ParentUI)
+	{
+		Application::ButtonEvents.insert(ButtonEvent(nullptr, ParentUI, ButtonIndex));
+	}
+	if (Parent || ParentOverride)
+	{
+		Application::ButtonEvents.insert(ButtonEvent(ParentOverride ? ParentOverride : Parent, nullptr, ButtonIndex));
+	}
 }

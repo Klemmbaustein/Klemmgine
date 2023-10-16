@@ -25,6 +25,7 @@
 #include <CSharp/CSharpInterop.h>
 #include <Rendering/Utility/BakedLighting.h>
 #include <Engine/File/Assets.h>
+#include <UI/UIDropdown.h>
 
 namespace Editor
 {
@@ -91,7 +92,8 @@ void EditorUI::LaunchInEditor()
 		}
 
 		if (!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll") 
-			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
+			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" })
+			&& CSharp::GetUseCSharp())
 		{
 			RebuildAndHotReload();
 		}
@@ -167,8 +169,6 @@ void EditorUI::SetLaunchCurrentScene(bool NewLaunch)
 {
 	Editor::LaunchCurrentScene = NewLaunch;
 }
-
-
 
 void EditorUI::SaveCurrentScene()
 {
@@ -277,6 +277,7 @@ void EditorUI::CreateFile(std::string Path, std::string Name, std::string Ext)
 
 EditorUI::EditorUI()
 {
+
 	Editor::CurrentUI = this;
 
 	GenUITextures();

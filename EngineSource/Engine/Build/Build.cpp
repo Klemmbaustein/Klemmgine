@@ -88,9 +88,12 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			Debugging::EngineStatus = "Build: Copying assets";
 			Log::Print("[Build]: Copying assets");
 			const auto copyOptions = std::filesystem::copy_options::recursive;
-			std::cout << std::filesystem::current_path() << std::endl;
 			std::filesystem::copy("Content/", TargetFolder + "Assets/Content", copyOptions);
 			std::filesystem::copy("Fonts", TargetFolder + "Assets/");
+			if (std::filesystem::exists("Locale"))
+			{
+				std::filesystem::copy("Locale", TargetFolder + "Assets/Locale");
+			}
 			Debugging::EngineStatus = "Building C++ solution";
 #if _WIN32
 

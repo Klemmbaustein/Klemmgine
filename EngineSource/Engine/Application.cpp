@@ -419,7 +419,7 @@ void PollInput()
 		if (Event.type == SDL_QUIT)
 		{
 #if EDITOR
-			Application::EditorUserInterface->OnLeave(Application::Quit);
+			Editor::CurrentUI->OnLeave(Application::Quit);
 #else
 			Application::Quit();
 #endif
@@ -431,7 +431,9 @@ void PollInput()
 		else if (Event.type == SDL_KEYDOWN)
 		{
 			if (Event.key.keysym.sym < 128)
+			{
 				Input::Keys[Event.key.keysym.sym] = true;
+			}
 			else
 			{
 				int sym = Event.key.keysym.sym;
@@ -501,7 +503,9 @@ void PollInput()
 			std::vector<int> Indices;
 
 			if (Event.key.keysym.sym < 128)
+			{
 				Input::Keys[Event.key.keysym.sym] = false;
+			}
 			else
 			{
 				int sym = Event.key.keysym.sym;
@@ -575,9 +579,13 @@ void PollInput()
 						s->ScrollDown();
 				}
 				if (ScrollDistance < 0)
+				{
 					ScrollDistance++;
+				}
 				else
+				{
 					ScrollDistance--;
+				}
 			}
 		}
 	}
@@ -587,7 +595,9 @@ void PollInput()
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 	}
 	else
+	{
 		SDL_SetRelativeMouseMode(SDL_TRUE);
+	}
 }
 
 void DrawPostProcessing()

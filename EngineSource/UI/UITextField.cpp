@@ -3,7 +3,6 @@
 #include <UI/UIBackground.h>
 #include <Math/Math.h>
 #include <Engine/Input.h>
-#include <Engine/Timer.h>
 #include <Rendering/VertexBuffer.h>
 #include <GL/glew.h>
 #include <Engine/Log.h>

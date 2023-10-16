@@ -14,8 +14,9 @@ public:
 	};
 };
 
-SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolder)
+SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolder, bool ShouldSaveOnClose)
 {
+	this->ShouldSave = ShouldSaveOnClose;
 	if (InSaveFolder)
 	{
 		if (!std::filesystem::exists("Saves/"))
@@ -194,7 +195,7 @@ SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolde
 
 }
 
-SaveGame::SaveProperty SaveGame::GetProperty(std::string Name)
+SaveGame::SaveProperty SaveGame::GetProperty(std::string Name) const
 {
 	auto FoundIndex = Properties.find(Name);
 	if (FoundIndex != Properties.end())
@@ -217,7 +218,7 @@ void SaveGame::SetProperty(SaveProperty S)
 	}
 }
 
-SaveGame::SaveProperty SaveGame::GetPropertyOfType(std::string Name, Type::TypeEnum PropertyType)
+SaveGame::SaveProperty SaveGame::GetPropertyOfType(std::string Name, Type::TypeEnum PropertyType) const
 {
 	auto P = GetProperty(Name);
 	if (P.Type != PropertyType)
@@ -228,7 +229,7 @@ SaveGame::SaveProperty SaveGame::GetPropertyOfType(std::string Name, Type::TypeE
 	return P;
 }
 
-int SaveGame::GetInt(std::string Name)
+int SaveGame::GetInt(std::string Name) const
 {
 	try
 	{
@@ -240,7 +241,7 @@ int SaveGame::GetInt(std::string Name)
 	}
 }
 
-bool SaveGame::GetBool(std::string Name)
+bool SaveGame::GetBool(std::string Name) const
 {
 	try
 	{
@@ -252,7 +253,7 @@ bool SaveGame::GetBool(std::string Name)
 	}
 }
 
-std::string SaveGame::GetString(std::string Name)
+std::string SaveGame::GetString(std::string Name) const
 {
 	try
 	{
@@ -264,7 +265,7 @@ std::string SaveGame::GetString(std::string Name)
 	}
 }
 
-float SaveGame::GetFloat(std::string Name)
+float SaveGame::GetFloat(std::string Name) const
 {
 	try
 	{
@@ -277,7 +278,7 @@ float SaveGame::GetFloat(std::string Name)
 }
 
 
-Vector3 SaveGame::GetVector(std::string Name)
+Vector3 SaveGame::GetVector(std::string Name) const
 {
 	try
 	{
@@ -291,6 +292,10 @@ Vector3 SaveGame::GetVector(std::string Name)
 
 SaveGame::~SaveGame()
 {
+	if (!ShouldSave)
+	{
+		return;
+	}
 	std::ofstream OutFile = std::ofstream(OpenedSave, std::ios::out);
 	// loop through all the properties and write them to the "OpenedSave" file
 	for (const auto& p : Properties)
@@ -324,12 +329,12 @@ SaveGame::~SaveGame()
 	OutFile.close();
 }
 
-bool SaveGame::SaveGameIsNew()
+bool SaveGame::SaveGameIsNew() const
 {
 	return IsNew;
 }
 
-std::map<std::string, SaveGame::SaveProperty> SaveGame::GetProperties()
+std::map<std::string, SaveGame::SaveProperty> SaveGame::GetProperties() const
 {
 	return Properties;
 }

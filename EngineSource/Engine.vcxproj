@@ -29,11 +29,11 @@
     <ClCompile Include="Engine\Importers\ModelConverter.cpp" />
     <ClCompile Include="Engine\Input.cpp" />
     <ClCompile Include="Engine\LaunchArgs.cpp" />
+    <ClCompile Include="Engine\StrLocale.cpp" />
     <ClCompile Include="Engine\Log.cpp" />
     <ClCompile Include="Engine\OS.cpp" />
     <ClCompile Include="Engine\Scene.cpp" />
     <ClCompile Include="Engine\Stats.cpp" />
-    <ClCompile Include="Engine\Timer.cpp" />
     <ClCompile Include="Engine\Utility\FileUtility.cpp" />
     <ClCompile Include="Engine\Utility\StringUtility.cpp" />
     <ClCompile Include="Math\Collision\Collision.cpp" />
@@ -111,6 +111,7 @@
     <ClCompile Include="UI\UIBackground.cpp" />
     <ClCompile Include="UI\UIBox.cpp" />
     <ClCompile Include="UI\UIButton.cpp" />
+    <ClCompile Include="UI\UIDropdown.cpp" />
     <ClCompile Include="UI\UIScrollBox.cpp" />
     <ClCompile Include="UI\UIText.cpp" />
     <ClCompile Include="UI\UITextField.cpp" />
@@ -130,11 +131,11 @@
     <ClInclude Include="Engine\Importers\Importer.h" />
     <ClInclude Include="Engine\Importers\ModelConverter.h" />
     <ClInclude Include="Engine\Input.h" />
+    <ClInclude Include="Engine\StrLocale.h" />
     <ClInclude Include="Engine\Log.h" />
     <ClInclude Include="Engine\OS.h" />
     <ClInclude Include="Engine\Scene.h" />
     <ClInclude Include="Engine\Stats.h" />
-    <ClInclude Include="Engine\Timer.h" />
     <ClInclude Include="Engine\TypeEnun.h" />
     <ClInclude Include="Engine\Utility\FileUtility.h" />
     <ClInclude Include="Engine\Utility\StringUtility.h" />
@@ -216,6 +217,7 @@
     <ClInclude Include="UI\UIBackground.h" />
     <ClInclude Include="UI\UIBox.h" />
     <ClInclude Include="UI\UIButton.h" />
+    <ClInclude Include="UI\UIDropdown.h" />
     <ClInclude Include="UI\UIfwd.h" />
     <ClInclude Include="UI\UIScrollBox.h" />
     <ClInclude Include="UI\UIText.h" />

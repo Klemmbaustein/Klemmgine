@@ -7,6 +7,7 @@ struct VertexBuffer;
 
 class UIButton : public UIBox
 {
+protected:
 	float ButtonColorMultiplier = 1.f;
 	Vector2 Offset;
 	VertexBuffer* ButtonVertexBuffer;
@@ -24,7 +25,10 @@ class UIButton : public UIBox
 	unsigned int TextureID = 0;
 	void ScrollTick(Shader* UsedShader);
 	void MakeGLBuffers();
-	void Tick() override;
+	virtual void Tick() override;
+	virtual void Update() override;
+	virtual void Draw() override;
+	virtual void OnClicked();
 public:
 	bool GetUseTexture();
 	UIButton* SetOpacity(float NewOpacity);
@@ -41,8 +45,5 @@ public:
 
 	UIButton(bool Horizontal, Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, Shader* ButtonShader = Graphics::UIShader);
 	~UIButton();
-
-	void Update() override;
-	void Draw() override;
 	UIBox* ParentOverride = nullptr;
 };

@@ -1,4 +1,5 @@
 #include "StringUtility.h"
+#include <cstdarg>
 
 void StrReplace::ReplaceChar(std::string& Target, char A, std::string b)
 {
@@ -12,4 +13,14 @@ void StrReplace::ReplaceChar(std::string& Target, char A, std::string b)
 		}
 	}
 	Target = NewStr;
+}
+
+std::string StrUtil::Format(std::string Format, ...)
+{
+	char* buf = new char[Format.size() + 250ull]();
+	va_list va;
+	va_start(va, Format);
+	vsprintf_s(buf, Format.size() + 250, Format.c_str(), va);
+	va_end(va);
+	return buf;
 }
