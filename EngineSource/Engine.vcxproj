@@ -435,7 +435,7 @@
       <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
-      <Command>$(ProjectDir)..\Tools\bin\BuildTool.exe  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
+      <Command>"$(ProjectDir)..\Tools\bin\BuildTool.exe"  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
     </PreBuildEvent>
     <BuildLog>
       <Path>..\$(IntDir)$(MSBuildProjectName).log</Path>

@@ -160,7 +160,7 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	}
 	Log::Print("[Build]: Found .sln file: " + SolutionName, Log::LogColor::Green);
 
-	std::string Command = "\"" + VSInstallPath + "\" " + std::string(SolutionName) + ".sln /Build " + Configuration;
+	std::string Command = "\"" + VSInstallPath + "\" Code/" + std::string(SolutionName) + ".vcxproj /Build " + Configuration;
 
 	Log::Print("[Build]: Running command: " + Command + " (This can take a while)", Vector3(0.5));
 	int ret = system(Command.c_str());
