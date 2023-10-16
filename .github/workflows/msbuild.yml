@@ -1,0 +1,75 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: MSBuild
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  write-all
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+      
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      # Add additional options to the MSBuild command line here (like platform or verbosity level).
+      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+      run: ./setup.ps1
+
+    - name: create-zip
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      # Also remove large unneeded folders
+      run: |
+        rm .git -r -force
+        rm Dependencies\assimp\test -r -force
+        rm Dependencies\SDL\test -r -force
+        Remove-Item .\* -Recurse -Include *.obj
+        rm Dependencies\glm\doc -r -force
+        rm Dependencies\glm\test -r -force
+        Compress-Archive ./* Release.zip
+
+    - name: release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: "Release #${{ github.run_number }}"
+        tag_name: "Release-${{ github.run_number }}"
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: upload artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/Release.zip
+        asset_name: Klemmgine-Release-${{ github.run_number }}.zip
+        asset_content_type: application/zip
