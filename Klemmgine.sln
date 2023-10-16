@@ -5,10 +5,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Klemmgine", "Klemmgine", "{C7EE7711-2C45-4969-BE29-0127B05E2AAA}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
-		INSTALLATION.md = INSTALLATION.md
 		LICENSE = LICENSE
 		README.md = README.md
-		setup-deps.ps1 = setup-deps.ps1
+		setup.ps1 = setup.ps1
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CSharpCore", "CSharpCore\CSharpCore.csproj", "{FF4F9039-A754-4CFD-A452-650D43286015}"
@@ -16,6 +15,7 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Engine", "EngineSource\Engine.vcxproj", "{87F55D1D-99B2-4042-ADD5-AAAE85B9A61B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{8F068CEA-34ED-41B3-9FFE-0B32D8155D5A} = {8F068CEA-34ED-41B3-9FFE-0B32D8155D5A}
+		{E8120D43-2F56-409E-9718-8756DA2FD52E} = {E8120D43-2F56-409E-9718-8756DA2FD52E}
 		{FF4F9039-A754-4CFD-A452-650D43286015} = {FF4F9039-A754-4CFD-A452-650D43286015}
 	EndProjectSection
 EndProject

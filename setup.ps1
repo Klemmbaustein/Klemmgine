@@ -30,3 +30,7 @@ msbuild OpenAL.vcxproj -nologo /p:Configuration=Release /p:Platform=x64
 cd ..\..
 Write-Host "--- Finished building OpenAL ---"
 Write-Host "--- Finished setting up dependencies ---"
+
+Write-Host "--- Building Engine ---"
+msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64
+Write-Host "--- Done ---"
