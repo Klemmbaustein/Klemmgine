@@ -32,5 +32,8 @@ Write-Host "--- Finished building OpenAL ---"
 Write-Host "--- Finished setting up dependencies ---"
 
 Write-Host "--- Building Engine ---"
+cd CSharpCore
+dotnet restore
+cd ..
 msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64
 Write-Host "--- Done ---"
