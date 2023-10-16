@@ -238,16 +238,17 @@ void CSharp::Init()
 		return;
 	}
 
+#if !RELEASE
 	Console::RegisterCommand(Console::Command("makecsproj", []() 
 		{
 			CSharpLog("Rebuilding project csproj file...", CS_Log_Build);
 			WriteCSProj("Scripts/CSharpAssembly.csproj");
 		}, {}));
-
 	if (!std::filesystem::exists("Scripts/CSharpAssembly.csproj"))
 	{
 		Console::ExecuteConsoleCommand("makecsproj");
 	}
+#endif
 	CSharp::LoadRuntime();
 	void* LogRegister = CSharp::LoadCSharpFunction("LoadLogFunction", "EngineLog", "LoadFunctionDelegate");
 
