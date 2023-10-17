@@ -2,6 +2,7 @@
 #pragma once
 #include <UI/Default/UICanvas.h>
 #include <UI/UIfwd.h>
+#include <Engine/Input.h>
 
 class DebugUI : public UICanvas
 {
@@ -13,7 +14,7 @@ class DebugUI : public UICanvas
 	UITextField* LogPrompt = nullptr;
 	UIText* DebugTexts[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
 
-	bool ConsoleReadInput(int Key);
+	bool ConsoleReadInput(Input::Key Key);
 
 	int LastLogMessageAmount = 0;
 

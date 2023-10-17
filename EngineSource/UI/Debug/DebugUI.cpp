@@ -8,7 +8,6 @@
 
 #include <Engine/Application.h>
 #include <Engine/Console.h>
-#include <Engine/Input.h>
 #include <Engine/Log.h>
 
 namespace Input
@@ -40,12 +39,12 @@ DebugUI::DebugUI()
 	LogBackground->SetOpacity(0.9f);
 }
 
-bool DebugUI::ConsoleReadInput(int Key)
+bool DebugUI::ConsoleReadInput(Input::Key KeyCode)
 {
 	bool PrevBlockInput = false;
 	std::swap<bool>(Input::BlockInput, PrevBlockInput);
 	Input::BlockInputConsole = false;
-	bool KeyVal = Input::IsKeyDown(Key);
+	bool KeyVal = Input::IsKeyDown(KeyCode);
 	std::swap(Input::BlockInput, PrevBlockInput);
 	Input::BlockInputConsole = LogPrompt->GetIsEdited();
 	return KeyVal;
@@ -74,12 +73,12 @@ void DebugUI::Tick()
 		StatsRedrawTimer += Performance::DeltaTime;
 	}
 	FPS++;
-	if (ConsoleReadInput(SDLK_RETURN) && !LogPrompt->GetIsEdited() && !IsEditingText)
+	if (ConsoleReadInput(Input::Key::RETURN) && !LogPrompt->GetIsEdited() && !IsEditingText)
 	{
 		IsEditingText = 5;
 		LogPrompt->Edit();
 	}
-	if (!ConsoleReadInput(SDLK_RETURN) && IsEditingText)
+	if (!ConsoleReadInput(Input::Key::RETURN) && IsEditingText)
 	{
 		IsEditingText--;
 	}
@@ -106,7 +105,7 @@ void DebugUI::OnButtonClicked(int Index)
 {
 	if (Index == 0)
 	{
-		if (ConsoleReadInput(SDLK_RETURN) && LogPrompt->GetText().size())
+		if (ConsoleReadInput(Input::Key::RETURN) && LogPrompt->GetText().size())
 		{
 			Log::Print("> " + LogPrompt->GetText(), Vector3(0.3f, 0.6f, 1));
 			Console::ExecuteConsoleCommand(LogPrompt->GetText());
