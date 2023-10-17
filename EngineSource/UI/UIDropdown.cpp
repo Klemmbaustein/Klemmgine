@@ -43,6 +43,8 @@ UIDropdown* UIDropdown::SetTextSize(float Size, float Padding)
 {
 	SelectedText->SetTextSize(Size);
 	SelectedText->SetPadding(Padding);
+	this->TextSize = Size;
+	this->TextPadding = Padding;
 	return this;
 }
 
@@ -83,9 +85,10 @@ void UIDropdown::GenerateOptions()
 	}
 }
 
-void UIDropdown::SelectOption(size_t Index)
+UIDropdown* UIDropdown::SelectOption(size_t Index)
 {
 	SelectedIndex = Index;
+	std::cout << Index << std::endl;
 	SelectedOption = Options.at(Index);
 	SelectedText->SetText(SelectedOption.Name);
 
@@ -98,6 +101,7 @@ void UIDropdown::SelectOption(size_t Index)
 		Application::ButtonEvents.insert(ButtonEvent(ParentOverride ? ParentOverride : Parent, nullptr, ButtonIndex));
 	}
 	GenerateOptions();
+	return this;
 }
 
 void UIDropdown::Tick()

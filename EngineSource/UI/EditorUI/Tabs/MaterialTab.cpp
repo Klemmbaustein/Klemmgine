@@ -14,12 +14,8 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Rendering/Texture/Texture.h>
 #include <cmath>
+#include <UI/UIDropdown.h>
 #include <Rendering/Mesh/Model.h>
-
-/*
-* TODO: Rewrite:
-* The current UI for this is very ugly.
-*/
 
 void MaterialTab::OnButtonClicked(int Index)
 {
@@ -70,8 +66,14 @@ void MaterialTab::OnButtonClicked(int Index)
 		case Type::Int:
 		case Type::Float:
 		case Type::GL_Texture:
-			Value = ((UITextField*)TextFields[Index])->GetText();
+		{
+			Texture::TextureInfo Info;
+			Info.File = ((UITextField*)TextFields[Index])->GetText();
+			Info.Filtering = (Texture::TextureFiltering)((UIDropdown*)TextureDropdowns.at(Index * 2))->SelectedIndex;
+			Info.Wrap = (Texture::TextureWrap)((UIDropdown*)TextureDropdowns.at(Index * 2 + 1))->SelectedIndex;
+			Value = Texture::CreateTextureInfoString(Info);
 			break;
+		}
 		case Type::Vector3:
 		case Type::Vector3Color:
 			Value = ((UIVectorField*)TextFields[Index])->GetValue().ToString();
@@ -154,7 +156,9 @@ void MaterialTab::Load(std::string File)
 		std::string Path = "Shaders/" + LoadedMaterial.FragmentShader;
 		Path = Path.substr(0, Path.find_last_of("/\\"));
 
-		std::vector<Material::Param> ShaderUniforms = Preprocessor::ParseGLSL(FileUtil::GetFileContent("Shaders/" + LoadedMaterial.FragmentShader), Path).ShaderParams;
+		std::vector<Material::Param> ShaderUniforms = Preprocessor::ParseGLSL(
+			FileUtil::GetFileContent("Shaders/" + LoadedMaterial.FragmentShader),
+			Path).ShaderParams;
 		for (size_t i = 0; i < std::max(ShaderUniforms.size(), LoadedMaterial.Uniforms.size()); i++)
 		{
 			if (ShaderUniforms.size() <= i)
@@ -206,6 +210,7 @@ void MaterialTab::GenerateUI()
 		Texture::UnloadTexture(i);
 	}
 	PreviewTextures.clear();
+	TextureDropdowns.clear();
 
 	int Index = 0;
 	for (auto& i : LoadedMaterial.Uniforms)
@@ -264,26 +269,64 @@ void MaterialTab::GenerateUI()
 		}
 		case Type::GL_Texture:
 		{
-			unsigned int NewTexture = Texture::LoadTexture(i.Value);
+			auto TextureInfo = Texture::ParseTextureInfoString(i.Value);
+			unsigned int NewTexture = Texture::LoadTexture(TextureInfo);
 			NewField = (new UITextField(true, 0, UIColors[0], this, Index, Renderer))
 				->SetTextColor(UIColors[2])
-				->SetText(i.Value)
+				->SetText(TextureInfo.File)
 				->SetPadding(0.02f, 0.02f, 0, 0)
 				->SetMinSize(Vector2(0.2f, 0.05f));
 			ParamBox->AddChild((new UIBackground(true, 0, 1, 0.15f))
 				->SetUseTexture(true, NewTexture)
 				->SetSizeMode(UIBox::SizeMode::PixelRelative));
+
+			UIBox* TextureSelectionBoxes[2] =
+			{
+				(new UIDropdown(0, 0.09f, UIColors[0], UIColors[2],
+				{
+					UIDropdown::Option("Nearest"),
+					UIDropdown::Option("Linear"),
+				}, Index, this, Renderer))
+				->SetTextSize(0.4f, 0.001f)
+				->SelectOption((int)TextureInfo.Filtering)
+				->SetPadding(0.02f, 0.02f, 0, 0.02f),
+				
+				(new UIDropdown(0, 0.09f, UIColors[0], UIColors[2],
+				{
+					UIDropdown::Option("Clamp"),
+					UIDropdown::Option("Border"),
+					UIDropdown::Option("Repeat"),
+				}, Index, this, Renderer))
+				->SetTextSize(0.4f, 0.001f)
+				->SelectOption((int)TextureInfo.Wrap)
+				->SetPadding(0.02f, 0.02f, 0, 0)
+			};
+
+			ParamBox->AddChild((new UIBox(false, 0))
+				->SetPadding(0)
+				->AddChild((new UIBox(true, 0))
+					->SetPadding(0)
+					->AddChild(TextureSelectionBoxes[0])
+					->AddChild(TextureSelectionBoxes[1]))
+				->AddChild((new UIBox(true, 0))
+					->SetPadding(0)
+					->AddChild(NewField)));
+
 			TextBox->SetMinSize(Vector2(0.3f, 0.15f));
 			PreviewTextures.push_back(NewTexture);
+			TextureDropdowns.push_back(TextureSelectionBoxes[0]);
+			TextureDropdowns.push_back(TextureSelectionBoxes[1]);
 			break;
 		}
 		default:
 			break;
 		}
 		Index++;
-		if (NewField)
+		if (NewField && i.Type != Type::GL_Texture)
 		{
 			ParamBox->AddChild(NewField);
+			TextureDropdowns.push_back(nullptr);
+			TextureDropdowns.push_back(nullptr);
 		}
 		TextFields.push_back(NewField);
 		

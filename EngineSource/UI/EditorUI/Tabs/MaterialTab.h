@@ -34,6 +34,7 @@ private:
 	std::vector<unsigned int> PreviewTextures;
 	UITextField* ShaderTextFields[2];
 	std::vector<UIBox*> TextFields;
+	std::vector<UIBox*> TextureDropdowns;
 	UIText* TabName = nullptr;
 	UIBox* Rows[2];
 	TextRenderer* Renderer;

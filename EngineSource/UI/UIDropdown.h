@@ -25,7 +25,7 @@ public:
 	std::vector<Option> Options;
 	void GenerateOptions();
 	
-	void SelectOption(size_t Index);
+	UIDropdown* SelectOption(size_t Index);
 
 	UIDropdown(Vector2 Position, float Size, Vector3 Color, Vector3 TextColor, std::vector<Option> Options, int Index, UICanvas* Parent, TextRenderer* Renderer);
 	UIDropdown* SetTextSize(float Size, float Padding);

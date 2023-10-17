@@ -158,10 +158,11 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 			break;
 		case Type::GL_Texture:
 		{
-			unsigned int Texture = Texture::LoadTexture(u.Value);
-			if (Texture)
+			Texture::TextureInfo TextureInfo = Texture::ParseTextureInfoString(u.Value);
+			unsigned int LoadedTexture = Texture::LoadTexture(TextureInfo);
+			if (LoadedTexture)
 			{
-				Uniforms[UniformIndex].Content = (void*)new unsigned int(Texture);
+				Uniforms[UniformIndex].Content = (void*)new unsigned int(LoadedTexture);
 			}
 			else
 			{
@@ -173,8 +174,9 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 			break;
 		}
 	}
-	catch (std::exception)
+	catch (std::exception& e)
 	{
+		Log::Print(e.what(), Log::LogColor::Yellow);
 		switch (u.Type)
 		{
 		case Type::Int:
