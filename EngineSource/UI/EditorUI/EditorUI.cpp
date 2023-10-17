@@ -26,6 +26,7 @@
 #include <Rendering/Utility/BakedLighting.h>
 #include <Engine/File/Assets.h>
 #include <UI/UIDropdown.h>
+#include <SDL.h>
 
 namespace Editor
 {
@@ -91,8 +92,8 @@ void EditorUI::LaunchInEditor()
 			Build::BuildCurrentSolution("Debug");
 		}
 
-		if (!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll") 
-			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" })
+		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll") 
+			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
 			&& CSharp::GetUseCSharp())
 		{
 			RebuildAndHotReload();
@@ -421,7 +422,7 @@ void EditorUI::Tick()
 		}
 	}
 
-	if (Input::IsKeyDown(SDLK_LCTRL) && Input::IsKeyDown(SDLK_s))
+	if (Input::IsKeyDown(Input::Key::LCTRL) && Input::IsKeyDown(Input::Key::s))
 	{
 		if (!Input::IsRMBDown && ChangedScene && !Editor::IsSavingScene)
 		{

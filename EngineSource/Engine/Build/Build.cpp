@@ -143,7 +143,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 }
 int Build::BuildCurrentSolution(std::string Configuration)
 {
-	std::string VSInstallPath = GetVSLocation() + "\\Common7\\IDE\\devenv.exe";
+	std::string MSBuildPath = GetVSLocation() + "\\MSBuild\\Current\\Bin\\msbuild.exe";
 	std::string SolutionName;
 	for (auto& i : std::filesystem::directory_iterator("."))
 	{
@@ -160,11 +160,11 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	}
 	Log::Print("[Build]: Found .sln file: " + SolutionName, Log::LogColor::Green);
 
-	std::string Command = "\"" + VSInstallPath + "\" Code/" + std::string(SolutionName) + ".vcxproj /Build " + Configuration;
+	std::string Command = "\"" + MSBuildPath + "\" Code/" + std::string(SolutionName) + ".vcxproj /p:Platform=x64 /p:Configuration=" + Configuration;
 
-	Log::Print("[Build]: Running command: " + Command + " (This can take a while)", Vector3(0.5));
+	Log::Print("[Build]: Invoking MSBuild - " + MSBuildPath, Vector3(1));
 	int ret = system(Command.c_str());
-	if (ret)
+	if (!ret)
 	{
 		Log::Print("[Build]: Built project for configuration: " + Configuration, Log::LogColor::Green);
 	}

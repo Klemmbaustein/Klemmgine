@@ -165,7 +165,7 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 			}
 			else
 			{
-				Uniforms[UniformIndex].Content = (void*)new unsigned int();
+				Uniforms[UniformIndex].Content = (void*)new unsigned int(0);
 			}
 			break;
 		}

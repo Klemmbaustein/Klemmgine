@@ -10,13 +10,14 @@ namespace Input
 	bool BlockInput = false;
 }
 
-bool Input::IsKeyDown(int Key)
+bool Input::IsKeyDown(Key InputKey)
 {
-	if (!(Key < 128))
+	int KeyID = (int)InputKey;
+	if (!(KeyID < 128))
 	{
-		Key -= 1073741755;
+		KeyID -= 1073741755;
 	}
-	bool Test = Input::Keys[Key];
+	bool Test = Input::Keys[KeyID];
 	if (BlockInput || BlockInputConsole)
 	{
 		Test = false;

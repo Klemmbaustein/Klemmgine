@@ -14,12 +14,12 @@
 #include <Rendering/Utility/Framebuffer.h>
 #include <Engine/Build/Build.h>
 
-#include <SDL.h>
 #include <thread>
 
 class EditorUI;
 class UIVectorField;
 class UITextField;
+struct SDL_Cursor;
 extern bool ChangedScene;
 
 namespace Editor
@@ -162,9 +162,12 @@ public:
 		ObjectListItem(WorldObject* Object, int ListIndex)
 		{
 			this->Object = Object;
-			if (Object) this->Name = Object->GetName();
 			this->ListIndex = ListIndex;
-			IsSelected = Object->IsSelected;
+			if (Object)
+			{
+				Name = Object->GetName(); 
+				IsSelected = Object->IsSelected;
+			}
 		}
 
 		bool IsSelected = false;

@@ -32,7 +32,6 @@ protected:
 	bool TwoSided = true;
 	std::string MeshPath;
 
-	UIText* TabName = nullptr;
 	TextRenderer* Renderer;
 	UIScrollBox* Rows[2];
 	std::vector<UITextField*> MaterialTextFields;

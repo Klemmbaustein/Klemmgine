@@ -482,7 +482,7 @@ void PollInput()
 				Application::SetFullScreen(!Application::GetFullScreen());
 				break;
 			case SDLK_v:
-				if (TextInput::PollForText && (Input::IsKeyDown(SDLK_LCTRL) || Input::IsKeyDown(SDLK_RCTRL)))
+				if (TextInput::PollForText && (Input::IsKeyDown(Input::Key::LCTRL) || Input::IsKeyDown(Input::Key::RCTRL)))
 				{
 					std::string ClipboardText = SDL_GetClipboardText();
 					if (TextInput::TextIndex < TextInput::Text.size())

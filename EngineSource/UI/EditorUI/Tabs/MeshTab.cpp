@@ -33,8 +33,6 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 	this->Renderer = Renderer;
 
 	TabBackground->SetAlign(UIBox::Align::Reverse);
-	TabName = new UIText(1, UIColors[2], "Model: ", Renderer);
-	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	if (!PreviewBuffer)
 	{
 		PreviewBuffer = new FramebufferObject();
@@ -44,7 +42,6 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 		Cam->yaw = 90;
 		PreviewBuffer->FramebufferCamera = Cam;
 	}
-	TabBackground->AddChild(TabName);
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);
 	Rows[0] = new UIScrollBox(false, 0, true);
@@ -89,7 +86,6 @@ void MeshTab::Load(std::string File)
 		PreviewBuffer->GetBuffer()->ReInit((int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 		Graphics::MainCamera->Position = Vector3(0, 4, 15);
 		Graphics::MainCamera->SetRotation(Vector3(0, -90, 0));
-		TabName->SetText("Model: " + FileUtil::GetFileNameWithoutExtensionFromPath(File));
 		ModelData = ModelGenerator::ModelData();
 		ModelData.LoadModelFromFile(File);
 		if (!MESHTAB_DEBUG)

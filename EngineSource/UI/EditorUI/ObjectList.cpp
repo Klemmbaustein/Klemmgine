@@ -45,7 +45,7 @@ void ObjectList::OnButtonClicked(int Index)
 {
 	if (Index >= 0)
 	{
-		if (!Input::IsKeyDown(SDLK_LSHIFT))
+		if (!Input::IsKeyDown(Input::Key::LSHIFT))
 		{
 			for (auto o : Objects::AllObjects)
 			{

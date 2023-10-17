@@ -51,7 +51,7 @@ void LogUI::OnButtonClicked(int Index)
 {
 	if (Index == 0)
 	{
-		if (Input::IsKeyDown(SDLK_RETURN))
+		if (Input::IsKeyDown(Input::Key::RETURN))
 		{
 			Log::Print("> " + LogPrompt->GetText(), Vector3(0.3f, 0.6f, 1));
 			Console::ExecuteConsoleCommand(LogPrompt->GetText());

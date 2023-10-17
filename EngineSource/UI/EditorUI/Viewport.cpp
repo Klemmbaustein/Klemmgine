@@ -187,12 +187,12 @@ void Viewport::Tick()
 		Editor::CurrentUI->UIElements[6]->UpdateLayout();
 	}
 
-	if (Input::IsKeyDown(SDLK_ESCAPE))
+	if (Input::IsKeyDown(Input::Key::ESCAPE))
 	{
 		ClearSelectedObjects();
 	}
 
-	if (Input::IsKeyDown(SDLK_DELETE) && !TextInput::PollForText)
+	if (Input::IsKeyDown(Input::Key::DELETE) && !TextInput::PollForText)
 	{
 		for (int i = 0; i < Objects::AllObjects.size(); i++)
 		{
@@ -225,7 +225,7 @@ void Viewport::Tick()
 		}
 	}
 
-	if (!ViewportLock && Input::IsKeyDown(SDLK_LCTRL) && Input::IsKeyDown(SDLK_d))
+	if (!ViewportLock && Input::IsKeyDown(Input::Key::LCTRL) && Input::IsKeyDown(Input::Key::d))
 	{
 		if (!IsCopying)
 		{
@@ -311,7 +311,7 @@ void Viewport::Tick()
 				(Rotation * 50000.f) + Graphics::MainCamera->Position);
 			if (CollisionTest.Hit && !Hit)
 			{
-				if (!Input::IsKeyDown(SDLK_LSHIFT))
+				if (!Input::IsKeyDown(Input::Key::LSHIFT))
 				{
 					ClearSelectedObjects();
 				}
@@ -337,37 +337,37 @@ void Viewport::Tick()
 
 		float MovementSpeed = 50;
 
-		if (Input::IsKeyDown(SDLK_LCTRL))
+		if (Input::IsKeyDown(Input::Key::LCTRL))
 		{
 			MovementSpeed *= 0.25;
 		}
 
-		if (Input::IsKeyDown(SDLK_LSHIFT))
+		if (Input::IsKeyDown(Input::Key::LSHIFT))
 		{
 			MovementSpeed *= 5;
 		}
 
-		if (Input::IsKeyDown(SDLK_w))
+		if (Input::IsKeyDown(Input::Key::w))
 		{
 			Graphics::MainCamera->MoveForward(Performance::DeltaTime * MovementSpeed);
 		}
-		if (Input::IsKeyDown(SDLK_s))
+		if (Input::IsKeyDown(Input::Key::s))
 		{
 			Graphics::MainCamera->MoveForward(Performance::DeltaTime * -MovementSpeed);
 		}
-		if (Input::IsKeyDown(SDLK_d))
+		if (Input::IsKeyDown(Input::Key::d))
 		{
 			Graphics::MainCamera->MoveRight(Performance::DeltaTime * MovementSpeed);
 		}
-		if (Input::IsKeyDown(SDLK_a))
+		if (Input::IsKeyDown(Input::Key::a))
 		{
 			Graphics::MainCamera->MoveRight(Performance::DeltaTime * -MovementSpeed);
 		}
-		if (Input::IsKeyDown(SDLK_e))
+		if (Input::IsKeyDown(Input::Key::e))
 		{
 			Graphics::MainCamera->MoveUp(Performance::DeltaTime * MovementSpeed);
 		}
-		if (Input::IsKeyDown(SDLK_q))
+		if (Input::IsKeyDown(Input::Key::q))
 		{
 			Graphics::MainCamera->MoveUp(Performance::DeltaTime * -MovementSpeed);
 		}

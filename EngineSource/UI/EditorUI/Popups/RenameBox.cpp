@@ -78,7 +78,7 @@ void RenameBox::OnButtonClicked(int Index)
 void RenameBox::Tick()
 {
 	UpdatePanel();
-	if (Input::IsKeyDown(SDLK_RETURN))
+	if (Input::IsKeyDown(Input::Key::RETURN))
 	{
 		OnButtonClicked(-2);
 	}

@@ -34,7 +34,6 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		"../../../EngineSource",
 		"../GeneratedIncludes",
 		"../../../Dependencies/glm",
-		"../../../Dependencies/SDL/include"
 	};
 
 	std::vector<std::string> LibraryPaths =

@@ -38,7 +38,7 @@ class Component;
 class WorldObject
 {
 public:
-	WorldObject(ObjectDescription _d = ObjectDescription("Empty Object", 0));
+	WorldObject(ObjectDescription Descr = ObjectDescription("Empty Object", 0));
 	virtual ~WorldObject();
 	void Start(std::string ObjectName, Transform Transform);
 	virtual void Destroy();
