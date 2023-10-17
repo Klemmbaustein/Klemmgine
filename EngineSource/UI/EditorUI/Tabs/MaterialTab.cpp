@@ -65,6 +65,8 @@ void MaterialTab::OnButtonClicked(int Index)
 		{
 		case Type::Int:
 		case Type::Float:
+			Value = ((UITextField*)TextFields[Index])->GetText();
+			break;
 		case Type::GL_Texture:
 		{
 			Texture::TextureInfo Info;
