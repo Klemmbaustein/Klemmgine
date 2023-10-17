@@ -10,6 +10,7 @@
 #include <Rendering/Mesh/Model.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <UI/UIButton.h>
+#include <UI/EditorUI/EditorUI.h>
 
 #define MESHTAB_DEBUG 1
 
@@ -31,7 +32,9 @@ namespace MaterialTemplates
 MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors)
 {
 	this->Renderer = Renderer;
-
+	TabName = new UIText(1, UIColors[2], "Model: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
+	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
+	TabBackground->AddChild(TabName);
 	TabBackground->SetAlign(UIBox::Align::Reverse);
 	if (!PreviewBuffer)
 	{
@@ -44,17 +47,22 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 	}
 	auto RowBox = new UIBox(true, 0);
 	TabBackground->AddChild(RowBox);
-	Rows[0] = new UIScrollBox(false, 0, true);
+	Rows[0] = new UIBackground(false, 0, UIColors[1]);
 	RowBox->AddChild(Rows[0]);
 	PreviewWindow = new UIBackground(true, 0, 1, 0.5f);
 	Rows[0]->AddChild(PreviewWindow);
+	Rows[0]->SetMinSize(Vector2(0, 1.1f));
+	Rows[0]->SetMaxSize(Vector2(1, 1.1f));
+	Rows[0]->SetAlign(UIBox::Align::Reverse);
 	PreviewWindow->SetBorder(UIBox::BorderType::Rounded, 1);
 
 	Rows[1] = new UIScrollBox(false, 0, true);
 	Rows[1]->SetAlign(UIBox::Align::Reverse);
-	Rows[1]->SetMinSize(Vector2(0, 1));
-	Rows[1]->SetMaxSize(Vector2(1, 1));
-	RowBox->AddChild(Rows[1]);
+	Rows[1]->SetMinSize(Vector2(1.0f, 1.0f));
+	Rows[1]->SetMaxSize(Vector2(1.0f, 1.0f));
+	RowBox->AddChild((new UIBox(false, 0))
+		->AddChild(Rows[1])
+		->AddChild(new UIText(0.7f, UIColors[2], "Materials", Renderer)));
 }
 
 void MeshTab::Tick()
@@ -83,6 +91,7 @@ void MeshTab::Load(std::string File)
 {
 	try
 	{
+		TabName->SetText(FileUtil::GetFileNameWithoutExtensionFromPath(File));
 		PreviewBuffer->GetBuffer()->ReInit((int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 		Graphics::MainCamera->Position = Vector3(0, 4, 15);
 		Graphics::MainCamera->SetRotation(Vector3(0, -90, 0));
@@ -149,41 +158,46 @@ void MeshTab::Generate()
 	Rows[0]->DeleteChildren();
 	Rows[1]->DeleteChildren();
 	int Index = -1;
+	PreviewWindow = new UIBackground(true, 0, 1, 0.3f);
+	Rows[0]->AddChild(PreviewWindow);
+	Rows[0]->AddChild(new UIText(0.5f, UIColors[2], "Model properties", Renderer));
+
 	for (auto& i : Options)
 	{
 		auto OptionBox = new UIBox(true, 0);
 		auto NewText = new UIText(0.5f, UIColors[2], i, Renderer);
 		OptionBox->AddChild(NewText);
-		auto NewButton = new UIButton(true, 0, UIColors[0] * 2, this, Index);
+		auto NewButton = new UIButton(true, 0, 1, this, Index);
 		OptionBox->AddChild(NewButton);
 		OptionBox->SetPadding(0.01f);
-		NewButton->SetPadding(0, 0, 0.01f, 0);
-		NewText->SetPadding(0);
-		auto ButtonText = new UIText(0.5f, UIColors[2], *OptionVariables[std::abs(Index) - 1] ? "true " : "false", Renderer);
-		NewButton->SetBorder(UIBox::BorderType::Rounded, 0.5);
-		ButtonText->SetPadding(0.01f);
-		NewButton->AddChild(ButtonText);
+		NewButton
+			->SetUseTexture(*OptionVariables[std::abs(Index) - 1], Editor::CurrentUI->Textures[16])
+			->SetMinSize(0.04f)
+			->SetPadding(0, 0, 0.01f, 0)
+			->SetSizeMode(UIBox::SizeMode::PixelRelative);
+		NewText->SetPadding(0, 0, 0.02f, 0);
+		NewButton->SetBorder(UIBox::BorderType::Rounded, 0.3f);
 		Rows[0]->AddChild(OptionBox);
 		Index--;
 	}
-	auto Text = new UIText(0.6f, UIColors[2], "Materials", Renderer);
-	Rows[1]->AddChild(Text);
 	MaterialTextFields.clear();
+	int MaterialIndex = 0;
 	for (auto& i : ModelData.Elements)
 	{
 		auto NewTextInput = new UITextField(true, 0, UIColors[1], this, 1, Renderer);
-		NewTextInput->SetMinSize(Vector2(0.4f, 0.075f));
+		NewTextInput->SetMinSize(Vector2(0.4f, 0.05f));
 		NewTextInput->SetText(i.ElemMaterial);
-		NewTextInput->SetBorder(UIBox::BorderType::Rounded, 0.5f);
-		Rows[1]->AddChild(NewTextInput);
+		Rows[1]->AddChild((new UIBox(true, 0))
+			->SetPadding(0)
+			->AddChild((new UIText(0.5f, UIColors[2], "Material " + std::to_string(MaterialIndex++) + ": ", Renderer))
+				->SetPadding(0, 0.03f, 0, 0))
+			->AddChild(NewTextInput));
 		MaterialTextFields.push_back(NewTextInput);
 	}
-	PreviewWindow = new UIBackground(true, 0, 1, 0.5f);
-	Rows[0]->AddChild(PreviewWindow);
-	PreviewWindow->SetBorder(UIBox::BorderType::Rounded, 1);
 	UIBox::DrawAllUIElements();
 	UIBox::RedrawUI();
-	Rows[1]->SetMinSize(Rows[0]->GetUsedSize());
+	Rows[1]->SetMinSize(Vector2(1.0f, 1.0f));
+	Rows[1]->SetMaxSize(Vector2(1.0f, 1.0f));
 }
 
 void MeshTab::OnButtonClicked(int Index)
