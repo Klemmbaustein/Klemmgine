@@ -88,7 +88,6 @@ void UIDropdown::GenerateOptions()
 UIDropdown* UIDropdown::SelectOption(size_t Index)
 {
 	SelectedIndex = Index;
-	std::cout << Index << std::endl;
 	SelectedOption = Options.at(Index);
 	SelectedText->SetText(SelectedOption.Name);
 

@@ -6,6 +6,7 @@
 #include <Engine/Log.h>
 #include <Engine/Build/Pack.h>
 #include <map>
+#include <cstring>
 #include <Engine/Utility/StringUtility.h>
 
 namespace Preprocessor

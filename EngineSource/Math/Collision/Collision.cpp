@@ -328,7 +328,7 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstMesh(CollisionMesh*
 					Vector3 n = Vector3::Cross(
 						Vector3(*b2[0], *b2[1], *b2[2]) - Vector3(*a2[0], *a2[1], *a2[2]),
 						Vector3(*c2[0], *c2[1], *c2[2]) - Vector3(*a2[0], *a2[1], *a2[2]));
-					if (isnan(n.X))
+					if (std::isnan(n.X))
 					{
 						r.Hit = false;
 						//the triangle has a surface area of 0, we skip it (if thats the case, all elements of the normal vector are nan)

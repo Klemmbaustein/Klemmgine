@@ -28,6 +28,7 @@ void Locale::SetLocale(std::string Name)
 		Log::Print("Locale for language " + Name + " does not exist.");
 		return;
 	}
+	Log::Print("Setting locale to \"" + Name + "\" (" + LocalePath + Name + ".loc)");
 	LocaleFile = SaveGame(Path, "loc", false, false);
 }
 

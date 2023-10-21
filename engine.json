@@ -1,0 +1,50 @@
+{
+#ifndef CONFIG
+#error "Variable CONFIG needs to be defined"
+#endif
+#define Debug 0
+#define Editor 1
+#define Release 2
+
+#if CONFIG == Debug
+#define NAME "Engine-Debug"
+#elif CONFIG == Editor
+#define NAME "Engine-Editor"
+#elif CONFIG == Release
+#define NAME "Engine-Release"
+#endif
+  "projects": [
+	{
+	  "name": NAME,
+	  "outputPath": "lib/",
+#if MSVC_WINDOWS
+	  "preBuildCommand": "Tools\\bin\\BuildTool.exe in=EngineSource/Objects out=Tools/BuildTool/Output",
+#else
+	  "preBuildCommand": "Tools/bin/BuildTool in=EngineSource/Objects out=Tools/BuildTool/Output",
+#endif
+	  "sources": [
+		"EngineSource/*.cpp"
+	  ],
+	  "includes": [
+		"EngineSource",
+		"Dependencies/glm",
+		"Dependencies/assimp/include",
+		"Dependencies/glew-cmake/include",
+		"Dependencies/openal-soft/include",
+		"Dependencies/SDL/include",
+		"Tools/BuildTool/Output"
+	  ],
+	  "defines": [
+#if CONFIG == Editor
+		"EDITOR",
+#elif CONFIG == Release
+		"RELEASE",
+#endif
+		"ENGINE_CSHARP",
+		"GLEW_STATIC"
+	  ],
+	  "type": "static_lib",
+	  "optimization": "fast"
+	}
+  ]
+}

@@ -1,5 +1,6 @@
 #include "CollisionBox.h"
 #include <iostream>
+#include <cmath>
 
 Collision::Box Collision::operator*(Box a, Vector3 b)
 {

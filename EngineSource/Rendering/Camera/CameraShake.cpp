@@ -1,5 +1,6 @@
 #include "CameraShake.h"
 #include <Engine/Stats.h>
+#include <cmath>
 
 namespace CameraShake
 {

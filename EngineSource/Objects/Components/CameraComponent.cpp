@@ -1,4 +1,3 @@
-#pragma once
 #include "CameraComponent.h"
 #include <Engine/Stats.h>
 #include <Rendering/Utility/Framebuffer.h>

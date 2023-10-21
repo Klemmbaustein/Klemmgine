@@ -25,3 +25,6 @@ CSharpCore/Build
 /EngineRelease
 /EditorContent/Config/EditorPrefs.pref
 /lib
+/Build
+/Tools/BuildTool/Outputexit/GENERATED
+/KlemmBuild
