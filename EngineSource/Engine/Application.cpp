@@ -813,6 +813,7 @@ int Initialize(int argc, char** argv)
 	if (SDLReturnValue != 0)
 	{
 		std::cout << "Could not start SDL2 (" << SDL_GetError() << ")\n";
+		return 1;
 	}
 	else
 	{
@@ -862,7 +863,7 @@ int Initialize(int argc, char** argv)
 	{
 		std::cout << "GLEW Init Error:\n" << glewGetErrorString(glewInit());
 		SDL_DestroyWindow(Application::Window);
-		std::cout << "\n-Press Enter to continue-";
+		std::cout << "\nPress Enter to continue";
 		std::cin.get();
 		return 1;
 	}

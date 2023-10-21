@@ -188,7 +188,6 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(NativeRaycast);
 	REGISTER_FUNCTION(CallConsoleCommand);
 	REGISTER_FUNCTION(Vector3::GetScaledAxis);
-
 }
 
 #endif
