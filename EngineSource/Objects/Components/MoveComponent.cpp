@@ -83,7 +83,6 @@ void MoveComponent::Tick()
 {
 	if (IsInEditor || !Active || (GetParent()->GetIsReplicated() && (Client::GetIsConnected() && GetParent()->NetOwner != Client::GetClientID())))
 	{
-		Log::Print("help");
 		return;
 	}
 	InputDirection.Y = 0;
