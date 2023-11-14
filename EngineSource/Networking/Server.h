@@ -1,6 +1,6 @@
 #pragma once
-#if !EDITOR
 #include <Engine/Application.h>
+#if !EDITOR
 #include "Packet.h"
 
 class WorldObject;
