@@ -1,3 +1,4 @@
+#if !SERVER
 #include "UIScrollBox.h"
 #include <UI/Default/ScrollObject.h>
 #include <Engine/Log.h>
@@ -53,7 +54,6 @@ UIScrollBox* UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 			ScrollBarBackground = new UIButton(false, 0, 0.25f, nullptr, 0);
 			ScrollBarBackground->ParentOverride = this;
 			ScrollBarBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-			ScrollBarBackground->SetAlign(UIBox::Align::Reverse);
 			ScrollBarBackground->SetPosition(OffsetPosition + Vector2(Size.X - ScrollBarBackground->GetUsedSize().X, 0));
 #if EDITOR
 			ScrollBar = new UIBackground(true, 0, 0.55f, Vector2(0.01f, 0.1f));
@@ -193,3 +193,4 @@ UIScrollBox::~UIScrollBox()
 {
 	SetDisplayScrollBar(false);
 }
+#endif

@@ -1,3 +1,4 @@
+#if !SERVER
 #include "VertexBuffer.h"
 #include <GL/glew.h>
 #include <iostream>
@@ -57,3 +58,4 @@ void VertexBuffer::Draw()
 	glDrawElements(GL_TRIANGLES, IndicesSize, GL_UNSIGNED_INT, nullptr);
 	Unbind();
 }
+#endif

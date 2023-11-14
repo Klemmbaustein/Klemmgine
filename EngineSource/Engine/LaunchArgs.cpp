@@ -59,8 +59,18 @@ namespace LaunchArgs
 
 	void NoStartupInfo(std::vector<std::string> AdditionalArgs)
 	{
-		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -fullscreen", Log::LogColor::Yellow);
+		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -nostartupinfo", Log::LogColor::Yellow);
 		Application::ShowStartupInfo = false;
+	}
+
+	void Connect(std::vector<std::string> AdditionalArgs)
+	{
+		if (AdditionalArgs.size() != 1)
+		{
+			Log::Print("Unexpected or missing arguments in -connect", Log::LogColor::Yellow);
+			return;
+		}
+		Console::ExecuteConsoleCommand("connect " + AdditionalArgs[0]);
 	}
 
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
@@ -71,7 +81,13 @@ namespace LaunchArgs
 		std::pair("wireframe", Wireframe),
 		std::pair("version", GetVersion),
 		std::pair("fullscreen", FullScreen),
-		std::pair("nostartupinfo", NoStartupInfo)
+		std::pair("nostartupinfo", NoStartupInfo),
+		std::pair("connect", Connect),
+#if SERVER
+		std::pair("quitondisconnect", [](std::vector<std::string> arg) {
+			Console::ExecuteConsoleCommand("quitondisconnect");
+}),
+#endif
 	};
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments)
 	{

@@ -22,9 +22,7 @@ cppinfo.txt
 CSharpCore/obj
 CSharpCore/Build
 *.lastcodeanalysissucceeded
-/EngineRelease
-/EditorContent/Config/EditorPrefs.pref
-/lib
-/Build
-/Tools/BuildTool/Outputexit/GENERATED
-/KlemmBuild
+EngineRelease
+EditorContent/Config/EditorPrefs.pref
+lib
+Build

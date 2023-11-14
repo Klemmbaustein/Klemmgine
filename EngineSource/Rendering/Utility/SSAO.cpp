@@ -1,3 +1,4 @@
+#if !SERVER
 #include "SSAO.h"
 #include <random>
 #include <vector>
@@ -140,3 +141,4 @@ void SSAO::ResizeBuffer(unsigned int X, unsigned int Y)
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
 
 }
+#endif

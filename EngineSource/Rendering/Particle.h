@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <Math/Vector.h>
 
@@ -67,3 +68,4 @@ namespace Particles
 		bool IsActive = true;
 	};
 }
+#endif

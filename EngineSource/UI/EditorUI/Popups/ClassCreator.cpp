@@ -8,8 +8,9 @@ ClassCreator::ClassCreator() : EditorPanel(Editor::CurrentUI->UIColors, 0.25, 1,
 {
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
+	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
 	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-	TabBackground->SetAlign(UIBox::Align::Default);
+	TabBackground->SetVerticalAlign(UIBox::Align::Default);
 	TabBackground->AddChild(ButtonBackground);
 
 	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
@@ -24,7 +25,11 @@ ClassCreator::ClassCreator() : EditorPanel(Editor::CurrentUI->UIColors, 0.25, 1,
 				->SetPadding(0.005f)));
 
 	// TODO: Implement actual functionality
-	TabBackground->AddChild(new UIText(2, 1, "TODO", Editor::CurrentUI->EngineUIText));
+	TabBackground->AddChild((new UIBackground(true, 0, 1, 0.3f))
+		->SetVerticalAlign(UIBox::Align::Centered)
+		->SetHorizontalAlign(UIBox::Align::Centered)
+		->AddChild((new UIText(2, 0, "TODO", Editor::CurrentUI->EngineUIText))
+			->SetPadding(0)));
 
 	UpdateLayout();
 }

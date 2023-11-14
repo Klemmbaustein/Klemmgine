@@ -22,7 +22,7 @@ ObjectList::ObjectList(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edito
 		->SetPadding(0.005f, 0.005f, 0.005f / Graphics::AspectRatio, 0.005f / Graphics::AspectRatio)
 		->SetMinSize(Vector2(Scale.X - (0.005f / Graphics::AspectRatio), Scale.Y - Editor::CurrentUI->UIElements[2]->Scale.Y - 0.01f))
 		->SetMaxSize(Vector2(Scale.X - (0.005f / Graphics::AspectRatio), Scale.Y - Editor::CurrentUI->UIElements[2]->Scale.Y - 0.01f));
-	TabBackground->SetAlign(UIBox::Align::Reverse);
+	TabBackground->SetVerticalAlign(UIBox::Align::Reverse);
 	TabBackground
 		->AddChild(HeaderBox
 			->SetPadding(0)
@@ -80,7 +80,7 @@ void ObjectList::UpdateLayout()
 		->SetMaxSize(Vector2(Scale.X, Editor::CurrentUI->UIElements[2]->Scale.Y));
 
 	ObjectListBox->DeleteChildren();
-	ObjectListBox->BoxAlign = UIBox::Align::Reverse;
+	ObjectListBox->SetVerticalAlign(UIBox::Align::Reverse);
 	ListIterator = 0;
 
 	auto ObjectList = Editor::CurrentUI->GetObjectList();
@@ -123,6 +123,7 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 		}
 
 		ObjectListBox->AddChild(ElementButton
+			->SetVerticalAlign(UIBox::Align::Centered)
 			->SetMinSize(Vector2(TabBackground->GetUsedSize().X - 0.02f, 0.045f))
 			->SetPadding(0, 0, 0, 0.01f));
 

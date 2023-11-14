@@ -36,7 +36,7 @@ namespace ModelGenerator
 		void Clear();
 
 		//Save the generated model to a file
-		void SaveModelData(std::string File, bool MaterialsInContent = true);
+		void SaveModelData(std::string File);
 
 		void MakeCollisionBox();
 

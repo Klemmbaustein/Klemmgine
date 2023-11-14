@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <vector>
 #include <Rendering/Renderable.h>
@@ -51,3 +52,4 @@ public:
 protected:
 	Framebuffer* buf;
 };
+#endif

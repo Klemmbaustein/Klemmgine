@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <UI/UIBox.h>
 #include <UI/Default/UICanvas.h>
@@ -47,3 +48,4 @@ public:
 	~UIButton();
 	UIBox* ParentOverride = nullptr;
 };
+#endif

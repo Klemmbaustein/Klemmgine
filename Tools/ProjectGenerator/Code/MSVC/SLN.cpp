@@ -59,6 +59,7 @@ MinimumVisualStudioVersion = 10.0.40219.1\n";
 		Debug|x64 = Debug|x64\n\
 		Editor|x64 = Editor|x64\n\
 		Release|x64 = Release|x64\n\
+		Server|x64 = Server|x64\n\
 	EndGlobalSection\n";
 	out << "	GlobalSection(ProjectConfigurationPlatforms) = postSolution\n";
 
@@ -70,6 +71,8 @@ MinimumVisualStudioVersion = 10.0.40219.1\n";
 		{" + i.GUID + "}.Debug|x64.Build.0 = Debug|x64\n\
 		{" + i.GUID + "}.Editor|x64.ActiveCfg = Editor|x64\n\
 		{" + i.GUID + "}.Editor|x64.Build.0 = Editor|x64\n\
+		{" + i.GUID + "}.Server|x64.ActiveCfg = Server|x64\n\
+		{" + i.GUID + "}.Server|x64.Build.0 = Server|x64\n\
 		{" + i.GUID + "}.Release|x64.ActiveCfg = Release|x64\n\
 		{" + i.GUID + "}.Release|x64.Build.0 = Release|x64\n";
 		}
@@ -79,6 +82,8 @@ MinimumVisualStudioVersion = 10.0.40219.1\n";
 		{" + i.GUID + "}.Debug|x64.Build.0 = Release|Any CPU\n\
 		{" + i.GUID + "}.Editor|x64.ActiveCfg = Release|Any CPU\n\
 		{" + i.GUID + "}.Editor|x64.Build.0 = Release|Any CPU\n\
+		{" + i.GUID + "}.Server|x64.ActiveCfg = Release|Any CPU\n\
+		{" + i.GUID + "}.Server|x64.Build.0 = Release|Any CPU\n\
 		{" + i.GUID + "}.Release|x64.ActiveCfg = Release|Any CPU\n\
 		{" + i.GUID + "}.Release|x64.Build.0 = Release|Any CPU\n";
 		}

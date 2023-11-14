@@ -1,3 +1,4 @@
+#if !SERVER
 #include "UITextField.h"
 #include <UI/UIText.h>
 #include <UI/UIBackground.h>
@@ -64,7 +65,7 @@ void UITextField::Tick()
 
 	if (Size.X != 0)
 	{
-		TextObject->WrapDistance = std::max(Size.X * 1.5f, 0.1f);
+		TextObject->WrapDistance = std::max(Size.X * 1.75f, 0.1f);
 	}
 	else
 	{
@@ -146,7 +147,7 @@ void UITextField::Tick()
 		{
 			TextFieldTimer = 0;
 			IBeamPosition = NewPos;
-			IBeamScale = Vector2(0.0015f, 0.066f) * TextSize;
+			IBeamScale = Vector2(0.002f, 0.066f) * TextSize;
 			UIBox::RedrawUI();
 		}
 		if (!ShowIBeam)
@@ -247,8 +248,8 @@ bool UITextField::GetIsPressed()
 	return IsPressed;
 }
 
-UITextField::UITextField(bool Horizontal, Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, TextRenderer* Renderer, Shader* ButtonShader)
-	: UIBox(Horizontal, Position)
+UITextField::UITextField(Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, TextRenderer* Renderer, Shader* ButtonShader)
+	: UIBox(false, Position)
 {
 	this->ButtonIndex = ButtonIndex;
 	this->ButtonShader = ButtonShader;
@@ -257,8 +258,6 @@ UITextField::UITextField(bool Horizontal, Vector2 Position, Vector3 Color, UICan
 	TextObject = new UIText(0, Vector3(1), HintText, Renderer);
 	TextObject->SetTextSize(0.4f);
 	TextObject->SetPadding(0.005f);
-	SetHorizontal(false);
-	SetAlign(UIBox::Align::Reverse);
 	
 	HasMouseCollision = true;
 
@@ -314,3 +313,4 @@ void UITextField::Update()
 		//Size = TextDesiredSize;
 	}
 }
+#endif

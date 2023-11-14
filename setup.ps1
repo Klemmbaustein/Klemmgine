@@ -6,6 +6,14 @@ msbuild -noconsolelogger -nologo /p:Configuration=Release /p:Platform=x64
 cd ..\..\..\..
 Write-Host "--- Finished building SDL2 ---"
 
+Write-Host "--- Building SDL2_net ---"
+cd Dependencies\SDL_net
+cmake cmake -S . -B Build -DSDL2_LIBRARY="..\SDL\VisualC\SDL\x64\Release\SDL2.lib" -DSDL2_INCLUDE_DIR="..\SDL\include"
+cd Build\
+msbuild SDL2_net.vcxproj /p:Configuration=Release /p:Platform=x64
+cd ..\..\..
+Write-Host "--- Finished SDL2_net ---"
+
 Write-Host "--- Configuring glew ---"
 cd Dependencies\glew-cmake
 cmake CMakeLists.txt

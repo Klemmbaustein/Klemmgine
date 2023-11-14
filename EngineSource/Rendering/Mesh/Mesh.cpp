@@ -7,7 +7,7 @@
 #include <Rendering/Texture/Texture.h>
 #include <GL/glew.h>
 #include <Engine/Log.h>
-
+#if !SERVER
 Mesh::Mesh(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Material Mat)
 {
 	NumVertices = (int)Vertices.size();
@@ -57,3 +57,4 @@ void Mesh::SetUniform(Material::Param NewUniform)
 {
 	RenderContext.LoadUniform(NewUniform);
 }
+#endif

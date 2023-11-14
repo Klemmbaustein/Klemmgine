@@ -1,4 +1,4 @@
-#if !EDITOR && !RELEASE
+#if !EDITOR && !RELEASE && !SERVER
 #include "DebugUI.h"
 #include <UI/UIText.h>
 #include <UI/UITextField.h>
@@ -22,8 +22,8 @@ DebugUI::DebugUI()
 	CurrentDebugUI = this;
 	Text = new TextRenderer();
 
-	UIBox* DebugTextBackground = new UIBox(false, Vector2(-0.99f, 0.7f));
-	DebugTextBackground->SetAlign(UIBox::Align::Reverse);
+	UIBox* DebugTextBackground = new UIBox(false, Vector2(-0.985f, 0.695f));
+	DebugTextBackground->SetVerticalAlign(UIBox::Align::Reverse);
 
 	for (auto& i : DebugTexts)
 	{
@@ -32,11 +32,12 @@ DebugUI::DebugUI()
 		DebugTextBackground->AddChild(i);
 	}
 
-	LogPrompt = new UITextField(true, -1, 0.1f, this, 0, Text);
+	LogPrompt = new UITextField(-1, 0.1f, this, 0, Text);
 	LogPrompt->SetMinSize(Vector2(2, 0.06f));
 	LogPrompt->SetTextSize(0.6f);
 	LogBackground = new UIBackground(false, Vector2(-1, -0.94f), 0.05f, Vector2(2, 0.8f));
 	LogBackground->SetOpacity(0.9f);
+	LogBackground->SetVerticalAlign(UIBox::Align::Default);
 }
 
 bool DebugUI::ConsoleReadInput(Input::Key KeyCode)
@@ -117,14 +118,19 @@ void DebugUI::GenerateLog()
 {
 	LogBackground->DeleteChildren();
 
-	for (size_t i = Log::Messages.size() - 1; i >= std::max((size_t)0, (size_t)Log::Messages.size() - 21); i--)
+	if (Log::Messages.empty())
+	{
+		return;
+	}
+
+	for (int64_t i = Log::Messages.size() - 1; i >= std::max((int64_t)0, (int64_t)Log::Messages.size() - 23); i--)
 	{
 		std::string str = Log::Messages[i].Text;
 		if (Log::Messages[i].Amount >= 1)
 		{
 			str.append(" (x" + std::to_string(Log::Messages[i].Amount + 1) + ")");
 		}
-		LogBackground->AddChild((new UIText(0.6f, Log::Messages[i].Color, str, Text))->SetPadding(0));
+		LogBackground->AddChild((new UIText(0.5f, Log::Messages[i].Color, str, Text))->SetPadding(0));
 	}
 }
 #endif

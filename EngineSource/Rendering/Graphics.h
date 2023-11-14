@@ -63,25 +63,28 @@ namespace Graphics
 	extern Vector2 WindowResolution;
 	void SetWindowResolution(Vector2 NewResolution);
 	extern float AspectRatio;
+#if !SERVER
 	extern Camera* MainCamera;
 	extern Shader* MainShader;
 	extern Shader* ShadowShader;
 	extern Shader* TextShader;
+	extern Shader* UIShader;
+#endif
 	extern bool IsRenderingShadows;
 	extern float ChrAbbSize, Vignette;
-	extern Shader* UIShader;
 	extern unsigned int PCFQuality;
+#if !SERVER
 	extern FramebufferObject* MainFramebuffer;
+	extern std::vector<FramebufferObject*> AllFramebuffers;
+#endif
 	namespace UI
 	{
 		extern std::vector<ScrollObject*> ScrollObjects;
 	}
-	void RecompileShaders();
 	namespace FBO
 	{
 		extern unsigned int SSAOBuffers[3];
 		extern unsigned int ssaoColorBuffer;
 		extern unsigned int ssaoFBO;
 	}
-	extern std::vector<FramebufferObject*> AllFramebuffers;
 }

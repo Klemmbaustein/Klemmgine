@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <UI/Default/TextRenderer.h>
 #include <UI/UIBox.h>
@@ -44,3 +45,4 @@ public:
 	void OnAttached() override;
 	Vector2 GetUsedSize() override;
 };
+#endif

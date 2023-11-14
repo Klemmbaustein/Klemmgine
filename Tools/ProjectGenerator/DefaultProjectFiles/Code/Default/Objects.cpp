@@ -5,12 +5,10 @@
 // This file needs to be compiled per project since the objects are different for each project.
 
 template<typename T>
-inline T* Objects::SpawnObject(Transform ObjectTransform)
+inline T* Objects::SpawnObject(Transform ObjectTransform, uint64_t NetID)
 {
 	T* NewObject = new T();
-	NewObject->Start(NewObject->GetObjectDescription().Name, ObjectTransform);
-	NewObject->CurrentScene = Scene::CurrentScene;
-	return NewObject;
+	return dynamic_cast<T*>(NewObject->Start(NewObject->GetObjectDescription().Name, ObjectTransform, NetID));
 }
 
 bool Objects::DestroyObject(WorldObject* Object)
@@ -23,7 +21,7 @@ bool Objects::DestroyObject(WorldObject* Object)
 	return false;
 }
 
-WorldObject* Objects::SpawnObjectFromID(uint32_t ID, Transform ObjectTransform)
+WorldObject* Objects::SpawnObjectFromID(uint32_t ID, Transform ObjectTransform, uint64_t NetID)
 {
 	switch (ID)
 	{

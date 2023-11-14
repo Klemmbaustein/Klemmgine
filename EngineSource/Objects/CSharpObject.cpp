@@ -4,7 +4,7 @@
 
 void CSharpObject::Begin()
 {
-	Properties.push_back(Objects::Property("Object class", Type::String, &CSharpClass));
+	AddEditorProperty(Property("C#:Object class", Type::String, &CSharpClass));
 }
 
 void CSharpObject::Tick()

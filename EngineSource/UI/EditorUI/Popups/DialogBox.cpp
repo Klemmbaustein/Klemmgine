@@ -8,8 +8,9 @@ DialogBox::DialogBox(std::string Title, Vector2 Position, std::string Message, s
 {
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5);
 	ButtonBackground->SetPadding(0);
+	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
 	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-	TabBackground->SetAlign(UIBox::Align::Default);
+	TabBackground->SetVerticalAlign(UIBox::Align::Default);
 	TabBackground->AddChild(ButtonBackground);
 	this->Answers = Answers;
 	for (size_t i = 0; i < Answers.size(); i++)

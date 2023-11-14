@@ -74,14 +74,13 @@ EditorPanel::EditorPanel(Vector3* UIColors, Vector2 Position, Vector2 Scale, Vec
 	{
 		Position = Position - (Scale * 0.5);
 		MainBackground = new UIBox(false, Position);
-		MainBackground->AddChild(TabBackground);
 		TitleBackground = new UIBackground(true, Position, UIColors[0] * 0.75f, Vector2(Scale.X, 0));
 		TitleText = new UIText(0.5f, UIColors[2], Title, Editor::CurrentUI->EngineUIText);
 		TitleText->SetPadding(0.005f);
 		TitleBackground->AddChild(TitleText);
 		MainBackground->AddChild(TitleBackground);
+		MainBackground->AddChild(TabBackground);
 		TabBackground->SetHorizontal(false);
-		TabBackground->SetAlign(UIBox::Align::Reverse);
 		TabBackground->SetPadding(0);
 		TitleBackground->SetPadding(0);
 		TitleBackground->HasMouseCollision = true;

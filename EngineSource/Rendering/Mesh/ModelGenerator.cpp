@@ -116,7 +116,7 @@ namespace ModelGenerator
 		*this = ModelGenerator::ModelData();
 	}
 
-	void ModelData::SaveModelData(std::string Path, bool MaterialsInContent)
+	void ModelData::SaveModelData(std::string Path)
 	{
 		std::ofstream Output(Path, std::ios::out | std::ios::binary);
 
@@ -148,7 +148,7 @@ namespace ModelGenerator
 			{
 				Output.write((char*)&ElemInds[i], sizeof(int));
 			}
-			std::string MaterialString = MaterialsInContent ? "Content/" + Elements[j].ElemMaterial : Elements[j].ElemMaterial;
+			std::string MaterialString = Elements[j].ElemMaterial;
 			size_t size = MaterialString.size();
 			Output.write((char*)&size, sizeof(size_t));
 			Output.write(MaterialString.c_str(), sizeof(char) * size);

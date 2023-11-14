@@ -2,6 +2,7 @@
 #pragma once
 #include <string>
 #include <Math/Vector.h>
+#include <Engine/EngineError.h>
 
 class WorldObject;
 
@@ -60,10 +61,7 @@ namespace CSharp
 	template<typename T, typename... Args> 
 	T StaticCall(void* Function, Args... argument)
 	{
-		if (!Function)
-		{
-			return T();
-		}
+		ENGINE_ASSERT(Function, "");
 		typedef T(__stdcall* f)(Args...);
 		f fPtr = (f)Function;
 		return fPtr(argument...);

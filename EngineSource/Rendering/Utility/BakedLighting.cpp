@@ -264,6 +264,8 @@ void BakedLighting::BakeCurrentSceneToFile()
 		{
 			if (dynamic_cast<MeshComponent*>(c))
 			{
+				if (!dynamic_cast<MeshComponent*>(c)->GetModel()->CastShadow)
+					continue;
 				ModelGenerator::ModelData m = dynamic_cast<MeshComponent*>(c)->GetModelData();
 				if (!m.CastShadow)
 					continue;

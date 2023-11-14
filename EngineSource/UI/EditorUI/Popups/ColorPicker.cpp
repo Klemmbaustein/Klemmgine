@@ -105,8 +105,9 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
 	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
+	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
 	TabBackground->AddChild(ButtonBackground);
-	TabBackground->SetAlign(UIBox::Align::Default);
+	TabBackground->SetVerticalAlign(UIBox::Align::Default);
 	std::vector<std::string> Answers =
 	{
 		"Apply",
@@ -145,11 +146,9 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 
 	RGBBox = new UIBox(false, 0);
 	RGBBox->SetPadding(0);
-	RGBBox->SetAlign(UIBox::Align::Reverse);
 	auto PreviewBox = new UIBox(false, 0);
 	PreviewBox->SetPadding(0);
 	PreviewBox->AddChild(RGBBox);
-	PreviewBox->SetAlign(UIBox::Align::Reverse);
 	PreviewBox->AddChild(ColorPickerBackgrounds[2]);
 	PickerBackground->AddChild(ColorPickerBackgrounds[0]);
 	PickerBackground->AddChild(ColorPickerBackgrounds[1]);
@@ -259,7 +258,7 @@ void ColorPicker::GenerateRGBDisplay()
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		RGBTexts[i] = new UITextField(true, 0, UIColors[1], this, 2, Editor::CurrentUI->EngineUIText);
+		RGBTexts[i] = new UITextField(0, UIColors[1], this, 2, Editor::CurrentUI->EngineUIText);
 		RGBTexts[i]
 			->SetTextSize(0.4f)
 			->SetMinSize(Vector2(0.06f, 0.04f))

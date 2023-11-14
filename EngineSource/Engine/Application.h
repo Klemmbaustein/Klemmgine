@@ -17,6 +17,8 @@ namespace Application
 
 	extern bool ShowStartupInfo;
 
+	int Initialize(int argc, char** argv);
+
 	extern float LogicTime, RenderTime, SyncTime;
 	extern SDL_Window* Window;
 	void Quit();

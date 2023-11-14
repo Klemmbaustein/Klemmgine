@@ -160,7 +160,7 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	}
 	Log::Print("[Build]: Found .sln file: " + SolutionName, Log::LogColor::Green);
 
-	std::string Command = "\"" + MSBuildPath + "\" " + SolutionName + " /p:Platform=x64 /p:Configuration=" + Configuration;
+	std::string Command = "\"" + MSBuildPath + "\" " + SolutionName + ".sln /t:build /p:Platform=x64 /p:Configuration=" + Configuration;
 
 	Log::Print("[Build]: Invoking MSBuild - " + MSBuildPath, Vector3(1));
 	int ret = system(Command.c_str());

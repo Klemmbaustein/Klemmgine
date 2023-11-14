@@ -23,18 +23,18 @@ uniform float u_time = 0;
 void main()
 {
 	bool transparent = false;
-	vec3 texcolor;
+	vec4 texcolor;
 	if(u_useTexture)
 	{
-		texcolor = u_diffuse * texture(u_texture, v_texcoord).rgb;
-		transparent = texture(u_texture, v_texcoord).w < 0.33f ? true : false;
+		texcolor = vec4(u_diffuse, 1.0) * texture(u_texture, v_texcoord);
+		transparent = texcolor.w < 0.33f ? true : false;
 	}
 	else
-		texcolor = u_diffuse;
+		texcolor = vec4(u_diffuse, 1);
 	if(transparent)
 		discard;
 
 	invertReverseFaceNormal = u_reverseNormal;
-	vec3 color = GetLighting(texcolor, u_specularStrength, u_specularSize) + u_emissive;
+	vec3 color = GetLighting(texcolor.xyz, u_specularStrength, u_specularSize) + u_emissive;
 	RETURN_COLOR(color);
 }

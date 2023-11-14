@@ -167,9 +167,10 @@ ItemBrowser::ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edi
 {
 	CPPClasses = GetEditorUIClasses();
 	TabBackground->SetHorizontal(false);
-	TabBackground->SetAlign(UIBox::Align::Reverse);
 	ContentBox = new UIBox(false, 0);
-	TabBackground->AddChild(ContentBox->SetPadding(0));
+	TabBackground->AddChild(ContentBox
+		->SetPadding(0)
+		->SetVerticalAlign(UIBox::Align::Default));
 
 	UpdateLayout();
 }
@@ -183,11 +184,10 @@ void ItemBrowser::UpdateLayout()
 	BrowserScrollBox = new UIScrollBox(false, Scale - Vector2(0, 0.1f), true);
 	BrowserScrollBox->SetMinSize(Vector2(TabBackground->GetMinSize().X, 1.675f));
 	BrowserScrollBox->SetMaxSize(Vector2(MaxSize.X, 1.675f));
-	BrowserScrollBox->SetAlign(UIBox::Align::Reverse);
 	ContentBox->AddChild(BrowserScrollBox
 		->SetPadding(0));
 
-	PathField = new UITextField(true, 0, UIColors[0], this, -3, Editor::CurrentUI->EngineUIText);
+	PathField = new UITextField(0, UIColors[0], this, -3, Editor::CurrentUI->EngineUIText);
 
 	ContentBox->AddChild((new UIBackground(true, 0, UIColors[1], Vector2(Scale.X, 0.1f)))
 		->SetPadding(0)
@@ -212,7 +212,7 @@ void ItemBrowser::UpdateLayout()
 	for (auto& i : Tabs)
 	{
 		auto NewButton = new UIButton(true, 0, UIColors[0] * (ButtonIndex == SelectedTab ? 1.5f : 1.0f), this, -5 - ((int)ButtonIndex));
-		NewButton->SetAlign(UIBox::Align::Centered);
+		NewButton->SetHorizontalAlign(UIBox::Align::Centered);
 		TabBox->AddChild(NewButton
 			->SetBorder(UIBox::BorderType::DarkenedEdge, 0.25f)
 			->SetPadding(0)
@@ -300,7 +300,6 @@ void ItemBrowser::UpdateLayout()
 		NewBackground->SetMinSize(Vector2(0.14f, 0.19f));
 		NewBackground->SetSizeMode(UIBox::SizeMode::PixelRelative);
 		NewBackground->SetPadding(0.005f * Graphics::AspectRatio, 0.005f * Graphics::AspectRatio, 0.005f, 0.005f);
-		NewBackground->SetAlign(UIBox::Align::Reverse);
 		NewBackground->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		NewBackground->SetNeedsToBeSelected(true);
 		UIBackground* ItemImage = new UIBackground(true, 0, 1, Vector2(0.12f));

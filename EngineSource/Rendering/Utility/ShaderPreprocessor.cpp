@@ -53,7 +53,7 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 		CodeStream.getline(Line, 4096);
 		std::stringstream CurrentLine;
 		std::string LineString = Line;
-		StrReplace::ReplaceChar(LineString, '=', " = ");
+		StrUtil::ReplaceChar(LineString, '=', " = ");
 		CurrentLine << LineString;
 		StringPos += CurrentLine.str().size();
 		std::string LineStart;
@@ -118,7 +118,7 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 			//Params.push_back(Material::Param(CurrentLine.str(), ));
 			std::string Name;
 			CurrentLine >> Name;
-			StrReplace::ReplaceChar(Name, ';', "");
+			StrUtil::ReplaceChar(Name, ';', "");
 
 			std::string Default;
 			CurrentLine >> Default;
@@ -131,10 +131,10 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 					// xy = vec3(1, 2, 3);
 					LineString = LineString.substr(LineString.find_first_of("=") + 1);
 					// vec3(1, 2, 3);
-					StrReplace::ReplaceChar(LineString, '(', " ");
-					StrReplace::ReplaceChar(LineString, ')', " ");
-					StrReplace::ReplaceChar(LineString, ',', " ");
-					StrReplace::ReplaceChar(LineString, ';', "");
+					StrUtil::ReplaceChar(LineString, '(', " ");
+					StrUtil::ReplaceChar(LineString, ')', " ");
+					StrUtil::ReplaceChar(LineString, ',', " ");
+					StrUtil::ReplaceChar(LineString, ';', "");
 					// vec3 1 2 3
 
 
@@ -172,7 +172,7 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 				case Type::Int:
 				{
 					CurrentLine >> Default;
-					StrReplace::ReplaceChar(Default, ';', "");
+					StrUtil::ReplaceChar(Default, ';', "");
 				}
 					break;
 				case Type::GL_Texture:
@@ -181,7 +181,7 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 				case Type::Bool:
 				{
 					CurrentLine >> Default;
-					StrReplace::ReplaceChar(Default, ';', "");
+					StrUtil::ReplaceChar(Default, ';', "");
 					if (Default == "true")
 					{
 						Default = "1";

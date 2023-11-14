@@ -43,7 +43,8 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		"../../../Dependencies/glew-cmake/lib/Release",
 		"../../../Dependencies/assimp/lib/Release",
 		"../../../Dependencies/openal-soft/Release",
-		"../../../Dependencies/SDL/VisualC/SDL/x64/Release"
+		"../../../Dependencies/SDL/VisualC/SDL/x64/Release",
+		"../../../Dependencies/SDL_net/Build/Release"
 
 	};
 
@@ -51,7 +52,8 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 	{
 		"Debug",
 		"Editor",
-		"Release"
+		"Release",
+		"Server"
 	};
 	
 	std::string IncludePathsString;
@@ -146,7 +148,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 				.Add(XML("EnableCOMDATFolding", "true"))
 				.Add(XML("FavorSizeOrSpeed", "Speed"))
 				.Add(XML("AdditionalDependencies",
-					"assimp-vc143-mt.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)"))
+					"assimp-vc143-mt.lib;OpenAL32.lib;SDL2_net.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)"))
 				.Add(XML("OutputFile", "$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)"))
 				.Add(XML("Subsystem", "Console")));
 

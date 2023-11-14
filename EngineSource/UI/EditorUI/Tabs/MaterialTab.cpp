@@ -94,7 +94,6 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text) : EditorTab(UICo
 {
 	Renderer = Text;
 
-	TabBackground->SetAlign(UIBox::Align::Reverse);
 	TabName = new UIText(1, UIColors[2], "Material: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
 	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	TabBackground->AddChild(TabName);
@@ -102,10 +101,8 @@ MaterialTab::MaterialTab(Vector3* UIColors, TextRenderer* Text) : EditorTab(UICo
 	TabBackground->AddChild(RowBox);
 	Rows[0] = new UIScrollBox(false, 0, true);
 	RowBox->AddChild(Rows[0]);
-	Rows[0]->SetAlign(UIBox::Align::Reverse);
 
 	Rows[1] = new UIBackground(false, 0, UIColors[1]);
-	Rows[1]->SetAlign(UIBox::Align::Reverse);
 	RowBox->AddChild(Rows[1]);
 
 
@@ -229,7 +226,6 @@ void MaterialTab::GenerateUI()
 		ParamBox->AddChild(TextBox
 			->SetMinSize(Vector2(0.3f, 0.1f))
 			->SetPadding(0.005f)
-			->SetAlign(UIBox::Align::Reverse)
 			->AddChild((new UIText(0.5f, UIColors[2], i.UniformName, Renderer))
 				->SetWrapEnabled(true, 0.4f, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0.005f))
@@ -250,7 +246,7 @@ void MaterialTab::GenerateUI()
 		case Type::Float:
 		case Type::Int:
 		{
-			NewField = (new UITextField(true, 0, UIColors[0], this, Index, Renderer))
+			NewField = (new UITextField(0, UIColors[0], this, Index, Renderer))
 				->SetText(i.Value)
 				->SetTextColor(UIColors[2])
 				->SetMinSize(Vector2(0.26f, 0.05f));
@@ -273,7 +269,7 @@ void MaterialTab::GenerateUI()
 		{
 			auto TextureInfo = Texture::ParseTextureInfoString(i.Value);
 			unsigned int NewTexture = Texture::LoadTexture(TextureInfo);
-			NewField = (new UITextField(true, 0, UIColors[0], this, Index, Renderer))
+			NewField = (new UITextField(0, UIColors[0], this, Index, Renderer))
 				->SetTextColor(UIColors[2])
 				->SetText(TextureInfo.File)
 				->SetPadding(0.02f, 0.02f, 0, 0)
@@ -308,11 +304,11 @@ void MaterialTab::GenerateUI()
 				->SetPadding(0)
 				->AddChild((new UIBox(true, 0))
 					->SetPadding(0)
-					->AddChild(TextureSelectionBoxes[0])
-					->AddChild(TextureSelectionBoxes[1]))
+					->AddChild(NewField))
 				->AddChild((new UIBox(true, 0))
 					->SetPadding(0)
-					->AddChild(NewField)));
+					->AddChild(TextureSelectionBoxes[0])
+					->AddChild(TextureSelectionBoxes[1])));
 
 			TextBox->SetMinSize(Vector2(0.3f, 0.15f));
 			PreviewTextures.push_back(NewTexture);
@@ -357,8 +353,8 @@ void MaterialTab::GenerateMaterialProperties()
 
 	Rows[1]->AddChild(new UIText(0.6f, 1, "Shader files", Renderer));
 
-	ShaderTextFields[0] = new UITextField(true, 0, UIColors[0], this, -4, Renderer);
-	ShaderTextFields[1] = new UITextField(true, 0, UIColors[0], this, -4, Renderer);
+	ShaderTextFields[0] = new UITextField(0, UIColors[0], this, -4, Renderer);
+	ShaderTextFields[1] = new UITextField(0, UIColors[0], this, -4, Renderer);
 
 	Rows[1]->AddChild(ShaderTextFields[0]
 		->SetText(LoadedMaterial.VertexShader)

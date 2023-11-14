@@ -13,6 +13,10 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="Server|x64">
+      <Configuration>Server</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CSharp\CSharpInterop.cpp" />
@@ -40,6 +44,11 @@
     <ClCompile Include="Math\Collision\CollisionBox.cpp" />
     <ClCompile Include="Math\Math.cpp" />
     <ClCompile Include="Math\Vector.cpp" />
+    <ClCompile Include="Networking\Client.cpp" />
+    <ClCompile Include="Networking\NetworkEvent.cpp" />
+    <ClCompile Include="Networking\Networking.cpp" />
+    <ClCompile Include="Networking\Packet.cpp" />
+    <ClCompile Include="Networking\Server.cpp" />
     <ClCompile Include="Objects\Components\BillboardComponent.cpp" />
     <ClCompile Include="Objects\Components\CameraComponent.cpp" />
     <ClCompile Include="Objects\Components\CollisionComponent.cpp" />
@@ -144,6 +153,12 @@
     <ClInclude Include="Math\Collision\TriangleIntersect.h" />
     <ClInclude Include="Math\Math.h" />
     <ClInclude Include="Math\Vector.h" />
+    <ClInclude Include="Networking\Client.h" />
+    <ClInclude Include="Networking\NetworkEvent.h" />
+    <ClInclude Include="Networking\Networking.h" />
+    <ClInclude Include="Networking\NetworkingInternal.h" />
+    <ClInclude Include="Networking\Packet.h" />
+    <ClInclude Include="Networking\Server.h" />
     <ClInclude Include="Objects\Components\BillboardComponent.h" />
     <ClInclude Include="Objects\Components\CameraComponent.h" />
     <ClInclude Include="Objects\Components\CollisionComponent.h" />
@@ -243,6 +258,13 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Server|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
@@ -262,21 +284,28 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Server|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>NotSet</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -284,6 +313,9 @@
   <ImportGroup Label="Shared">
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Server|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Editor|Win32'" Label="PropertySheets">
@@ -295,6 +327,9 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Server|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -303,13 +338,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Server|x64'">
+    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
-    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Label="MySettings">
     <ShowAllFiles>true</ShowAllFiles>
@@ -318,6 +356,22 @@
     <VcpkgEnabled>false</VcpkgEnabled>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Server|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -373,7 +427,45 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <ProgramDataBaseFileName>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration).pdb</ProgramDataBaseFileName>
+      <ObjectFileName>..\$(IntDir)</ObjectFileName>
+      <AssemblerListingLocation>..\$(IntDir)</AssemblerListingLocation>
+      <ModuleOutputFile>..\$(IntDir)</ModuleOutputFile>
+      <ModuleDependenciesFile>..\$(IntDir)</ModuleDependenciesFile>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
+      <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+    </Lib>
+    <PreBuildEvent>
+      <Command>$(ProjectDir)..\Tools\bin\BuildTool.exe  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
+    </PreBuildEvent>
+    <BuildLog>
+      <Path>..\$(IntDir)$(MSBuildProjectName).log</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Server|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;SERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -411,7 +503,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;EDITOR;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
@@ -449,7 +541,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>

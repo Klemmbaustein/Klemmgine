@@ -1,3 +1,4 @@
+#if !SERVER
 #include "UIButton.h"
 #include <Math/Math.h>
 #include <Engine/Input.h>
@@ -273,3 +274,4 @@ void UIButton::OnClicked()
 		Application::ButtonEvents.insert(ButtonEvent(ParentOverride ? ParentOverride : Parent, nullptr, ButtonIndex));
 	}
 }
+#endif

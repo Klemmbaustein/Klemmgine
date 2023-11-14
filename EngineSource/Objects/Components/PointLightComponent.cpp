@@ -4,22 +4,28 @@
 
 void PointLightComponent::Begin()
 {
+#if !SERVER
 	Graphics::MainFramebuffer->Lights.push_back(CurrentLight);
+#endif
 }
 
 void PointLightComponent::Tick()
 {
+#if !SERVER
 	if (CurrentLight != PreviousLight || PreviousTransform != GetParent()->GetTransform())
 	{
 		CurrentLight.Position = Vector3::TranslateVector(RelativeTransform.Location, GetParent()->GetTransform());
 		Update();
 		PreviousTransform = GetParent()->GetTransform();
 	}
+#endif
 }
 
 void PointLightComponent::Destroy()
 {
+#if !SERVER
 	Graphics::MainFramebuffer->Lights.erase(Graphics::MainFramebuffer->Lights.begin() + GetLightIndex());
+#endif
 }
 
 
@@ -55,12 +61,15 @@ float PointLightComponent::GetFalloff()
 
 void PointLightComponent::Update()
 {
+#if !SERVER
 	Graphics::MainFramebuffer->Lights[GetLightIndex()] = CurrentLight;
 	PreviousLight = CurrentLight;
+#endif
 }
 
 size_t PointLightComponent::GetLightIndex()
 {
+#if !SERVER
 	for (size_t i = 0; i < Graphics::MainFramebuffer->Lights.size(); i++)
 	{
 		if (Graphics::MainFramebuffer->Lights[i] == PreviousLight)
@@ -69,4 +78,6 @@ size_t PointLightComponent::GetLightIndex()
 		}
 	}
 	throw("Could not find light index");
+#endif
+	return 0;
 }

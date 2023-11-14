@@ -1,3 +1,4 @@
+#if !SERVER
 #include <UI/Default/ScrollObject.h>
 #include <Math/Math.h>
 #include <Rendering/Graphics.h>
@@ -59,3 +60,4 @@ void ScrollObject::ScrollDown()
 		Percentage = 0;
 	UIBox::RedrawUI();
 }
+#endif

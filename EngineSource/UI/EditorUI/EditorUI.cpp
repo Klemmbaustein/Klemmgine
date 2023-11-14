@@ -16,7 +16,6 @@
 #include <UI/EditorUI/Viewport.h>
 #include <UI/EditorUI/ObjectList.h>
 #include <UI/EditorUI/ContextMenu.h>
-#include <GL/glew.h>
 #include <atomic>
 #include <Engine/Log.h>
 #include <Engine/Input.h>
@@ -27,6 +26,10 @@
 #include <Engine/File/Assets.h>
 #include <UI/UIDropdown.h>
 #include <SDL.h>
+#include <Rendering/Texture/Texture.h>
+
+int EditorUI::NumLaunchClients = 1;
+
 
 namespace Editor
 {
@@ -77,8 +80,7 @@ namespace UI
 bool ChangedScene = false;
 
 std::string EditorUI::LaunchInEditorArgs;
-FILE* EditorUI::DebugProcess = nullptr;
-std::thread* EditorUI::DebugProcessIOThread = nullptr;
+bool EditorUI::LaunchWithServer = false;
 
 void EditorUI::LaunchInEditor()
 {
@@ -92,7 +94,14 @@ void EditorUI::LaunchInEditor()
 			Build::BuildCurrentSolution("Debug");
 		}
 
-		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll") 
+		if (!std::filesystem::exists(ProjectName + "-Server.exe")
+			|| std::filesystem::last_write_time(ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
+		{
+			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
+			Build::BuildCurrentSolution("Server");
+		}
+
+		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll")
 			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
 			&& CSharp::GetUseCSharp())
 		{
@@ -115,46 +124,46 @@ void EditorUI::LaunchInEditor()
 	{
 		Args.append(" -scene " + FileUtil::GetFileNameFromPath(Scene::CurrentScene));
 	}
+	if (LaunchWithServer)
+	{
+		Args.append(" -connect localhost ");
+	}
 #if _WIN32
 	std::string CommandLine = ProjectName + "-Debug.exe -nostartupinfo " + Args;
 #else
-	std::string CommandLine = "./" + ProjectName + "-Debug -nostartupinfo " + Args;
+	std::string CommandLine = "./" + ProjectName + "-Debug -nostartupinfo " + Args + " &";
 #endif
 	Log::Print("[Debug]: Starting process: " + CommandLine, Log::LogColor::Blue);
 #if _WIN32
-	DebugProcess = _popen(CommandLine.c_str(), "r");
+	std::string Command;
+	for (int i = 0; i < NumLaunchClients; i++)
+	{
+		Command.append("start /b " + CommandLine + " > nul");
+		if (i < NumLaunchClients - 1)
+		{
+			Command.append(" && ");
+		}
+	}
+	system(Command.c_str());
 #else
-	DebugProcess = popen(CommandLine.c_str(), "r");
+	for (int i = 0; i < NumLaunchClients; i++)
+	{
+		system(CommandLine.c_str());
+	}
 #endif
-	DebugProcessIOThread = new std::thread(ReadProcessOutput);
+	if (LaunchWithServer)
+	{
+#if _WIN32
+		system(("start " + ProjectName + "-Server.exe -nostartupinfo -quitondisconnect " + Args).c_str());
+#else
+		system(("./" + ProjectName + "-Server.exe -nostartupinfo -quitondisconnect " + Args + " &").c_str());
+#endif
+	}
 }
 
 void EditorUI::SetSaveSceneOnLaunch(bool NewValue)
 {
 	Editor::SaveSceneOnLaunch = NewValue;
-}
-
-void EditorUI::ReadProcessOutput()
-{
-	std::string CurrentMessage;
-	Log::Print("[Debug]: --------------------------------[Start of debugging session]--------------------------------", Log::LogColor::Blue);
-	while (!feof(DebugProcess))
-	{
-		char NewChar = (char)fgetc(DebugProcess);
-
-		if (NewChar == '\n')
-		{
-			Log::Print("[Debug]: " + CurrentMessage);
-			CurrentMessage.clear();
-		}
-		else
-		{
-			CurrentMessage.append({ NewChar });
-		}
-	}
-	Log::Print("[Debug]: ---------------------------------[End of debugging session]---------------------------------", Log::LogColor::Blue);
-	fclose(DebugProcess);
-	DebugProcess = nullptr;
 }
 
 #ifdef ENGINE_CSHARP
@@ -363,14 +372,6 @@ void EditorUI::Tick()
 	}
 #endif
 
-	if (!DebugProcess && DebugProcessIOThread)
-	{
-		DebugProcessIOThread->join();
-		delete DebugProcessIOThread;
-		DebugProcessIOThread = nullptr;
-	}
-
-
 	Editor::HoveringPopup = Editor::PrevHoveringPopup;
 	Editor::PrevHoveringPopup = false;
 	Editor::DraggingPopup = false;
@@ -436,8 +437,6 @@ void EditorUI::Tick()
 	}
 }
 
-
-
 void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position)
 {
 	if (Dropdown)
@@ -447,7 +446,6 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 
 	CurrentDropdown = Menu;
 	Dropdown = new UIBackground(false, Position, UIColors[0] * 2);
-	Dropdown->SetAlign(UIBox::Align::Reverse);
 	Dropdown->SetBorder(UIBox::BorderType::Rounded, 0.4f);
 	for (size_t i = 0; i < Menu.size(); i++)
 	{
@@ -519,32 +517,11 @@ void EditorUI::GenUITextures()
 
 	for (int i = 0; i < Textures.size(); i++)
 	{
-		glDeleteTextures(1, &Textures.at(i));
+		Texture::UnloadTexture(Textures[i]);
 	}
 	for (int i = 0; i < ImageSize; i++)
 	{
-		int TextureWidth = 0;
-		int TextureHeigth = 0;
-		int BitsPerPixel = 0;
-		stbi_set_flip_vertically_on_load(true);
-		auto TextureBuffer = stbi_load(("../../EditorContent/Images/" + Images[i]).c_str(), &TextureWidth, &TextureHeigth, &BitsPerPixel, 4);
-
-
-		GLuint TextureID;
-		glGenTextures(1, &TextureID);
-		glBindTexture(GL_TEXTURE_2D, TextureID);
-
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TextureWidth, TextureHeigth, 0, GL_RGBA, GL_UNSIGNED_BYTE, TextureBuffer);
-
-		Textures.push_back(TextureID);
-		if (TextureBuffer)
-		{
-			stbi_image_free(TextureBuffer);
-		}
+		Textures.push_back(Texture::LoadTexture("../../EditorContent/Images/" + Images[i]));
 	}
 }
 

@@ -157,17 +157,28 @@ void Console::InitializeConsole()
 			[]() {
 				ConsoleLog("Version: " + std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(Project::ProjectName) + ")");
 				ConsoleLog("OS: " + OS::GetOSString());
+#if SERVER
+				ConsoleLog("Running server");
+#endif
 			},
 			[]() {
+#if !SERVER
 				ConsoleLog("OpenGL version: " + std::string((const char*)glGetString(GL_VERSION)));
 				ConsoleLog("GLSL: " + std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
 				ConsoleLog("Window resolution: x=" + std::to_string((int)Graphics::WindowResolution.X) + " y=" + std::to_string((int)Graphics::WindowResolution.Y));
 				ConsoleLog("Shadow resolution: " + std::to_string(Graphics::ShadowResolution) + "x" + std::to_string(Graphics::ShadowResolution) + "px");
 				ConsoleLog("Shaders: " + std::to_string(GetNumShaders()));
+#else
+				ConsoleLog("Build config is server - no graphics");
+#endif
 			},
 			[]() {
+#if !SERVER
 				ConsoleLog("OpenAL version: " + Sound::GetVersionString());
 				ConsoleLog("Sounds: " + std::to_string(Sound::GetSounds().size()) + "/255");
+#else
+				ConsoleLog("Build config is server - no sound");
+#endif
 			},
 			[]() {
 #if ENGINE_CSHARP
@@ -490,6 +501,11 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 				PrintArguments(FoundCommand.Arguments, E_ERROR);
 				return false;
 			}
+			if (FoundCommand.Arguments[i].Optional && CommandVec.size() < i + 2)
+			{
+				break;
+			}
+
 			if (IsTypeNumber(FoundCommand.Arguments[i].Type) && !IsTypeNumber(GetDataTypeFromString(CommandVec[i + 1])))
 			{
 				ConsoleLog("Expected " + Type::Types[FoundCommand.Arguments[i].Type] + " for '" + FoundCommand.Arguments[i].Name + "', found string.", E_ERROR);

@@ -83,7 +83,7 @@ void WriteSpawnList(std::vector<Object> Objects, std::string TargetFolder)
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
 		uint32_t ID = hash_str_uint32(Objects[i].Name);
-		OutStream << "case " + std::to_string(ID) + ": return (WorldObject*)SpawnObject<" + Objects[i].Name + ">(ObjectTransform); " << std::endl;
+		OutStream << "case " + std::to_string(ID) + ": return (WorldObject*)SpawnObject<" + Objects[i].Name + ">(ObjectTransform, NetID); " << std::endl;
 	}
 	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_Spawnlist.h");
 }

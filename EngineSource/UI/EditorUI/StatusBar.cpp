@@ -21,12 +21,12 @@ StatusBar::StatusBar(Vector3* Colors)
 	VersionText.append("-C#");
 #endif
 
-	Texts[2] = new UIText(0.55f, UIColors[2], "FPS: ", Editor::CurrentUI->EngineUIText);
-	TabBackground->AddChild(Texts[2]->SetPadding(0.005f, 0.005f, 0.01f, 0.025f));
-
+	Texts[2] = new UIText(0.5f, UIColors[2], "FPS: ", Editor::CurrentUI->EngineUIText);
+	TabBackground->AddChild(Texts[2]->SetPadding(0, 0, 0.01f, 0.025f));
+	TabBackground->SetVerticalAlign(UIBox::Align::Centered);
 	WindowButtonBox = (new UIBox(true, Vector2(0.75f, 0.95f)))
 		->SetMinSize(Vector2(0.25f, 0.05f));
-	WindowButtonBox->SetAlign(UIBox::Align::Reverse);
+	WindowButtonBox->SetHorizontalAlign(UIBox::Align::Centered);
 }
 
 

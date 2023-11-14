@@ -1,4 +1,5 @@
 // Engine includes
+#define SDL_MAIN_HANDLED
 #include <Engine/Application.h>
 #include <Engine/OS.h>
 #include <Engine/Input.h>
@@ -32,10 +33,14 @@
 #include <Rendering/Camera/FrustumCulling.h>
 #include <Rendering/Graphics.h>
 #include <Rendering/Utility/PostProcess.h>
+#include <Rendering/BillboardSprite.h>
+#include <Rendering/Texture/Texture.h>
 
 #include <Math/Collision/Collision.h>
 
 #include <CSharp/CSharpInterop.h>
+
+#include <Networking/Networking.h>
 
 // Library includes
 #include <GL/glew.h>
@@ -44,12 +49,12 @@
 // STL includes
 #include <iostream>
 #include <thread>
-
-#include <Rendering/BillboardSprite.h>
-#include <Rendering/Texture/Texture.h>
-
+#include <deque>
 Vector2 GetMousePosition()
 {
+#if SERVER
+	return 0;
+#endif
 	int x;
 	int y;
 	SDL_GetMouseState(&x, &y);
@@ -66,70 +71,14 @@ namespace Application
 	bool ShowStartupInfo = true;
 	bool RenderPostProcess = true;
 
-#if EDITOR
-	constexpr int MOUSE_GRAB_PADDING = 5;
-
-	SDL_HitTestResult HitTestCallback(SDL_Window* Window, const SDL_Point* Area, void* Data)
-	{
-		int Width, Height;
-		SDL_GetWindowSize(Window, &Width, &Height);
-		int x;
-		int y;
-		SDL_GetMouseState(&x, &y);
-		Input::MouseLocation = Vector2(((float)Area->x / (float)Width - 0.5f) * 2.0f, 1.0f - ((float)Area->y / (float)Height * 2.0f));
-
-		if (Area->y < MOUSE_GRAB_PADDING)
-		{
-			if (Area->x < MOUSE_GRAB_PADDING)
-			{
-				return SDL_HITTEST_RESIZE_TOPLEFT;
-			}
-			else if (Area->x > Width - MOUSE_GRAB_PADDING)
-			{
-				return SDL_HITTEST_RESIZE_TOPRIGHT;
-			}
-			else
-			{
-				return SDL_HITTEST_RESIZE_TOP;
-			}
-		}
-		else if (Area->y > Height - MOUSE_GRAB_PADDING)
-		{
-			if (Area->x < MOUSE_GRAB_PADDING)
-			{
-				return SDL_HITTEST_RESIZE_BOTTOMLEFT;
-			}
-			else if (Area->x > Width - MOUSE_GRAB_PADDING)
-			{
-				return SDL_HITTEST_RESIZE_BOTTOMRIGHT;
-			}
-			else
-			{
-				return SDL_HITTEST_RESIZE_BOTTOM;
-			}
-		}
-		else if (Area->x < MOUSE_GRAB_PADDING)
-		{
-			return SDL_HITTEST_RESIZE_LEFT;
-		}
-		else if (Area->x > Width - MOUSE_GRAB_PADDING)
-		{
-			return SDL_HITTEST_RESIZE_RIGHT;
-		}
-		else if (EditorUI::IsTitleBarHovered() && !UI::HoveredBox)
-		{
-			return SDL_HITTEST_DRAGGABLE;
-		}
-
-		return SDL_HITTEST_NORMAL;
-	}
-#endif
-
 	SDL_Window* Window = nullptr;
 	bool ShouldClose = false;
 	
 	bool WindowHasFocus()
 	{
+#if SERVER
+		return false;
+#endif
 		return SDL_GetKeyboardFocus() == Window || Stats::Time <= 1;
 	}
 
@@ -139,6 +88,9 @@ namespace Application
 	}
 	void Minimize()
 	{
+#if SERVER
+		return;
+#endif
 		SDL_MinimizeWindow(Window);
 	}
 	std::set<ButtonEvent> ButtonEvents;
@@ -166,6 +118,7 @@ namespace Application
 	}
 	void SetFullScreen(bool NewFullScreen)
 	{
+#if !SERVER
 #if EDITOR
 		if (NewFullScreen)
 		{
@@ -183,9 +136,13 @@ namespace Application
 		Graphics::SetWindowResolution(Vector2((float)w, (float)h));
 		UIBox::RedrawUI();
 #endif
+#endif
 	}
 	bool GetFullScreen()
 	{
+#if SERVER
+		return false;
+#endif
 #if EDITOR
 		auto flag = SDL_GetWindowFlags(Window);
 		auto is_fullscreen = flag & SDL_WINDOW_MAXIMIZED;
@@ -197,6 +154,9 @@ namespace Application
 	}
 	void SetCursorPosition(Vector2 NewPos)
 	{
+#if SERVER
+		return;
+#endif
 		Vector2 Size = GetWindowSize();
 		Vector2 TranslatedPos = Vector2(((NewPos.X + 1) / 2) * Size.X, (((NewPos.Y) + 1) / 2) * Size.Y);
 		TranslatedPos.Y = Size.Y - TranslatedPos.Y;
@@ -208,6 +168,9 @@ namespace Application
 	}
 	Vector2 GetWindowSize()
 	{
+#if SERVER
+		return 0;
+#endif
 		int w, h;
 		SDL_GetWindowSize(Window, &w, &h);
 		return Vector2((float)w, (float)h);
@@ -240,7 +203,7 @@ void GLAPIENTRY MessageCallback(
 		|| type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR
 		|| type == GL_DEBUG_TYPE_PORTABILITY)
 	{
-		Log::Print(std::string(message)  + " - " + Debugging::EngineStatus);
+		Log::Print(std::string(message)  + " - " + Debugging::EngineStatus, Log::LogColor::Red);
 		SDL_Delay(15);
 	}
 }
@@ -259,6 +222,7 @@ void TickObjects()
 
 void DrawFramebuffer(FramebufferObject* Buffer)
 {
+#if !SERVER
 	if (!Buffer->FramebufferCamera) return;
 
 #if EDITOR
@@ -393,10 +357,12 @@ void DrawFramebuffer(FramebufferObject* Buffer)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
+#endif
 }
 
-void InitializeShaders()
+static void InitializeShaders()
 {
+#if !SERVER
 	std::cout << "- Initializing Shaders";
 	Graphics::TextShader = new Shader("Shaders/UI/text.vert", "Shaders/UI/text.frag");
 	std::cout << ".";
@@ -407,11 +373,32 @@ void InitializeShaders()
 	Application::ShadowShader = new Shader("Shaders/Internal/shadow.vert", "Shaders/Internal/shadow.frag", "Shaders/Internal/shadow.geom");
 	Graphics::ShadowShader = Application::ShadowShader;
 	std::cout << "." << std::endl;
+#endif
 }
 
-
-void PollInput()
+namespace ConsoleInput
 {
+	std::condition_variable cv;
+	std::mutex mutex;
+	std::deque<std::string> lines;
+
+	std::thread* ReadConsoleThread;
+	static void ReadConsole()
+	{
+		while (true)
+		{
+			std::string tmp;
+			std::getline(std::cin, tmp);
+			std::lock_guard lock{ mutex };
+			lines.push_back(std::move(tmp));
+			cv.notify_one();
+		}
+	}
+}
+
+static void PollInput()
+{
+#if !SERVER
 	Input::MouseMovement = Vector2();
 	SDL_Event Event;
 	while (SDL_PollEvent(&Event))
@@ -598,10 +585,12 @@ void PollInput()
 	{
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
+#endif
 }
 
 void DrawPostProcessing()
 {
+#if !SERVER
 	bool ShouldSkip3D = false;
 #if EDITOR
 	if (!Application::WindowHasFocus())
@@ -714,20 +703,44 @@ void DrawPostProcessing()
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	Application::PostProcessShader->Unbind();
 	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
+#endif
 }
 
 void ApplicationLoop()
 {
 	const Application::Timer FrameTimer;
 	const Application::Timer LogicTimer;
+#if !SERVER
 	PollInput();
 	CameraShake::Tick();
 	Sound::Update();
+#endif
+#if !EDITOR
+	if (Project::UseNetworkFunctions)
+	{
+		Networking::Update();
+	}
+#endif
+
+	std::deque<std::string> toProcess;
+	{
+		std::unique_lock lock{ ConsoleInput::mutex };
+		if (ConsoleInput::cv.wait_for(lock, std::chrono::seconds(0), [&] { return !ConsoleInput::lines.empty(); }))
+		{
+			std::swap(ConsoleInput::lines, toProcess);
+		}
+	}
+
+	for (auto& i : toProcess)
+	{
+		Console::ExecuteConsoleCommand(i);
+	}
 
 	WorldObject::DestroyMarkedObjects();
 	TickObjects();
 	float LogicTime = LogicTimer.TimeSinceCreation();
 	const Application::Timer RenderTimer;
+#if !SERVER
 	Debugging::EngineStatus = "Rendering (Framebuffer)";
 	for (FramebufferObject* Buffer : Graphics::AllFramebuffers)
 	{
@@ -754,7 +767,6 @@ void ApplicationLoop()
 		}
 	}
 	Application::ButtonEvents.clear();
-
 	Debugging::EngineStatus = "Ticking (UI)";
 	for (int i = 0; i < Graphics::UIToRender.size(); i++)
 	{
@@ -774,12 +786,17 @@ void ApplicationLoop()
 		new DebugUI();
 	}
 #endif
+#endif
 	Scene::Tick();
 	const Application::Timer SwapTimer;
+#if !SERVER
 	SDL_GL_SetSwapInterval(0 - Graphics::VSync);
 	SDL_GL_SwapWindow(Application::Window);
+#endif
 
+#if !SERVER
 	Application::RenderTime = RenderTime;
+#endif
 	Application::LogicTime = LogicTime;
 	Application::SyncTime = SwapTimer.TimeSinceCreation();
 
@@ -790,13 +807,20 @@ void ApplicationLoop()
 	Stats::Time += Performance::DeltaTime;
 	Performance::DrawCalls = 0u;
 
-	if (IS_IN_EDITOR && !Application::WindowHasFocus())
+#if EDITOR
+	if (!Application::WindowHasFocus())
 	{
 		SDL_Delay(100 - (Uint32)(Performance::DeltaTime * 1000));
 	}
+#endif
+#if SERVER
+	SDL_Delay((Uint32)(1000.0f
+		* std::max(1.0f / (float)Networking::GetTickRate() - Performance::DeltaTime,
+			0.0f)));
+#endif
 }
 
-int Initialize(int argc, char** argv)
+int Application::Initialize(int argc, char** argv)
 {
 	OS::SetConsoleWindowVisible(true);
 	Assets::ScanForAssets();
@@ -819,6 +843,7 @@ int Initialize(int argc, char** argv)
 	{
 		std::cout << "SDL2 started (No error)\n";
 	}
+#if !SERVER
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
@@ -889,14 +914,21 @@ int Initialize(int argc, char** argv)
 	Graphics::MainCamera = Scene::DefaultCamera;
 	Graphics::MainFramebuffer = new FramebufferObject();
 	Graphics::MainFramebuffer->FramebufferCamera = Graphics::MainCamera;
-
+#endif
 #if ENGINE_CSHARP
 	CSharp::Init();
 #endif
-	BakedLighting::Init();
 	Console::InitializeConsole();
-	Console::RegisterConVar(Console::Variable("post_process", Type::Bool, &Application::RenderPostProcess, nullptr));
 	Cubemap::RegisterCommands();
+#if !EDITOR
+	if (Project::UseNetworkFunctions)
+	{
+		Networking::Init();
+	}
+#endif
+#if !SERVER
+	BakedLighting::Init();
+	Console::RegisterConVar(Console::Variable("post_process", Type::Bool, &Application::RenderPostProcess, nullptr));
 	InitializeShaders();
 	UIBox::InitUI();
 	Application::UIMergeEffect = new PostProcess::Effect("Internal/uimerge.frag", PostProcess::EffectType::UI_Internal);
@@ -904,6 +936,10 @@ int Initialize(int argc, char** argv)
 	CSM::Init();
 	Bloom::Init();
 	SSAO::Init();
+#endif
+
+	ConsoleInput::ReadConsoleThread = new std::thread(ConsoleInput::ReadConsole);
+
 	if (argc > 1)
 	{
 		std::vector<std::string> LaunchArguments;
@@ -942,5 +978,13 @@ int Initialize(int argc, char** argv)
 	{
 		ApplicationLoop();
 	}
-	return 0;
+#if !EDITOR
+	Networking::Exit();
+#endif
+	exit(0);
+}
+
+int main(int argc, char** argv)
+{
+	return Application::Initialize(argc, argv);
 }

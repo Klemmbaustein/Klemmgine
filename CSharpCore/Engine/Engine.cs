@@ -41,7 +41,7 @@ public struct EngineTransform
 	}
 }
 
-internal static class Engine
+static class Engine
 {
 	public static Assembly? LoadedAsm = null;
 	static Int64 CurrentObjectIndex = 0;
@@ -67,7 +67,7 @@ internal static class Engine
 
 		LoadedAsm = Assembly.Load(File.ReadAllBytes(Path));
 
-		LoadTypeFromAssembly("Log")?.GetMethod("LoadLogFunction")?.Invoke(null, new Delegate[] { EngineLog.Print });
+		LoadTypeFromAssembly("Engine.Log.Log")!.GetMethod("LoadLogFunction")!.Invoke(null, new Delegate[] { EngineLog.Print });
 
 
 		var WorldObjectType = LoadTypeFromAssembly("WorldObject");
@@ -78,7 +78,7 @@ internal static class Engine
 			return;
 		}
 
-		WorldObjectType?.GetMethod("LoadGetObjectFunction")?.Invoke(null, new object[] { (object)GetObjectFromID });
+		WorldObjectType?.GetMethod("LoadGetObjectFunction")!.Invoke(null, new object[] { (object)GetObjectFromID });
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{
@@ -88,8 +88,8 @@ internal static class Engine
 			}
 		}
 
-		StatsObject = LoadTypeFromAssembly("Stats");
-		StatsObject?.GetField("InEditor")?.SetValue(null, InEditor);
+		StatsObject = LoadTypeFromAssembly("Engine.Stats");
+		StatsObject!.GetField("InEditor")!.SetValue(null, InEditor);
 	}
 
 	public static Int32 Instantiate(string obj, EngineTransform t, IntPtr NativeObject)
@@ -201,7 +201,7 @@ internal static class Engine
 
 	public static void SetDelta(float NewDelta)
 	{
-		StatsObject?.GetField("DeltaTime")?.SetValue(null, NewDelta);
+		StatsObject!.GetField("DeltaTime")?.SetValue(null, NewDelta);
 	}
 
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]

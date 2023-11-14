@@ -27,6 +27,9 @@ public:
 	template<typename T>
 	static T* CreateNewCanvas()
 	{
+#if SERVER
+		return nullptr;
+#endif
 		if (IsInEditor)
 		{
 			return nullptr;

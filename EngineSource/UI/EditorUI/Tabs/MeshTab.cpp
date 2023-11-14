@@ -12,8 +12,6 @@
 #include <UI/UIButton.h>
 #include <UI/EditorUI/EditorUI.h>
 
-#define MESHTAB_DEBUG 1
-
 namespace MaterialTemplates
 {
 	struct TemplateParam
@@ -35,7 +33,6 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 	TabName = new UIText(1, UIColors[2], "Model: " + FileUtil::GetFileNameWithoutExtensionFromPath(Filepath), Renderer);
 	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	TabBackground->AddChild(TabName);
-	TabBackground->SetAlign(UIBox::Align::Reverse);
 	if (!PreviewBuffer)
 	{
 		PreviewBuffer = new FramebufferObject();
@@ -46,23 +43,24 @@ MeshTab::MeshTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors
 		PreviewBuffer->FramebufferCamera = Cam;
 	}
 	auto RowBox = new UIBox(true, 0);
+	RowBox->SetVerticalAlign(UIBox::Align::Default);
 	TabBackground->AddChild(RowBox);
+
+	PreviewWindow = new UIBackground(true, 0, 1, 0.5f);
+
 	Rows[0] = new UIBackground(false, 0, UIColors[1]);
 	RowBox->AddChild(Rows[0]);
-	PreviewWindow = new UIBackground(true, 0, 1, 0.5f);
 	Rows[0]->AddChild(PreviewWindow);
 	Rows[0]->SetMinSize(Vector2(0, 1.1f));
 	Rows[0]->SetMaxSize(Vector2(1, 1.1f));
-	Rows[0]->SetAlign(UIBox::Align::Reverse);
 	PreviewWindow->SetBorder(UIBox::BorderType::Rounded, 1);
 
 	Rows[1] = new UIScrollBox(false, 0, true);
-	Rows[1]->SetAlign(UIBox::Align::Reverse);
 	Rows[1]->SetMinSize(Vector2(1.0f, 1.0f));
 	Rows[1]->SetMaxSize(Vector2(1.0f, 1.0f));
 	RowBox->AddChild((new UIBox(false, 0))
-		->AddChild(Rows[1])
-		->AddChild(new UIText(0.7f, UIColors[2], "Materials", Renderer)));
+		->AddChild(new UIText(0.7f, UIColors[2], "Materials", Renderer))
+		->AddChild(Rows[1]));
 }
 
 void MeshTab::Tick()
@@ -91,19 +89,12 @@ void MeshTab::Load(std::string File)
 {
 	try
 	{
-		TabName->SetText(FileUtil::GetFileNameWithoutExtensionFromPath(File));
+		TabName->SetText("Model: " + FileUtil::GetFileNameWithoutExtensionFromPath(File));
 		PreviewBuffer->GetBuffer()->ReInit((int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 		Graphics::MainCamera->Position = Vector3(0, 4, 15);
 		Graphics::MainCamera->SetRotation(Vector3(0, -90, 0));
 		ModelData = ModelGenerator::ModelData();
 		ModelData.LoadModelFromFile(File);
-		if (!MESHTAB_DEBUG)
-		{
-			for (auto& m : ModelData.Elements)
-			{
-				m.ElemMaterial = m.ElemMaterial.substr(8);
-			}
-		}
 		HasCollision = ModelData.HasCollision;
 		TwoSided = ModelData.TwoSided;
 		CastShadow = ModelData.CastShadow;
@@ -143,7 +134,7 @@ void MeshTab::Save()
 		ModelData.CastShadow = CastShadow;
 		ModelData.HasCollision = HasCollision;
 		ModelData.TwoSided = TwoSided;
-		ModelData.SaveModelData(InitialName, !MESHTAB_DEBUG);
+		ModelData.SaveModelData(InitialName);
 		PreviewModel = nullptr;
 		PreviewBuffer->ClearContent();
 	}
@@ -184,14 +175,16 @@ void MeshTab::Generate()
 	int MaterialIndex = 0;
 	for (auto& i : ModelData.Elements)
 	{
-		auto NewTextInput = new UITextField(true, 0, UIColors[1], this, 1, Renderer);
+		auto NewTextInput = new UITextField(0, UIColors[1], this, 1, Renderer);
 		NewTextInput->SetMinSize(Vector2(0.4f, 0.05f));
 		NewTextInput->SetText(i.ElemMaterial);
 		Rows[1]->AddChild((new UIBox(true, 0))
 			->SetPadding(0)
-			->AddChild((new UIText(0.5f, UIColors[2], "Material " + std::to_string(MaterialIndex++) + ": ", Renderer))
-				->SetPadding(0, 0.03f, 0, 0))
-			->AddChild(NewTextInput));
+			->SetVerticalAlign(UIBox::Align::Centered)
+			->AddChild((new UIText(0.5f, UIColors[2], "Material " + std::to_string(MaterialIndex++) + ":  ", Renderer))
+				->SetPadding(0, 0, 0, 0))
+			->AddChild(NewTextInput
+				->SetPadding(0)));
 		MaterialTextFields.push_back(NewTextInput);
 	}
 	UIBox::DrawAllUIElements();

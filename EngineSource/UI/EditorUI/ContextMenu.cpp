@@ -16,13 +16,12 @@ ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : Edi
 {
 	BackgroundBox = new UIScrollBox(false, 0, true);
 	BackgroundBox->SetPadding(0.01f);
-	BackgroundBox->SetAlign(UIBox::Align::Reverse);
 	UpdateLayout();
 }
 
 UITextField* ContextMenu::GenerateTextField(std::string Content, int Index)
 {
-	auto NewElement = new UITextField(true, 0, 0.2f, this, Index, Editor::CurrentUI->EngineUIText);
+	auto NewElement = new UITextField(0, 0.2f, this, Index, Editor::CurrentUI->EngineUIText);
 	((UITextField*)NewElement)->SetText(Content);
 	((UITextField*)NewElement)->SetTextSize(0.4f);
 	NewElement->SetPadding(0.005f, 0.005f, 0.02f, 0.005f);
@@ -71,11 +70,13 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 			// Vector3_Colors and Vector3s both use VectorFields, so we treat them the same
 		case Type::Vector3Color:
 			VectorType = UIVectorField::VecType::rgb;
+			[[fallthrough]];
 		case Type::Vector3Rotation:
 			if (VectorType == UIVectorField::VecType::xyz)
 			{
 				VectorType = UIVectorField::VecType::PitchYawRoll;
 			}
+			[[fallthrough]];
 		case Type::Vector3:
 			NewElement = new UIVectorField(0, *(Vector3*)i.Variable, this, ElemIndex, Editor::CurrentUI->EngineUIText);
 			NewElement->SetPadding(0.005f, 0, 0.02f, 0);
@@ -219,8 +220,12 @@ void ContextMenu::UpdateLayout()
 
 		std::map<std::string, std::vector<ContextMenuSection>> Categories;
 
-		for (Objects::Property i : SelectedObject->Properties)
+		for (WorldObject::Property i : SelectedObject->Properties)
 		{
+			if (i.PType != WorldObject::Property::PropertyType::EditorProperty)
+			{
+				continue;
+			}
 			auto Colon = i.Name.find_last_of(":");
 			std::string CategoryName = SelectedObject->GetObjectDescription().Name;
 			if (Colon != std::string::npos)

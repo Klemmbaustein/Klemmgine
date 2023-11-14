@@ -17,6 +17,10 @@
 #include <Sound/Sound.h>
 #include <Math/Collision/Collision.h>
 #include <Engine/Console.h>
+#include <UI/UIBox.h>
+#include <UI/UIBackground.h>
+#include <UI/UIText.h>
+#include <Engine/Application.h>
 
 namespace NativeFunctions
 {
@@ -104,7 +108,7 @@ namespace NativeFunctions
 
 	CSharp::CSharpWorldObject NewCSObject(const char* TypeName, Transform ObjectTransform)
 	{
-		CSharpObject* NewObject = Objects::SpawnObject<CSharpObject>(ObjectTransform);
+		CSharpObject* NewObject = Objects::SpawnObject<CSharpObject>(ObjectTransform, 0);
 		NewObject->LoadClass(TypeName);
 		return NewObject->CS_Obj;
 	}
@@ -148,6 +152,125 @@ namespace NativeFunctions
 	{
 		TargetObject->SetTransform(NewTransform);
 	}
+
+#if !SERVER
+	UIBox* CreateUIBox(bool Horizontal, Vector2 Position)
+	{
+#if !EDITOR
+		return new UIBox(Horizontal, Position);
+#endif
+		return nullptr;
+	}
+
+	void DestroyUIBox(UIBox* Target)
+	{
+#if !EDITOR
+		delete Target;
+#endif
+	}
+
+	void SetUIBoxMinSize(Vector2 NewMinSize, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetMinSize(NewMinSize);
+#endif
+	}
+
+	void SetUIBoxMaxSize(Vector2 NewMaxSize, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetMaxSize(NewMaxSize);
+#endif
+	}
+
+	void SetUIBoxPosition(Vector2 Position, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetPosition(Position);
+#endif
+	}
+
+	void SetUIBoxVerticalAlign(UIBox::Align NewAlign, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetVerticalAlign(NewAlign);
+#endif
+	}
+
+	void SetUIBoxHorizontalAlign(UIBox::Align NewAlign, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetHorizontalAlign(NewAlign);
+#endif
+	}
+
+	void SetUIBoxSizeMode(UIBox::SizeMode Mode, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetSizeMode(Mode);
+#endif
+	}
+
+	void SetUIBoxBorder(UIBox::BorderType NewBorder, float Size, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetBorder(NewBorder, Size);
+#endif
+	}
+
+	void SetUIBoxPadding(float Up, float Down, float Left, float Right, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetPadding(Up, Down, Left, Right);
+#endif
+	}
+
+	void SetUIBoxPaddingSizeMode(UIBox::SizeMode Mode, UIBox* Target)
+	{
+#if !EDITOR
+		Target->SetPaddingSizeMode(Mode);
+#endif
+	}
+
+	void AddUIBoxChild(UIBox* Child, UIBox* Target)
+	{
+#if !EDITOR
+		Target->AddChild(Child);
+#endif
+	}
+
+
+	UIBackground* CreateUIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale)
+	{
+#if EDITOR
+		return nullptr;
+#endif
+		return (UIBackground*)(new UIBackground(Horizontal, Position, Color, MinScale))->SetTryFill(true);
+	}
+
+	TextRenderer* CreateTextRenderer(const char* Font)
+	{
+#if EDITOR
+		return nullptr;
+#endif
+		return new TextRenderer(Font);
+	}
+
+	UIText* CreateUIText(float Scale, Vector3 Color, const char* Text, TextRenderer* Renderer)
+	{
+#if EDITOR
+		return nullptr;
+#endif
+		return new UIText(Scale, Color, Text, Renderer);
+	}
+
+	void SetCursorVisible(bool NewVisible)
+	{
+#if !EDITOR
+		Input::CursorVisible = NewVisible;
+#endif
+	}
+#endif
 }
 
 #define REGISTER_FUNCTION(func) CSharp::RegisterNativeFunction(# func, func)
@@ -156,6 +279,7 @@ void NativeFunctions::RegisterNativeFunctions()
 {
 	using namespace Input;
 	using namespace CameraShake;
+	using namespace Application;
 
 	ENGINE_ASSERT(CSharp::IsAssemblyLoaded(), "Assembly should always be loaded first before registering any native functions.");
 
@@ -188,6 +312,29 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(NativeRaycast);
 	REGISTER_FUNCTION(CallConsoleCommand);
 	REGISTER_FUNCTION(Vector3::GetScaledAxis);
+
+#if !SERVER
+	REGISTER_FUNCTION(SetCursorVisible);
+
+	REGISTER_FUNCTION(CreateUIBox);
+	REGISTER_FUNCTION(DestroyUIBox);
+	REGISTER_FUNCTION(SetUIBoxMinSize);
+	REGISTER_FUNCTION(SetUIBoxMaxSize);
+	REGISTER_FUNCTION(AddUIBoxChild);
+	REGISTER_FUNCTION(SetUIBoxHorizontalAlign);
+	REGISTER_FUNCTION(SetUIBoxVerticalAlign);
+	REGISTER_FUNCTION(SetUIBoxSizeMode);
+	REGISTER_FUNCTION(SetUIBoxBorder);
+	REGISTER_FUNCTION(SetUIBoxPadding);
+	REGISTER_FUNCTION(SetUIBoxPosition);
+	REGISTER_FUNCTION(SetUIBoxPaddingSizeMode);
+
+	REGISTER_FUNCTION(CreateUIBackground);
+
+	REGISTER_FUNCTION(CreateUIText);
+	REGISTER_FUNCTION(CreateTextRenderer);
+#endif
+
 }
 
 #endif

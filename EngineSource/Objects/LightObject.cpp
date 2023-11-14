@@ -7,9 +7,9 @@ void LightObject::Begin()
 {
 	Light = new PointLightComponent();
 	Attach(Light);
-	Properties.push_back(Objects::Property("Intensity", Type::Float, &Intensity));
-	Properties.push_back(Objects::Property("Range", Type::Float, &Falloff));
-	Properties.push_back(Objects::Property("Color", Type::Vector3Color, &Color));
+	AddEditorProperty(Property("Intensity", Type::Float, &Intensity));
+	AddEditorProperty(Property("Range", Type::Float, &Falloff));
+	AddEditorProperty(Property("Color", Type::Vector3Color, &Color));
 	OnPropertySet();
 
 #if EDITOR

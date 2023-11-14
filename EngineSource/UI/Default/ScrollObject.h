@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <Math/Vector.h>
 class ScrollObject
@@ -14,3 +15,4 @@ public:
 	bool Active = true;
 	float MaxScroll = 10;
 };
+#endif

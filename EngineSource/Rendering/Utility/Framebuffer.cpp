@@ -1,3 +1,4 @@
+#if !SERVER
 #include "Framebuffer.h"
 #include <Rendering/Graphics.h>
 #include <GL/glew.h>
@@ -137,3 +138,4 @@ void Framebuffer::ReInit(int Width, int Height, bool ColorAttachementType)
 	}
 	Unbind();
 }
+#endif

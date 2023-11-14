@@ -79,7 +79,6 @@ class PreferenceTab : public EditorTab
 
 		SettingsCategory("Project specific",
 			{
-#ifdef ENGINE_CSHARP
 				SettingsCategory::Setting("Run from editor:Launch arguments", Type::String, "", [](std::string NewValue)
 				{
 					EditorUI::LaunchInEditorArgs = NewValue;
@@ -92,6 +91,16 @@ class PreferenceTab : public EditorTab
 				{
 					EditorUI::SetSaveSceneOnLaunch(NewValue == "1");
 				}),
+				SettingsCategory::Setting("Networking:Start server on launch", Type::Bool, "0", [](std::string NewValue)
+				{
+					EditorUI::LaunchWithServer = std::stoi(NewValue);
+				}),
+				SettingsCategory::Setting("Networking:Number of clients", Type::Int, "1", [](std::string NewValue)
+				{
+					EditorUI::NumLaunchClients = std::stoi(NewValue);
+				}),
+
+#ifdef ENGINE_CSHARP
 				SettingsCategory::Setting("C#:Use C# in project (Requires restart)", Type::Bool, "1", [](std::string NewValue)
 				{
 				}),

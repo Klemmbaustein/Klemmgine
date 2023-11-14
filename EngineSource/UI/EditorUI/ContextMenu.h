@@ -11,7 +11,7 @@ class ContextMenu : public EditorPanel
 {
 public:
 	UIScrollBox* BackgroundBox;
-	std::vector<Objects::Property> Properties;
+	std::vector<WorldObject::Property> Properties;
 	ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale);
 	struct ContextMenuSection
 	{

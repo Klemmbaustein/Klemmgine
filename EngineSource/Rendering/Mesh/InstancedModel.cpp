@@ -1,3 +1,4 @@
+#if !SERVER
 #include "InstancedModel.h"
 #include <filesystem>
 #include <fstream>
@@ -8,6 +9,7 @@
 #include <Engine/File/Assets.h>
 #include <Engine/Stats.h>
 #include <GL/glew.h>
+#include <Engine/EngineError.h>
 
 
 InstancedModel::InstancedModel(std::string Filename)
@@ -156,3 +158,4 @@ void InstancedModel::SimpleRender(Shader* UsedShader)
 	}
 	Performance::DrawCalls++;
 }
+#endif

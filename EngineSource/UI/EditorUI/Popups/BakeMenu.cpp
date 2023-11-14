@@ -21,8 +21,9 @@ BakeMenu::BakeMenu()
 	BakeMenuActive = true;
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
+	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
 	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-	TabBackground->SetAlign(UIBox::Align::Default);
+	TabBackground->SetVerticalAlign(UIBox::Align::Default);
 	TabBackground->AddChild(ButtonBackground);
 
 	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
@@ -36,8 +37,8 @@ BakeMenu::BakeMenu()
 			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Editor::CurrentUI->EngineUIText))
 				->SetPadding(0.005f)));
 
-	InputFields[0] = new UITextField(true, 0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
-	InputFields[1] = new UITextField(true, 0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
+	InputFields[0] = new UITextField(0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
+	InputFields[1] = new UITextField(0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
 
 
 
@@ -142,7 +143,7 @@ void BakeMenu::StartBake()
 	TabBackground->DeleteChildren();
 	ButtonBackground = nullptr;
 	
-	TabBackground->SetAlign(UIBox::Align::Reverse);
+	TabBackground->SetVerticalAlign(UIBox::Align::Reverse);
 
 	TabBackground->AddChild((new UIText(0.6f, UIColors[2], "Baking lighting...", Editor::CurrentUI->EngineUIText))
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.005f));
@@ -154,7 +155,6 @@ void BakeMenu::StartBake()
 	LogScrollBox = new UIScrollBox(false, 0, true);
 	LogScrollBox->SetMinSize(Vector2(0.45f, 0.35f));
 	LogScrollBox->SetMaxSize(Vector2(0.45f, 0.35f));
-	LogScrollBox->SetAlign(UIBox::Align::Reverse);
 	LogScrollBox->SetPadding(0);
 
 	TabBackground->AddChild((new UIBackground(true, 0, UIColors[1], 0))

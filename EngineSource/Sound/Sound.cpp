@@ -1,4 +1,5 @@
 #include "Sound.h"
+#if !SERVER
 #include <AL/al.h>
 #include <Engine/Utility/FileUtility.h>
 #include <AL/alc.h>
@@ -131,18 +132,20 @@ char* loadWAV(const char* fn, int& chan, int& samplerate, int& bps, int& size)
 	in.read(data, size);
 	return data;
 }
-
+#endif
 namespace Sound
 {
+#if !SERVER
 	void Update3DVolumeOfSound(const Source& CurrentSource, const Vector3& Position)
 	{
 		float Distance = (CurrentSource.Location - Position).Length();
 		Distance = Distance * Distance * (CurrentSource.Distance / 100.0f) / 100.f;
 		alSourcef(CurrentSource.AudioSource, AL_GAIN, std::max(CurrentSource.Volume - Distance, 0.0f));
 	}
-
+#endif
 	void StopAllSounds()
 	{
+#if !SERVER
 		for (Source s : CurrentSources)
 		{
 			if (alIsSource(s.AudioSource))
@@ -151,9 +154,12 @@ namespace Sound
 			}
 		}
 		CurrentSources.clear();
+#endif
 	}
+
 	void Update()
 	{
+#if !SERVER
 		Vector3 ForwardVec, PositionVec;
 		if (Graphics::MainCamera)
 		{
@@ -186,9 +192,11 @@ namespace Sound
 				}
 			}
 		}
+#endif
 	}
 	void Init()
 	{
+#if !SERVER
 		ALCdevice* device = alcOpenDevice(NULL);
 		ENGINE_ASSERT(device != NULL, "Cannot open sound card");
 
@@ -210,29 +218,42 @@ namespace Sound
 				Console::ConsoleLog("Sound " + Console::CommandArgs()[0] + " doesn't exist!", Console::E_ERROR);
 			}, {Console::Command::Argument("sound", Type::String)}));
 		Console::RegisterConVar(Console::Variable("soundvolume", Type::Float, &MasterVolume, nullptr));
+#endif
 	}
 	void End()
 	{
+#if !SERVER
 		alcCloseDevice(CurrentDevice);
 		alcMakeContextCurrent(nullptr);
 		alcDestroyContext(ALContext);
 		Log::Print("Sound: Shutting down", Vector3(1, 1, 0));
+#endif
 	}
 	void SetSoundVolume(float NewVolume)
 	{
+#if !SERVER
 		MasterVolume = NewVolume;
+#endif
 	}
 	float GetSoundVolume()
 	{
+#if !SERVER
 		return MasterVolume;
+#endif
+		return 0;
 	}
 	std::string GetVersionString()
 	{
+#if !SERVER
 		return alGetString(AL_VERSION);
+#else
+		return "No sound";
+#endif
 	}
 	std::vector<std::string> GetSounds()
 	{
 		std::vector<std::string> Sounds;
+#if !SERVER
 		for (Source& s : CurrentSources)
 		{
 			if (s.Is3D)
@@ -244,10 +265,12 @@ namespace Sound
 				Sounds.push_back(s.name);
 			}
 		}
+#endif
 		return Sounds;
 	}
 	SoundSource PlaySound3D(SoundBuffer* Sound, Vector3 Position, float MaxDistance, float Pitch, float Volume, bool Looping)
 	{
+#if !SERVER
 		ALuint NewSource;
 		Vector3 PositionVec;
 		alGenSources(1, &NewSource);
@@ -266,10 +289,13 @@ namespace Sound
 		CurrentSources.push_back(Source(NewSource, Pitch, Volume, Looping, true, Position, MaxDistance, Sound->Name + " (ID: " + std::to_string(Sound->Buffer) + ")"));
 		Update3DVolumeOfSound(CurrentSources[CurrentSources.size() - 1], PositionVec);
 		return SoundSource(NewSource, Pitch, Volume, Looping);
+#endif
+		return SoundSource(0, 0, 0, false);
 	}
 
 	SoundSource PlaySound2D(SoundBuffer* Sound, float Pitch, float Volume, bool Looping)
 	{
+#if !SERVER
 		ALuint NewSource;
 		alGenSources(1, &NewSource);
 		alSourcef(NewSource, AL_PITCH, Pitch);
@@ -281,10 +307,13 @@ namespace Sound
 		alSourcePlay(NewSource);
 		CurrentSources.push_back(Source(NewSource, Pitch, Volume, Looping, false, Vector3(), 0, Sound->Name + " (ID: " + std::to_string(Sound->Buffer) + ")"));
 		return SoundSource(NewSource, Pitch, Volume, Looping);
+#endif
+		return SoundSource(0, 0, 0, false);
 	}
 
 	SoundBuffer* LoadSound(std::string File)
 	{
+#if !SERVER
 		File.append(".wav");
 		int channel, sampleRate, bps, size;
 		std::string FileAsset = Assets::GetAsset(File);
@@ -336,10 +365,14 @@ namespace Sound
 		alBufferData(bufferid, format, data, size, sampleRate);
 		delete data;
 		return new SoundBuffer(bufferid, File);
+#endif
+		return nullptr;
 	}
 	SoundBuffer::~SoundBuffer()
 	{
+#if !SERVER
 		alDeleteBuffers(1, &Buffer);
+#endif
 	}
 	SoundSource::SoundSource(unsigned int Buffer, float Pitch, float Volume, bool Looping)
 	{
@@ -350,6 +383,7 @@ namespace Sound
 	}
 	void SoundSource::Stop()
 	{
+#if !SERVER
 		alSourceStop(Source);
 		alDeleteSources(1, &Source);
 		for (size_t i = 0; i < CurrentSources.size(); i++)
@@ -361,16 +395,21 @@ namespace Sound
 				break;
 			}
 		}
+#endif
 	}
 	void SoundSource::SetPitch(float NewPitch)
 	{
+#if !SERVER
 		if(alIsSource(Source))
-		alSourcef(Source, AL_PITCH, NewPitch);
+			alSourcef(Source, AL_PITCH, NewPitch);
+#endif
 	}
 	void SoundSource::SetVolume(float NewVolume)
 	{
+#if !SERVER
 		if (alIsSource(Source))
-		alSourcef(Source, AL_GAIN, NewVolume);
+			alSourcef(Source, AL_GAIN, NewVolume);
+#endif
 	}
 	float SoundSource::GetPitch()
 	{

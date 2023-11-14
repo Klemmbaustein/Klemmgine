@@ -1,3 +1,4 @@
+#if !SERVER
 #include "Particle.h"
 #include <Rendering/VertexBuffer.h>
 #include <GL/glew.h>
@@ -304,3 +305,4 @@ void Particles::ParticleEmitter::Draw(Camera* MainCamera , bool MainFrameBuffer,
 		ParticleVertexBuffers[Elem]->Unbind();
 	}
 }
+#endif

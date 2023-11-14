@@ -18,10 +18,8 @@
 #include <UI/Debug/DebugUI.h>
 #include <Engine/EngineProperties.h>
 
-// Old maps do not save the fog and sun properties
+// Old scene files do not save the fog and sun properties
 #define SAVE_FOG_AND_SUN 1
-// Old maps do not save cubemap files
-#define SAVE_CUBEMAP_FILE 1
 
 namespace Scene
 {
@@ -59,6 +57,7 @@ namespace Scene
 		}
 		if (std::filesystem::exists(FilePath))
 		{
+#if !SERVER
 			Graphics::MainCamera = DefaultCamera;
 			if (!IsInEditor)
 			{
@@ -71,12 +70,16 @@ namespace Scene
 				UIBox::ClearUI();
 			}
 			Sound::StopAllSounds();
+			if (Graphics::MainFramebuffer)
+			{
+				Graphics::MainFramebuffer->ReflectionCubemapName.clear();
+			}
+#endif
 			for (int i = 0; i < Objects::AllObjects.size(); i++)
 			{
 				Objects::AllObjects.at(i)->IsSelected = false;
 			}
 			TextInput::PollForText = false;
-			Graphics::MainFramebuffer->ReflectionCubemapName.clear();
 			Debugging::EngineStatus = "Loading Scene";
 			for (int i = 0; i < Objects::AllObjects.size(); i++)
 			{
@@ -88,6 +91,7 @@ namespace Scene
 			WorldObject::DestroyMarkedObjects();
 
 			Objects::AllObjects.clear();
+#if !SERVER
 			if (!IsInEditor)
 			{
 				for (FramebufferObject* f : Graphics::AllFramebuffers)
@@ -97,13 +101,21 @@ namespace Scene
 						delete f;
 					}
 				}
-				Graphics::AllFramebuffers.clear();
-				Graphics::AllFramebuffers.push_back(Graphics::MainFramebuffer);
+				if (Graphics::MainFramebuffer)
+				{
+					Graphics::AllFramebuffers.clear();
+					Graphics::AllFramebuffers.push_back(Graphics::MainFramebuffer);
+				}
 			}
-			Graphics::MainFramebuffer->ClearContent();
+			if (Graphics::MainFramebuffer)
+			{
+				Graphics::MainFramebuffer->ClearContent();
+			}
 			CameraShake::StopAllCameraShake();
+#endif
 			Collision::CollisionBoxes.clear();
 			std::ifstream Input(FilePath, std::ios::in | std::ios::binary);
+			Input.exceptions(std::ios::failbit | std::ios::badbit);
 			std::vector<WorldObject> WorldObjects;
 			Editor::IsInSubscene = false;
 			CurrentScene = FileUtil::GetFilePathWithoutExtension(FilePath);
@@ -129,15 +141,19 @@ namespace Scene
 			Graphics::WorldSun.Intensity = SunProperties[3].X;
 			Graphics::WorldSun.AmbientIntensity = SunProperties[3].Y;
 
+
 			// Read the fog's properties
 			Graphics::WorldFog.FogColor = FogProperties[0];
 			Graphics::WorldFog.Falloff = FogProperties[1].X; 
 			Graphics::WorldFog.Distance = FogProperties[1].Y;
 			Graphics::WorldFog.MaxDensity = FogProperties[1].Z;
 #endif
-
-#if SAVE_CUBEMAP_FILE
-			Graphics::MainFramebuffer->ReflectionCubemapName = ReadBinaryStringFromFile(Input);
+			std::string CubeName = ReadBinaryStringFromFile(Input);
+#if !SERVER
+			if (Graphics::MainFramebuffer)
+			{
+				Graphics::MainFramebuffer->ReflectionCubemapName = CubeName;
+			}
 #endif
 			int ObjectLength = 0;
 			Input.read((char*)&ObjectLength, sizeof(int));
@@ -168,8 +184,9 @@ namespace Scene
 				}
 			}
 
-			
+#if !SERVER
 			BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(FilePath));
+#endif
 			Log::Print(std::string("Loaded Scene (").append(std::to_string(ObjectLength)).append(std::string(" Object(s) Loaded)")));
 			Input.close();
 		}
@@ -211,7 +228,9 @@ namespace Scene
 			Output.write((char*)&FogProperties, sizeof(FogProperties));
 		}
 #endif
+#if !SERVER
 		WriteBinaryStringToFile(Graphics::MainFramebuffer->ReflectionCubemapName, Output);
+#endif
 		int ObjectLength = (int)SavedObjects.size();
 		Output.write((char*)&ObjectLength, sizeof(int));
 

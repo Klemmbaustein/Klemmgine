@@ -21,17 +21,16 @@ LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(U
 {
 	LogScrollBox = new UIScrollBox(false, 0, true);
 	LogScrollBox->SetTryFill(true);
-	LogScrollBox->SetAlign(UIBox::Align::Reverse);
-	LogPrompt = new UITextField(true, 0, UIColors[1] * 0.5f, this, 0, Editor::CurrentUI->EngineUIText);
+	LogPrompt = new UITextField(0, UIColors[1] * 0.5f, this, 0, Editor::CurrentUI->EngineUIText);
 	LogPrompt->HintText = "Enter command here";
 	TabBackground->AddChild((new UIBackground(false, 0, UIColors[1] * 0.99f, 0))
+		->AddChild(LogScrollBox
+			->SetScrollSpeed(4)
+			->SetPadding(0, 0, 0.01f, 0))
 		->AddChild(LogPrompt
 			->SetTextSize(0.45f)
 			->SetPadding(0)
-			->SetTryFill(true))
-		->AddChild(LogScrollBox
-			->SetScrollSpeed(4)
-			->SetPadding(0, 0, 0.01f, 0)));
+			->SetTryFill(true)));
 
 	UpdateLogBoxSize();
 }

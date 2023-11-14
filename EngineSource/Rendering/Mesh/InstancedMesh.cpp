@@ -1,3 +1,4 @@
+#if !SERVER
 #include "InstancedMesh.h"
 #include "Math/Vector.h"
 #include "Rendering/Shader.h"
@@ -64,3 +65,4 @@ void InstancedMesh::SetInstances(std::vector<Transform> T)
 {
 	Instances = T;
 }
+#endif

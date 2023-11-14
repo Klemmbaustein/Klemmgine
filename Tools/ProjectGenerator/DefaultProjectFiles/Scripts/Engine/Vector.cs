@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Globalization;
 using System.Runtime.InteropServices;
 
+/*
+ * A structure containing single precision X, Y and Z coordinates.
+ * Equivalent to 'struct Vector3' in 'Math/Vector.h'
+ */
 [StructLayout(LayoutKind.Sequential)]
 public struct Vector3
 {
@@ -41,9 +46,13 @@ public struct Vector3
 		return 0;
 	}
 
-	override public string ToString()
+	public override readonly string ToString()
 	{
-		return string.Format("{0} {1} {2}", X, Y, Z);
+		var Culture = CultureInfo.GetCultureInfo("en-US");
+		return string.Format("{0} {1} {2}",
+			X.ToString("f", Culture),
+			Y.ToString("f", Culture),
+			Z.ToString("f", Culture));
 	}
 	public static Vector3 operator+(Vector3 a, Vector3 b)
 	{
@@ -109,6 +118,63 @@ public struct Vector3
 	public static bool NearlyEqual(Vector3 a, Vector3 b, float Threshold)
 	{
 		return NearlyEqual(a.X, b.X, Threshold) && NearlyEqual(a.Y, b.Y, Threshold) && NearlyEqual(a.Z, b.Z, Threshold);
+	}
+}
+
+/*
+ * A structure containing single precision X and Y coordinates.
+ * Equivalent to 'struct Vector2' in 'Math/Vector.h'
+ */
+[StructLayout(LayoutKind.Sequential)]
+public struct Vector2
+{
+	public float X = 0;
+	public float Y = 0;
+
+	public Vector2()
+	{
+
+	}
+
+	public Vector2(float X, float Y)
+	{
+		this.X = X;
+		this.Y = Y;
+	}
+
+	public Vector2(float XY)
+	{
+		X = XY;
+		Y = XY;
+	}
+
+	public static implicit operator Vector2(float val)
+	{
+		return new Vector2(val, val);
+	}
+
+	public override readonly string ToString()
+	{
+		var Culture = CultureInfo.GetCultureInfo("en-US");
+		return string.Format("{0} {1}",
+			X.ToString("f", Culture),
+			Y.ToString("f", Culture));
+	}
+	public static Vector2 operator +(Vector2 a, Vector2 b)
+	{
+		return new Vector2(a.X + b.X, a.Y + b.Y);
+	}
+	public static Vector2 operator -(Vector2 a, Vector2 b)
+	{
+		return new Vector2(a.X - b.X, a.Y - b.Y);
+	}
+	public static Vector2 operator *(Vector2 a, Vector2 b)
+	{
+		return new Vector2(a.X * b.X, a.Y * b.Y);
+	}
+	public static Vector2 operator /(Vector2 a, Vector2 b)
+	{
+		return new Vector2(a.X / b.X, a.Y / b.Y);
 	}
 }
 

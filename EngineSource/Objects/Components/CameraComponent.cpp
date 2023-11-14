@@ -9,6 +9,7 @@ void CameraComponent::Begin()
 
 void CameraComponent::Tick()
 {
+#if !SERVER
 	Vector3 ParentRotation = GetParent()->GetTransform().Rotation;
 	ParentRotation = Vector3(ParentRotation.X, ParentRotation.Y, 0);
 	Transform ParentTransform = Transform(GetParent()->GetTransform().Location,
@@ -19,10 +20,12 @@ void CameraComponent::Tick()
 	ParentRotation = Vector3(ParentRotation.X, ParentRotation.Y, 0);
 	ComponentCamera.SetRotation(ParentRotation);
 	ComponentCamera.Update();
+#endif
 }
 
 void CameraComponent::Destroy()
 {
+#if !SERVER
 	for (FramebufferObject* f : Graphics::AllFramebuffers)
 	{
 		if (f->FramebufferCamera == &ComponentCamera)
@@ -30,12 +33,15 @@ void CameraComponent::Destroy()
 			f->FramebufferCamera = nullptr;
 		}
 	}
+#endif
 }
 
 
 void CameraComponent::SetFOV(float FOV)
 {
+#if !SERVER
 	ComponentCamera.ReInit((FOV / 180) * 3.14159f * 2, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
+#endif
 }
 
 CameraComponent::CameraComponent()
@@ -44,9 +50,11 @@ CameraComponent::CameraComponent()
 
 void CameraComponent::Use()
 {
+#if !SERVER
 	if (!IsInEditor)
 	{
 		Graphics::MainFramebuffer->FramebufferCamera = &ComponentCamera;
 		Graphics::MainCamera = &ComponentCamera;
 	}
+#endif
 }

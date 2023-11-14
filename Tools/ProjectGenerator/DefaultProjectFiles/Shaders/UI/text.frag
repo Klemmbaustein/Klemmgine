@@ -10,7 +10,6 @@ uniform vec3 textColor;
 uniform float u_opacity = 1.0f;
 uniform float u_textSize = 0.0f;
 uniform vec2 u_screenRes = vec2(1600, 900);
-uniform float u_depth;
 uniform vec3 transform;
 
 #define NUM_SAMPLES 2
@@ -37,7 +36,7 @@ void main()
 		}
 	}
 	sampled /= NUM_SAMPLES * NUM_SAMPLES * 2 * 2;
-	f_alpha.xyz = vec3(1, u_depth * u_opacity, 0);
+	f_alpha.xyz = vec3(1, 1, 1);
 	f_alpha.w = sampled * u_opacity;
 	color = vec4(v_color, f_alpha.w);
 }  

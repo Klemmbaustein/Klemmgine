@@ -49,11 +49,11 @@ void InstancedMeshObject::Tick()
 
 void InstancedMeshObject::Begin()
 {
-	Properties.push_back(Objects::Property("Mesh", Type::String, &Filename));
-	Properties.push_back(Objects::Property("NumInstances", Type::Int, &Amount));
-	Properties.push_back(Objects::Property("Range", Type::Int, &Range));
-	Properties.push_back(Objects::Property("Component Name", Type::String, &ComponentName));
-	Properties.push_back(Objects::Property("Scale", Type::Vector3, &Scale));
+	AddEditorProperty(Property("Mesh", Type::String, &Filename));
+	AddEditorProperty(Property("NumInstances", Type::Int, &Amount));
+	AddEditorProperty(Property("Range", Type::Int, &Range));
+	AddEditorProperty(Property("Component Name", Type::String, &ComponentName));
+	AddEditorProperty(Property("Scale", Type::Vector3, &Scale));
 
 	IMComponent = nullptr;
 

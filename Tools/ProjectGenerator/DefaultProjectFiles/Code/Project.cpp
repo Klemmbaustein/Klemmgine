@@ -2,6 +2,8 @@
 
 namespace Project
 {
+	bool UseNetworkFunctions = false;
+
 	// This is the name of the current project
 	const char* ProjectName = "Untitled";
 
@@ -14,6 +16,5 @@ namespace Project
 	// This function will be called on startup.
 	void OnLaunch()
 	{
-
 	}
 }

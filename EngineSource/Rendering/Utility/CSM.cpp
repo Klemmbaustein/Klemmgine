@@ -1,3 +1,4 @@
+#if !SERVER
 #include "CSM.h"
 #include <Rendering/Camera/Camera.h>
 #include <Rendering/Graphics.h>
@@ -281,3 +282,4 @@ namespace CSM
 		return ret;
 	}
 }
+#endif

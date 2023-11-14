@@ -1,6 +1,7 @@
 #include "MoveComponent.h"
 #include <Engine/Stats.h>
 #include <Engine/Log.h>
+#include <Networking/Client.h>
 
 // TODO: Rewrite
 // TODO: Rewrite again because this is really bad
@@ -80,8 +81,9 @@ void MoveComponent::Begin()
 
 void MoveComponent::Tick()
 {
-	if (IsInEditor || !Active)
+	if (IsInEditor || !Active || (GetParent()->GetIsReplicated() && (Client::GetIsConnected() && GetParent()->NetOwner != Client::GetClientID())))
 	{
+		Log::Print("help");
 		return;
 	}
 	InputDirection.Y = 0;

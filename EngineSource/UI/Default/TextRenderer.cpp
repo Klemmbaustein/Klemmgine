@@ -1,4 +1,5 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+﻿#if !SERVER
+#define _CRT_SECURE_NO_WARNINGS
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include "TextRenderer.h"
 #define STB_TRUETYPE_IMPLEMENTATION
@@ -248,12 +249,15 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 	return (Vector2(MaxX / Graphics::AspectRatio / 450, y / 450 * 5)) * Scale;
 }
 
-Vector2 TextRenderer::GetLetterPosition(ColoredText Text, float Scale, bool Wrapped, float LengthBeforeWrap)
+Vector2 TextRenderer::GetLetterPosition(ColoredText Text, size_t Index, float Scale, bool Wrapped, float LengthBeforeWrap)
 {
 	float originalScale = Scale;
 	Scale *= 2.5f;
 	float x = 0.f, y = CharacterSize;
 	size_t Wraps = 0;
+	size_t it = 0;
+	Vector2 LetterPosition = Vector2(x / Graphics::AspectRatio / 450, (y / 450 * 5)) * Scale;
+
 	for (auto& seg : Text)
 	{
 		size_t LastWordIndex = SIZE_MAX;
@@ -282,6 +286,11 @@ Vector2 TextRenderer::GetLetterPosition(ColoredText Text, float Scale, bool Wrap
 				LastWordIndex = i;
 			}
 
+			if (it++ < Index)
+			{
+				LetterPosition = Vector2(x / Graphics::AspectRatio / 450, (y / 450 * 5)) * Scale;
+			}
+
 			if (x * Scale / 450 > LengthBeforeWrap && Wrapped)
 			{
 				Wraps++;
@@ -290,20 +299,23 @@ Vector2 TextRenderer::GetLetterPosition(ColoredText Text, float Scale, bool Wrap
 					i = LastWordIndex;
 					LastWrapIndex = i;
 				}
-				std::cout << x << std::endl;
 				x = 0;
-				y += CharacterSize;
+				y -= CharacterSize;
 			}
 		}
 	}
-	return (Vector2(x / Graphics::AspectRatio / 450, y / 450 * 5)) * Scale;
+	if (Wraps == 0)
+	{
+		return Vector2(LetterPosition.X, 0);
+	}
+	return Vector2(LetterPosition.X, LetterPosition.Y);
 }
 
 DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap)
 {
 	for (auto& i : Text)
 	{
-		StrReplace::ReplaceChar(i.Text, '	', "    ");
+		StrUtil::ReplaceChar(i.Text, '	', "    ");
 	}
 	GLuint newVAO = 0, newVBO = 0;
 	glGenVertexArrays(1, &newVAO);
@@ -463,3 +475,4 @@ DrawableText::~DrawableText()
 	glDeleteBuffers(1, &VBO);
 	glDeleteVertexArrays(1, &VAO);
 }
+#endif

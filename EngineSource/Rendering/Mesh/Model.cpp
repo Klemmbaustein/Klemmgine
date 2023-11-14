@@ -1,3 +1,4 @@
+#if !SERVER
 #include "Model.h"
 #include <string>
 #include <fstream>
@@ -170,3 +171,4 @@ void Model::SetUniform(Material::Param NewUniform, uint8_t MeshIndex)
 {
 	Meshes[MeshIndex]->SetUniform(NewUniform);
 }
+#endif

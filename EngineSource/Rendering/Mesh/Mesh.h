@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include "Math/Vector.h"
 #include "Rendering/Shader.h"
@@ -23,4 +24,4 @@ private:
 	int NumIndices;
 	int NumVertices;
 };
-
+#endif

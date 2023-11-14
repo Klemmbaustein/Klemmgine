@@ -14,11 +14,9 @@ void PreferenceTab::GenerateUI()
 	if (!SettingsBox)
 	{
 		SettingsCategoryBox = new UIBackground(false, 0, UIColors[0] * 1.2f, Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
-		SettingsCategoryBox->SetAlign(UIBox::Align::Reverse);
 		TabBackground->AddChild(SettingsCategoryBox);
 
 		SettingsBox = new UIScrollBox(false, 0, true);
-		SettingsBox->SetAlign(UIBox::Align::Reverse);
 		TabBackground->AddChild(SettingsBox);
 	}
 	SettingsBox->DeleteChildren();
@@ -40,11 +38,11 @@ void PreferenceTab::GenerateUI()
 	SettingsCategoryBox->SetMaxSize(Vector2(2, TabBackground->GetUsedSize().Y - 0.2f));
 	SettingsCategoryBox->SetColor(UIColors[0] * 1.2f);
 
-	SettingsBox->AddChild((new UIText(1, UIColors[2], "Settings/" + Preferences[SelectedSetting].Name, Renderer))
+	SettingsBox->AddChild((new UIText(0.8f, UIColors[2], "Settings/" + Preferences[SelectedSetting].Name, Renderer))
 		->SetPadding(0, 0, 0, 0));
 
 	SettingsBox->AddChild((new UIBackground(true, 0, UIColors[2], Vector2(SegmentSize, 0.005f)))
-		->SetPadding(0, 0.1f, 0, 0));
+		->SetPadding(0, 0.05f, 0, 0));
 
 	std::map<std::string, std::vector<SettingsCategory::Setting>> Categories;
 
@@ -82,7 +80,7 @@ void PreferenceTab::GenerateUI()
 			(new UIButton(true, 0, UIColors[1], this, -400 + CurentCategory))
 				->SetPadding(0.01f, 0.01f, 0, 0)
 				->SetMinSize(Vector2(SegmentSize, 0))
-				->AddChild((new UIText(0.6f, UIColors[2], "> " + cat.first, Renderer))
+				->AddChild((new UIText(0.55f, UIColors[2], "> " + cat.first, Renderer))
 					->SetPadding(0.01f)));
 
 		for (size_t i = 0; i < cat.second.size(); i++)
@@ -104,18 +102,17 @@ void PreferenceTab::GenerateUI()
 
 void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value)
 {
-	Parent->AddChild((new UIText(0.6f, UIColors[2], Name, Renderer))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
+	Parent->AddChild((new UIText(0.5f, UIColors[2], Name, Renderer))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
 	UIBox* Element;
 	switch (SectionType)
 	{
 	case Type::Float:
 		break;
 	case Type::Int:
-		break;
 	case Type::String:
-		Element = (new UITextField(true, 0, UIColors[1], this, Index, Renderer))
+		Element = (new UITextField(0, UIColors[1], this, Index, Renderer))
 			->SetText(Value)
-			->SetMinSize(Vector2(TabBackground->GetMinSize().X - 0.6f, 0.05f))
+			->SetMinSize(Vector2(TabBackground->GetMinSize().X - 1.0f, 0))
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
@@ -135,7 +132,7 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 		Element = (new UIButton(true, 0, 1, this, Index))
 			->SetUseTexture(std::stoi(Value), Editor::CurrentUI->Textures[16])
 			->SetSizeMode(UIBox::SizeMode::PixelRelative)
-			->SetMinSize(0.05f)
+			->SetMinSize(0.04f)
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
@@ -186,6 +183,18 @@ void PreferenceTab::OnButtonClicked(int Index)
 		case Type::String:
 			Setting.Value = dynamic_cast<UITextField*>(LoadedSettingElements[Index])->GetText();
 			break;
+		case Type::Int:
+		{
+			try
+			{
+				Setting.Value = std::to_string(std::stoi(dynamic_cast<UITextField*>(LoadedSettingElements[Index])->GetText()));
+			}
+			catch (std::exception)
+			{
+
+			}
+		}
+			break;
 		default:
 			break;
 		}
@@ -198,6 +207,7 @@ void PreferenceTab::OnButtonClicked(int Index)
 PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors)
 {
 	this->Renderer = Renderer;
+	TabBackground->SetVerticalAlign(UIBox::Align::Default);
 	TabBackground->SetHorizontal(true);
 	GenerateUI();
 

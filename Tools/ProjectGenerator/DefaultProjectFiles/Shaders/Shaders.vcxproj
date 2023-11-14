@@ -1,0 +1,110 @@
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Editor|x64">
+      <Configuration>Editor</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ShowAllFiles>true</ShowAllFiles>
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectGuid>{91315EA7-5B25-4D8E-A732-C66EB73E510E}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.default.props" />
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <PropertyGroup>
+    <IncludePath>$(ProjectDir)./;$(ProjectDir)../../../EngineSource;$(ProjectDir)../GeneratedIncludes;$(ProjectDir)../../../Dependencies/glm;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)../../../lib;$(ProjectDir)../../../CSharpCore/lib;$(ProjectDir)../../../Dependencies/glew-cmake/lib/Release;$(ProjectDir)../../../Dependencies/assimp/lib/Release;$(ProjectDir)../../../Dependencies/openal-soft/Release;$(ProjectDir)../../../Dependencies/SDL/VisualC/SDL/x64/Release;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="./basic.frag" />
+    <None Include="./basic.vert" />
+    <None Include="./Editor/color_picker.frag" />
+    <None Include="./Internal/billboard.frag" />
+    <None Include="./Internal/billboard.vert" />
+    <None Include="./Internal/bloom.frag" />
+    <None Include="./Internal/postprocess.frag" />
+    <None Include="./Internal/postprocess.vert" />
+    <None Include="./Internal/shadow.frag" />
+    <None Include="./Internal/shadow.geom" />
+    <None Include="./Internal/shadow.vert" />
+    <None Include="./Internal/ssao.frag" />
+    <None Include="./Internal/uimerge.frag" />
+    <None Include="./shared.frag" />
+    <None Include="./shared.vert" />
+    <None Include="./skybox.frag" />
+    <None Include="./skybox.vert" />
+    <None Include="./UI/text.frag" />
+    <None Include="./UI/text.vert" />
+    <None Include="./UI/uishader.frag" />
+    <None Include="./UI/uishader.vert" />
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>DEBUG;NDEBUG;_CONSOLE;GLEW_STATIC;ENGINE_CSHARP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>..\$(IntDir)</ObjectFileName>
+      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalDependencies>assimp-vc143-mt.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+      <Subsystem>Console</Subsystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
+    <ClCompile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>EDITOR;NDEBUG;_CONSOLE;GLEW_STATIC;ENGINE_CSHARP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>..\$(IntDir)</ObjectFileName>
+      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalDependencies>assimp-vc143-mt.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+      <Subsystem>Console</Subsystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <PreprocessorDefinitions>RELEASE;NDEBUG;_CONSOLE;GLEW_STATIC;ENGINE_CSHARP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>..\$(IntDir)</ObjectFileName>
+      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+    <Link>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <AdditionalDependencies>assimp-vc143-mt.lib;OpenAL32.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+      <Subsystem>Console</Subsystem>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+</Project>

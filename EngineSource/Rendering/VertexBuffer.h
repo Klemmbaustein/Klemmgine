@@ -1,8 +1,7 @@
 #pragma once
-
 #include <vector>
 #include "Vertex.h"
-
+#if !SERVER
 struct VertexBuffer
 {
 	unsigned int VAO = 0u, VBO = 0u, EBO = 0u, IndicesSize = 0u;
@@ -17,3 +16,4 @@ public:
 
 	void Draw();
 };
+#endif

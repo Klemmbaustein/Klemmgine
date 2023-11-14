@@ -35,7 +35,6 @@ void Toolbar::GenerateButtons()
 		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.11f)))
 			->SetPadding(0.015f, 0.015f, 0.02f, 0.01f));
 		auto Elem = new UIBox(false, 0);
-		Elem->SetAlign(UIBox::Align::Reverse);
 		Elem->SetPadding(0.0f);
 		TabBackground->AddChild(Elem);
 
@@ -55,13 +54,13 @@ void Toolbar::GenerateButtons()
 				->SetPadding(0.015f)
 				->SetBorder(UIBox::BorderType::Rounded, 0.25f)
 				->SetSizeMode(UIBox::SizeMode::PixelRelative)
-				->AddChild((new UIText(0.375f, UIColors[2], btn.Name, Editor::CurrentUI->EngineUIText))
-					->SetPadding(0.005f))
 				->AddChild((new UIButton(true, 0, 1, this, (int)i * MAX_CATEGORY_BUTTONS + (int)j))
 					->SetUseTexture(true, btn.Texture)
 					->SetMinSize(0.055f)
 					->SetPadding(0.01f, 0.01f, 0.02f, 0.02f)
-					->SetSizeMode(UIBox::SizeMode::PixelRelative)));
+					->SetSizeMode(UIBox::SizeMode::PixelRelative))
+				->AddChild((new UIText(0.375f, UIColors[2], btn.Name, Editor::CurrentUI->EngineUIText))
+					->SetPadding(0.005f)));
 			j++;
 		}
 	}

@@ -183,7 +183,6 @@ void ParticleEditorTab::Generate()
 	for (auto& i : ScrollBoxes)
 	{
 		i = new UIBox(false, 0);
-		i->SetAlign(UIBox::Align::Reverse);
 		i->SetPadding(0);
 		i->SetMinSize(Vector2(0.3f, ScrollSize));
 		i->SetMaxSize(Vector2(0.3f, ScrollSize));
@@ -207,7 +206,7 @@ void ParticleEditorTab::Generate()
 
 		NewText = (new UIText(0.7f, UIColors[2], "Size", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 		ScrollBoxes[0]->AddChild(NewText);
-		UITextField* NewTextField = new UITextField(true, Vector2(-0.1f, 0.1f), 0.2f, this, 102, TabText);
+		UITextField* NewTextField = new UITextField(Vector2(-0.1f, 0.1f), 0.2f, this, 102, TabText);
 		ScrollBoxes[0]->AddChild(NewTextField);
 		std::stringstream stream;
 		stream << std::fixed << std::setprecision(2) << SelectedParticle.Size;
@@ -218,7 +217,7 @@ void ParticleEditorTab::Generate()
 
 		NewText = (new UIText(0.7f, UIColors[2], "Lifetime", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 		ScrollBoxes[0]->AddChild(NewText);
-		NewTextField = new UITextField(true, Vector2(-0.1f, 0.05f), 0.2f, this, 103, TabText);
+		NewTextField = new UITextField(Vector2(-0.1f, 0.05f), 0.2f, this, 103, TabText);
 		ScrollBoxes[0]->AddChild(NewTextField);
 		stream = std::stringstream();
 		stream << std::fixed << std::setprecision(2) << SelectedParticle.LifeTime;
@@ -229,7 +228,7 @@ void ParticleEditorTab::Generate()
 
 		NewText = (new UIText(0.7f, UIColors[2], "Spawn delay", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 		ScrollBoxes[0]->AddChild(NewText);
-		NewTextField = new UITextField(true, Vector2(-0.1f, -0.2f), 0.2f, this, 104, TabText);
+		NewTextField = new UITextField(Vector2(-0.1f, -0.2f), 0.2f, this, 104, TabText);
 		ScrollBoxes[0]->AddChild(NewTextField);
 		stream = std::stringstream();
 		stream << std::fixed << std::setprecision(2) << SelectedParticle.SpawnDelay;
@@ -240,7 +239,7 @@ void ParticleEditorTab::Generate()
 
 		NewText = (new UIText(0.7f, UIColors[2], "Spawn loops", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 		ScrollBoxes[1]->AddChild(NewText);
-		NewTextField = new UITextField(true, Vector2(-0.1f, -0.35f), 0.2f, this, 105, TabText);
+		NewTextField = new UITextField(Vector2(-0.1f, -0.35f), 0.2f, this, 105, TabText);
 		ScrollBoxes[1]->AddChild(NewTextField);
 		NewTextField->SetText(std::to_string(SelectedParticle.NumLoops));
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
@@ -249,7 +248,7 @@ void ParticleEditorTab::Generate()
 
 		NewText = (new UIText(0.7f, UIColors[2], "Material", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 		ScrollBoxes[1]->AddChild(NewText);
-		NewTextField = new UITextField(true, Vector2(-0.1f, -0.5f), 0.2f, this, 106, TabText);
+		NewTextField = new UITextField(Vector2(-0.1f, -0.5f), 0.2f, this, 106, TabText);
 		ScrollBoxes[1]->AddChild(NewTextField);
 		NewTextField->SetText(ElementMaterials[SelectedElement]);
 		NewTextField->SetMinSize(Vector2(0.265f, 0.05f));
@@ -270,7 +269,7 @@ void ParticleEditorTab::Generate()
 
 		NewText = (new UIText(0.7f, UIColors[2], "Start scale", TabText))->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 		ScrollBoxes[1]->AddChild(NewText);
-		NewTextField = new UITextField(true, 0, 0.2f, this, 109, TabText);
+		NewTextField = new UITextField(0, 0.2f, this, 109, TabText);
 		stream = std::stringstream();
 		stream << std::fixed << std::setprecision(2) << SelectedParticle.StartScale;
 		ScrollBoxes[1]->AddChild(NewTextField);
@@ -281,7 +280,7 @@ void ParticleEditorTab::Generate()
 
 		NewText = new UIText(0.7f, UIColors[2], "End scale", TabText);
 		ScrollBoxes[1]->AddChild(NewText);
-		NewTextField = new UITextField(true, 0, 0.2f, this, 110, TabText);
+		NewTextField = new UITextField(0, 0.2f, this, 110, TabText);
 		stream = std::stringstream();
 		stream << std::fixed << std::setprecision(2) << SelectedParticle.EndScale;
 		ScrollBoxes[1]->AddChild(NewTextField);

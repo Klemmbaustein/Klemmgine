@@ -1,3 +1,4 @@
+#if !SERVER
 #include "UIDropdown.h"
 #include <UI/UIText.h>
 #include <Engine/Log.h>
@@ -34,7 +35,6 @@ UIDropdown::UIDropdown(Vector2 Position,
 
 	OptionsBox = new UIBox(false, Position + Vector2(0, -1));
 	OptionsBox->SetMinSize(Vector2(0, 1));
-	OptionsBox->SetAlign(UIBox::Align::Reverse);
 	OptionsBox->IsVisible = false;
 	GenerateOptions();
 }
@@ -126,3 +126,4 @@ void UIDropdown::OnChildClicked(int Index)
 	SelectOption((size_t)Index);
 	OptionsBox->IsVisible = false;
 }
+#endif

@@ -1,6 +1,3 @@
-[submodule "Dependencies/-b"]
-	path = Dependencies/-b
-	url = https://github.com/libsdl-org/SDL.git
 [submodule "Dependencies/SDL"]
 	path = Dependencies/SDL
 	url = https://github.com/libsdl-org/SDL.git
@@ -20,3 +17,7 @@
 [submodule "Dependencies/assimp"]
 	path = Dependencies/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "Dependencies/SDL_net"]
+	path = Dependencies/SDL_net
+	url = https://github.com/libsdl-org/SDL_net.git
+	branch = SDL2

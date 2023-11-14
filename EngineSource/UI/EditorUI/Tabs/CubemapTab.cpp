@@ -13,11 +13,12 @@
 #include <Rendering/Texture/Cubemap.h>
 #include <Engine/File/Save.h>
 
+// TODO: Remake
+
 CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors)
 {
 	this->Renderer = Renderer;
 
-	TabBackground->SetAlign(UIBox::Align::Reverse);
 	TabName = new UIText(1, UIColors[2], "Model: ", Renderer);
 	TabName->SetPadding(0.1f, 0.05f, 0.05f, 0);
 	if (!PreviewBuffer)
@@ -32,7 +33,6 @@ CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UI
 	TabBackground->AddChild(TabName);
 	CubemapSidesBox = new UIBackground(false, Vector2(-0.6f, -0.3f), UIColors[1]);
 	CubemapSidesBox->SetMinSize(Vector2(0.3f, 0.8f));
-	CubemapSidesBox->SetAlign(UIBox::Align::Reverse);
 	CubemapSidesBox->SetBorder(UIBox::BorderType::Rounded, 1);
 	CubemapSidesBox->IsVisible = false;
 	PreviewWindow = new UIBackground(true, Vector2(-0.2f, -0.3f), 0.999f, 0.8f);
@@ -107,7 +107,7 @@ void CubemapTab::Generate()
 	SideFields.clear();
 	for (size_t i = 0; i < Cubenames.size(); i++)
 	{
-		UITextField* text = new UITextField(true, 0, 0.2f, this, 0, Renderer);
+		UITextField* text = new UITextField(0, 0.2f, this, 0, Renderer);
 		text->SetText(SaveFile->GetProperty(Cubenames[i]).Value);
 		text->SetMinSize(Vector2(0.2f, 0.05f));
 		text->SetPadding(0);

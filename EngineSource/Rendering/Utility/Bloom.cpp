@@ -1,3 +1,4 @@
+#if !SERVER
 #include "Bloom.h"
 #include <GL/glew.h>
 #include <SDL.h>
@@ -110,3 +111,4 @@ void Bloom::OnResized()
 		);
 	}
 }
+#endif

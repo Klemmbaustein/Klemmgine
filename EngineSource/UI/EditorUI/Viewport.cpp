@@ -430,6 +430,7 @@ void Viewport::UpdateTabBar()
 		auto NewText = new UIText(0.4f, UIColors[2], FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText);
 		TabTexts.push_back(NewText);
 		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 3 : 1.5f), this, (int)i * 2))
+			->SetVerticalAlign(UIBox::Align::Centered)
 			->SetBorder(UIBox::BorderType::Rounded, 0.25f)
 			->SetPadding(0, 0, 0, 0.02f)
 			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01f, 0.045f)))

@@ -78,9 +78,7 @@ public:
 #if ENGINE_CSHARP
 	static void RebuildAndHotReload();
 #endif
-	static FILE* DebugProcess;
 	static void ReadProcessOutput();
-	static std::thread* DebugProcessIOThread;
 	static void LaunchInEditor();
 	static void SetSaveSceneOnLaunch(bool NewValue);
 	static std::string LaunchInEditorArgs;
@@ -89,7 +87,8 @@ public:
 	static void OpenScene(std::string NewScene);
 	static bool GetUseLightMode();
 	static void SetUseLightMode(bool NewLightMode);
-
+	static int NumLaunchClients;
+	static bool LaunchWithServer;
 	static void CreateFile(std::string Path, std::string Name, std::string Ext);
 	EditorUI();
 	void OnLeave(void(*ReturnF)());

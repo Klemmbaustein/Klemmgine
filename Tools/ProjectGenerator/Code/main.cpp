@@ -10,6 +10,7 @@ std::vector<std::string> DependenyDlls =
 	"Dependencies/assimp/bin/Release/assimp-vc143-mt.dll",
 	"Dependencies/openal-soft/Release/OpenAL32.dll",
 	"Dependencies/SDL/VisualC/SDL/x64/Release/SDL2.dll",
+	"Dependencies/SDL_net/Build/Release/SDL2_net.dll",
 	"CSharpCore/lib/nethost.dll"
 };
 
@@ -128,7 +129,7 @@ int main(int argc, char** argv)
 	if (LaunchArgs["includeCsharp"] == "true")
 	{
 		std::cout << "- Including C# project in solution" << std::endl;
-		std::string CsGUID = VSProj::WriteCSProj("Games/" + ProjectName + "/Scripts", "CSharpAssembly", "net6.0");
+		std::string CsGUID = VSProj::WriteCSProj("Games/" + ProjectName + "/Scripts", "CSharpAssembly", "net7.0");
 
 		SLN::Project CSProject;
 		CSProject.Name = "CSharpAssembly";

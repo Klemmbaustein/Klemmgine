@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <UI/UIBox.h>
 #include <Rendering/Graphics.h>
@@ -31,3 +32,4 @@ public:
 	void Update() override;
 	void OnAttached() override;
 };
+#endif

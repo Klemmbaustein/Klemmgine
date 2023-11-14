@@ -25,6 +25,7 @@ namespace Graphics
 	float AspectRatio = 16.0f / 9.0f;
 	void SetWindowResolution(Vector2 NewResolution)
 	{
+#if !SERVER
 		if (NewResolution == WindowResolution)
 		{
 			return;
@@ -49,14 +50,17 @@ namespace Graphics
 		}
 
 		UIBox::ForceUpdateUI();
+#endif
 	}
 	float Gamma = 1;
 	float ChrAbbSize = 0, Vignette = 0.1f;
+#if !SERVER
 	Camera* MainCamera;
 	Shader* MainShader;
 	Shader* ShadowShader;
 	Shader* TextShader;
 	Shader* UIShader;
+#endif
 	bool IsRenderingShadows = false;
 	namespace UI
 	{
@@ -69,10 +73,12 @@ namespace Graphics
 		unsigned int ssaoColorBuffer;
 		unsigned int ssaoFBO;
 	}
+#if !SERVER
 	FramebufferObject* MainFramebuffer;
 	std::vector<FramebufferObject*> AllFramebuffers;
 	bool Light::operator==(Light b)
 	{
 		return Position == b.Position && Color == b.Color && Intensity == b.Intensity && Falloff == b.Falloff;
 	}
+#endif
 }

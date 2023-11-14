@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 
 #include <glm/glm.hpp>
@@ -42,3 +43,4 @@ namespace CSM
 
 	std::vector<glm::mat4> getLightSpaceMatrices();
 }
+#endif

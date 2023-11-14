@@ -5,7 +5,7 @@
 
 void ParticleObject::Begin()
 {
-	Properties.push_back(Objects::Property("Emitter", Type::String, &ParticleName));
+	AddEditorProperty(Property("Emitter", Type::String, &ParticleName));
 	if (Particle) Detach(Particle);
 	Particle = new ParticleComponent();
 	Attach(Particle);

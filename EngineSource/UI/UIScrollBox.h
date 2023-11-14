@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <UI/UIBox.h>
 
@@ -38,3 +39,4 @@ public:
 	UIScrollBox(bool Horizontal, Vector2 Position, bool DisplayScrollBar);
 	~UIScrollBox();
 };
+#endif

@@ -4,7 +4,6 @@
 
 class MoveComponent : public Component
 {
-	CollisionComponent* CollisionMeshes[2] = { nullptr, nullptr };
 	// Tries to move the object in the given direction, over the given distance.
 	// If "TryAdjust" is "true", it will try to adjust the object's position to one that is more valid.
 	Collision::HitResponse TryMove(Vector3 Direction, float Distance, bool TryAdjust = true);
@@ -16,6 +15,7 @@ class MoveComponent : public Component
 	int IsOnGround = 5;
 	bool HasBounced = false;
 public:
+	CollisionComponent* CollisionMeshes[2] = { nullptr, nullptr };
 	// Returns true if the object is touching the ground, false if not.
 	bool GetIsOnGround();
 	Vector3 GetVelocity();

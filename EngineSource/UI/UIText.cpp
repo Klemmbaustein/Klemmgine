@@ -1,3 +1,4 @@
+#if !SERVER
 #include "UIText.h"
 #include <Engine/Log.h>
 #include <iostream>
@@ -146,8 +147,13 @@ Vector2 UIText::GetLetterLocation(size_t Index)
 	{
 		WrapDistance /= Graphics::AspectRatio;
 	}
-	std::string Text = TextSegment::CombineToString(RenderedText);
-	return Vector2(Renderer->GetLetterPosition({ TextSegment(Text.substr(0, Index), 1) }, TextSize * 2, Wrap, WrapDistance).X, 0) + OffsetPosition;
+	return Renderer->GetLetterPosition(
+		RenderedText,
+		Index,
+		TextSize * 2,
+		Wrap,
+		WrapDistance
+	) + OffsetPosition;
 }
 
 void UIText::Draw()
@@ -192,3 +198,4 @@ Vector2 UIText::GetUsedSize()
 	}
 	return Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, WrapDistance);
 }
+#endif

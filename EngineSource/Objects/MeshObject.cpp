@@ -20,7 +20,7 @@ void MeshObject::Begin()
 	for (size_t i = 0; i < 16; i++)
 	{
 		MaterialNames[i] = "";
-		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
+		AddEditorProperty(Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
 	}
 	OnPropertySet();
 }
@@ -52,17 +52,19 @@ void MeshObject::LoadFromFile(std::string Filename)
 
 	Mesh = new MeshComponent();
 	Mesh->Load(m);
+#if !SERVER
 	Mesh->GetModel()->CastShadow = Mesh->GetModel()->CastShadow && MeshCastShadow;
+#endif
 	Attach(Mesh);
 	this->Filename = Filename;
-	if (Mesh->GetModel()->HasCollision || (IsInEditor && Mesh->GetModelData().GetMergedVertices().size() < 5000))
+	if (m.HasCollision || (IsInEditor && m.GetMergedVertices().size() < 5000))
 	{
 		ModelGenerator::ModelData CollDat;
 		auto& CollElem = CollDat.AddElement();
-		CollElem.Vertices = Mesh->GetModelData().GetMergedVertices();
-		CollElem.Indices = Mesh->GetModelData().GetMergedIndices();
+		CollElem.Vertices = m.GetMergedVertices();
+		CollElem.Indices = m.GetMergedIndices();
 
-		if (Mesh->GetModelData().GetMergedVertices().size() >= 5000)
+		if (m.GetMergedVertices().size() >= 5000)
 		{
 			CollDat.SeperateElementToGrid(0, std::max(200.0f, m.CollisionBox.GetLength() / 6));
 		}
@@ -79,15 +81,15 @@ void MeshObject::LoadFromFile(std::string Filename)
 	Properties.clear();
 	GenerateDefaultCategories();
 	MaterialNames.clear();
-	MaterialNames.resize(Mesh->GetModel()->ModelMeshData.Elements.size());
-	for (size_t i = 0; i < Mesh->GetModel()->ModelMeshData.Elements.size(); i++)
+	MaterialNames.resize(m.Elements.size());
+	for (size_t i = 0; i < m.Elements.size(); i++)
 	{
-		MaterialNames[i] = Mesh->GetModel()->ModelMeshData.Elements[i].ElemMaterial;
+		MaterialNames[i] = m.Elements[i].ElemMaterial;
 		if (MaterialNames[i].substr(0, 8) == "Content/")
 		{
 			MaterialNames[i] = MaterialNames[i].substr(8);
 		}
-		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
+		AddEditorProperty(Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
 	}
 }
 
@@ -97,7 +99,7 @@ void MeshObject::OnPropertySet()
 	{
 		if (!Filename.empty())
 		{
-			Log::Print("Could find model file: " + Filename, Log::LogColor::Yellow);
+			Log::Print("Could find not model file: " + Filename + ".jsm", Log::LogColor::Yellow);
 		}
 		return;
 	}
@@ -112,6 +114,7 @@ void MeshObject::OnPropertySet()
 	LoadFromFile(Filename);
 	Properties.clear();
 	GenerateDefaultCategories();
+#if !SERVER
 	MaterialNames.clear();
 	MaterialNames.resize(Mesh->GetModel()->ModelMeshData.Elements.size());
 	for (size_t i = 0; i < Mesh->GetModel()->ModelMeshData.Elements.size(); i++)
@@ -121,13 +124,14 @@ void MeshObject::OnPropertySet()
 		{
 			MaterialNames[i] = MaterialNames[i].substr(8);
 		}
-		Properties.push_back(Objects::Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
+		AddEditorProperty(Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
 	}
+#endif
 }
 
 void MeshObject::GenerateDefaultCategories()
 {	
 	// Categories are sorted alphabetically. The text renderer doesn't render newlines, so the categories have \n first so they will be sorted first.
-	Properties.push_back(Objects::Property("\nMesh:Mesh file", Type::String, &Filename));
-	Properties.push_back(Objects::Property("\nMesh:Cast Shadow", Type::Bool, &MeshCastShadow));
+	AddEditorProperty(Property("\nMesh:Mesh file", Type::String, &Filename));
+	AddEditorProperty(Property("\nMesh:Cast Shadow", Type::Bool, &MeshCastShadow));
 }

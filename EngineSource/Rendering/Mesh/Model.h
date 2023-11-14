@@ -8,6 +8,7 @@
 #include <Rendering/Mesh/ModelGenerator.h>
 #include <Rendering/Texture/Material.h>
 
+#if !SERVER
 class Mesh;
 
 class Model : public Renderable
@@ -80,3 +81,4 @@ protected:
 	glm::mat4 ModelViewProjection = glm::mat4(1);
 	float NonScaledSize = 1;
 };
+#endif

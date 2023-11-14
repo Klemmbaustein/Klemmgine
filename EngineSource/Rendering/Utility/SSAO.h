@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 namespace SSAO
 {
@@ -5,3 +6,4 @@ namespace SSAO
 	unsigned int Render(unsigned int NormalBuffer, unsigned int PositionBuffer);
 	void ResizeBuffer(unsigned int X, unsigned int Y);
 }
+#endif

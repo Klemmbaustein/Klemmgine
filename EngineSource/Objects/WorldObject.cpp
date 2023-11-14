@@ -2,6 +2,12 @@
 #include "Components/Component.h"
 #include <sstream>
 #include <Engine/Log.h>
+#include <Engine/Scene.h>
+#include <Networking/Networking.h>
+#include <Networking/Server.h>
+#include <Networking/Client.h>
+#include <Networking/NetworkEvent.h>
+#include <Engine/Utility/StringUtility.h>
 
 namespace Objects
 {
@@ -21,6 +27,19 @@ namespace Objects
 	}
 }
 
+void WorldObject::_CallEvent(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments)
+{
+	for (const auto& i : NetEvents)
+	{
+		if (i.Function == Function)
+		{
+			i.Invoke(Arguments);
+			return;
+		}
+	}
+	Log::Print("[Net]: Could not invoke Event", Log::LogColor::Yellow);
+}
+
 WorldObject::WorldObject(ObjectDescription _d)
 {
 	TypeName = _d.Name;
@@ -31,12 +50,33 @@ WorldObject::~WorldObject()
 {
 }
 
-void WorldObject::Start(std::string ObjectName, Transform Transform)
+WorldObject* WorldObject::Start(std::string ObjectName, Transform Transform, uint64_t NetID)
 {
-	Name = ObjectName;
-	Objects::AllObjects.push_back(this);
-	SetTransform(Transform);
-	Begin();
+#if !EDITOR
+	if ((!Client::GetIsConnected() && !Server::IsServer()) || (!GetIsReplicated() || NetID != Networking::ServerID))
+#endif
+	{
+		this->NetID = NetID;
+		Name = ObjectName;
+		CurrentScene = Scene::CurrentScene;
+		Objects::AllObjects.push_back(this);
+		SetTransform(Transform);
+		Begin();
+	}
+#if !EDITOR && SERVER
+	else if (NetID == Networking::ServerID)
+	{
+		return Networking::SpawnReplicatedObjectFromID(TypeID, Transform);
+	}
+#elif !EDITOR
+	else
+	{
+		delete this;
+		return nullptr;
+	}
+#endif
+
+	return this;
 }
 
 void WorldObject::Destroy()
@@ -49,6 +89,11 @@ void WorldObject::Tick()
 
 void WorldObject::Begin()
 {
+}
+
+bool WorldObject::GetIsReplicated()
+{
+	return false;
 }
 
 void WorldObject::SetTransform(Transform NewTransform)
@@ -92,6 +137,18 @@ void WorldObject::TickComponents()
 	}
 }
 
+void WorldObject::AddEditorProperty(Property p)
+{
+	p.PType = Property::PropertyType::EditorProperty;
+	Properties.push_back(p);
+}
+
+void WorldObject::AddNetProperty(Property p, Property::NetOwner Owner)
+{
+	p.PType = Property::PropertyType::NetProperty;
+	p.PropertyOwner = Owner;
+	Properties.push_back(p);
+}
 
 std::string WorldObject::Serialize()
 {
@@ -123,30 +180,18 @@ void WorldObject::OnPropertySet()
 std::string WorldObject::GetPropertiesAsString()
 {
 	std::stringstream OutProperties;
-	for (Objects::Property p : Properties)
+	for (Property p : Properties)
 	{
-		OutProperties << p.Name << ";" << p.Type << ";";
-		switch (p.Type)
+		if (p.PType != Property::PropertyType::EditorProperty)
 		{
-		case Type::Float:
-			OutProperties << std::to_string(*(float*)p.Data);
-			break;
-		case Type::Int:
-			OutProperties << std::to_string(*((int*)p.Data));
-			break;
-		case Type::String:
-			OutProperties << *((std::string*)p.Data);
-			break;
-		case Type::Vector3Color:
-		case Type::Vector3:
-			OutProperties << (*(Vector3*)p.Data).ToString();
-			break;
-		case Type::Bool:
-			OutProperties << std::to_string(*((bool*)p.Data));
-			break;
-		default:
-			break;
+			continue;
 		}
+
+		StrUtil::ReplaceChar(p.Name, '#', "\\#");
+		StrUtil::ReplaceChar(p.Name, ';', "\\;");
+
+		OutProperties << p.Name << ";" << p.Type << ";";
+		OutProperties << p.ValueToString();
 		OutProperties << "#";
 	}
 	return OutProperties.str();
@@ -155,17 +200,26 @@ std::string WorldObject::GetPropertiesAsString()
 void WorldObject::LoadProperties(std::string in)
 {
 	int i = 0;
-	Objects::Property CurrentProperty = Objects::Property("", Type::Float, nullptr);
+	Property CurrentProperty = Property("", Type::Float, nullptr);
 	std::string current;
+	char prev = 0;
 	for (char c : in)
 	{
-		if (c != ';' && c != '#')
+		if ((c != ';' && c != '#') || prev == '\\')
 		{
+			if (prev == '\\' && c == '\\')
+			{
+				prev = 0;
+			}
+			if (prev == '\\')
+			{
+				current.pop_back();
+			}
 			current = current + c;
+			prev = c;
 		}
 		else
 		{
-
 			switch (i)
 			{
 			case 0:
@@ -181,8 +235,12 @@ void WorldObject::LoadProperties(std::string in)
 					i = 0;
 					continue;
 				}
-				for (Objects::Property p : Properties)
+				for (Property& p : Properties)
 				{
+					if (p.PType != Property::PropertyType::EditorProperty)
+					{
+						continue;
+					}
 					if (p.Name == CurrentProperty.Name)
 					{
 						switch (CurrentProperty.Type)
@@ -222,8 +280,21 @@ void WorldObject::LoadProperties(std::string in)
 
 void WorldObject::DestroyMarkedObjects()
 {
-	for(auto* o : Objects::ObjectsToDestroy)
+	for (auto* o : Objects::ObjectsToDestroy)
 	{
+#if !EDITOR
+		if (Client::GetIsConnected() && o->GetIsReplicated())
+		{
+			if (Client::GetClientID() == o->NetOwner || Client::GetClientID() == Networking::ServerID)
+			{
+#if !SERVER
+				NetworkEvent::TriggerNetworkEvent("__destr", {}, o, Networking::ServerID);
+#else
+				Server::HandleDestroyObject(o);
+#endif
+			}
+		}
+#endif
 		o->Destroy();
 		for (Component* LoopComponent : o->GetComponents())
 		{
@@ -242,4 +313,84 @@ void WorldObject::DestroyMarkedObjects()
 	}
 
 	Objects::ObjectsToDestroy.clear();
+}
+
+void WorldObject::SetNetOwner(int64_t NewNetID)
+{
+#if SERVER
+	Server::SetObjNetOwner(this, NewNetID);
+#endif
+}
+
+std::string WorldObject::Property::ValueToString()
+{
+	switch (Type)
+	{
+	case Type::Float:
+		return std::to_string(*(float*)Data);
+	case Type::Int:
+		return std::to_string(*((int*)Data));
+	case Type::String:
+		return *((std::string*)Data);
+	case Type::Vector3Color:
+	case Type::Vector3:
+		return (*(Vector3*)Data).ToString();
+	case Type::Bool:
+		return std::to_string(*((bool*)Data));
+	default:
+		return std::string();
+	}
+}
+
+void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
+{
+#if !EDITOR
+	switch (Type)
+	{
+	case WorldObject::NetEvent::EventType::Server:
+		if (Client::GetClientID() == Parent->NetOwner)
+		{
+			NetworkEvent::TriggerNetworkEvent(Name, Arguments, Parent, Networking::ServerID);
+		}
+		else
+		{
+			Log::PrintMultiLine("Attempted to invoke NetEvent '" + Name + "' on " + Networking::ClientIDToString(Client::GetClientID()) + "\n"
+				"but the event can only be called from the owning client (client " + Networking::ClientIDToString(Parent->NetOwner) + ")",
+				Log::LogColor::Yellow,
+				"[Net]: ");
+		}
+		break;
+	case WorldObject::NetEvent::EventType::Owner:
+		if (Client::GetClientID() == Networking::ServerID)
+		{
+			NetworkEvent::TriggerNetworkEvent(Name, Arguments, Parent, Parent->NetOwner);
+		}
+		else
+		{
+			Log::PrintMultiLine("Attempted to invoke NetEvent '" + Name + "' on " + Networking::ClientIDToString(Client::GetClientID()) + "\n"
+				"but the event can only be called from the server",
+				Log::LogColor::Yellow,
+				"[Net]: ");
+		}
+		break;
+	case WorldObject::NetEvent::EventType::Clients:
+		if (Client::GetClientID() == Networking::ServerID)
+		{
+			for (const auto& i : Server::GetClients())
+			{
+				NetworkEvent::TriggerNetworkEvent(Name, Arguments, Parent, i.ID);
+			}
+		}
+		else
+		{
+			Log::PrintMultiLine("Attempted to invoke NetEvent '" + Name + "' on " + Networking::ClientIDToString(Client::GetClientID()) + "\n"
+				"but the event can only be called from the server",
+				Log::LogColor::Yellow,
+				"[Net]: ");
+		}
+		break;
+	default:
+		break;
+	}
+#endif
 }

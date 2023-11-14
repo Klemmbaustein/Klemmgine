@@ -1,3 +1,4 @@
+#if !SERVER
 #include "UIBackground.h"
 #include <GL/glew.h>
 #include <Rendering/Vertex.h>
@@ -153,3 +154,4 @@ void UIBackground::Update()
 void UIBackground::OnAttached()
 {
 }
+#endif

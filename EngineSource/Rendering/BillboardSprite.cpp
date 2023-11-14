@@ -1,3 +1,4 @@
+#if !SERVER
 #include "BillboardSprite.h"
 #include <Rendering/Graphics.h>
 #include <Rendering/Utility/Framebuffer.h>
@@ -78,3 +79,4 @@ void BillboardSprite::Render(Camera* WorldCamera, bool MainFrameBuffer, bool Tra
 void BillboardSprite::SimpleRender(Shader* UsedShader)
 {
 }
+#endif

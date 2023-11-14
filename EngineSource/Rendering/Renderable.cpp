@@ -13,6 +13,7 @@
 
 void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFramebuffer)
 {
+#if !SERVER
 	ShaderToApply->Bind();
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, CSM::ShadowMaps);
@@ -49,10 +50,12 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFr
 		glUniform1f(glGetUniformLocation(ShaderToApply->GetShaderID(),
 			((std::string("cascadePlaneDistances[") + std::to_string(i)) + "]").c_str()), CSM::shadowCascadeLevels[i] * CSM::CSMDistance);
 	}
+#endif
 }
 
 ObjectRenderContext::ObjectRenderContext(Material m)
 {
+#if !SERVER
 	this->Mat = m;
 	ContextShader = ReferenceShader("Shaders/" + m.VertexShader, "Shaders/" + m.FragmentShader);
 	if (!ContextShader)
@@ -68,6 +71,7 @@ ObjectRenderContext::ObjectRenderContext(Material m)
 	{
 		LoadUniform(i);
 	}
+#endif
 }
 
 ObjectRenderContext::ObjectRenderContext()
@@ -80,11 +84,14 @@ ObjectRenderContext::~ObjectRenderContext()
 
 void ObjectRenderContext::Bind()
 {
+#if !SERVER
 	BindWithShader(ContextShader);
+#endif
 }
 
 void ObjectRenderContext::BindWithShader(Shader* s)
 {
+#if !SERVER
 	s->Bind();
 	GLint TexIterator = 0;
 	for (int i = 0; i < Uniforms.size(); ++i)
@@ -116,15 +123,20 @@ void ObjectRenderContext::BindWithShader(Shader* s)
 			break;
 		}
 	}
+#endif
 }
 
 Shader* ObjectRenderContext::GetShader()
 {
+#if !SERVER
 	return ContextShader;
+#endif
+	return nullptr;
 }
 
 void ObjectRenderContext::LoadUniform(Material::Param u)
 {
+#if !SERVER
 	size_t UniformIndex = SIZE_MAX;
 	for (size_t i = 0; i < Uniforms.size(); i++)
 	{
@@ -197,10 +209,12 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 			break;
 		}
 	}
+#endif
 }
 
 void ObjectRenderContext::Unload()
 {
+#if !SERVER
 	for (Uniform& u : Uniforms)
 	{
 		if (!u.Content)
@@ -231,4 +245,5 @@ void ObjectRenderContext::Unload()
 	DereferenceShader("Shaders/" + Mat.VertexShader, "Shaders/" + Mat.FragmentShader);
 	ContextShader = nullptr;
 	Mat = Material();
+#endif
 }

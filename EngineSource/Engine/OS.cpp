@@ -219,11 +219,11 @@ namespace OS
 		std::pair(ConsoleColor::Yellow, FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY),
 	};
 	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-}
 
-void OS::SetConsoleColor(ConsoleColor NewColor)
-{
-	SetConsoleTextAttribute(hConsole, WindowsColors[NewColor]);
+	void SetConsoleColor(ConsoleColor NewColor)
+	{
+		SetConsoleTextAttribute(hConsole, WindowsColors[NewColor]);
+	}
 }
 #endif
 

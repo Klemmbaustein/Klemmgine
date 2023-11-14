@@ -10,17 +10,22 @@
 
 void ParticleComponent::Begin()
 {
+#if !SERVER
 	Emitter = new Particles::ParticleEmitter();
 	Graphics::MainFramebuffer->ParticleEmitters.push_back(Emitter);
+#endif
 }
 
 void ParticleComponent::Tick()
 {
+#if !SERVER
 	Emitter->Position = Vector3::TranslateVector(Position, GetParent()->GetTransform());
 	Emitter->Rotation = Rotation;
+#endif
 }
 void ParticleComponent::Destroy()
 {
+#if !SERVER
 	for (auto f : Graphics::AllFramebuffers)
 	{
 		for (int i = 0; i < f->ParticleEmitters.size(); i++)
@@ -32,9 +37,11 @@ void ParticleComponent::Destroy()
 		}
 	}
 	delete Emitter;
+#endif
 }
 void ParticleComponent::LoadParticle(std::string Name)
 {
+#if !SERVER
 	std::vector<std::string> ElementMaterials;
 	std::string File = Assets::GetAsset(Name + ".jspart");
 	for (unsigned int i = 0; i < Emitter->ParticleVertexBuffers.size(); i++)
@@ -60,36 +67,57 @@ void ParticleComponent::LoadParticle(std::string Name)
 	{
 		Log::Print("Particle emitter " + Name + " does not exist");
 	}
+#endif
 }
 void ParticleComponent::SetActive(bool Active)
 {
+#if !SERVER
 	Emitter->Active = Active;
+#endif
 }
 bool ParticleComponent::GetActive()
 {
+#if !SERVER
 	return Emitter->Active;
+#endif
+	return false;
 }
 bool ParticleComponent::GetIsFinished()
 {
+#if !SERVER
 	return !Emitter->IsActive;
+#endif
+	return false;
 }
 void ParticleComponent::Reset()
 {
+#if !SERVER
 	Emitter->Reset();
+#endif
 }
 void ParticleComponent::SetRelativeRotation(Vector3 NewRotation)
 {
+#if !SERVER
 	this->Rotation = NewRotation;
+#endif
 }
 Vector3 ParticleComponent::GetRelativeRotation()
 {
+#if !SERVER
 	return Rotation;
+#endif
+	return 0;
 }
 void ParticleComponent::SetRelativePosition(Vector3 NewPos)
 {
+#if !SERVER
 	Position = NewPos;
+#endif
 }
 Vector3 ParticleComponent::GetRelativePosition()
 {
+#if !SERVER
 	return Position;
+#endif
+	return 0;
 }

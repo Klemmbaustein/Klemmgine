@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <Math/Vector.h>
 #include <set>
@@ -30,8 +31,10 @@ public:
 
 	UIBox* SetSizeMode(SizeMode NewMode);
 	BorderType BoxBorder = BorderType::None;
+	SizeMode PaddingSizeMode = SizeMode::ScreenRelative;
 	float BorderRadius = 0;
-	Align BoxAlign = Align::Default;
+	Align HorizontalBoxAlign = Align::Default;
+	Align VerticalBoxAlign = Align::Reverse;
 
 	UIBox(bool Horizontal, Vector2 Position);
 	virtual ~UIBox();
@@ -39,7 +42,8 @@ public:
 	void InvalidateLayout();
 	UIBox* AddChild(UIBox* NewChild);
 	UIBox* GetAbsoluteParent();
-	UIBox* SetAlign(Align NewAlign);
+	UIBox* SetHorizontalAlign(Align NewAlign);
+	UIBox* SetVerticalAlign(Align NewAlign);
 	static void DrawAllUIElements();
 	void DeleteChildren();
 
@@ -55,6 +59,7 @@ public:
 	UIBox* SetPadding(float Up, float Down, float Left, float Right);
 	UIBox* SetPadding(float AllDirs);
 	UIBox* SetTryFill(bool NewTryFill);
+	UIBox* SetPaddingSizeMode(SizeMode NewSizeMode);
 	UIBox* SetHorizontal(bool IsHorizontal);
 	bool GetTryFill();
 	friend UIScrollBox;
@@ -71,6 +76,7 @@ public:
 
 	bool IsChildOf(UIBox* Parent);
 	bool HasMouseCollision = false;
+	void UpdateSelfAndChildren();
 
 protected:
 	bool ShouldBeTicked = true;
@@ -97,10 +103,12 @@ protected:
 
 	std::vector<UIBox*> Children;
 	UIBox* Parent = nullptr;
-	void UpdateSelfAndChildren();
 	void UpdateScale();
 	void UpdatePosition();
 private:
+	float GetVerticalOffset();
+	float GetHorizontalOffset();
+	Vector2 GetLeftRightPadding(UIBox* Target);
 	void DrawThisAndChildren();
 	bool ChildrenHorizontal = true;
 	bool PrevIsVisible = true;
@@ -111,3 +119,4 @@ namespace UI
 	extern UIBox* HoveredBox;
 	extern UIBox* NewHoveredBox;
 }
+#endif

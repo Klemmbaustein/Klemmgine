@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <Rendering/Mesh/Model.h>
 #include <Rendering/Mesh/InstancedMesh.h>
@@ -25,3 +26,4 @@ protected:
 	glm::mat4 ModelViewProjection = glm::mat4();
 	Collision::Box NonScaledSize;
 };
+#endif

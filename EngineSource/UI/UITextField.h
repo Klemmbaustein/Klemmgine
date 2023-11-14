@@ -46,7 +46,7 @@ public:
 	bool GetIsHovered();
 	bool GetIsPressed();
 
-	UITextField(bool Horizontal, Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, TextRenderer* Renderer, Shader* ButtonShader = Graphics::UIShader);
+	UITextField(Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, TextRenderer* Renderer, Shader* ButtonShader = Graphics::UIShader);
 	~UITextField() override;
 	void Draw() override;
 	void Update() override;
