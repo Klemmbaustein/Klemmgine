@@ -10,7 +10,7 @@ namespace Networking
 {
 	void Init();
 	void HandleTick();
-	void RecievePackets();
+	void ReceivePackets();
 	void Update();
 	WorldObject* SpawnReplicatedObjectFromID(uint32_t ID, Transform Location);
 	std::string IPtoStr(void* addr);

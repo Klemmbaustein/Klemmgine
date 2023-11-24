@@ -43,7 +43,6 @@ std::wstring OS::Utf8ToWstring(std::string utf8)
 	return str;
 }
 
-
 void OS::SetConsoleWindowVisible(bool Visible)
 {
 	// Set console code page to UTF-8 so console known how to interpret string data
@@ -149,7 +148,14 @@ std::string OS::GetOSString()
 
 	OSVERSIONINFOEXW osInfo;
 
-	*(FARPROC*)&RtlGetVersion = GetProcAddress(GetModuleHandleA("ntdll"), "RtlGetVersion");
+	HMODULE ntDLL = GetModuleHandleA("ntdll");
+
+	if (!ntDLL)
+	{
+		return "Unknown";
+	}
+
+	*(FARPROC*)&RtlGetVersion = GetProcAddress(ntDLL, "RtlGetVersion");
 
 	if (NULL != RtlGetVersion)
 	{

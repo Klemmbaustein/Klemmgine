@@ -50,7 +50,9 @@
 #include <iostream>
 #include <thread>
 #include <deque>
-Vector2 GetMousePosition()
+#include <mutex>
+
+static Vector2 GetMousePosition()
 {
 #if SERVER
 	return 0;
@@ -189,7 +191,7 @@ namespace LaunchArgs
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments);
 }
 
-void GLAPIENTRY MessageCallback(
+static void GLAPIENTRY MessageCallback(
 	GLenum source,
 	GLenum type,
 	GLuint id,
@@ -208,7 +210,7 @@ void GLAPIENTRY MessageCallback(
 	}
 }
 
-void TickObjects()
+static void TickObjects()
 {
 	for (size_t i = 0; i < Objects::AllObjects.size(); i++)
 	{
@@ -220,7 +222,7 @@ void TickObjects()
 #endif
 }
 
-void DrawFramebuffer(FramebufferObject* Buffer)
+static void DrawFramebuffer(FramebufferObject* Buffer)
 {
 #if !SERVER
 	if (!Buffer->FramebufferCamera) return;
@@ -588,7 +590,7 @@ static void PollInput()
 #endif
 }
 
-void DrawPostProcessing()
+static void DrawPostProcessing()
 {
 #if !SERVER
 	bool ShouldSkip3D = false;
@@ -706,7 +708,7 @@ void DrawPostProcessing()
 #endif
 }
 
-void ApplicationLoop()
+static void ApplicationLoop()
 {
 	const Application::Timer FrameTimer;
 	const Application::Timer LogicTimer;
@@ -907,6 +909,8 @@ int Application::Initialize(int argc, char** argv)
 	glDebugMessageCallback(MessageCallback, 0);
 
 	std::cout << "GLEW started (No error)\n";
+
+	Error::Init();
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	Sound::Init();

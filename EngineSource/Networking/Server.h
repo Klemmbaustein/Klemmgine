@@ -13,8 +13,8 @@ namespace Server
 		void* IP = nullptr;
 		uint64_t ID = 0;
 
-		void SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform);
-		void SendServerTravelRequest(std::string SceneName);
+		void SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform) const;
+		void SendServerTravelRequest(std::string SceneName) const;
 	};
 
 	// Function called when a 'ConnectionRequest' packet has been received.

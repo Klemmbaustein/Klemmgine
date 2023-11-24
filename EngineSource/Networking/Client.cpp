@@ -87,6 +87,12 @@ void Client::OnConnected(Packet* p)
 	{
 		return;
 	}
+
+	if (p->Data.size() < sizeof(uint64_t) + 1)
+	{
+		return;
+	}
+
 	ConnectedServer = *(IPaddress*)p->FromAddr;
 	IsConnecting = false;
 	memcpy(&ClientID, &p->Data[1], sizeof(uint64_t));
@@ -110,7 +116,10 @@ void Client::Update()
 			return;
 		}
 		ConnectionAttempts++;
-		Log::Print(StrUtil::Format("[Net]: Connection timed out - retrying (%i/%i)", ConnectionAttempts, MAX_CONNECTION_ATTEMPTS), Log::LogColor::Yellow);
+		Log::Print(StrUtil::Format("[Net]: Connection timed out - retrying (%i/%i)",
+			ConnectionAttempts,
+			MAX_CONNECTION_ATTEMPTS),
+			Log::LogColor::Yellow);
 		AttemptConnection();
 		ConnectionTimer.Reset();
 	}

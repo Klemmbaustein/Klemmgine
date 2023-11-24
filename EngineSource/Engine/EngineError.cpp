@@ -2,13 +2,35 @@
 #include <Engine/Log.h>
 #include <stacktrace>
 #include <iostream>
+#include <csignal>
 
-void Engine::AssertFailure(std::string Name, std::string Location)
+static void HandleSigSegV(int SignalID)
 {
-	Log::Print("[Error]: --------------------------------[Assert failed]--------------------------------", Log::LogColor::Red);
+	Error::AssertFailure("Access violation", "");
+}
+
+void Error::Init()
+{
+	signal(SIGSEGV, HandleSigSegV);
+}
+
+void Error::AssertFailure(std::string Name, std::string Location)
+{
+	Log::Print("[Error]: ------------------------------------[Error]------------------------------------", Log::LogColor::Red);
 	Log::PrintMultiLine(Name, Log::LogColor::Red, "[Error]: ");
 	Log::Print("[Error]: " + Location, Log::LogColor::Red);
 
+	PrintStackTrace();
+
+#if _WIN32
+	__debugbreak();
+#else
+	throw 0;
+#endif
+}
+
+void Error::PrintStackTrace()
+{
 #if __cpp_lib_stacktrace >= 202011L
 	Log::Print("[Error]: ---------------------------------[Stack trace]---------------------------------", Log::LogColor::Red);
 	auto trace = std::stacktrace::current();
@@ -18,7 +40,7 @@ void Engine::AssertFailure(std::string Name, std::string Location)
 		std::string descr = i.description();
 		descr = descr.substr(descr.find_first_of("!") + 1);
 		descr = descr.substr(0, descr.find_first_of("+"));
-		descr.append(", Line " + std::to_string(i.source_line()));
+		descr.append("(), Line " + std::to_string(i.source_line()));
 		if (i.source_file() == __FILE__)
 		{
 			continue;
@@ -26,6 +48,11 @@ void Engine::AssertFailure(std::string Name, std::string Location)
 #else
 		std::string descr = i.description();
 #endif
+		if (FileUtil::GetExtension(i.source_file()) == "inl")
+		{
+			continue;
+		}
+
 		if (i.source_file().empty())
 		{
 			continue;
@@ -35,9 +62,4 @@ void Engine::AssertFailure(std::string Name, std::string Location)
 	}
 #endif
 
-#if _WIN32
-	__debugbreak();
-#else
-	throw 0;
-#endif
 }

@@ -38,7 +38,7 @@ std::string Objects::GetCategoryFromID(uint32_t ID)
 	{
 #include <GENERATED/GENERATED_Categories.h>
 	default:
-		Log::Print("Tried to access caregory for object " + std::to_string(ID) + " but that ID does not exist!", Log::LogColor::Yellow);
+		Log::Print("Tried to access category for object " + std::to_string(ID) + " but that ID does not exist!", Log::LogColor::Yellow);
 		return "";
 	}
 }

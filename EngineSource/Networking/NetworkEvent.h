@@ -13,4 +13,6 @@ namespace NetworkEvent
 	void HandleEventAccept(Packet* Data);
 
 	void Update();
+
+	void ClearEventsFor(uint64_t PlayerID);
 }

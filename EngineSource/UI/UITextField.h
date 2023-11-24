@@ -31,20 +31,20 @@ class UITextField : public UIBox
 	float ButtonColorMultiplier = 1;
 	float TextFieldTimer = 0;
 public:
-	Vector3 GetColor();
+	Vector3 GetColor() const;
 	UITextField* SetColor(Vector3 NewColor);
 	UITextField* SetTextColor(Vector3 NewColor);
-	Vector3 GetTextColor();
+	Vector3 GetTextColor() const;
 	UIBox* ParentOverride = nullptr;
 	void Edit();
 	bool GetIsEdited() { return IsEdited; }
 	UITextField* SetText(std::string NewText);
 	UITextField* SetTextSize(float NewTextSize);
-	float GetTextSize();
+	float GetTextSize() const;
 	std::string GetText();
 	std::string HintText; // Will be displayed when the text field is empty
-	bool GetIsHovered();
-	bool GetIsPressed();
+	bool GetIsHovered() const;
+	bool GetIsPressed() const;
 
 	UITextField(Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, TextRenderer* Renderer, Shader* ButtonShader = Graphics::UIShader);
 	~UITextField() override;

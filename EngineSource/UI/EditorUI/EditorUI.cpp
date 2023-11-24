@@ -17,6 +17,7 @@
 #include <UI/EditorUI/ObjectList.h>
 #include <UI/EditorUI/ContextMenu.h>
 #include <atomic>
+#include <thread>
 #include <Engine/Log.h>
 #include <Engine/Input.h>
 #include <UI/EditorUI/Popups/DialogBox.h>
@@ -70,6 +71,37 @@ namespace Editor
 	}
 	std::atomic<bool> CanHotreload = false;
 
+	struct ProcessInfo
+	{
+		std::string Command;
+		FILE* Pipe;
+		std::thread* Thread;
+		std::atomic<bool> Active;
+		bool Async;
+	};
+
+	std::map<FILE*, ProcessInfo> ProcessPipes;
+
+	static void ReadProcessPipe(FILE* p)
+	{
+		std::string CurrentMessage;
+		while (!feof(p))
+		{
+			char NewChar = (char)fgetc(p);
+
+			if (NewChar == '\n')
+			{
+				Log::Print(CurrentMessage);
+				CurrentMessage.clear();
+			}
+			else
+			{
+				CurrentMessage.append({ NewChar });
+			}
+		}
+		fclose(p);
+		ProcessPipes[p].Active = false;
+	}
 }
 
 namespace UI
@@ -170,7 +202,7 @@ void EditorUI::SetSaveSceneOnLaunch(bool NewValue)
 void EditorUI::RebuildAndHotReload()
 {
 	Log::Print("Rebuilding C# assembly...", Log::LogColor::Green);
-	system("cd Scripts && dotnet build");
+	PipeProcessToLog("cd Scripts && dotnet build", false);
 	Editor::CanHotreload = true;
 }
 #endif
@@ -272,6 +304,30 @@ void EditorUI::SetUseLightMode(bool NewLightMode)
 	UIBox::ForceUpdateUI();
 }
 
+void EditorUI::PipeProcessToLog(std::string Command, bool Async)
+{
+	using namespace Editor;
+
+#if _WIN32
+	auto process = _popen(Command.c_str(), "r");
+#else
+	auto process = popen(Command.c_str(), "r");
+#endif
+
+	ProcessInfo proc;
+
+	proc.Active = true;
+	proc.Command = Command;
+	proc.Pipe = process;
+	proc.Async = Async;
+	proc.Thread = new std::thread(ReadProcessPipe, process);
+
+	if (!Async)
+	{
+		proc.Thread->join();
+	}
+}
+
 void EditorUI::CreateFile(std::string Path, std::string Name, std::string Ext)
 {
 	std::string Addition;
@@ -359,6 +415,20 @@ void EditorUI::OnLeave(void(*ReturnF)())
 
 void EditorUI::Tick()
 {
+	for (auto& i : Editor::ProcessPipes)
+	{
+		if (!i.second.Active)
+		{
+			if (i.second.Async)
+			{
+				i.second.Thread->join();
+			}
+			delete i.second.Thread;
+			Editor::ProcessPipes.erase(i.first);
+			break;
+		}
+	}
+
 #ifdef ENGINE_CSHARP
 	if (Editor::CanHotreload == true)
 	{

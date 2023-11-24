@@ -129,7 +129,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 #endif
 
 			Log::Print("[Build]: Complete", Log::LogColor::Green);
-			return "Sucess";
+			return "Success";
 		}
 		Log::Print("[Build]: Cannot find folder", Vector3(1, 0, 0));
 		std::filesystem::create_directories(TargetFolder);

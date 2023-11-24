@@ -38,7 +38,11 @@ namespace NetworkEvent
 		}
 		else
 		{
-			IP = Server::GetClientInfoFromID(e.TargetClient)->IP;
+			auto Client = Server::GetClientInfoFromID(e.TargetClient);
+			if (Client)
+			{
+				IP = Client->IP;
+			}
 		}
 		p.Send(IP);
 	}
@@ -71,6 +75,12 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 {
 	uint64_t EventID = 0;
 	uint64_t ObjID = 0;
+
+	if (Data->Data.size() < sizeof(EventID) + sizeof(ObjID) + 1)
+	{
+		return;
+	}
+
 	Data->Read(EventID);
 	Data->Read(ObjID);
 
@@ -136,6 +146,11 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 
 void NetworkEvent::HandleEventAccept(Packet* Data)
 {
+	if (Data->Data.size() < sizeof(EventID) + 1)
+	{
+		return;
+	}
+
 	uint64_t EventID = 0;
 	Data->Read(EventID);
 	for (size_t i = 0; i < SentEvents.size(); i++)
@@ -162,6 +177,17 @@ void NetworkEvent::Update()
 		{
 			SentEvents[i].LastTick = Networking::GetGameTick();
 			SendEvent(SentEvents[i]);
+		}
+	}
+}
+void NetworkEvent::ClearEventsFor(uint64_t PlayerID)
+{
+	for (size_t i = 0; i < SentEvents.size(); i++)
+	{
+		if (SentEvents[i].TargetClient == PlayerID)
+		{
+			SentEvents.erase(SentEvents.begin() + i);
+			i--;
 		}
 	}
 }

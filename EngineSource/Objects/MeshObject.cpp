@@ -16,12 +16,7 @@ void MeshObject::Tick()
 void MeshObject::Begin()
 {
 	GenerateDefaultCategories();
-	MaterialNames.resize(16);
-	for (size_t i = 0; i < 16; i++)
-	{
-		MaterialNames[i] = "";
-		AddEditorProperty(Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
-	}
+	AddEditorProperty(Property("Materials:Materials", Type::String | Type::List, &MaterialNames));
 	OnPropertySet();
 }
 
@@ -40,14 +35,7 @@ void MeshObject::LoadFromFile(std::string Filename)
 		{
 			continue;
 		}
-		if (MaterialNames[i].substr(0, 8) != "Content/")
-		{
-			m.Elements.at(i).ElemMaterial = "Content/" + MaterialNames.at(i);
-		}
-		else
-		{
-			m.Elements.at(i).ElemMaterial = MaterialNames.at(i);
-		}
+		m.Elements.at(i).ElemMaterial = MaterialNames.at(i);
 	}
 
 	Mesh = new MeshComponent();
@@ -78,19 +66,13 @@ void MeshObject::LoadFromFile(std::string Filename)
 		}
 	}
 
-	Properties.clear();
-	GenerateDefaultCategories();
-	MaterialNames.clear();
-	MaterialNames.resize(m.Elements.size());
-	for (size_t i = 0; i < m.Elements.size(); i++)
+#if !SERVER
+	MaterialNames.resize(Mesh->GetModel()->ModelMeshData.Elements.size());
+	for (size_t i = 0; i < Mesh->GetModel()->ModelMeshData.Elements.size(); i++)
 	{
-		MaterialNames[i] = m.Elements[i].ElemMaterial;
-		if (MaterialNames[i].substr(0, 8) == "Content/")
-		{
-			MaterialNames[i] = MaterialNames[i].substr(8);
-		}
-		AddEditorProperty(Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
+		MaterialNames[i] = Mesh->GetModel()->ModelMeshData.Elements[i].ElemMaterial;
 	}
+#endif
 }
 
 void MeshObject::OnPropertySet()
@@ -110,23 +92,9 @@ void MeshObject::OnPropertySet()
 			MaterialNames.clear();
 		}
 		PreviousFilename = Filename;
+
 	}
 	LoadFromFile(Filename);
-	Properties.clear();
-	GenerateDefaultCategories();
-#if !SERVER
-	MaterialNames.clear();
-	MaterialNames.resize(Mesh->GetModel()->ModelMeshData.Elements.size());
-	for (size_t i = 0; i < Mesh->GetModel()->ModelMeshData.Elements.size(); i++)
-	{
-		MaterialNames[i] = Mesh->GetModel()->ModelMeshData.Elements[i].ElemMaterial;
-		if (MaterialNames[i].substr(0, 8) == "Content/")
-		{
-			MaterialNames[i] = MaterialNames[i].substr(8);
-		}
-		AddEditorProperty(Property("Materials:Material " + std::to_string(i), Type::String, &MaterialNames[i]));
-	}
-#endif
 }
 
 void MeshObject::GenerateDefaultCategories()

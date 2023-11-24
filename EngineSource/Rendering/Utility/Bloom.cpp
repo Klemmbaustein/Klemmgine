@@ -13,13 +13,13 @@ namespace Bloom
 	unsigned int pingpongFBO[2];
 	unsigned int pingpongBuffer[2];
 	float BloomResolutionMultiplier = 0.15f;
+	int BloomShape = 2;
 }
 
 unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 {
 	if (Graphics::Bloom)
 	{
-		size_t Ratio = 2;
 		glViewport(0,
 			0,
 			(unsigned int)(Graphics::WindowResolution.X * BloomResolutionMultiplier),
@@ -33,7 +33,7 @@ unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 		for (unsigned int i = 0; i < amount; i++)
 		{
 			glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
-			glUniform1i(glGetUniformLocation(BloomShader->GetShaderID(), "horizontal"), (i % Ratio) != 0);
+			glUniform1i(glGetUniformLocation(BloomShader->GetShaderID(), "horizontal"), (i % (unsigned int)BloomShape) != 0);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(
 				GL_TEXTURE_2D, first_iteration ? buf : pingpongBuffer[!horizontal]
@@ -79,6 +79,7 @@ void Bloom::Init()
 		);
 	}
 	Console::RegisterConVar(Console::Variable("bloom", Type::Bool, &Graphics::Bloom, nullptr));
+	Console::RegisterConVar(Console::Variable("bloom_shape", Type::Int, &Bloom::BloomShape, nullptr));
 }
 
 void Bloom::OnResized()

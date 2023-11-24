@@ -61,6 +61,13 @@ public:
 			this->Type = Type;
 			this->Data = Data;
 		}
+		Property(std::string Name, int Type, void* Data)
+		{
+			this->Name = Name;
+			this->Type = (Type::TypeEnum)Type;
+			this->Data = Data;
+		}
+
 		std::string Name;
 		Type::TypeEnum Type;
 		void* Data;

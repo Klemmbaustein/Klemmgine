@@ -30,6 +30,6 @@ namespace Type
 		Byte = 6,
 		Bool = 7,
 		Vector3Rotation = 8,
-		List = 9
+		List = 0b10000000
 	};
 }

@@ -24,7 +24,7 @@
 
 namespace NativeFunctions
 {
-	MeshComponent* NewMeshComponent(const char* ModelFile, WorldObject* Parent)
+	static MeshComponent* NewMeshComponent(const char* ModelFile, WorldObject* Parent)
 	{
 		MeshComponent* NewModel = new MeshComponent();
 		Parent->Attach(NewModel);
@@ -33,7 +33,7 @@ namespace NativeFunctions
 		return NewModel;
 	}
 
-	CollisionComponent* NewCollisionComponent(const char* ModelFile, WorldObject* Parent)
+	static CollisionComponent* NewCollisionComponent(const char* ModelFile, WorldObject* Parent)
 	{
 		CollisionComponent* NewCollider = new CollisionComponent();
 		Parent->Attach(NewCollider);
@@ -43,7 +43,7 @@ namespace NativeFunctions
 		return NewCollider;
 	}
 
-	CameraComponent* NewCameraComponent(float FOV, WorldObject* Parent)
+	static CameraComponent* NewCameraComponent(float FOV, WorldObject* Parent)
 	{
 		CameraComponent* NewCamera = new CameraComponent();
 		Parent->Attach(NewCamera);
@@ -51,7 +51,7 @@ namespace NativeFunctions
 		return NewCamera;
 	}
 
-	ParticleComponent* NewParticleComponent(const char* ParticleFile, WorldObject* Parent)
+	static ParticleComponent* NewParticleComponent(const char* ParticleFile, WorldObject* Parent)
 	{
 		ParticleComponent* Particle = new ParticleComponent();
 		Parent->Attach(Particle);
@@ -59,102 +59,102 @@ namespace NativeFunctions
 		return Particle;
 	}
 
-	MoveComponent* NewMoveComponent(WorldObject* Parent)
+	static MoveComponent* NewMoveComponent(WorldObject* Parent)
 	{
 		MoveComponent* Movement = new MoveComponent();
 		Parent->Attach(Movement);
 		return Movement;
 	}
 
-	void MovementComponentJump(MoveComponent* Target)
+	static void MovementComponentJump(MoveComponent* Target)
 	{
 		Target->Jump();
 	}
 
-	void MovementComponentAddMovementInput(Vector3 Direction, MoveComponent* Target)
+	static void MovementComponentAddMovementInput(Vector3 Direction, MoveComponent* Target)
 	{
 		Target->AddMovementInput(Direction);
 	}
 
-	void UseCamera(CameraComponent* Cam)
+	static void UseCamera(CameraComponent* Cam)
 	{
 		Cam->Use();
 	}
 
-	void DestroyComponent(Component* c, WorldObject* Parent)
+	static void DestroyComponent(Component* c, WorldObject* Parent)
 	{
 		Parent->Detach(c);
 	}
 	
-	void SetComponentTransform(Component* c, Transform NewTransform)
+	static void SetComponentTransform(Component* c, Transform NewTransform)
 	{
 		c->RelativeTransform = NewTransform;
 	}
 
-	Transform GetComponentTransform(Component* c)
+	static Transform GetComponentTransform(Component* c)
 	{
 		return c->RelativeTransform;
 	}
 
-	Vector3 GetMouseMovement()
+	static Vector3 GetMouseMovement()
 	{
 		return Vector3(Input::MouseMovement, 0);
 	}
 
-	void LoadScene(const char* SceneName)
+	static void LoadScene(const char* SceneName)
 	{
 		Scene::LoadNewScene(SceneName);
 	}
 
-	CSharp::CSharpWorldObject NewCSObject(const char* TypeName, Transform ObjectTransform)
+	static CSharp::CSharpWorldObject NewCSObject(const char* TypeName, Transform ObjectTransform)
 	{
 		CSharpObject* NewObject = Objects::SpawnObject<CSharpObject>(ObjectTransform, 0);
 		NewObject->LoadClass(TypeName);
 		return NewObject->CS_Obj;
 	}
 
-	void DestroyObject(WorldObject* Ptr)
+	static void DestroyObject(WorldObject* Ptr)
 	{
 		Objects::DestroyObject(Ptr);
 	}
 
-	Sound::SoundBuffer* LoadSound(const char* File)
+	static Sound::SoundBuffer* LoadSound(const char* File)
 	{
 		return Sound::LoadSound(File);
 	}
 
-	void PlaySound(Sound::SoundBuffer* s, float Pitch, float Volume, bool Looping)
+	static void PlaySound(Sound::SoundBuffer* s, float Pitch, float Volume, bool Looping)
 	{
 		Sound::PlaySound2D(s, Pitch, Volume, Looping);
 	}
 	
-	void UnloadSound(Sound::SoundBuffer* s)
+	static void UnloadSound(Sound::SoundBuffer* s)
 	{
 		delete s;
 	}
 
-	Collision::HitResponse NativeRaycast(Vector3 Start, Vector3 End, WorldObject* ObjectsToIgnore)
+	static Collision::HitResponse NativeRaycast(Vector3 Start, Vector3 End, WorldObject* ObjectsToIgnore)
 	{
 		return Collision::LineTrace(Start, End, {ObjectsToIgnore});
 	}
 
-	bool CallConsoleCommand(const char* cmd)
+	static bool CallConsoleCommand(const char* cmd)
 	{
 		return Console::ExecuteConsoleCommand(cmd);
 	}
 
-	Transform GetObjectTransform(WorldObject* TargetObject)
+	static Transform GetObjectTransform(WorldObject* TargetObject)
 	{
 		return TargetObject->GetTransform();
 	}
 
-	void SetObjectTransform(Transform NewTransform, WorldObject* TargetObject)
+	static void SetObjectTransform(Transform NewTransform, WorldObject* TargetObject)
 	{
 		TargetObject->SetTransform(NewTransform);
 	}
 
 #if !SERVER
-	UIBox* CreateUIBox(bool Horizontal, Vector2 Position)
+	static UIBox* CreateUIBox(bool Horizontal, Vector2 Position)
 	{
 #if !EDITOR
 		return new UIBox(Horizontal, Position);
@@ -162,77 +162,77 @@ namespace NativeFunctions
 		return nullptr;
 	}
 
-	void DestroyUIBox(UIBox* Target)
+	static void DestroyUIBox(UIBox* Target)
 	{
 #if !EDITOR
 		delete Target;
 #endif
 	}
 
-	void SetUIBoxMinSize(Vector2 NewMinSize, UIBox* Target)
+	static void SetUIBoxMinSize(Vector2 NewMinSize, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetMinSize(NewMinSize);
 #endif
 	}
 
-	void SetUIBoxMaxSize(Vector2 NewMaxSize, UIBox* Target)
+	static void SetUIBoxMaxSize(Vector2 NewMaxSize, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetMaxSize(NewMaxSize);
 #endif
 	}
 
-	void SetUIBoxPosition(Vector2 Position, UIBox* Target)
+	static void SetUIBoxPosition(Vector2 Position, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetPosition(Position);
 #endif
 	}
 
-	void SetUIBoxVerticalAlign(UIBox::Align NewAlign, UIBox* Target)
+	static void SetUIBoxVerticalAlign(UIBox::Align NewAlign, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetVerticalAlign(NewAlign);
 #endif
 	}
 
-	void SetUIBoxHorizontalAlign(UIBox::Align NewAlign, UIBox* Target)
+	static void SetUIBoxHorizontalAlign(UIBox::Align NewAlign, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetHorizontalAlign(NewAlign);
 #endif
 	}
 
-	void SetUIBoxSizeMode(UIBox::SizeMode Mode, UIBox* Target)
+	static void SetUIBoxSizeMode(UIBox::SizeMode Mode, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetSizeMode(Mode);
 #endif
 	}
 
-	void SetUIBoxBorder(UIBox::BorderType NewBorder, float Size, UIBox* Target)
+	static void SetUIBoxBorder(UIBox::BorderType NewBorder, float Size, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetBorder(NewBorder, Size);
 #endif
 	}
 
-	void SetUIBoxPadding(float Up, float Down, float Left, float Right, UIBox* Target)
+	static void SetUIBoxPadding(float Up, float Down, float Left, float Right, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetPadding(Up, Down, Left, Right);
 #endif
 	}
 
-	void SetUIBoxPaddingSizeMode(UIBox::SizeMode Mode, UIBox* Target)
+	static void SetUIBoxPaddingSizeMode(UIBox::SizeMode Mode, UIBox* Target)
 	{
 #if !EDITOR
 		Target->SetPaddingSizeMode(Mode);
 #endif
 	}
 
-	void AddUIBoxChild(UIBox* Child, UIBox* Target)
+	static void AddUIBoxChild(UIBox* Child, UIBox* Target)
 	{
 #if !EDITOR
 		Target->AddChild(Child);
@@ -240,7 +240,7 @@ namespace NativeFunctions
 	}
 
 
-	UIBackground* CreateUIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale)
+	static UIBackground* CreateUIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale)
 	{
 #if EDITOR
 		return nullptr;
@@ -248,7 +248,7 @@ namespace NativeFunctions
 		return (UIBackground*)(new UIBackground(Horizontal, Position, Color, MinScale))->SetTryFill(true);
 	}
 
-	TextRenderer* CreateTextRenderer(const char* Font)
+	static TextRenderer* CreateTextRenderer(const char* Font)
 	{
 #if EDITOR
 		return nullptr;
@@ -256,7 +256,7 @@ namespace NativeFunctions
 		return new TextRenderer(Font);
 	}
 
-	UIText* CreateUIText(float Scale, Vector3 Color, const char* Text, TextRenderer* Renderer)
+	static UIText* CreateUIText(float Scale, Vector3 Color, const char* Text, TextRenderer* Renderer)
 	{
 #if EDITOR
 		return nullptr;
@@ -264,7 +264,7 @@ namespace NativeFunctions
 		return new UIText(Scale, Color, Text, Renderer);
 	}
 
-	void SetCursorVisible(bool NewVisible)
+	static void SetCursorVisible(bool NewVisible)
 	{
 #if !EDITOR
 		Input::CursorVisible = NewVisible;
@@ -280,6 +280,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	using namespace Input;
 	using namespace CameraShake;
 	using namespace Application;
+	using namespace Error;
 
 	ENGINE_ASSERT(CSharp::IsAssemblyLoaded(), "Assembly should always be loaded first before registering any native functions.");
 
@@ -312,6 +313,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(NativeRaycast);
 	REGISTER_FUNCTION(CallConsoleCommand);
 	REGISTER_FUNCTION(Vector3::GetScaledAxis);
+	REGISTER_FUNCTION(PrintStackTrace);
 
 #if !SERVER
 	REGISTER_FUNCTION(SetCursorVisible);

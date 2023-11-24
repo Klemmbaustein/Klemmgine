@@ -147,7 +147,7 @@ void UITextField::Tick()
 		{
 			TextFieldTimer = 0;
 			IBeamPosition = NewPos;
-			IBeamScale = Vector2(0.002f, 0.066f) * TextSize;
+			IBeamScale = Vector2(2.0f / Graphics::WindowResolution.X, 0.066f * TextSize);
 			UIBox::RedrawUI();
 		}
 		if (!ShowIBeam)
@@ -168,7 +168,7 @@ void UITextField::Tick()
 	TextObject->SetText(EnteredText.empty() && !IsEdited ? HintText : (IsEdited ? RendererdText : EnteredText));
 }
 
-Vector3 UITextField::GetColor()
+Vector3 UITextField::GetColor() const
 {
 	return Color;
 }
@@ -189,7 +189,7 @@ UITextField* UITextField::SetTextColor(Vector3 NewColor)
 	return this;
 }
 
-Vector3 UITextField::GetTextColor()
+Vector3 UITextField::GetTextColor() const
 {
 	return TextColor;
 }
@@ -228,7 +228,7 @@ UITextField* UITextField::SetTextSize(float NewTextSize)
 	return this;
 }
 
-float UITextField::GetTextSize()
+float UITextField::GetTextSize() const
 {
 	return TextSize;
 }
@@ -238,12 +238,12 @@ std::string UITextField::GetText()
 	return EnteredText;
 }
 
-bool UITextField::GetIsHovered()
+bool UITextField::GetIsHovered() const
 {
 	return IsHovered;
 }
 
-bool UITextField::GetIsPressed()
+bool UITextField::GetIsPressed() const
 {
 	return IsPressed;
 }

@@ -27,14 +27,14 @@ namespace Particles
 	};
 	struct ParticleInstance
 	{
-		float InitialLifeTime;
-		float LifeTime;
+		float InitialLifeTime = 0;
+		float LifeTime = 0;
 		Vector3 Velocity;
 		Vector3 Position;
 		Vector3 Force;
-		float Scale;
-		float StartScale;
-		float EndScale;
+		float Scale = 0;
+		float StartScale = 0;
+		float EndScale = 0;
 		bool operator==(const ParticleInstance& b) const = default;
 	};
 

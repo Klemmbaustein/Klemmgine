@@ -179,7 +179,7 @@ void Networking::SendObjectInfo(WorldObject* obj, void* TargetAddr)
 			continue;
 		}
 #if SERVER
-		if (i.PropertyOwner == WorldObject::Property::NetOwner::Server)
+		if (i.PropertyOwner == WorldObject::Property::NetOwner::Server || obj->NetOwner != Server::GetClientInfoFromIP(TargetAddr)->ID)
 #else
 		if (i.PropertyOwner == WorldObject::Property::NetOwner::Client && obj->NetOwner == Client::GetClientID())
 #endif
@@ -244,7 +244,7 @@ void Networking::Init()
 
 void Networking::HandleTick()
 {
-	RecievePackets();
+	ReceivePackets();
 #if !SERVER
 	Client::Update();
 #else
@@ -253,7 +253,7 @@ void Networking::HandleTick()
 	NetworkEvent::Update();
 }
 
-void Networking::RecievePackets()
+void Networking::ReceivePackets()
 {
 	auto p = Packet::Receive();
 

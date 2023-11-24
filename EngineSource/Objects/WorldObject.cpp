@@ -197,6 +197,35 @@ std::string WorldObject::GetPropertiesAsString()
 	return OutProperties.str();
 }
 
+template<typename T>
+static void AssignStringToPtr(Type::TypeEnum t, std::string str, void* ptr, T (*FromString)(std::string val))
+{
+	if (t & Type::List)
+	{
+		auto vec = (std::vector<T>*)ptr;
+		vec->clear();
+		std::string val;
+		for (unsigned char i : str)
+		{
+			if (i != 0xff)
+			{
+				val.append({ (char)i });
+			}
+			else
+			{
+				vec->push_back(FromString(val));
+				val.clear();
+			}
+		}
+		if (!val.empty())
+		{
+			vec->push_back(FromString(val));
+		}
+		return;
+	}
+	*(T*)ptr = FromString(str);
+}
+
 void WorldObject::LoadProperties(std::string in)
 {
 	int i = 0;
@@ -243,25 +272,27 @@ void WorldObject::LoadProperties(std::string in)
 					}
 					if (p.Name == CurrentProperty.Name)
 					{
-						switch (CurrentProperty.Type)
+						switch ((Type::TypeEnum)(CurrentProperty.Type &  ~Type::List))
 						{
 						case Type::Float:
-							*((float*)p.Data) = std::stof(current);
+							AssignStringToPtr<float>(p.Type, current, p.Data, [](std::string val){return std::stof(val);});
 							break;
 						case Type::Int:
-							*((int*)p.Data) = std::stoi(current);
+							AssignStringToPtr<int>(p.Type, current, p.Data, [](std::string val) {return std::stoi(val); });
 							break;
 						case Type::String:
-							*((std::string*)p.Data) = (current);
+							AssignStringToPtr<std::string>(p.Type, current, p.Data, [](std::string val) {return val; });
 							break;
 						case Type::Vector3Color:
+						case Type::Vector3Rotation:
 						case Type::Vector3:
-							*((Vector3*)p.Data) = Vector3::stov(current);
+							AssignStringToPtr<Vector3>(p.Type, current, p.Data, [](std::string val) {return Vector3::stov(val); });
 							break;
 						case Type::Bool:
-							*((bool*)p.Data) = std::stoi(current);
+							AssignStringToPtr<bool>(p.Type, current, p.Data, [](std::string val) {return (bool)std::stoi(val); });
 							break;
 						default:
+							Log::Print(std::to_string(CurrentProperty.Type ^ Type::List));
 							break;
 						}
 						break;
@@ -322,8 +353,68 @@ void WorldObject::SetNetOwner(int64_t NewNetID)
 #endif
 }
 
+template<typename T>
+static std::string ListToString(void* Data, std::string(*ToString)(T Data))
+{
+	auto& vec = *(std::vector<T>*)(Data);
+
+	std::string val;
+
+	for (auto i : vec)
+	{
+		val.append(ToString(i) + std::string({(char)0xff}));
+	}
+	if (!val.empty())
+	{
+		val.pop_back();
+	}
+	return val;
+}
+
 std::string WorldObject::Property::ValueToString()
 {
+	if (Type & Type::List)
+	{
+		Type = (Type::TypeEnum)(Type ^ Type::List);
+
+		switch (Type)
+		{
+		case Type::Vector3Color:
+		case Type::Vector3Rotation:
+		case Type::Vector3:
+		{
+			return ListToString<Vector3>(Data, [](Vector3 Data){
+				return Data.ToString();
+				});
+		}
+		case Type::Float:
+		{
+			return ListToString<float>(Data, [](float Data) {
+				return std::to_string(Data);
+				});
+		}
+		case Type::Int:
+			return ListToString<int>(Data, [](int Data) {
+				return std::to_string(Data);
+				});
+		case Type::String:
+			return ListToString<std::string>(Data, [](std::string Data) {
+				return Data;
+				});
+		case Type::Byte:
+			return ListToString<uint8_t>(Data, [](uint8_t Data) {
+				return std::to_string(Data);
+				});
+		case Type::Bool:
+			return ListToString<bool>(Data, [](bool Data) {
+				return std::to_string(Data);
+				});
+		default:
+			break;
+		}
+		return std::string();
+	}
+
 	switch (Type)
 	{
 	case Type::Float:
@@ -338,8 +429,9 @@ std::string WorldObject::Property::ValueToString()
 	case Type::Bool:
 		return std::to_string(*((bool*)Data));
 	default:
-		return std::string();
+		break;
 	}
+	return std::string();
 }
 
 void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const

@@ -14,8 +14,6 @@
 #include <Rendering/Utility/Framebuffer.h>
 #include <Engine/Build/Build.h>
 
-#include <thread>
-
 class EditorUI;
 class UIVectorField;
 class UITextField;
@@ -89,6 +87,9 @@ public:
 	static void SetUseLightMode(bool NewLightMode);
 	static int NumLaunchClients;
 	static bool LaunchWithServer;
+
+	static void PipeProcessToLog(std::string Command, bool Async);
+
 	static void CreateFile(std::string Path, std::string Name, std::string Ext);
 	EditorUI();
 	void OnLeave(void(*ReturnF)());

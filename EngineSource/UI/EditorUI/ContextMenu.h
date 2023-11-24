@@ -34,6 +34,7 @@ public:
 
 	UITextField* GenerateTextField(std::string Content, int Index);
 	void GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index);
+	void GenerateSectionElement(ContextMenuSection Element, WorldObject* ContextObject, std::string Name);
 
 	void Tick() override;
 	void OnButtonClicked(int Index) override;

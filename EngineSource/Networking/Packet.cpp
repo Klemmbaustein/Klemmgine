@@ -52,6 +52,11 @@ void Packet::EvaluatePacket()
 		break;
 	case PacketType::ValueUpdate:
 	{
+		if (Data.size() < sizeof(uint64_t) + 1)
+		{
+			break;
+		}
+
 		uint64_t ObjID = 0;
 		Read(ObjID);
 		std::string Value;

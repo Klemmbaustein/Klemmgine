@@ -44,7 +44,7 @@ namespace Server
 	static std::vector<ClientInfo> Clients;
 	static uint64_t UIDCounter = 0;
 	static ClientInfo* ServerClient = new ClientInfo();
-	void ClientInfo::SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform)
+	void ClientInfo::SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform) const
 	{
 		Packet p;
 		p.Write((uint8_t)Packet::PacketType::SpawnObject);
@@ -55,7 +55,7 @@ namespace Server
 		p.Send(IP);
 
 	}
-	void ClientInfo::SendServerTravelRequest(std::string SceneName)
+	void ClientInfo::SendServerTravelRequest(std::string SceneName) const
 	{
 		Packet p;
 		p.Data =
@@ -66,7 +66,7 @@ namespace Server
 		p.Send(IP);
 	}
 
-	void HandleClientDisconnect(ClientInfo* Client)
+	static void HandleClientDisconnect(ClientInfo* Client)
 	{
 		for (auto& i : OnDisconnectedCallbacks)
 		{
@@ -75,12 +75,14 @@ namespace Server
 
 		for (size_t i = 0; i < Clients.size(); i++)
 		{
-			if (&Clients[i] == Client)
+			if (Clients[i].ID == Client->ID)
 			{
 				Clients.erase(Clients.begin() + i);
 			}
 		}
-		if (ShouldQuitOnPlayerDisconnect && Clients.size() == 0)
+		NetworkEvent::ClearEventsFor(Client->ID);
+
+		if (ShouldQuitOnPlayerDisconnect && Clients.empty())
 		{
 			exit(0);
 		}
