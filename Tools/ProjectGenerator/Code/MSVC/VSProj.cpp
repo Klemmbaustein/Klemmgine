@@ -194,9 +194,9 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		.AddTag("ToolsVersion", "Current")
 		.AddTag("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003")
 		.Add(XML("PropertyGroup")
-			.Add(XML("LocalDebuggerWorkingDirectory", "$(ProjectDir)../bin/"))
+			.Add(XML("LocalDebuggerWorkingDirectory", "$(ProjectDir)../"))
 			.Add(XML("LocalDebuggerCommandArguments", "-editorPath " + CurrentPath.string()))
-			.Add(XML("LocalDebuggerCommand", "$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)"))
+			.Add(XML("LocalDebuggerCommand", "$(ProjectDir)../bin/$(ProjectName)-$(Configuration)$(TargetExt)"))
 			.Add(XML("DebuggerFlavor", "WindowsLocalDebugger")));
 	std::ofstream UserOut = std::ofstream(Name + ".vcxproj.user");
 	UserOut << User.Write();

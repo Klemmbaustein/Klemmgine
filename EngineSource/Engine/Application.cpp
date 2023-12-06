@@ -54,6 +54,11 @@
 #include <deque>
 #include <mutex>
 
+#if _WIN32
+#define NOMINMAX
+#include <Windows.h>
+#endif
+
 static Vector2 GetMousePosition()
 {
 #if SERVER
@@ -868,8 +873,9 @@ int Application::Initialize(int argc, char** argv)
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	int flags = SDL_WINDOW_OPENGL;
-
-
+#if _WIN32
+	SetProcessDPIAware();
+#endif
 	// Set Window resolution to the screens resolution * 0.75
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
