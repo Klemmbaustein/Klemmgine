@@ -29,25 +29,25 @@ void main()
 	if(centeredTexCoords.x > scale.x - u_borderScale)
 	{
 		IsInEdge = true;
-		if(u_borderType == 2) drawnColor = u_color * 0.75;
+		if (u_borderType == 2) drawnColor = u_color * 0.75;
 	}
-	if(centeredTexCoords.y > scale.y - u_borderScale)
+	if (centeredTexCoords.y > scale.y - u_borderScale)
 	{
-		if(u_borderType == 2) drawnColor = u_color * 0.75;
-		if(IsInEdge && u_borderType == 1)
+		if (u_borderType == 2) drawnColor = u_color * 0.75;
+		if (IsInEdge && u_borderType == 1)
 		{
 			opacity *= clamp(1.0 / pow((length((scale - u_borderScale) - centeredTexCoords) / u_borderScale), 1000 * u_borderScale), 0, 1);
 		}
 	}
-	if(u_offset.y * 2 > v_position.y)
+	if (u_offset.y * 2 > v_position.y)
 	{
 		discard;
 	}
-	if(u_offset.z * 2 < v_position.y)
+	if (u_offset.z * 2 < v_position.y)
 	{
 		discard;
 	}
-	if(u_useTexture == 1)
+	if (u_useTexture == 1)
 	{
 		vec4 sampled = vec4(0);
 		vec2 offset = (0.5 / scale) / vec2(1600, 900);
@@ -68,7 +68,7 @@ void main()
 		sampled.xyz /= samples;
 		sampled.w /= NUM_SAMPLES * NUM_SAMPLES * 2 * 2;
 		opacity *= sampled.w;
-		f_color = vec4(drawnColor.xyz * sampled.xyz, opacity);
+		f_color = vec4(clamp(drawnColor.xyz * sampled.xyz, vec3(0), vec3(1)), opacity);
 	}
 	else
 	{
