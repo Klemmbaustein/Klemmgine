@@ -61,7 +61,7 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 	OutlineBuffer->FramebufferCamera = Graphics::MainCamera;
 	ArrowsBuffer = new FramebufferObject();
 	ArrowsBuffer->FramebufferCamera = Graphics::MainCamera;
-	ArrowsModel = new Model("../../EditorContent/Models/Arrows.jsm");
+	ArrowsModel = new Model(Application::GetEditorPath() + "/EditorContent/Models/Arrows.jsm");
 	ArrowsModel->ModelTransform.Scale = Vector3(1, 1, 1);
 	ArrowsModel->ModelTransform.Rotation.Y = -Math::PI_F / 2.0f;
 	ArrowsBuffer->Renderables.push_back(ArrowsModel);

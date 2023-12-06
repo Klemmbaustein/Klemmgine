@@ -10,6 +10,8 @@
 #include <Engine/EngineError.h>
 #include <Engine/File/Assets.h>
 #include <Engine/Stats.h>
+#include <Engine/BackgroundTask.h>
+
 #include <Sound/Sound.h>
 
 #include <UI/Default/UICanvas.h>
@@ -176,6 +178,17 @@ namespace Application
 		int w, h;
 		SDL_GetWindowSize(Window, &w, &h);
 		return Vector2((float)w, (float)h);
+	}
+	std::string EditorPath;
+
+	void SetEditorPath(std::string NewEditorPath)
+	{
+		EditorPath = NewEditorPath;
+	}
+
+	std::string GetEditorPath()
+	{
+		return EditorPath;
 	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
 	std::thread ConsoleThread;
@@ -789,6 +802,7 @@ static void ApplicationLoop()
 	}
 #endif
 #endif
+	BackgroundTask::UpdateTaskStatus();
 	Scene::Tick();
 	const Application::Timer SwapTimer;
 #if !SERVER
@@ -826,6 +840,7 @@ int Application::Initialize(int argc, char** argv)
 {
 	OS::SetConsoleWindowVisible(true);
 	Assets::ScanForAssets();
+	Application::EditorPath = std::filesystem::current_path().u8string();
 
 	for (int i = 0; i < 322; i++) // Array of keys, should be 'false' in the beginning
 	{
@@ -910,7 +925,26 @@ int Application::Initialize(int argc, char** argv)
 
 	std::cout << "GLEW started (No error)\n";
 
+#endif
+	Console::InitializeConsole();
 	Error::Init();
+#if !EDITOR
+	if (Project::UseNetworkFunctions)
+	{
+		Networking::Init();
+	}
+#endif
+
+	if (argc > 1)
+	{
+		std::vector<std::string> LaunchArguments;
+		for (size_t i = 1; i < argc; i++)
+		{
+			LaunchArguments.push_back(argv[i]);
+		}
+		LaunchArgs::EvaluateLaunchArguments(LaunchArguments);
+	}
+#if !SERVER
 
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	Sound::Init();
@@ -922,14 +956,7 @@ int Application::Initialize(int argc, char** argv)
 #if ENGINE_CSHARP
 	CSharp::Init();
 #endif
-	Console::InitializeConsole();
 	Cubemap::RegisterCommands();
-#if !EDITOR
-	if (Project::UseNetworkFunctions)
-	{
-		Networking::Init();
-	}
-#endif
 #if !SERVER
 	BakedLighting::Init();
 	Console::RegisterConVar(Console::Variable("post_process", Type::Bool, &Application::RenderPostProcess, nullptr));
@@ -943,16 +970,6 @@ int Application::Initialize(int argc, char** argv)
 #endif
 
 	ConsoleInput::ReadConsoleThread = new std::thread(ConsoleInput::ReadConsole);
-
-	if (argc > 1)
-	{
-		std::vector<std::string> LaunchArguments;
-		for (size_t i = 1; i < argc; i++)
-		{
-			LaunchArguments.push_back(argv[i]);
-		}
-		LaunchArgs::EvaluateLaunchArguments(LaunchArguments);
-	}
 
 
 	std::string Startup = Project::GetStartupScene();

@@ -2,6 +2,7 @@
 #include <Objects/Components/PointLightComponent.h>
 #include <Objects/Components/BillboardComponent.h>
 #include <Objects/Components/CollisionComponent.h>
+#include <Engine/Application.h>
 
 void LightObject::Begin()
 {
@@ -15,7 +16,7 @@ void LightObject::Begin()
 #if EDITOR
 	Billboard = new BillboardComponent();
 	Attach(Billboard);
-	Billboard->Load("../../EditorContent/Images/Light.png");
+	Billboard->Load(Application::GetEditorPath() + "/EditorContent/Images/Light.png");
 	ModelGenerator::ModelData m;
 	m.AddElement().MakeCube(2, 0);
 

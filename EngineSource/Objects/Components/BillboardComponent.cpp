@@ -25,7 +25,7 @@ BillboardComponent::~BillboardComponent()
 void BillboardComponent::Load(std::string Texture)
 {
 #if !SERVER
-	Load(Texture::LoadTexture(Texture));
+	Load(Texture::LoadTexture(Texture, Texture::TextureFiltering::Linear));
 #endif
 }
 

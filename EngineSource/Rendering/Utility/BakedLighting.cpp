@@ -85,7 +85,7 @@ namespace Bake
 	std::vector<Graphics::Light> Lights;
 	Vector3 BakeScale;
 
-	Vector3 BakeMapToPos(uint64_t TextureElement)
+	static Vector3 BakeMapToPos(uint64_t TextureElement)
 	{
 		int64_t x = TextureElement % BakedLighting::LightmapResolution;
 		int64_t y = (TextureElement / BakedLighting::LightmapResolution) % BakedLighting::LightmapResolution;
@@ -100,7 +100,7 @@ namespace Bake
 	constexpr int NUM_CHUNK_SPLITS = 2;
 	std::atomic<float> ThreadProgress[NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS];
 
-	void BakeSection(int64_t x, int64_t y, int64_t z, size_t ThreadID)
+	static void BakeSection(int64_t x, int64_t y, int64_t z, size_t ThreadID)
 	{
 		const uint64_t SECTION_SIZE = BakedLighting::LightmapResolution / NUM_CHUNK_SPLITS;
 		const float ProgressPerPixel = 1.0f / (SECTION_SIZE * SECTION_SIZE * SECTION_SIZE);
@@ -136,7 +136,7 @@ namespace Bake
 {
 	glm::vec3 SunDirection = glm::vec3(0, -1, 0);
 
-	inline Collision::HitResponse BakeRayTrace(const glm::vec3& orig, const glm::vec3& end, const glm::vec3& A, const glm::vec3& B, const glm::vec3& C)
+	static inline Collision::HitResponse BakeRayTrace(const glm::vec3& orig, const glm::vec3& end, const glm::vec3& A, const glm::vec3& B, const glm::vec3& C)
 	{
 		glm::vec3 E1 = C - A;
 		glm::vec3 E2 = B - A;
@@ -155,7 +155,7 @@ namespace Bake
 
 	const float ShadowBias = 2;
 
-	Collision::HitResponse BakeLine(const glm::vec3& start, const glm::vec3& end, bool mode)
+	static Collision::HitResponse BakeLine(const glm::vec3& start, const glm::vec3& end, bool mode)
 	{
 		Collision::HitResponse r;
 		if (mode)
@@ -240,7 +240,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	return std::min((LightInt / 2 + TotalLightIntensity / 4.0f), 1.0f);
 }
 
-std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
+static std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
 {
 	if (x < 0 || x >= (int64_t)BakedLighting::LightmapResolution
 		|| y < 0 || y >= (int64_t)BakedLighting::LightmapResolution
@@ -265,7 +265,9 @@ void BakedLighting::BakeCurrentSceneToFile()
 			if (dynamic_cast<MeshComponent*>(c))
 			{
 				if (!dynamic_cast<MeshComponent*>(c)->GetModel()->CastShadow)
+				{
 					continue;
+				}
 				ModelGenerator::ModelData m = dynamic_cast<MeshComponent*>(c)->GetModelData();
 				if (!m.CastShadow)
 					continue;

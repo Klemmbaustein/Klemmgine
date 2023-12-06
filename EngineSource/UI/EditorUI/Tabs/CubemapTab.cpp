@@ -12,6 +12,7 @@
 #include <UI/UIButton.h>
 #include <Rendering/Texture/Cubemap.h>
 #include <Engine/File/Save.h>
+#include <Engine/Application.h>
 
 // TODO: Remake
 
@@ -158,7 +159,7 @@ void CubemapTab::UpdatePreviewModel()
 	elem.RemoveDuplicateVertices();
 	elem.GenerateNormals();
 	m.TwoSided = false;
-	elem.ElemMaterial = "../../EditorContent/Materials/Reflective";
+	elem.ElemMaterial = Application::GetEditorPath() + "/EditorContent/Materials/Reflective";
 	PreviewModel = new Model(m);
 	PreviewBuffer->ClearContent();
 	PreviewBuffer->UseWith(PreviewModel);

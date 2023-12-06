@@ -78,7 +78,7 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 {
 	UIBox* NewElement = nullptr;
 	UIText* NewElementText = new UIText(0.4f, UIColors[2], Element.Name, Editor::CurrentUI->EngineUIText);
-	NewElementText->SetPadding(0.005f, 0.005f, 0.02f, 0.005f);
+	NewElementText->SetPadding(0.01f, 0.005f, 0.02f, 0.005f);
 	BackgroundBox->AddChild(NewElementText);
 	int ElemIndex = Name == "Object" ? -2 : -1;
 	UIVectorField::VecType VectorType = UIVectorField::VecType::xyz;

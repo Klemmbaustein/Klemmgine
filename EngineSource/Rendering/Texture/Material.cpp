@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <Engine/Utility/FileUtility.h>
 #include <Engine/EngineError.h>
+#include <Engine/Application.h>
 
 class MaterialException : public std::exception
 {
@@ -60,6 +61,11 @@ Material Material::LoadMaterialFile(std::string Name)
 	{
 		File = Assets::GetAsset(Name.substr(8) + Ext);
 	}
+	if (Name.substr(0, 5) == "../..")
+	{
+		File = Application::GetEditorPath() + Name.substr(5) + Ext;
+	}
+
 	if (!std::filesystem::exists(File))
 	{
 		File = Name + Ext;
@@ -67,7 +73,7 @@ Material Material::LoadMaterialFile(std::string Name)
 	if (!std::filesystem::exists(File))
 	{
 		Log::Print("Could not load material: " + Name, Log::LogColor::Yellow);
-		File = "../../EditorContent/Materials/EngineDefaultPhong.jsmat";
+		File = Application::GetEditorPath() + "/EditorContent/Materials/EngineDefaultPhong.jsmat";
 #ifdef RELEASE
 		ENGINE_ASSERT(std::filesystem::exists(File), "Could not load material: " + Name + ".\n\
 This is a fatal error on release builds.\n\

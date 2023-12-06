@@ -12,7 +12,7 @@ void ParseError(std::string Reason, std::string File, std::string Function, size
 
 #define PARSE_ERROR(reason) ParseError(reason, __FILE__, __FUNCTION__, __LINE__)
 
-// 32bit string hash for gnerating the ID of an object
+// 32bit string hash for generating the ID of an object
 inline uint32_t hash_str_uint32(const std::string& str) {
 
 	uint32_t hash = 0x811c9dc5;

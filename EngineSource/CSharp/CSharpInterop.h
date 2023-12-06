@@ -61,7 +61,7 @@ namespace CSharp
 	template<typename T, typename... Args> 
 	T StaticCall(void* Function, Args... argument)
 	{
-		ENGINE_ASSERT(Function, "");
+		ENGINE_ASSERT(Function, "Function cannot be null");
 		typedef T(__stdcall* f)(Args...);
 		f fPtr = (f)Function;
 		return fPtr(argument...);

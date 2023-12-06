@@ -31,20 +31,20 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 	std::vector<std::string> IncludePaths =
 	{
 		"./",
-		"../../../EngineSource",
+		CurrentPath.string() + "/EngineSource",
 		"../GeneratedIncludes",
-		"../../../Dependencies/glm",
+		CurrentPath.string() + "/Dependencies/glm",
 	};
 
 	std::vector<std::string> LibraryPaths =
 	{
-		"../../../lib",
-		"../../../CSharpCore/lib",
-		"../../../Dependencies/glew-cmake/lib/Release",
-		"../../../Dependencies/assimp/lib/Release",
-		"../../../Dependencies/openal-soft/Release",
-		"../../../Dependencies/SDL/VisualC/SDL/x64/Release",
-		"../../../Dependencies/SDL_net/Build/Release"
+		CurrentPath.string() + "/lib",
+		CurrentPath.string() + "/CSharpCore/lib",
+		CurrentPath.string() + "/Dependencies/glew-cmake/lib/Release",
+		CurrentPath.string() + "/Dependencies/assimp/lib/Release",
+		CurrentPath.string() + "/Dependencies/openal-soft/Release",
+		CurrentPath.string() + "/Dependencies/SDL/VisualC/SDL/x64/Release",
+		CurrentPath.string() + "/Dependencies/SDL_net/Build/Release"
 
 	};
 
@@ -60,7 +60,14 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 
 	for (auto& i : IncludePaths)
 	{
-		IncludePathsString.append("$(ProjectDir)" + i + ";");
+		if (i[1] != ':')
+		{
+			IncludePathsString.append("$(ProjectDir)" + i + ";");
+		}
+		else
+		{
+			IncludePathsString.append(i + ";");
+		}
 	}
 	IncludePathsString.append("$(IncludePath)");
 
@@ -68,7 +75,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 
 	for (auto& i : LibraryPaths)
 	{
-		LibraryPathsString.append("$(ProjectDir)" + i + ";");
+		LibraryPathsString.append(i + ";");
 	}
 	LibraryPathsString.append("$(LibraryPath)");
 
@@ -91,6 +98,11 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 				.AddTag("Include", "." + File));
 		}
 	}
+
+	/*
+	*   <OutDir>$(ProjectDir)..\</OutDir>
+	*	<TargetName>$(ProjectName)-$(Configuration)</TargetName>
+	*/
 
 	Project.AddTag("DefaultTargets", "Build")
 		.AddTag("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003");
@@ -128,6 +140,10 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		.Add(ClCompiles)
 		.Add(ClIncludes);
 
+	Project.Add(XML("PropertyGroup")
+		.Add(XML("OutDir", "$(ProjectDir)..\\bin\\"))
+		.Add(XML("TargetName", "$(ProjectName)-$(Configuration)")));
+
 	for (auto& i : Configurations)
 	{
 		std::string UpperCaseName = i;
@@ -140,6 +156,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 				.Add(XML("LanguageStandard", "stdcpp20"))
 				.Add(XML("LanguageStandard_C", "stdc17"))
 				.Add(XML("MultiProcessorCompilation", "true"))
+				.Add(XML("PreprocessorDefinitions", "$(ExternalCompilerOptions);%(PreprocessorDefinitions)"))
 				.Add(XML("PreprocessorDefinitions", UpperCaseName + ";NDEBUG;_CONSOLE;GLEW_STATIC;ENGINE_CSHARP;%(PreprocessorDefinitions)"))
 				.Add(XML("ObjectFileName", "..\\$(IntDir)"))
 				.Add(XML("AdditionalOptions", "/Zc:char8_t- %(AdditionalOptions)")))
@@ -149,14 +166,18 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 				.Add(XML("FavorSizeOrSpeed", "Speed"))
 				.Add(XML("AdditionalDependencies",
 					"assimp-vc143-mt.lib;OpenAL32.lib;SDL2_net.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)"))
-				.Add(XML("OutputFile", "$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)"))
+				.Add(XML("OutputFile", "$(OutputPath)$(TargetName)$(TargetExt)"))
 				.Add(XML("Subsystem", "Console")));
 
 		if (WithBuildTool)
 		{
 			DefGroup.Add(XML("PreBuildEvent")
 				.Add(XML("Command",
-					"\"$(ProjectDir)../../../Tools/bin/BuildTool.exe\" in=../../../EngineSource/Objects in=./Objects out=../GeneratedIncludes")));
+					"\""
+					+ CurrentPath.string()
+					+ "/Tools/bin/BuildTool.exe\" in="
+					+ CurrentPath.string()
+					+ "/EngineSource/Objects in=./Objects out=../GeneratedIncludes")));
 		}
 
 		Project.Add(DefGroup);
@@ -173,7 +194,8 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		.AddTag("ToolsVersion", "Current")
 		.AddTag("xmlns", "http://schemas.microsoft.com/developer/msbuild/2003")
 		.Add(XML("PropertyGroup")
-			.Add(XML("LocalDebuggerWorkingDirectory", "$(ProjectDir)../"))
+			.Add(XML("LocalDebuggerWorkingDirectory", "$(ProjectDir)../bin/"))
+			.Add(XML("LocalDebuggerCommandArguments", "-editorPath " + CurrentPath.string()))
 			.Add(XML("LocalDebuggerCommand", "$(ProjectDir)../$(ProjectName)-$(Configuration)$(TargetExt)"))
 			.Add(XML("DebuggerFlavor", "WindowsLocalDebugger")));
 	std::ofstream UserOut = std::ofstream(Name + ".vcxproj.user");

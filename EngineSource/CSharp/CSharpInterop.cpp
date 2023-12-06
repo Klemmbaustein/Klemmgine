@@ -13,6 +13,8 @@
 #include <Engine/Build/Build.h>
 #include <Engine/File/Save.h>
 #include <Engine/Console.h>
+#include <Engine/OS.h>
+#include <Engine/Application.h>
 
 #include <Utility/DotNet/nethost.h>
 #include <Utility/DotNet/coreclr_delegates.h>
@@ -21,7 +23,7 @@
 #define CSHARP_LIBRARY_NAME "CSharpCore"
 
 #if !RELEASE
-#define CSHARP_LIBRARY_PATH STR("../../CSharpCore/Build/CSharpCore")
+#define CSHARP_LIBRARY_PATH STR("CSharpCore/Build/CSharpCore")
 #else
 #define CSHARP_LIBRARY_PATH STR("CSharp/Core/CSharpCore")
 #endif
@@ -97,20 +99,20 @@ namespace CSharp
 	load_assembly_and_get_function_pointer_fn get_dotnet_load_assembly(const char_t* assembly);
 
 #ifdef _WIN32
-	void* load_library(const char_t* path)
+	static void* load_library(const char_t* path)
 	{
 		HMODULE h = ::LoadLibraryW(path);
 		ENGINE_ASSERT(h != nullptr, "Could not load library");
 		return (void*)h;
 	}
-	void* get_export(void* h, const char* name)
+	static void* get_export(void* h, const char* name)
 	{
 		void* f = ::GetProcAddress((HMODULE)h, name);
 		ENGINE_ASSERT(f != nullptr, "Could not export library: " + std::string(name));
 		return f;
 	}
 
-	void UnloadLibrary(void* Library)
+	static void UnloadLibrary(void* Library)
 	{
 		::FreeLibrary((HMODULE)Library);
 	}
@@ -131,7 +133,7 @@ namespace CSharp
 #endif
 
 	// Using the nethost library, discover the location of hostfxr and get exports
-	bool load_hostfxr()
+	static bool load_hostfxr()
 	{
 		if (!GetUseCSharp())
 		{
@@ -209,7 +211,7 @@ namespace CSharp
 }
 
 
-void WriteCSProj(std::string Name)
+static void WriteCSProj(std::string Name)
 {
 	std::filesystem::create_directories("CSharp/Build");
 	std::ofstream out = std::ofstream(Name);
@@ -226,7 +228,7 @@ void WriteCSProj(std::string Name)
 </Project>";
 	out.close();
 }
-void CSharpInternalPrint(const char* Msg)
+static void CSharpInternalPrint(const char* Msg)
 {
 	CSharp::CSharpLog(Msg, CSharp::CS_Log_Script);
 }
@@ -364,6 +366,13 @@ void CSharp::LoadRuntime()
 
 	ENGINE_ASSERT(load_hostfxr(), "Failure: load_hostfxr() failed.");
 
+	if (Application::GetEditorPath() != std::filesystem::current_path().string())
+	{
+#if !RELEASE
+		root_path = OS::Utf8ToWstring(Application::GetEditorPath());
+#endif
+	}
+
 	const string_t config_path = root_path + STR("/") + string_t(CSHARP_LIBRARY_PATH) + STR(".runtimeconfig.json");
 
 	load_assembly_and_get_function_pointer = get_dotnet_load_assembly(config_path.c_str());
@@ -392,7 +401,20 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 	typedef void (CORECLR_DELEGATE_CALLTYPE* StaticFunction)();
 	StaticFunction fCallback = nullptr;
 
-	const string_t dotnetlib_path = string_t(CSHARP_LIBRARY_PATH) + STR(".dll");
+	string_t root_path = std::filesystem::current_path().wstring();
+	auto pos = root_path.find_last_of(DIR_SEPARATOR);
+	ENGINE_ASSERT(pos != string_t::npos, "Root path isn't valid");
+
+	ENGINE_ASSERT(load_hostfxr(), "Failure: load_hostfxr() failed.");
+
+	if (Application::GetEditorPath() != std::filesystem::current_path().string())
+	{
+#if !RELEASE
+		root_path = OS::Utf8ToWstring(Application::GetEditorPath());
+#endif
+	}
+
+	const string_t dotnetlib_path = root_path + STR("/") + string_t(CSHARP_LIBRARY_PATH) + STR(".dll");
 	std::string Name = CSHARP_LIBRARY_NAME;
 
 	string_t dotnet_type = string_t(Namespace.begin(), Namespace.end()) + STR(", ") + string_t(Name.begin(), Name.end());

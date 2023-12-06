@@ -40,15 +40,20 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-      run: ./setup.ps1
+      run: |
+        
+        ./setup.ps1 CI_BUILD
 
     - name: create-zip
       working-directory: ${{env.GITHUB_WORKSPACE}}
-      # Also remove large unneeded folders
+      # Also remove unneeded folders
       run: |
         rm .git -r -force
-        rm Dependencies\assimp\test -r -force
-        rm Dependencies\SDL\test -r -force
+        rm Dependencies\assimp -r -force
+        rm Dependencies\glew-cmake -r -force
+        rm Dependencies\openal-soft -r -force
+        rm Dependencies\SDL_net -r -force
+        rm Dependencies\SDL -r -force
         Remove-Item .\* -Recurse -Include *.obj
         rm Dependencies\glm\doc -r -force
         rm Dependencies\glm\test -r -force

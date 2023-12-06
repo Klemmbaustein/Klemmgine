@@ -70,12 +70,13 @@ void Packet::EvaluatePacket()
 		}
 		std::vector<std::string> Values;
 		size_t Last = 0;
+
 		do
 		{
-			size_t PrevLast = Last;
-			Last = Value.find_first_of(";", PrevLast) + 1;
-			Values.push_back(Value.substr(PrevLast, Last - 1));
-		} while (Last != std::string::npos + 1);
+			size_t PrevLast = Last == 0 ? Last : Last + 1;
+			Last = Value.find_first_of(";", PrevLast);
+			Values.push_back(Value.substr(PrevLast, Last - PrevLast));
+		} while (Last != std::string::npos);
 
 		for (auto& i : Values)
 		{

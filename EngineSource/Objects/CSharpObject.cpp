@@ -41,6 +41,10 @@ void CSharpObject::Reload()
 			SetName(CSharpClass);
 		}
 	}
+	else if (!CSharpClass.empty())
+	{
+		Log::Print("Could not load C# class: " + CSharpClass, Log::LogColor::Yellow);
+	}
 }
 
 void CSharpObject::OnPropertySet()

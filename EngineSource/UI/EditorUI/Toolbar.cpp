@@ -32,7 +32,7 @@ void Toolbar::GenerateButtons()
 		{
 			continue;
 		}
-		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.11f)))
+		TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(2.0f / Graphics::WindowResolution.X, 0.11f)))
 			->SetPadding(0.015f, 0.015f, 0.02f, 0.01f));
 		auto Elem = new UIBox(false, 0);
 		Elem->SetPadding(0.0f);
@@ -64,7 +64,7 @@ void Toolbar::GenerateButtons()
 			j++;
 		}
 	}
-	TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(0.001f, 0.11f)))
+	TabBackground->AddChild((new UIBackground(true, 0, UIColors[2] * 0.5f, Vector2(2.0f / Graphics::WindowResolution.X, 0.11f)))
 		->SetPadding(0.015f, 0.015f, 0.02f, 0.01f));
 }
 
@@ -139,8 +139,7 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 #ifdef ENGINE_CSHARP
 	RegisterNewButtonCategory(ButtonCategory("C#",
 		{
-			ButtonCategory::Button("Reload C#", Editor::CurrentUI->Textures[12], []() 
-				{ new std::thread(EditorUI::RebuildAndHotReload); }),
+			ButtonCategory::Button("Reload C#", Editor::CurrentUI->Textures[12], []() { new std::thread(EditorUI::RebuildAndHotReload); }),
 		}));
 #endif
 
@@ -149,6 +148,7 @@ Toolbar::Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel
 
 void Toolbar::UpdateLayout()
 {
+	GenerateButtons();
 }
 
 void Toolbar::Tick()

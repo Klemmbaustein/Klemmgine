@@ -9,6 +9,11 @@ public:
 
 	UITextField* ClassNameTextField = nullptr;
 
+	UIText* PathText = nullptr;
+	std::string PathString;
+
+	UITextField* ClassFields[2];
+
 	void UpdateLayout() override;
 	void Tick() override;
 	void OnButtonClicked(int Index) override;
@@ -21,6 +26,6 @@ public:
 #endif
 	};
 
-	static void Create(std::string Name, ClassType NewType);
+	static void Create(std::string Name, std::string Namespace, ClassType NewType);
 };
 #endif

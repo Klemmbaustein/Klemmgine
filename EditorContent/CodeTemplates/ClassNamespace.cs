@@ -1,3 +1,4 @@
+namespace @;
 
 public class $ : WorldObject
 {

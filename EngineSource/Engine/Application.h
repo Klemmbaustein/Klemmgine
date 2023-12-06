@@ -31,6 +31,8 @@ namespace Application
 #if EDITOR
 	extern EditorUI* EditorUserInterface;
 #endif
+	void SetEditorPath(std::string NewEditorPath);
+	std::string GetEditorPath();
 
 	extern std::set<ButtonEvent> ButtonEvents;
 	struct Timer

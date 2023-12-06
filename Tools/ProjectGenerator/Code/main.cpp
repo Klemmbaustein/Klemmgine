@@ -5,17 +5,27 @@
 #include <map>
 #include <filesystem>
 
-std::vector<std::string> DependenyDlls =
+std::vector<std::string> DependencyDlls =
 {
-	"Dependencies/assimp/bin/Release/assimp-vc143-mt.dll",
-	"Dependencies/openal-soft/Release/OpenAL32.dll",
-	"Dependencies/SDL/VisualC/SDL/x64/Release/SDL2.dll",
-	"Dependencies/SDL_net/Build/Release/SDL2_net.dll",
-	"CSharpCore/lib/nethost.dll"
+	"bDependencies/assimp/bin/Release/assimp-vc143-mt.dll",
+	"bDependencies/openal-soft/Release/OpenAL32.dll",
+	"aDependencies/SDL/VisualC/SDL/x64/Release/SDL2.dll",
+	"aDependencies/SDL_net/Build/Release/SDL2_net.dll",
+	"aCSharpCore/lib/nethost.dll"
 };
 
 int main(int argc, char** argv)
 {
+	std::string ExecPath = argv[0];
+	ExecPath = ExecPath.substr(0, ExecPath.find_last_of("\\/"));
+	std::filesystem::current_path(ExecPath);
+
+	std::cout << "Klemmgine Project Generator v1.0";
+#if ENGINE_NO_SOURCE
+	std::cout << " - without engine source";
+#endif
+	std::cout << std::endl;
+
 	std::map<std::string, std::string> LaunchArgs =
 	{
 		std::pair("winSdk", "10.0"),
@@ -24,7 +34,9 @@ int main(int argc, char** argv)
 		std::pair("includeEngine", "true"),
 		std::pair("includeCsharp", "true"),
 		std::pair("upgrade", "false"),
-		std::pair("onlyBuildFiles", "false")
+		std::pair("onlyBuildFiles", "false"),
+		std::pair("ciBuild", "false"),
+		std::pair("projectPath", "")
 	};
 
 	std::string CurrentArg = "";
@@ -81,72 +93,100 @@ int main(int argc, char** argv)
 		return 1;
 	}
 
+	if (LaunchArgs["projectPath"].empty())
+	{
+		LaunchArgs["projectPath"] = "Games/" + ProjectName;
+	}
+
 	if (LaunchArgs["onlyBuildFiles"] == "false")
 	{
-		if (std::filesystem::exists("Games/" + ProjectName) && LaunchArgs["upgrade"] == "false")
+		if (std::filesystem::exists(LaunchArgs["projectPath"]) && LaunchArgs["upgrade"] == "false")
 		{
-			std::cout << "Warning: Games/" << ProjectName << " already exists. Replacing..." << std::endl;
-			std::filesystem::remove_all("Games/" + ProjectName);
+			std::cout << "Warning: " << LaunchArgs["projectPath"] << " already exists. Replacing..." << std::endl;
+			std::filesystem::remove_all(LaunchArgs["projectPath"]);
 		}
 		else
 		{
-			if (std::filesystem::exists("Games/" + ProjectName + "/.vs"))
+			if (std::filesystem::exists(LaunchArgs["projectPath"] + "/.vs"))
 			{
-				std::filesystem::remove_all("Games/" + ProjectName + "/.vs");
+				std::filesystem::remove_all(LaunchArgs["projectPath"] + "/.vs");
+				std::cout << "Upgrading project files of " << ProjectName << std::endl;
 			}
-			std::cout << "Upgrading project files of " << ProjectName << std::endl;
 		}
 
 		std::cout << "Copying project files" << std::endl;
-		std::filesystem::create_directories("Games/" + ProjectName + "/Code/Objects");
-		std::filesystem::copy("Tools/ProjectGenerator/DefaultProjectFiles", "Games/" + ProjectName,
+		std::filesystem::create_directories(LaunchArgs["projectPath"] + "/Code/Objects");
+		std::filesystem::copy("Tools/ProjectGenerator/ProjectFiles", LaunchArgs["projectPath"],
 			std::filesystem::copy_options::recursive
 			| std::filesystem::copy_options::overwrite_existing);
-		for (auto& i : DependenyDlls)
+#if ENGINE_NO_SOURCE
+		std::filesystem::copy("Tools/ProjectGenerator/ProjectFilesNoSource", LaunchArgs["projectPath"],
+			std::filesystem::copy_options::recursive
+			| std::filesystem::copy_options::overwrite_existing);
+#endif
+
+
+		for (auto& i : DependencyDlls)
 		{
-			if (!std::filesystem::exists(i))
+			std::string Name = i.substr(1);
+			std::string Path;
+			if (i[0] == 'b')
 			{
-				std::cout << "Could not find " << i << ". Ensure you have the project setup correctly." << std::endl;
+				Path = "/bin";
+			}
+
+			if (!std::filesystem::exists(Name))
+			{
+				std::cout << "Could not find " << Name << ". Ensure you have the project setup correctly." << std::endl;
 				exit(1);
 			}
-			std::filesystem::copy(i, "Games/" + ProjectName, std::filesystem::copy_options::overwrite_existing);
+			std::filesystem::create_directories(LaunchArgs["projectPath"] + Path);
+			std::filesystem::copy(Name, LaunchArgs["projectPath"] + Path, std::filesystem::copy_options::overwrite_existing);
+			std::cout << (LaunchArgs["projectPath"] + Path) << std::endl;;
 		}
 	}
 
-	std::string CppGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Code", ProjectName, "10.0", "v143", true);
+	std::string CppGUID = VSProj::WriteVCXProj(LaunchArgs["projectPath"] + "/Code", ProjectName, "10.0", "v143", true);
 
 	std::cout << "Generating solution..." << std::endl;
 
 	std::vector<SLN::Project> Projects;
 
-	SLN::Project CppProject;
-	CppProject.Name = ProjectName;
-	CppProject.Path = "Code";
-	CppProject.GUID = "A2BEFDE1-9019-4A47-839E-545ACCF559F2";
-	CppProject.Type = "vcxproj";
-	Projects.push_back(CppProject);
-
+#if ENGINE_NO_SOURCE
+	if (LaunchArgs["ciBuild"] != "false")
+#endif
+	{
+		SLN::Project CppProject;
+		CppProject.Name = ProjectName;
+		CppProject.Path = "Code";
+		CppProject.GUID = "A2BEFDE1-9019-4A47-839E-545ACCF559F2";
+		CppProject.Type = "vcxproj";
+		Projects.push_back(CppProject);
+	}
 	if (LaunchArgs["includeCsharp"] == "true")
 	{
 		std::cout << "- Including C# project in solution" << std::endl;
-		std::string CsGUID = VSProj::WriteCSProj("Games/" + ProjectName + "/Scripts", "CSharpAssembly", "net7.0");
+		std::string CsGUID = VSProj::WriteCSProj(LaunchArgs["projectPath"] + "/Scripts", "CSharpAssembly", "net7.0");
 
 		SLN::Project CSProject;
 		CSProject.Name = "CSharpAssembly";
 		CSProject.Path = "Scripts";
 		CSProject.GUID = CsGUID;
 		CSProject.Type = "csproj";
+#if !ENGINE_NO_SOURCE
 		Projects[0].Dependencies.push_back(CsGUID);
+#endif
 		Projects.push_back(CSProject);
 	}
 
+#if !ENGINE_NO_SOURCE
 	if (LaunchArgs["includeEngine"] == "true")
 	{
 		std::cout << "- Including engine project in solution" << std::endl;
 		SLN::Project EngineProject;
 		EngineProject.Name = "Engine";
 		EngineProject.Type = "vcxproj";
-		EngineProject.Path = "../../EngineSource";
+		EngineProject.Path = std::filesystem::current_path().append("EngineSource").string();
 		EngineProject.GUID = "E25491B8-04A8-4B57-9B45-C73718142C84";
 		Projects.push_back(EngineProject);
 
@@ -158,7 +198,9 @@ int main(int argc, char** argv)
 		Projects.push_back(EngineFolder);
 		Projects[0].Dependencies.push_back(EngineProject.GUID);
 	}
-	std::string ShaderGUID = VSProj::WriteVCXProj("Games/" + ProjectName + "/Shaders", "Shaders", "10.0", "v143", false);
+#endif
+
+	std::string ShaderGUID = VSProj::WriteVCXProj(LaunchArgs["projectPath"] + "/Shaders", "Shaders", "10.0", "v143", false);
 #if 1
 	SLN::Project ShaderProject;
 	ShaderProject.Name = "Shaders";
@@ -171,7 +213,7 @@ int main(int argc, char** argv)
 	if (LaunchArgs["onlyBuildFiles"] == "false")
 	{
 		std::cout << "- Writing solution" << std::endl;
-		SLN::WriteSolution("Games/" + ProjectName, ProjectName, Projects);
-		std::cout << "- Finished writing solution: Games/" << ProjectName << "/" << ProjectName << ".sln" << std::endl;
+		SLN::WriteSolution(LaunchArgs["projectPath"], ProjectName, Projects);
+		std::cout << "- Finished writing solution: " << LaunchArgs["projectPath"] << "/" << ProjectName << ".sln" << std::endl;
 	}
 }

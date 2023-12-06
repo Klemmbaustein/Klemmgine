@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Engine\BackgroundTask.cpp" />
+    <ClCompile Include="UI\EditorUI\Popups\AboutWindow.cpp" />
     <ClCompile Include="CSharp\CSharpInterop.cpp" />
     <ClCompile Include="CSharp\NativeFunctions.cpp" />
     <ClCompile Include="Engine\Application.cpp" />
@@ -126,6 +128,8 @@
     <ClCompile Include="UI\UITextField.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Engine\BackgroundTask.h" />
+    <ClInclude Include="UI\EditorUI\Popups\AboutWindow.h" />
     <ClInclude Include="CSharp\CSharpInterop.h" />
     <ClInclude Include="CSharp\NativeFunctions.h" />
     <ClInclude Include="Engine\Application.h" />
@@ -339,15 +343,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)..\lib\</OutDir>
+    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Server|x64'">
     <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)..\lib\</OutDir>
+    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
     <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)..\lib\</OutDir>
+    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <OutDir>$(ProjectDir)..\lib\</OutDir>
+    <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="MySettings">
     <ShowAllFiles>true</ShowAllFiles>
@@ -425,7 +437,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -448,7 +460,7 @@
     </Link>
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
-      <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutputPath)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
       <Command>$(ProjectDir)..\Tools\bin\BuildTool.exe  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
@@ -463,7 +475,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;SERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);SERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -486,7 +498,7 @@
     </Link>
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
-      <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutputPath)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
       <Command>$(ProjectDir)..\Tools\bin\BuildTool.exe  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
@@ -501,7 +513,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;EDITOR;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);EDITOR;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -524,7 +536,7 @@
     </Link>
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
-      <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutputPath)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
       <Command>"$(ProjectDir)..\Tools\bin\BuildTool.exe"  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>
@@ -539,7 +551,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -562,7 +574,7 @@
     </Link>
     <Lib>
       <LinkTimeCodeGeneration>false</LinkTimeCodeGeneration>
-      <OutputFile>$(ProjectDir)..\lib\$(ProjectName)-$(Configuration)$(TargetExt)</OutputFile>
+      <OutputFile>$(OutputPath)$(TargetName)$(TargetExt)</OutputFile>
     </Lib>
     <PreBuildEvent>
       <Command>$(ProjectDir)..\Tools\bin\BuildTool.exe  in=../EngineSource/Objects out=../Tools/BuildTool/Output</Command>

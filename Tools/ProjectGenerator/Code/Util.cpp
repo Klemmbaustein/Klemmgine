@@ -1,12 +1,15 @@
 #include "Util.h"
 #include <iostream>
 
+std::string Util::ProjectPath = "";
+
 #if _WIN32
 //Include Windows Headers
 #include <Windows.h>
 #include <Shlobj.h>
 #include <shobjidl.h> 
 #endif
+
 namespace Util
 {
 	std::string GetExtension(std::string File)

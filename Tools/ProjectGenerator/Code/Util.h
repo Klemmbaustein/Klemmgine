@@ -24,4 +24,6 @@ namespace Util
 	std::string GetFileNameFromPath(std::string FilePath);
 	std::vector<std::string> GetAllFilesInFolder(std::string Folder, bool IncludeFolders = false, bool Recursive = true, std::string RelativePath = "/");
 	void CopyFolderContent(std::string Folder, std::string To, std::set<std::string> FilesToIgnore = {}, std::atomic<float>* Progress = nullptr, float ProgressAmount = 1);
+
+	extern std::string ProjectPath;
 }

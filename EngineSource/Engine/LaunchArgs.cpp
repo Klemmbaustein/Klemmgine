@@ -11,7 +11,7 @@
 
 namespace LaunchArgs
 {
-	void NeverHideConsole(std::vector<std::string> AdditionalArgs)
+	static void NeverHideConsole(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size())
 		{
@@ -20,16 +20,17 @@ namespace LaunchArgs
 		OS::SetConsoleCanBeHidden(false);
 	}
 
-	void LoadScene(std::vector<std::string> AdditionalArgs)
+	static void LoadScene(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size() != 1)
 		{
-			Log::Print("Unexpected arguments in -loadscene", Log::LogColor::Yellow);
+			Log::Print("Unexpected or missing arguments in -loadscene", Log::LogColor::Yellow);
+			return;
 		}
 		Application::StartupSceneOverride = AdditionalArgs[0];
 	}
 
-	void NoVSync(std::vector<std::string> AdditionalArgs)
+	static void NoVSync(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size())
 		{
@@ -38,32 +39,32 @@ namespace LaunchArgs
 		Graphics::VSync = false;
 	}
 
-	void Wireframe(std::vector<std::string> AdditionalArgs)
+	static void Wireframe(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -wireframe", Log::LogColor::Yellow);
 		Graphics::IsWireframe = true;
 	}
 
-	void GetVersion(std::vector<std::string> AdditionalArgs)
+	static void GetVersion(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -version", Log::LogColor::Yellow);
 		Console::ExecuteConsoleCommand("version");
 		exit(0);
 	}
 
-	void FullScreen(std::vector<std::string> AdditionalArgs)
+	static void FullScreen(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -fullscreen", Log::LogColor::Yellow);
 		Application::SetFullScreen(true);
 	}
 
-	void NoStartupInfo(std::vector<std::string> AdditionalArgs)
+	static void NoStartupInfo(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -nostartupinfo", Log::LogColor::Yellow);
 		Application::ShowStartupInfo = false;
 	}
 
-	void Connect(std::vector<std::string> AdditionalArgs)
+	static void Connect(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size() != 1)
 		{
@@ -73,6 +74,15 @@ namespace LaunchArgs
 		Console::ExecuteConsoleCommand("connect " + AdditionalArgs[0]);
 	}
 
+	static void EditorPath(std::vector<std::string> AdditionalArgs)
+	{
+		if (AdditionalArgs.size() != 1)
+		{
+			Log::Print("Unexpected or missing arguments in -editorPath", Log::LogColor::Yellow);
+			return;
+		}
+		Application::SetEditorPath(AdditionalArgs[0]);
+	}
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
 	{
 		std::pair("neverhideconsole", NeverHideConsole),
@@ -83,10 +93,13 @@ namespace LaunchArgs
 		std::pair("fullscreen", FullScreen),
 		std::pair("nostartupinfo", NoStartupInfo),
 		std::pair("connect", Connect),
+#if !RELEASE
+		std::pair("editorPath", EditorPath),
+#endif
 #if SERVER
 		std::pair("quitondisconnect", [](std::vector<std::string> arg) {
 			Console::ExecuteConsoleCommand("quitondisconnect");
-}),
+		}),
 #endif
 	};
 	void EvaluateLaunchArguments(std::vector<std::string> Arguments)
@@ -101,6 +114,10 @@ namespace LaunchArgs
 				{
 					Commands[CurrentCommand.substr(1)](CommandArguments);
 				}
+				else if (!CurrentCommand.empty())
+				{
+					Log::Print("Unknown launch argument: " + CurrentCommand);
+				}
 				CommandArguments.clear();
 				CurrentCommand = arg;
 			}
@@ -112,6 +129,10 @@ namespace LaunchArgs
 		if (!CurrentCommand.empty() && Commands.contains(CurrentCommand.substr(1)))
 		{
 			Commands[CurrentCommand.substr(1)](CommandArguments);
+		}
+		else if (!CurrentCommand.empty())
+		{
+			Log::Print("Unknown launch argument: " + CurrentCommand);
 		}
 	}
 }

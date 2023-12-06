@@ -221,7 +221,7 @@ PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : Editor
 
 void PreferenceTab::Load(std::string File)
 {
-	SaveGame Pref = SaveGame("../../EditorContent/Config/EditorPrefs", "pref", false);
+	SaveGame Pref = SaveGame(Application::GetEditorPath() + "/EditorContent/Config/EditorPrefs", "pref", false);
 	SaveGame Proj = SaveGame(Build::GetProjectBuildName(), "keproj", false);
 	for (auto& cat : Preferences)
 	{
@@ -249,8 +249,8 @@ void PreferenceTab::Load(std::string File)
 
 void PreferenceTab::Save()
 {
-	std::filesystem::create_directories("../../EditorContent/Config");
-	SaveGame Pref = SaveGame("../../EditorContent/Config/EditorPrefs", "pref", false);
+	std::filesystem::create_directories(Application::GetEditorPath() + "/EditorContent/Config");
+	SaveGame Pref = SaveGame(Application::GetEditorPath() + "/EditorContent/Config/EditorPrefs", "pref", false);
 	SaveGame Proj = SaveGame(Build::GetProjectBuildName(), "keproj", false);
 	for (auto& cat : Preferences)
 	{

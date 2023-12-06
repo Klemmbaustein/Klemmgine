@@ -5,9 +5,11 @@
 
 class StatusBar : public EditorPanel
 {
-	UIText* Texts[3];
+	UIText* StatusText;
+	UIBox* BarBoxes[2];
 	float FPSUpdateTimer = 1;
 	unsigned int DisplayedFPS = 60;
+	int Selected = 0;
 public:
 	StatusBar(Vector3* Colors);
 
@@ -15,7 +17,11 @@ public:
 
 	UIBox* WindowButtonBox = nullptr;
 
+	UIBox* MenuBarDropdown = nullptr;
+
 	static bool IsHovered();
+
+	void GenerateMenuBarDropdown(int ButtonIndex);
 
 	void UpdateLayout() override;
 	void Tick() override;

@@ -1,4 +1,4 @@
-Write-Host "Building dependencies..."
+<#Write-Host "Building dependencies..."
 
 Write-Host "--- Building SDL2 ---"
 cd Dependencies\SDL\VisualC\SDL
@@ -42,6 +42,38 @@ Write-Host "--- Finished setting up dependencies ---"
 Write-Host "--- Building Engine ---"
 cd CSharpCore
 dotnet restore
-cd ..
-msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64
+cd ..#>
+if ($args[0] -eq "CI_BUILD")
+{
+	$Env:ExternalCompilerOptions = "ENGINE_NO_SOURCE=1"
+	msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
+	msbuild Klemmgine.sln /p:Configuration=Editor /p:Platform=x64 /p:CI_BUILD=1
+	msbuild Klemmgine.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
+	#msbuild Klemmgine.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
+
+	./ProjectGenerator.exe -projectName EngineBuild -includeEngine false -ciBuild true
+
+	cd Games/EngineBuild
+
+	dotnet restore
+
+	ls
+
+	#msbuild EngineBuild.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
+	msbuild EngineBuild.sln /p:Configuration=Editor /p:Platform=x64 /p:CI_BUILD=1
+	msbuild EngineBuild.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
+	#msbuild EngineBuild.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
+	rm x64 -r -force
+	rm GeneratedIncludes -r -force
+	rm Code -r -force
+	rm bin\*.pdb
+	cd ../..
+}
+else
+{
+	Write-Host $args[0]
+	<#
+	msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64
+	#>
+}
 Write-Host "--- Done ---"

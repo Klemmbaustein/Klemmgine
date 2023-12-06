@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
-using System.Security.Cryptography;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct EngineVector
@@ -52,9 +51,9 @@ static class Engine
 
 	public static object? GetObjectFromID(Int32 Id)
 	{
-		if (WorldObjects.ContainsKey(Id))
+		if (WorldObjects.TryGetValue(Id, out object? value))
 		{
-			return WorldObjects[Id];
+			return value;
 		}
 		return null;
 	}
@@ -146,12 +145,12 @@ static class Engine
 
 	public static void ExecuteFunctionOnObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string FunctionName)
 	{
-		if (!WorldObjects.ContainsKey(ID))
+		if (!WorldObjects.TryGetValue(ID, out object? value))
 		{
 			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID));
 			return;
 		}
-		var obj = WorldObjects[ID];
+		var obj = value;
 		var func = obj.GetType().GetMethod(FunctionName);
 		if (func == null)
 		{
@@ -174,12 +173,12 @@ static class Engine
 
 	public static EngineVector GetVectorFieldOfObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string Field)
 	{
-		if (!WorldObjects.ContainsKey(ID))
+		if (!WorldObjects.TryGetValue(ID, out object? value))
 		{
 			EngineLog.Print(string.Format("Tried to access {1} of object with ID {0} but that object doesn't exist!", ID, Field));
 			return new EngineVector();
 		}
-		var obj = WorldObjects[ID];
+		var obj = value;
 		var pos = Get(obj, Field);
 
 		return new EngineVector((float)Get(pos!, "X")!, (float)Get(pos!, "Y")!, (float)Get(pos!, "Z")!);
@@ -210,9 +209,34 @@ static class Engine
 		string AllTypes = "";
 		foreach (var i in WorldObjectTypes)
 		{
-			AllTypes += i.Name + " ";
+			if (i.Namespace != null)
+			{
+				AllTypes += i.Namespace.Replace('.', '/') + "/" + i.Name + " ";
+			}
+			else
+			{
+				AllTypes += i.Name + " ";
+			}
 		}
 
 		return AllTypes;
+	}
+
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	public static string GetStartupSceneInternally()
+	{
+		var ProjectType = LoadTypeFromAssembly("Project");
+		if (ProjectType == null)
+		{
+			EngineLog.Print("Failed to load project type");
+			return "";
+		}
+		var StartupScene = ProjectType.GetMethod("GetStartupScene");
+		if (StartupScene == null)
+		{
+			EngineLog.Print("Failed to load Project.GetStartupScene()");
+			return "";
+		}
+		return (string)StartupScene.Invoke(null, null)!;
 	}
 }

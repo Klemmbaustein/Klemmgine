@@ -39,6 +39,7 @@ namespace Build
 
 #define NOMINMAX
 #include <Windows.h>
+#include <Engine/Application.h>
 
 LONG GetStringRegKey(HKEY hKey, const std::wstring& strValueName, std::wstring& strValue, const std::wstring& strDefaultValue)
 {
@@ -62,17 +63,18 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 	{
 		if (std::filesystem::exists(TargetFolder))
 		{
+			const auto DirectoryCopyOptions = std::filesystem::copy_options::recursive;
 			Debugging::EngineStatus = "[Build]: Clearing folder";
 			Log::Print("[Build]: Clearing folder");
 
 			for (const auto& entry : std::filesystem::directory_iterator(TargetFolder))
 				std::filesystem::remove_all(entry.path());
-
+			std::filesystem::create_directories(TargetFolder + "bin");
 			Debugging::EngineStatus = "Build: Copying .dll files";
 			Log::Print("[Build]: Copying .dll files");
-
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
-			std::filesystem::copy("OpenAL32.dll", TargetFolder + "OpenAL32.dll");
+			std::filesystem::copy("bin/SDL2_net.dll", TargetFolder + "bin/SDL2_net.dll");
+			std::filesystem::copy("bin/OpenAL32.dll", TargetFolder + "bin/OpenAL32.dll");
 #ifdef ENGINE_CSHARP
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
 #endif
@@ -87,8 +89,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 
 			Debugging::EngineStatus = "Build: Copying assets";
 			Log::Print("[Build]: Copying assets");
-			const auto copyOptions = std::filesystem::copy_options::recursive;
-			std::filesystem::copy("Content/", TargetFolder + "Assets/Content", copyOptions);
+			std::filesystem::copy("Content/", TargetFolder + "Assets/Content", DirectoryCopyOptions);
 			std::filesystem::copy("Fonts", TargetFolder + "Assets/");
 			if (std::filesystem::exists("Locale"))
 			{
@@ -100,7 +101,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			int CompileResult = BuildCurrentSolution("Release");
 			if (!CompileResult)
 			{
-				std::filesystem::copy(GetProjectBuildName() + "-Release.exe", TargetFolder + Project::ProjectName + std::string(".exe"));
+				std::filesystem::copy("bin/" + GetProjectBuildName() + "-Release.exe", TargetFolder + Project::ProjectName + std::string(".exe"));
 			}
 			else
 			{
@@ -116,15 +117,15 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			if (CSharp::GetUseCSharp())
 			{
 				Log::Print("[Build]: Building C# core...");
-				system("cd ../../CSharpCore && dotnet publish -r win-x64 --self-contained false");
+				system(("cd " + Application::GetEditorPath() + "/CSharpCore && dotnet publish -r win-x64 --self-contained false").c_str());
 
-				std::filesystem::create_directories(TargetFolder + "/CSharp/Core");
-				std::filesystem::copy("../../CSharpCore/Build/win-x64/publish", TargetFolder + "/CSharp/Core");
+				std::filesystem::create_directories(TargetFolder + "/bin/CSharp/Core");
+				std::filesystem::copy(Application::GetEditorPath() + "/CSharpCore/Build/win-x64/publish", TargetFolder + "/bin/CSharp/Core");
 				Log::Print("[Build]: Building game C# assembly...");
 				system("cd Scripts && dotnet publish -r win-x64 --self-contained false");
 
-				std::filesystem::copy("CSharp/Build/win-x64/publish", TargetFolder + "/CSharp");
-				std::filesystem::copy("../../CSharpCore/NetRuntime", TargetFolder + "/CSharp/NetRuntime", copyOptions);
+				std::filesystem::copy("CSharp/Build/win-x64/publish", TargetFolder + "/bin/CSharp");
+				std::filesystem::copy(Application::GetEditorPath() + "/CSharpCore/NetRuntime", TargetFolder + "/bin/CSharp/NetRuntime", DirectoryCopyOptions);
 			}
 #endif
 
@@ -143,7 +144,8 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 }
 int Build::BuildCurrentSolution(std::string Configuration)
 {
-	std::string MSBuildPath = GetVSLocation() + "\\MSBuild\\Current\\Bin\\msbuild.exe";
+	std::string VSLocation = GetVSLocation();
+	std::string MSBuildPath = VSLocation + "\\MSBuild\\Current\\Bin\\msbuild.exe";
 	std::string SolutionName;
 	for (auto& i : std::filesystem::directory_iterator("."))
 	{
@@ -160,7 +162,11 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	}
 	Log::Print("[Build]: Found .sln file: " + SolutionName, Log::LogColor::Green);
 
-	std::string Command = "\"" + MSBuildPath + "\" " + SolutionName + ".sln /t:build /p:Platform=x64 /p:Configuration=" + Configuration;
+	std::filesystem::create_directories("Build\\");
+
+	std::string Command = ("\"" + MSBuildPath + "\" " + SolutionName + ".sln /p:Platform=x64 /p:Configuration=" + Configuration);
+
+	std::cout << Command << std::endl;
 
 	Log::Print("[Build]: Invoking MSBuild - " + MSBuildPath, Vector3(1));
 	int ret = system(Command.c_str());
@@ -171,6 +177,7 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	return ret;
 }
 #endif
+
 
 #if !RELEASE
 

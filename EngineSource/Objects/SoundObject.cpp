@@ -1,6 +1,7 @@
 #include "SoundObject.h"
 #include <Objects/Components/BillboardComponent.h>
 #include <Objects/Components/CollisionComponent.h>
+#include <Engine/Application.h>
 void SoundObject::Begin()
 {
 	
@@ -15,7 +16,7 @@ void SoundObject::Begin()
 #if EDITOR
 	auto EditorBillboard = new BillboardComponent();
 	Attach(EditorBillboard);
-	EditorBillboard->Load("../../EditorContent/Images/Sound.png");
+	EditorBillboard->Load(Application::GetEditorPath() + "/EditorContent/Images/Sound.png");
 	ModelGenerator::ModelData m;
 	m.AddElement().MakeCube(2, 0);
 
@@ -54,11 +55,11 @@ void SoundObject::LoadSound(std::string SoundName)
 	}
 #if !EDITOR
 	Buffer = Sound::LoadSound(Filename);
-	if (IsSpacialSound)
+	if (IsSpacialSound && Buffer)
 	{
 		Source = Sound::PlaySound3D(Buffer, GetTransform().Location, FalloffRange, Pitch, Volume, IsLooping);
 	}
-	else
+	else if (Buffer)
 	{
 		Source = Sound::PlaySound2D(Buffer, Pitch, Volume, IsLooping);
 	}

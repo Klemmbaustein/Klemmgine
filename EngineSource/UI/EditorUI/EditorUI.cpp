@@ -28,6 +28,8 @@
 #include <UI/UIDropdown.h>
 #include <SDL.h>
 #include <Rendering/Texture/Texture.h>
+#include <Engine/Application.h>
+#include <Networking/Networking.h>
 
 int EditorUI::NumLaunchClients = 1;
 
@@ -44,7 +46,7 @@ namespace Editor
 	Vector2 NewDragMinMax = DragMinMax;
 	bool IsSavingScene = false;
 	bool IsBakingScene = false;
-	bool LaunchCurrentScene = false;
+	bool LaunchCurrentScene = true;
 	bool SaveSceneOnLaunch = false;
 
 	Vector3 NewUIColors[EditorUI::NumUIColors] =
@@ -57,7 +59,7 @@ namespace Editor
 
 	bool LightMode = false;
 
-	Vector3 ReplaceWithNewUIColor(Vector3 PrevColor)
+	static Vector3 ReplaceWithNewUIColor(Vector3 PrevColor)
 	{
 		for (uint8_t i = 0; i < EditorUI::NumUIColors; i++)
 		{
@@ -74,10 +76,10 @@ namespace Editor
 	struct ProcessInfo
 	{
 		std::string Command;
-		FILE* Pipe;
-		std::thread* Thread;
-		std::atomic<bool> Active;
-		bool Async;
+		FILE* Pipe = nullptr;
+		std::thread* Thread = nullptr;
+		std::atomic<bool> Active = false;
+		bool Async = false;
 	};
 
 	std::map<FILE*, ProcessInfo> ProcessPipes;
@@ -119,19 +121,20 @@ void EditorUI::LaunchInEditor()
 	std::string ProjectName = Build::GetProjectBuildName();
 	try
 	{
-		if (!std::filesystem::exists(ProjectName + "-Debug.exe")
-			|| std::filesystem::last_write_time(ProjectName + "-Debug.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
+#if !ENGINE_NO_SOURCE
+		if (!std::filesystem::exists("bin/" + ProjectName + "-Debug.exe")
+			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Debug.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
 		{
 			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
 			Build::BuildCurrentSolution("Debug");
 		}
 
-		if (!std::filesystem::exists(ProjectName + "-Server.exe")
-			|| std::filesystem::last_write_time(ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
+		if (Project::UseNetworkFunctions && !std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
+			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
 		{
-			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
 			Build::BuildCurrentSolution("Server");
 		}
+#endif
 
 		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll")
 			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
@@ -161,16 +164,16 @@ void EditorUI::LaunchInEditor()
 		Args.append(" -connect localhost ");
 	}
 #if _WIN32
-	std::string CommandLine = ProjectName + "-Debug.exe -nostartupinfo " + Args;
+	std::string CommandLine = "bin\\" + ProjectName + "-Debug.exe -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
 #else
-	std::string CommandLine = "./" + ProjectName + "-Debug -nostartupinfo " + Args + " &";
+	std::string CommandLine = "./" + ProjectName + "-Debug -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args + " &";
 #endif
 	Log::Print("[Debug]: Starting process: " + CommandLine, Log::LogColor::Blue);
 #if _WIN32
 	std::string Command;
 	for (int i = 0; i < NumLaunchClients; i++)
 	{
-		Command.append("start /b " + CommandLine + " > nul");
+		Command.append("start /b " + CommandLine);
 		if (i < NumLaunchClients - 1)
 		{
 			Command.append(" && ");
@@ -186,7 +189,12 @@ void EditorUI::LaunchInEditor()
 	if (LaunchWithServer)
 	{
 #if _WIN32
-		system(("start " + ProjectName + "-Server.exe -nostartupinfo -quitondisconnect " + Args).c_str());
+		system(("start bin\\"
+			+ ProjectName
+			+ "-Server.exe -nostartupinfo -quitondisconnect -editorPath "
+			+ Application::GetEditorPath()
+			+ " "
+			+ Args).c_str());
 #else
 		system(("./" + ProjectName + "-Server.exe -nostartupinfo -quitondisconnect " + Args + " &").c_str());
 #endif
@@ -570,7 +578,7 @@ void EditorUI::GenUITextures()
 		"Reload.png",				//12 -> Reload symbol
 		"ExpandedArrow.png",		//13 -> Expanded arrow
 		"CollapsedArrow.png",		//14 -> Collapsed arrow
-		"Preferences.png",			//15 -> Collapsed arrow
+		"Placeholder.png",			//15 -> Placeholder
 		"Checkbox.png",				//16 -> Checked checkbox
 		"Cubemap.png",				//17 -> Cubemap icon
 		"Texture.png",				//18 -> Texture icon
@@ -591,7 +599,7 @@ void EditorUI::GenUITextures()
 	}
 	for (int i = 0; i < ImageSize; i++)
 	{
-		Textures.push_back(Texture::LoadTexture("../../EditorContent/Images/" + Images[i]));
+		Textures.push_back(Texture::LoadTexture(Application::GetEditorPath() + "/EditorContent/Images/" + Images[i]));
 	}
 }
 

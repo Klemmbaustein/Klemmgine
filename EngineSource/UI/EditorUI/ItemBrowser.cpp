@@ -36,10 +36,31 @@ std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 {
 	std::vector<std::string> IDs;
 	EditorClassesItem RootPath;
-	for (const auto& Object : Objects::EditorObjects)
+
+	auto AllObjects = Objects::EditorObjects;
+
+#ifdef ENGINE_CSHARP
+	for (auto& i : CSharp::GetAllClasses())
+	{
+		ObjectDescription Descr = ObjectDescription(i, CSharpObject::GetID());
+		AllObjects.push_back(Descr);
+	}
+#endif
+
+
+	for (const auto& Object : AllObjects)
 	{
 		// First seperate the Category into multiple names. For example: "Default/Rendering" -> { "Default", "Rendering" }
 		std::string CurrentPath = Objects::GetCategoryFromID(Object.ID);
+		if (Object.ID == CSharpObject::GetID() && Object.Name != "CSharpObject")
+		{
+			size_t Index = Object.Name.find_last_of("/");
+			CurrentPath = Object.Name.substr(0, Index);
+			if (Index == std::string::npos)
+			{
+				CurrentPath.clear();
+			}
+		}
 		EditorClassesItem* CurrentParent = &RootPath;
 		if (CurrentPath.empty())
 		{
@@ -87,16 +108,6 @@ std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 		NewItem.Object = Object;
 		CurrentParent->SubItems.push_back(NewItem);
 	}
-
-#ifdef ENGINE_CSHARP
-	for (auto& i : CSharp::GetAllClasses())
-	{
-		EditorClassesItem NewItem;
-		NewItem.Name = i;
-		NewItem.Object = ObjectDescription(i, CSharpObject::GetID());
-		RootPath.SubItems.push_back(NewItem);
-	}
-#endif
 	return RootPath.SubItems;
 }
 std::string ItemBrowser::GetCurrentCPPPathString()
@@ -491,7 +502,7 @@ void ItemBrowser::Tick()
 #ifdef ENGINE_CSHARP
 				if (Item.ID == CSharpObject::GetID() && Item.Name != "CSharpObject")
 				{
-					dynamic_cast<CSharpObject*>(newObject)->LoadClass(Item.Name);
+					dynamic_cast<CSharpObject*>(newObject)->LoadClass(Item.Name.substr(Item.Name.find_last_of("/") + 1));
 				}
 #endif
 			}
