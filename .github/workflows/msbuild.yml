@@ -59,7 +59,7 @@ jobs:
       with:
         draft: false
         prerelease: false
-        body: ${{CHANGES}}
+        body: ${{ env.CHANGES }}
         release_name: "Release #${{ github.run_number }}"
         tag_name: "Release-${{ github.run_number }}"
       env:
