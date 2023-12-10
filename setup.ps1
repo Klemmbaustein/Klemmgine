@@ -40,9 +40,7 @@ Write-Host "--- Finished building OpenAL ---"
 Write-Host "--- Finished setting up dependencies ---"
 
 Write-Host "--- Building Engine ---"
-cd CSharpCore
 dotnet restore
-cd
 if ($args[0] -eq "CI_BUILD")
 {
 	$Env:ExternalCompilerOptions = "ENGINE_NO_SOURCE=1"
