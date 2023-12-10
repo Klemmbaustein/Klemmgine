@@ -125,26 +125,29 @@ int main(int argc, char** argv)
 			| std::filesystem::copy_options::overwrite_existing);
 #endif
 
-#if !ENGINE_NO_SOURCE
-		for (auto& i : DependencyDlls)
-		{
-			std::string Name = i.substr(1);
-			std::string Path;
-			if (i[0] == 'b')
-			{
-				Path = "/bin";
-			}
-
-			if (!std::filesystem::exists(Name))
-			{
-				std::cout << "Could not find " << Name << ". Ensure you have the project setup correctly." << std::endl;
-				exit(1);
-			}
-			std::filesystem::create_directories(LaunchArgs["projectPath"] + Path);
-			std::filesystem::copy(Name, LaunchArgs["projectPath"] + Path, std::filesystem::copy_options::overwrite_existing);
-			std::cout << (LaunchArgs["projectPath"] + Path) << std::endl;;
-		}
+#if ENGINE_NO_SOURCE
+		if (LaunchArgs["ciBuild"] != "false")
 #endif
+		{
+			for (auto& i : DependencyDlls)
+			{
+				std::string Name = i.substr(1);
+				std::string Path;
+				if (i[0] == 'b')
+				{
+					Path = "/bin";
+				}
+
+				if (!std::filesystem::exists(Name))
+				{
+					std::cout << "Could not find " << Name << ". Ensure you have the project setup correctly." << std::endl;
+					exit(1);
+				}
+				std::filesystem::create_directories(LaunchArgs["projectPath"] + Path);
+				std::filesystem::copy(Name, LaunchArgs["projectPath"] + Path, std::filesystem::copy_options::overwrite_existing);
+				std::cout << (LaunchArgs["projectPath"] + Path) << std::endl;;
+			}
+		}
 	}
 
 	std::string CppGUID = VSProj::WriteVCXProj(LaunchArgs["projectPath"] + "/Code", ProjectName, "10.0", "v143", true);
