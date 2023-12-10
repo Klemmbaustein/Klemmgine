@@ -40,7 +40,7 @@ static std::vector<MenuBarItem> MenuBarItems =
 		}),
 	MenuBarItem("Edit",
 		{
-			MenuBarEntry("Settings", [](){ Viewport::ViewportInstance->OpenTab(6, "Settings.setting");}),
+			MenuBarEntry("Settings", []() { Viewport::ViewportInstance->OpenTab(6, "Settings.setting");}),
 			MenuBarEntry("Run Project", []() {
 			new std::thread([]() {
 					EditorUI::LaunchInEditor();

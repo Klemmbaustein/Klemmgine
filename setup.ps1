@@ -1,4 +1,4 @@
-<#Write-Host "Building dependencies..."
+Write-Host "Building dependencies..."
 
 Write-Host "--- Building SDL2 ---"
 cd Dependencies\SDL\VisualC\SDL
@@ -42,7 +42,7 @@ Write-Host "--- Finished setting up dependencies ---"
 Write-Host "--- Building Engine ---"
 cd CSharpCore
 dotnet restore
-cd ..#>
+cd
 if ($args[0] -eq "CI_BUILD")
 {
 	$Env:ExternalCompilerOptions = "ENGINE_NO_SOURCE=1"
