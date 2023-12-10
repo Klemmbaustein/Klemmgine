@@ -1,1 +1,2 @@
-- Test experimental pre-built binaries.
+- Added experimental pre-built binaries.
+- Changed github actions workflow.
