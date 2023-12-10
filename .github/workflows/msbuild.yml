@@ -8,8 +8,8 @@ name: MSBuild
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    paths:
+    - CHANGES.md
 
 env:
   # Path to the solution file relative to the root of the project.
@@ -48,15 +48,9 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Also remove unneeded folders
       run: |
+        CHANGE=$(cat CHANGES.md)
+        echo "CHANGES=CHANGE" >> $GITHUB_ENV
         rm .git -r -force
-        rm Dependencies\assimp -r -force
-        rm Dependencies\glew-cmake -r -force
-        rm Dependencies\openal-soft -r -force
-        rm Dependencies\SDL_net -r -force
-        rm Dependencies\SDL -r -force
-        Remove-Item .\* -Recurse -Include *.obj
-        rm Dependencies\glm\doc -r -force
-        rm Dependencies\glm\test -r -force
         Compress-Archive ./* Release.zip
 
     - name: release
@@ -65,6 +59,7 @@ jobs:
       with:
         draft: false
         prerelease: false
+        body: ${{CHANGES}}
         release_name: "Release #${{ github.run_number }}"
         tag_name: "Release-${{ github.run_number }}"
       env:

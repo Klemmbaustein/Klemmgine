@@ -66,6 +66,13 @@ if ($args[0] -eq "CI_BUILD")
 	rm Code -r -force
 	rm bin\*.pdb
 	cd ../..
+
+	mkdir Tools/ProjectGenerator/ProjectFilesNoSource/bin/
+	cp Games/EngineBuild/bin/* Tools/ProjectGenerator/ProjectFilesNoSource/bin/
+
+	$NativeFiles = "x64/", "lib/", "Dependencies/", "EngineSource/"
+
+	rm $NativeFiles
 }
 else
 {
