@@ -70,7 +70,7 @@ if ($args[0] -eq "CI_BUILD")
 	mkdir Tools/ProjectGenerator/ProjectFilesNoSource/bin/
 	cp Games/EngineBuild/bin/* Tools/ProjectGenerator/ProjectFilesNoSource/bin/
 
-	$NativeFiles = "x64/", "lib/", "Dependencies/", "EngineSource/"
+	$NativeFiles = 'x64/', 'lib/', 'Dependencies/', 'EngineSource/'
 
 	rm $NativeFiles
 }
