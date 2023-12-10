@@ -49,7 +49,7 @@ if ($args[0] -eq "CI_BUILD")
 	msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
 	msbuild Klemmgine.sln /p:Configuration=Editor /p:Platform=x64 /p:CI_BUILD=1
 	msbuild Klemmgine.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
-	#msbuild Klemmgine.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
+	msbuild Klemmgine.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
 
 	./ProjectGenerator.exe -projectName EngineBuild -includeEngine false -ciBuild true
 
@@ -59,10 +59,10 @@ if ($args[0] -eq "CI_BUILD")
 
 	ls
 
-	#msbuild EngineBuild.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
+	msbuild EngineBuild.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
 	msbuild EngineBuild.sln /p:Configuration=Editor /p:Platform=x64 /p:CI_BUILD=1
 	msbuild EngineBuild.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
-	#msbuild EngineBuild.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
+	msbuild EngineBuild.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
 	rm x64 -r -force
 	rm GeneratedIncludes -r -force
 	rm Code -r -force
@@ -72,8 +72,6 @@ if ($args[0] -eq "CI_BUILD")
 else
 {
 	Write-Host $args[0]
-	<#
 	msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64
-	#>
 }
 Write-Host "--- Done ---"
