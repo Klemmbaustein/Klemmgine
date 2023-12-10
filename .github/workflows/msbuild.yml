@@ -8,8 +8,6 @@ name: MSBuild
 on:
   push:
     branches: [ "master" ]
-    paths:
-    - CHANGES.md
 
 env:
   # Path to the solution file relative to the root of the project.

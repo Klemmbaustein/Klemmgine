@@ -125,7 +125,7 @@ int main(int argc, char** argv)
 			| std::filesystem::copy_options::overwrite_existing);
 #endif
 
-
+#if !ENGINE_NO_SOURCE
 		for (auto& i : DependencyDlls)
 		{
 			std::string Name = i.substr(1);
@@ -144,6 +144,7 @@ int main(int argc, char** argv)
 			std::filesystem::copy(Name, LaunchArgs["projectPath"] + Path, std::filesystem::copy_options::overwrite_existing);
 			std::cout << (LaunchArgs["projectPath"] + Path) << std::endl;;
 		}
+#endif
 	}
 
 	std::string CppGUID = VSProj::WriteVCXProj(LaunchArgs["projectPath"] + "/Code", ProjectName, "10.0", "v143", true);
