@@ -48,8 +48,6 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Also remove unneeded folders
       run: |
-        $text = Get-Content .\CHANGES.md -Raw 
-        echo ("CHANGES=" + $text) >> $env:GITHUB_ENV
         rm .git -r -force
         Compress-Archive ./* Release.zip
 
@@ -59,7 +57,6 @@ jobs:
       with:
         draft: false
         prerelease: false
-        body: ${{ env.CHANGES }}
         release_name: "Release #${{ github.run_number }}"
         tag_name: "Release-${{ github.run_number }}"
       env:
