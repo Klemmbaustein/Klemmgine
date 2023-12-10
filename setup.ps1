@@ -69,13 +69,14 @@ if ($args[0] -eq "CI_BUILD")
 
 	mkdir Tools/ProjectGenerator/ProjectFilesNoSource/bin/
 	cp Games/EngineBuild/bin/* Tools/ProjectGenerator/ProjectFilesNoSource/bin/
-	cü Games/EngineBuild/*.dll Tools/ProjectGenerator/ProjectFilesNoSource/
+	cp Games/EngineBuild/*.dll Tools/ProjectGenerator/ProjectFilesNoSource/
 
 	rm x64/ -r -force
 	rm lib/ -r -force
 	rm Dependencies/ -r -force
 	rm EngineSource/ -r -force
 	rm Tools/ProjectGenerator/x64 -r -force
+	rm Tools/BuildTool/x64 -r -force
 }
 else
 {
