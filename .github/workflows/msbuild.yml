@@ -48,7 +48,7 @@ jobs:
       working-directory: ${{env.GITHUB_WORKSPACE}}
       # Also remove unneeded folders
       run: |
-        $text = Get-Content .\file.txt -Raw 
+        $text = Get-Content .\CHANGES.md -Raw 
         echo ("CHANGES=" + $text) >> $env:GITHUB_ENV
         rm .git -r -force
         Compress-Archive ./* Release.zip
