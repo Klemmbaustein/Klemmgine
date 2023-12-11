@@ -44,13 +44,13 @@ For writing shaders, I recommend
 
 	```cmd
 
-	ProjectGenerator.exe -projectName {Your project name}
+	.\ProjectGenerator.exe -projectName {Your project name}
 
 	```
 
-	The new project files will be put in `EngineDir\Games\{Your project name}\`
+	The new project files will be put in `EngineDir\Games\{Your project name}\`.
 
-3. Run `Editor.bat` in your project files.
+3. Run `EngineDir\Games\{Your project name}\Editor.bat`.
 
 ## Build from source:
 
@@ -86,7 +86,7 @@ For writing shaders, I recommend
 
 	```
 
-	The new project files will be put in `EngineDir\Games\{Your project name}\`
+	The new project files will be put in `EngineDir\Games\{Your project name}\`.
 
 
 
