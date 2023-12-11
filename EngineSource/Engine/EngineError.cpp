@@ -36,8 +36,12 @@ void Error::AssertFailure(std::string Name, std::string Location)
 void Error::PrintStackTrace()
 {
 #if __cpp_lib_stacktrace >= 202011L
-	Log::Print("[Error]: ---------------------------------[Stack trace]---------------------------------", Log::LogColor::Red);
 	auto trace = std::stacktrace::current();
+	if (trace.empty())
+	{
+		return;
+	}
+	Log::Print("[Error]: ---------------------------------[Stack trace]---------------------------------", Log::LogColor::Red);
 	for (const auto& i : trace)
 	{
 #ifdef _MSC_VER

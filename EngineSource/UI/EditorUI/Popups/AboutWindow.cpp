@@ -4,20 +4,42 @@
 #include <Engine/Log.h>
 #include <Engine/EngineProperties.h>
 #include <CSharp/CSharpInterop.h>
+#include <UI/UIScrollBox.h>
+#include <unordered_map>
+
+// Template hell
+static std::vector<std::pair<std::string, std::vector<std::pair<std::string, std::string>>>> Credits =
+{ 
+	{"By:", {}},
+	{"Klemmbaustein", {std::pair("Github", "https://github.com/Klemmbaustein")}},
+	{"3rd party libraries:", {}},
+	{"stb_image, stb_truetype", {std::pair("Github", "https://github.com/nothings/stb")}},
+	{"assimp", {std::pair("Website", "https://assimp.org"), std::pair("Github", "https://github.com/assimp/assimp")}},
+	{"glew, glew_cmake", {std::pair("glew", "https://github.com/nigels-com/glew"), std::pair("glew_cmake", "https://github.com/Perlmint/glew-cmake")}},
+	{"glm", {std::pair("Github", "https://github.com/g-truc/glm")}},
+	{"OpenAL soft", {std::pair("Github", "https://github.com/kcat/openal-soft")}},
+	{"SDL2, SDL2_net", {
+		std::pair("Website", "https://www.libsdl.org/"),
+		std::pair("SDL2", "https://github.com/libsdl-org/SDL"),
+		std::pair("SDL2_net", "https://github.com/libsdl-org/SDL_net")
+	}}
+};
 
 AboutWindow::AboutWindow()
-	: EditorPanel(Editor::CurrentUI->UIColors, Position, Vector2(0.4f, 0.4f), Vector2(0.4f, 0.4f), Vector2(0.4f, 0.4f), true, "About")
+	: EditorPanel(Editor::CurrentUI->UIColors, Position, Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), true, "About")
 {
+	auto* Text = Editor::CurrentUI->EngineUIText;
+
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5);
 	ButtonBackground->SetPadding(0);
 	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
 	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
 
 	ButtonBackground->AddChild(
-		(new UIButton(true, 0, UIColors[2], this, (int)0))
+		(new UIButton(true, 0, UIColors[2], this, (int)-1))
 		->SetPadding(0.01f)
 		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Ok", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Ok", Text))
 			->SetPadding(0.005f)));
 
 	TabBackground->SetVerticalAlign(UIBox::Align::Default);
@@ -36,28 +58,58 @@ AboutWindow::AboutWindow()
 			->SetSizeMode(UIBox::SizeMode::PixelRelative))
 		->AddChild((new UIBox(false, 0))
 			->SetPadding(0)
-			->AddChild((new UIText(0.5f, UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING), Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.5f, UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING), Text))
 				->SetPadding(0.005f))
 #if ENGINE_CSHARP
-			->AddChild((new UIText(0.4f, UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.4f, UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), Text))
 				->SetPadding(0.005f))
 #else
-			->AddChild((new UIText(0.4f, UIColors[2], "  C#: No", Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.4f, UIColors[2], "  C#: No", Text))
 				->SetPadding(0.005f))
 #endif
 #if ENGINE_NO_SOURCE
-			->AddChild((new UIText(0.4f, UIColors[2], "  With pre-built binaries", Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.4f, UIColors[2], "  With pre-built binaries", Text))
 				->SetPadding(0.005f))
 			->AddChild((new UIText(0.4f, UIColors[2], "  Build date: " 
 				+ std::string(__DATE__)
 				+ " - "
-				+ std::string(__TIME__), Editor::CurrentUI->EngineUIText))
+				+ std::string(__TIME__), Text))
 				->SetPadding(0.005f))
 #endif
 	));
-	// TODO: Credits
-	// ContentBox->AddChild(new UIText(0.5, 1, "TODO: Credits", Editor::CurrentUI->EngineUIText));
 
+	UIScrollBox* CreditsBox = new UIScrollBox(false, 0, true);
+	ContentBox->AddChild(CreditsBox
+		->SetPadding(0));
+
+	int ButtonIndex = 0;
+
+	for (auto& i : Credits)
+	{
+		CreditsBox->AddChild((new UIText(0.45f, UIColors[2], i.first, Text))
+			->SetPadding(i.second.empty() ? 0.02f : 0.005f, 0.005f, i.second.empty() ? 0.005f : 0.02f, 0.005f));
+
+		UIBox* ButtonsBox = new UIBox(true, 0);
+		CreditsBox->AddChild(ButtonsBox
+			->SetPadding(0));
+
+		for (auto& entry : i.second)
+		{
+			ButtonsBox->AddChild((new UIButton(true, 0, UIColors[2], this, ButtonIndex++))
+				->SetBorder(UIBox::BorderType::Rounded, 0.2f)
+				->AddChild((new UIText(0.4f, UIColors[1], entry.first, Text))
+					->SetPadding(0.005f))
+				->SetPadding(0.005f, 0.005f, i.second.empty() ? 0.005f : 0.02f, 0.005f));
+		}
+
+		if (i.second.empty())
+		{
+			ButtonsBox->AddChild((new UIBackground(true, 0, UIColors[2], Vector2(0.5f, 0.003f)))
+				->SetPadding(0));
+		}
+	}
+	CreditsBox->SetMinSize(Vector2(0.5f, 0.375f));
+	CreditsBox->SetMaxSize(Vector2(0.5f, 0.375f));
 	UpdateLayout();
 }
 
@@ -73,8 +125,26 @@ AboutWindow::~AboutWindow()
 
 void AboutWindow::OnButtonClicked(int Index)
 {
-	delete this;
-	return;
+	if (Index == -1)
+	{
+		delete this;
+		return;
+	}
+
+	int it = 0;
+
+	for (auto& i : Credits)
+	{
+		for (auto& entry : i.second)
+		{
+			if (it++ == Index)
+			{
+#if _WIN32
+				system(("start " + entry.second).c_str());
+#endif
+			}
+		}
+	}
 }
 
 void AboutWindow::Tick()

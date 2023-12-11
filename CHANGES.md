@@ -4,3 +4,4 @@
 
 - Added experimental pre-built binaries.
 - Changed github actions workflow.
+- Added credits to about window.
