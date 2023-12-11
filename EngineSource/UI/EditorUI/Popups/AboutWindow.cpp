@@ -55,7 +55,6 @@ AboutWindow::AboutWindow()
 				->SetPadding(0.005f))
 #endif
 	));
-
 	// TODO: Credits
 	// ContentBox->AddChild(new UIText(0.5, 1, "TODO: Credits", Editor::CurrentUI->EngineUIText));
 

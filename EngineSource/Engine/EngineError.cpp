@@ -3,10 +3,12 @@
 #include <stacktrace>
 #include <iostream>
 #include <csignal>
+#include <Engine/OS.h>
+#include <Engine/Stats.h>
 
 static void HandleSigSegV(int SignalID)
 {
-	Error::AssertFailure("Access violation", "");
+	Error::AssertFailure("Access violation", "Status: " + Debugging::EngineStatus);
 }
 
 void Error::Init()
@@ -16,6 +18,7 @@ void Error::Init()
 
 void Error::AssertFailure(std::string Name, std::string Location)
 {
+	OS::SetConsoleWindowVisible(true);
 	Log::Print("[Error]: ------------------------------------[Error]------------------------------------", Log::LogColor::Red);
 	Log::PrintMultiLine(Name, Log::LogColor::Red, "[Error]: ");
 	Log::Print("[Error]: " + Location, Log::LogColor::Red);
@@ -27,6 +30,7 @@ void Error::AssertFailure(std::string Name, std::string Location)
 #else
 	throw 0;
 #endif
+	exit(1);
 }
 
 void Error::PrintStackTrace()

@@ -159,15 +159,21 @@ void EditorUI::LaunchInEditor()
 	{
 		Args.append(" -scene " + FileUtil::GetFileNameFromPath(Scene::CurrentScene));
 	}
-	if (LaunchWithServer)
-	{
-		Args.append(" -connect localhost ");
-	}
+
+#if ENGINE_NO_SOURCE
+	ProjectName = "Klemmgine";
+#endif
 #if _WIN32
+
 	std::string CommandLine = "bin\\" + ProjectName + "-Debug.exe -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
 #else
 	std::string CommandLine = "./" + ProjectName + "-Debug -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args + " &";
 #endif
+	if (LaunchWithServer)
+	{
+		CommandLine.append(" -connect localhost ");
+}
+
 	Log::Print("[Debug]: Starting process: " + CommandLine, Log::LogColor::Blue);
 #if _WIN32
 	std::string Command;

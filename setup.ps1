@@ -49,18 +49,18 @@ if ($args[0] -eq "CI_BUILD")
 	msbuild Klemmgine.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
 	msbuild Klemmgine.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
 
-	./ProjectGenerator.exe -projectName EngineBuild -includeEngine false -ciBuild true
+	./ProjectGenerator.exe -projectName Klemmgine -includeEngine false -ciBuild true
 
-	cd Games/EngineBuild
+	cd Games/Klemmgine
 
 	dotnet restore
 
 	ls
 
-	msbuild EngineBuild.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
-	msbuild EngineBuild.sln /p:Configuration=Editor /p:Platform=x64 /p:CI_BUILD=1
-	msbuild EngineBuild.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
-	msbuild EngineBuild.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
+	msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
+	msbuild Klemmgine.sln /p:Configuration=Editor /p:Platform=x64 /p:CI_BUILD=1
+	msbuild Klemmgine.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
+	msbuild Klemmgine.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
 	rm x64 -r -force
 	rm GeneratedIncludes -r -force
 	rm Code -r -force
@@ -68,8 +68,8 @@ if ($args[0] -eq "CI_BUILD")
 	cd ../..
 
 	mkdir Tools/ProjectGenerator/ProjectFilesNoSource/bin/
-	cp Games/EngineBuild/bin/* Tools/ProjectGenerator/ProjectFilesNoSource/bin/
-	cp Games/EngineBuild/*.dll Tools/ProjectGenerator/ProjectFilesNoSource/
+	cp Games/Klemmgine/bin/* Tools/ProjectGenerator/ProjectFilesNoSource/bin/
+	cp Games/Klemmgine/*.dll Tools/ProjectGenerator/ProjectFilesNoSource/
 
 	rm x64/ -r -force
 	rm lib/ -r -force
@@ -77,6 +77,7 @@ if ($args[0] -eq "CI_BUILD")
 	rm EngineSource/ -r -force
 	rm Tools/ProjectGenerator/x64 -r -force
 	rm Tools/BuildTool/x64 -r -force
+	rm Games/ -r -force
 }
 else
 {

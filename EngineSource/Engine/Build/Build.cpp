@@ -98,6 +98,9 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			Debugging::EngineStatus = "Building C++ solution";
 #if _WIN32
 
+#if ENGINE_NO_SOURCE
+			std::filesystem::copy("bin/Klemmgine-Release.exe", TargetFolder + Project::ProjectName + std::string(".exe"));
+#else
 			int CompileResult = BuildCurrentSolution("Release");
 			if (!CompileResult)
 			{
@@ -108,6 +111,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				Log::Print("[Build]: Failure: MSBuild returned " + std::to_string(CompileResult), Vector3(1, 0, 0));
 				return "";
 			}
+#endif
 #else
 			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
 			Log::Print("Pleasse recompile the program manually with the RELASE preprocessor definition (Release config).", Vector3(1, 0, 0));
@@ -132,7 +136,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			Log::Print("[Build]: Complete", Log::LogColor::Green);
 			return "Success";
 		}
-		Log::Print("[Build]: Cannot find folder", Vector3(1, 0, 0));
+		Log::Print("[Build]: Cannot find folder '" + TargetFolder + "' - Creating...", Log::LogColor::Yellow);
 		std::filesystem::create_directories(TargetFolder);
 		return Build::TryBuildProject(TargetFolder);
 	}

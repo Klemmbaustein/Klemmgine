@@ -108,6 +108,9 @@
     <ClCompile Include="Code\Util.cpp" />
     <ClCompile Include="Code\XML\XML.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="ProjectFilesNoSource\Editor.bat" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
