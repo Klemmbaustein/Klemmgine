@@ -12,6 +12,7 @@
 #include <UI/EditorUI/Popups/BakeMenu.h>
 #include <thread>
 #include "Viewport.h"
+#include <Engine/BackgroundTask.h>
 
 StatusBar* CurrentStatusBar = nullptr;
 
@@ -32,10 +33,10 @@ static std::vector<MenuBarItem> MenuBarItems =
 {
 	MenuBarItem("File",
 		{
-			MenuBarEntry("New", nullptr),
-			MenuBarEntry("Open", nullptr),
+			//MenuBarEntry("New", nullptr),
+			//MenuBarEntry("Open", nullptr),
 			MenuBarEntry("Save", []() { Editor::CurrentUI->SaveCurrentScene(); }, true),
-			MenuBarEntry("Build Project", []() { new std::thread(Build::TryBuildProject, "Build/"); }, true),
+			MenuBarEntry("Build Project", []() { new BackgroundTask([]() {Build::TryBuildProject("Build/"); }); }, true),
 			MenuBarEntry("Exit", []() { Application::Quit(); })
 		}),
 	MenuBarItem("Edit",
@@ -55,7 +56,7 @@ static std::vector<MenuBarItem> MenuBarItems =
 	MenuBarItem("C#",
 		{
 			MenuBarEntry("Open Solution", []() { OS::OpenFile(Build::GetProjectBuildName() + ".sln"); }),
-			MenuBarEntry("Reload C# Assembly", []() { new std::thread(EditorUI::RebuildAndHotReload); }, true),
+			MenuBarEntry("Reload C# Assembly", []() { new BackgroundTask(EditorUI::RebuildAndHotReload); }, true),
 			MenuBarEntry("New Class", []() { new ClassCreator(); }),
 		}),
 	MenuBarItem("Help",
