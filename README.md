@@ -1,43 +1,19 @@
 # Klemmgine
 
+A simple 3D game engine written in C++ using OpenGL and SDL2 for Windows. It has basic support for scripting in C#.
 
 
-A simple 3D game engine written in C++ using OpenGL and SDL2. It has basic support for scripting in C#.
+## Use with pre-built binaries
 
+### Requirements
 
+The .NET 7 SDK is required.
 
-## Requirements
+For shaders, I recommend [this Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=DanielScherzer.GLSL2022).
 
-
-
-The engine is currently only avaliable on Windows. 
-
-The code itself compiles on Linux, but there is no way to build it yet.
-
-
-
-Visual Studio 2022 is required for C++20 support. (Jetbrains Rider probably also works.)
-
-
-
-The required workloads are:
-
-- Desktop developement with C++
-
-- Desktop developement with C#
-
-
-
-For writing shaders, I recommend 
-
-[this extension](https://marketplace.visualstudio.com/items?itemName=DanielScherzer.GLSL2022).
-
-
-
-## Install from pre-built binaries
+### How to use
 
 1. Download the latest pre-built binaries [here](https://github.com/Klemmbaustein/Klemmgine/releases/latest).
-
 
 
 2. Extract the .zip file and run `ProjectGenerator.exe` to create a new project.	
@@ -54,7 +30,17 @@ For writing shaders, I recommend
 
 ## Build from source:
 
+### Requirements
 
+Visual Studio 2022 is required. For shaders, I recommend [this extension](https://marketplace.visualstudio.com/items?itemName=DanielScherzer.GLSL2022).
+
+The required workloads are:
+
+- Desktop developement with C++
+
+- Desktop developement with C#
+
+### How to build
 
 1. Clone the repository and it's submodules.
 
