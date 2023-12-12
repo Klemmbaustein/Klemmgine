@@ -73,7 +73,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			Debugging::EngineStatus = "Build: Copying .dll files";
 			Log::Print("[Build]: Copying .dll files");
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
-			std::filesystem::copy("bin/SDL2_net.dll", TargetFolder + "bin/SDL2_net.dll");
+			std::filesystem::copy("SDL2_net.dll", TargetFolder + "SDL2_net.dll");
 			std::filesystem::copy("bin/OpenAL32.dll", TargetFolder + "bin/OpenAL32.dll");
 #ifdef ENGINE_CSHARP
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");

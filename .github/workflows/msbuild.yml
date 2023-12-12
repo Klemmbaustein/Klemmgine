@@ -3,11 +3,15 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: MSBuild
+name: Build binaries
 
 on:
   push:
     branches: [ "master" ]
+    paths:
+    - CHANGES.md
+    - .github/workflows/**'
+
 
 env:
   # Path to the solution file relative to the root of the project.

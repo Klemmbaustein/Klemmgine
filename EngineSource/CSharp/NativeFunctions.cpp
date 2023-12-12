@@ -81,6 +81,16 @@ namespace NativeFunctions
 		Cam->Use();
 	}
 
+	static Collision::HitResponse CollisionComponentOverlap(CollisionComponent** IgnoredComponents, int32_t IgnoredLength, CollisionComponent* Target)
+	{
+		std::set<CollisionComponent*> Ignored;
+		for (int32_t i = 0; i < IgnoredLength; i++)
+		{
+			Ignored.insert(IgnoredComponents[i]);
+		}
+		return Target->OverlapCheck(Ignored);
+	}
+
 	static void DestroyComponent(Component* c, WorldObject* Parent)
 	{
 		Parent->Detach(c);
@@ -232,6 +242,20 @@ namespace NativeFunctions
 #endif
 	}
 
+	static Vector3 GetUIBoxSize(UIBox* Target)
+	{
+#if !EDITOR
+		return Vector3(Target->GetUsedSize(), 0);
+#endif
+	}
+
+	static Vector3 GetUIBoxPosition(UIBox* Target)
+	{
+#if !EDITOR
+		return Vector3(Target->GetPosition(), 0);
+#endif
+	}
+
 	static void AddUIBoxChild(UIBox* Child, UIBox* Target)
 	{
 #if !EDITOR
@@ -248,6 +272,29 @@ namespace NativeFunctions
 		return (UIBackground*)(new UIBackground(Horizontal, Position, Color, MinScale))->SetTryFill(true);
 	}
 
+	static void SetUIBackgroundColor(UIBackground* Target, Vector3 Color)
+	{
+#if !EDITOR
+		Target->SetColor(Color);
+#endif
+	}
+
+	static Vector3 GetUIBackgroundColor(UIBackground* Target)
+	{
+#if !EDITOR
+		return Target->GetColor();
+#endif
+		return 0;
+	}
+
+	static void SetUIBackgroundTexture(UIBackground* Target, const char* Texture)
+	{
+#if !EDITOR
+		Target->SetUseTexture(true, Texture);
+#endif
+		return;
+	}
+
 	static TextRenderer* CreateTextRenderer(const char* Font)
 	{
 #if EDITOR
@@ -262,6 +309,20 @@ namespace NativeFunctions
 		return nullptr;
 #endif
 		return new UIText(Scale, Color, Text, Renderer);
+	}
+
+	static void SetUITextText(const char* Text, UIText* Target)
+	{
+#if !EDITOR
+		Target->SetText(Text);
+#endif
+	}
+
+	static void SetUITextColor(Vector3 Color, UIText* Target)
+	{
+#if !EDITOR
+		Target->SetColor(Color);
+#endif
 	}
 
 	static void SetCursorVisible(bool NewVisible)
@@ -299,6 +360,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(GetComponentTransform);
 
 	REGISTER_FUNCTION(UseCamera);
+	REGISTER_FUNCTION(CollisionComponentOverlap);
 	REGISTER_FUNCTION(MovementComponentAddMovementInput);
 	REGISTER_FUNCTION(MovementComponentJump);
 
@@ -330,11 +392,18 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(SetUIBoxPadding);
 	REGISTER_FUNCTION(SetUIBoxPosition);
 	REGISTER_FUNCTION(SetUIBoxPaddingSizeMode);
+	REGISTER_FUNCTION(GetUIBoxPosition);
+	REGISTER_FUNCTION(GetUIBoxSize);
 
 	REGISTER_FUNCTION(CreateUIBackground);
+	REGISTER_FUNCTION(SetUIBackgroundColor);
+	REGISTER_FUNCTION(GetUIBackgroundColor);
+	REGISTER_FUNCTION(SetUIBackgroundTexture);
 
 	REGISTER_FUNCTION(CreateUIText);
 	REGISTER_FUNCTION(CreateTextRenderer);
+	REGISTER_FUNCTION(SetUITextColor);
+	REGISTER_FUNCTION(SetUITextText);
 #endif
 
 }

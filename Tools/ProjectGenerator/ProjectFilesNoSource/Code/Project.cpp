@@ -17,5 +17,6 @@ namespace Project
 	// This function will be called on startup.
 	void OnLaunch()
 	{
+		return CSharp::StaticCall<const char*>(CSharp::LoadCSharpFunction("OnLaunchInternally", "Engine", "VoidDelegate"));
 	}
 }

@@ -16,7 +16,7 @@ namespace Engine
 	public static class Console
 	{
 		private delegate bool CommandDelegate([MarshalAs(UnmanagedType.LPUTF8Str)] string Command);
-		public static bool ExecuteConsoleCommand([MarshalAs(UnmanagedType.LPUTF8Str)] string Command)
+		public static bool ExecuteConsoleCommand(string Command)
 		{
 			return (bool)NativeFunction.CallNativeFunction("CallConsoleCommand", typeof(CommandDelegate), new object[] { Command });
 		}

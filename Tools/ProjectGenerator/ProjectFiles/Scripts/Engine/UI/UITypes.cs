@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Xml.Linq;
+using static System.Formats.Asn1.AsnWriter;
+using static System.Net.Mime.MediaTypeNames;
 
-namespace UI
+namespace Engine.UI
 {
 	public class UIBox
 	{
@@ -13,7 +16,8 @@ namespace UI
 		protected delegate void SetAlignDelegate(Align NewAlign, IntPtr Box);
 		protected delegate void SetBorderDelegate(BorderType NewBorder, float Size, IntPtr Box);
 		protected delegate void SetPaddingDelegate(float UpPadding, float DownPadding, float LeftPadding, float RightPadding, IntPtr Box);
-		protected delegate void SetSizeModeDelegate(SizeMode mode, IntPtr Box);
+		protected delegate void SetSizeModeDelegate(SizeMode Mode, IntPtr Box);
+		protected delegate Vector3 GetVector2(IntPtr NativePtr);
 		protected IntPtr NativePtr;
 
 		public enum Orientation
@@ -80,6 +84,23 @@ namespace UI
 				typeof(SetBoxVec2),
 				new object[] { NewMaxSize, NativePtr });
 			return this;
+		}
+
+		public Vector2 GetUsedSize()
+		{
+			var vec3 = (Vector3)NativeFunction.CallNativeFunction("GetUIBoxSize",
+				typeof(GetVector2),
+				new object[] { NativePtr });
+			return new Vector2(vec3.X, vec3.Y);
+
+		}
+
+		public Vector2 GetPosition()
+		{
+			var vec3 = (Vector3)NativeFunction.CallNativeFunction("GetUIBoxPosition",
+				typeof(GetVector2),
+				new object[] { NativePtr });
+			return new Vector2(vec3.X, vec3.Y);
 		}
 
 		public UIBox SetPosition(Vector2 NewPosition)
@@ -162,6 +183,9 @@ namespace UI
 	public class UIBackground : UIBox
 	{
 		protected delegate IntPtr CreateBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale);
+		protected delegate void SetBackgroundColor(IntPtr Target, Vector3 NewColor);
+		protected delegate Vector3 GetBackgroundColor(IntPtr Target);
+		protected delegate void SetTextureDelegate(IntPtr Target, [MarshalAs(UnmanagedType.LPUTF8Str)] string Name);
 
 		public UIBackground(Orientation BoxOritentation, Vector2 Position, Vector3 Color, Vector2 MinScale) 
 			: base(BoxOritentation, Position)
@@ -176,18 +200,44 @@ namespace UI
 					MinScale
 				});
 		}
+
+		public UIBackground SetColor(Vector3 NewColor)
+		{
+			NativeFunction.CallNativeFunction("SetUIBackgroundColor",
+				typeof(SetBackgroundColor),
+				new object[] { NativePtr, NewColor });
+			return this;
+		}
+
+		public Vector3 GetColor()
+		{
+			return (Vector3)NativeFunction.CallNativeFunction("GetUIBackgroundColor",
+				typeof(GetBackgroundColor),
+				new object[] { NativePtr });
+		}
+
+		public UIBackground SetTexture(string TextureName)
+		{
+			NativeFunction.CallNativeFunction("SetUIBackgroundTexture",
+				typeof(SetTextureDelegate),
+				new object[] { NativePtr, TextureName });
+			return this;
+		}
+
 	}
 
 	public class UIText : UIBox
 	{
 		protected delegate IntPtr CreateText(float Scale, Vector3 Color, [MarshalAs(UnmanagedType.LPUTF8Str)] string Text, IntPtr TextFont);
+		protected delegate IntPtr SetTextDelegate([MarshalAs(UnmanagedType.LPUTF8Str)] string Text, IntPtr NativePtr);
+		protected delegate IntPtr SetColorDelegate(Vector3 Color, IntPtr NativePtr);
 		Font UsedFont = null;
 
 		public class Font
 		{
 			protected delegate IntPtr CreateFont([MarshalAs(UnmanagedType.LPUTF8Str)] string Name);
 
-			public Font([MarshalAs(UnmanagedType.LPUTF8Str)] string FontName = "Font.ttf")
+			public Font(string FontName = "Font.ttf")
 			{
 				NativePtr = (IntPtr)NativeFunction.CallNativeFunction("CreateTextRenderer",
 					typeof(CreateFont),
@@ -200,8 +250,32 @@ namespace UI
 			public IntPtr NativePtr;
 		}
 
+		public UIText SetText(string NewText)
+		{
+			NativeFunction.CallNativeFunction("SetUITextText",
+				typeof(SetTextDelegate),
+				new object[]
+				{
+					NewText,
+					NativePtr
+				});
+			return this;
+		}
+
+		public UIText SetColor(Vector3 Color)
+		{
+			NativeFunction.CallNativeFunction("SetUITextColor",
+				typeof(SetColorDelegate),
+				new object[]
+				{
+					Color,
+					NativePtr
+				});
+			return this;
+		}
+
 		public UIText(float Scale, Vector3 Color, string Text, Font TextFont)
-			: base(UIBox.Orientation.Horizontal, 0)
+			: base(Orientation.Horizontal, 0)
 		{
 			UsedFont = TextFont;
 

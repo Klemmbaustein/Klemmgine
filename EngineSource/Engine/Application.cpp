@@ -1008,6 +1008,7 @@ int Application::Initialize(int argc, char** argv)
 #if !EDITOR
 	Networking::Exit();
 #endif
+	OS::SetConsoleWindowVisible(true);
 	exit(0);
 }
 

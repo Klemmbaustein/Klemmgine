@@ -5,19 +5,26 @@ namespace Engine.Log
 {
 	public static class Log
 	{
-		static System.Action<string>? PrintFunction = null;
+		public enum Severity
+		{
+			Info = 0,
+			Warning = 1,
+			Error = 2
+		}
 
-		public static void LoadLogFunction(System.Action<string> Target)
+		static System.Action<string, int>? PrintFunction = null;
+
+		public static void LoadLogFunction(System.Action<string, int> Target)
 		{
 			PrintFunction = Target;
 		}
-		public static void Print(string Message)
+		public static void Print(string Message, Severity MessageSeverity = Severity.Info)
 		{
 			if (PrintFunction == null)
 			{
 				return;
 			}
-			PrintFunction.Invoke(Message);
+			PrintFunction.Invoke(Message, (int)MessageSeverity);
 		}
 	}
 }

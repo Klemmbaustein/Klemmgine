@@ -25,7 +25,7 @@
 #if !RELEASE
 #define CSHARP_LIBRARY_PATH STR("CSharpCore/Build/CSharpCore")
 #else
-#define CSHARP_LIBRARY_PATH STR("CSharp/Core/CSharpCore")
+#define CSHARP_LIBRARY_PATH STR("bin/CSharp/Core/CSharpCore")
 #endif
 
 #ifdef _WIN32
@@ -142,10 +142,10 @@ namespace CSharp
 		// Pre-allocate a large buffer for the path to hostfxr
 		char_t buffer[MAX_PATH];
 		size_t buffer_size = sizeof(buffer) / sizeof(char_t);
-		std::wstring Path = std::filesystem::current_path().wstring() + L"/CSharp";
+#if RELEASE
+		std::wstring Path = std::filesystem::current_path().wstring() + L"/bin/CSharp";
 		std::wstring NetPath = Path + L"/NetRuntime";
 
-#if RELEASE
 		get_hostfxr_parameters parameters = 
 		{
 			sizeof(hostfxr_initialize_parameters),
@@ -176,7 +176,7 @@ namespace CSharp
 		void* load_assembly_and_get_function_pointer = nullptr;
 
 #if RELEASE
-		std::wstring Path = std::filesystem::current_path().wstring() + L"/CSharp";
+		std::wstring Path = std::filesystem::current_path().wstring() + L"/bin/CSharp";
 		std::wstring NetPath = Path + L"/NetRuntime";
 
 		hostfxr_initialize_parameters parameters = 
@@ -228,9 +228,9 @@ static void WriteCSProj(std::string Name)
 </Project>";
 	out.close();
 }
-static void CSharpInternalPrint(const char* Msg)
+static void CSharpInternalPrint(const char* Msg, int Severity)
 {
-	CSharp::CSharpLog(Msg, CSharp::CS_Log_Script);
+	CSharp::CSharpLog(Msg, CSharp::CS_Log_Script, (CSharp::CSharpLogSev)Severity);
 }
 
 void CSharp::Init()
@@ -289,7 +289,7 @@ bool CSharp::GetUseCSharp()
 	{
 		LoadedUseCSharp = true;
 #if RELEASE
-		UseCSharp = std::filesystem::exists("CSharp");
+		UseCSharp = std::filesystem::exists("bin/CSharp");
 #else
 		SaveGame g = SaveGame(Build::GetProjectBuildName(), "keproj", false);
 		if (g.SaveGameIsNew())
@@ -373,8 +373,11 @@ void CSharp::LoadRuntime()
 #endif
 	}
 
+#if !RELEASE
 	const string_t config_path = root_path + STR("/") + string_t(CSHARP_LIBRARY_PATH) + STR(".runtimeconfig.json");
-
+#else
+	const string_t config_path = root_path + STR("/") + string_t(CSHARP_LIBRARY_PATH) + STR(".runtimeconfig.json");
+#endif
 	load_assembly_and_get_function_pointer = get_dotnet_load_assembly(config_path.c_str());
 	if (load_assembly_and_get_function_pointer == nullptr)
 	{
@@ -463,7 +466,7 @@ void CSharp::LoadAssembly()
 		AssemblyPath.c_str(), IsInEditor);
 #else
 	StaticCall<void, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
-		(std::filesystem::current_path().string() + "/CSharp/CSharpAssembly.dll").c_str(), IsInEditor);
+		(std::filesystem::current_path().string() + "/bin/CSharp/CSharpAssembly.dll").c_str(), IsInEditor);
 #endif
 
 	AllClasses.clear();

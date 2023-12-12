@@ -282,7 +282,6 @@ void Collision::CollisionMesh::ApplyMatrix()
 		}
 	}
 }
-size_t Collisions = 0;
 //Wow, this function sucks
 Collision::HitResponse Collision::CollisionMesh::CheckAgainstMesh(CollisionMesh* b)
 {
@@ -291,12 +290,6 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstMesh(CollisionMesh*
 	if (SpheresOverlapping(WorldPosition + SpherePosition, SphereCollisionSize,
 		b->WorldPosition + b->SpherePosition, b->SphereCollisionSize))
 	{
-		if (Collisions >= 100)
-		{
-			//std::cout << "INTERSECT: " << (WorldPosition + SpherePosition).ToString() << ", " << SphereCollisionSize
-			//	<< " : " << (b->WorldPosition + b->SpherePosition).ToString() << ", " << b->SphereCollisionSize << std::endl;
-		}
-		Collisions++;
 		HitResponse r;
 		r.Hit = false;
 		for (unsigned int i = 0; i < Indices.size(); i += 3)
@@ -385,7 +378,6 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstAABB(const Box& b)
 }
 Collision::HitResponse Collision::CollisionMesh::OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore)
 {
-	Collisions = 0; 
 	for (CollisionComponent* c : CollisionBoxes)
 	{
 		if (MeshesToIgnore.find(c) == MeshesToIgnore.end())
@@ -397,11 +389,6 @@ Collision::HitResponse Collision::CollisionMesh::OverlapCheck(std::set<Collision
 				{
 					newR.HitObject = c->GetParent();
 					newR.HitComponent = c;
-					//Log::Print("Collisions: " + std::to_string(Collisions));
-					if (Collisions >= 100)
-					{
-						std::cout << "Large Collision: Mesh with " << Vertices.size() << " vertices and scale of " << Scale.ToString() << std::endl;
-					}
 					return newR;
 				}
 			}

@@ -6,6 +6,7 @@
 #include <Rendering/Shader.h>
 #include <Engine/Log.h>
 #include <Rendering/Graphics.h>
+#include <Rendering/Texture/Texture.h>
 
 void UIBackground::ScrollTick(Shader* UsedShader)
 {
@@ -67,7 +68,7 @@ UIBackground* UIBackground::SetOpacity(float NewOpacity)
 	return this;
 }
 
-float UIBackground::GetOpacity()
+float UIBackground::GetOpacity() const
 {
 	return Opacity;
 }
@@ -81,14 +82,14 @@ void UIBackground::SetColor(Vector3 NewColor)
 	}
 }
 
-Vector3 UIBackground::GetColor()
+Vector3 UIBackground::GetColor() const
 {
 	return Color;
 }
 
-bool UIBackground::GetUseTexture()
+bool UIBackground::GetUseTexture() const
 {
-	return UseTexture;
+	return TextureMode;
 }
 
 void UIBackground::SetInvertTextureCoordinates(bool Invert)
@@ -98,12 +99,29 @@ void UIBackground::SetInvertTextureCoordinates(bool Invert)
 
 UIBackground* UIBackground::SetUseTexture(bool UseTexture, unsigned int TextureID)
 {
-	if (this->UseTexture != UseTexture || TextureID != this->TextureID)
+	if (this->TextureMode != (UseTexture ? 1 : 0) || TextureID != this->TextureID)
 	{
-		this->UseTexture = UseTexture;
+		this->TextureMode = UseTexture ? 1 : 0;
 		this->TextureID = TextureID;
 		RedrawUI();
 	}
+
+	return this;
+}
+
+UIBackground* UIBackground::SetUseTexture(bool UseTexture, std::string TextureName)
+{
+	this->TextureMode = (UseTexture ? 2 : 0);
+	if (!TextureMode)
+	{
+		return this;
+	}
+	this->TextureID = Texture::LoadTexture(TextureName);
+	if (TextureID == 0)
+	{
+		TextureMode = 0;
+	}
+	RedrawUI();
 
 	return this;
 }
@@ -119,6 +137,11 @@ UIBackground::UIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vec
 UIBackground::~UIBackground()
 {
 	delete BoxVertexBuffer;
+
+	if (TextureMode == 2)
+	{
+		Texture::UnloadTexture(TextureID);
+	}
 }
 
 void UIBackground::Draw()
@@ -137,10 +160,7 @@ void UIBackground::Draw()
 	BackgroundShader->SetFloat("u_aspectratio", Graphics::AspectRatio);
 	BackgroundShader->SetFloat("u_depth", GetCurrentUIDepth());
 
-	if (UseTexture)
-		glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_useTexture"), 1);
-	else
-		glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_useTexture"), 0);
+	BackgroundShader->SetInt("u_useTexture", (bool)TextureMode);
 	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

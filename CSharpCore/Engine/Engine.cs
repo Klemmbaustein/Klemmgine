@@ -66,7 +66,7 @@ static class Engine
 
 		LoadedAsm = Assembly.Load(File.ReadAllBytes(Path));
 
-		LoadTypeFromAssembly("Engine.Log.Log")!.GetMethod("LoadLogFunction")!.Invoke(null, new Delegate[] { EngineLog.Print });
+		LoadTypeFromAssembly("Engine.Log.Log")!.GetMethod("LoadLogFunction")!.Invoke(null, new object[] { new Action<string, int>(EngineLog.Print) });
 
 
 		var WorldObjectType = LoadTypeFromAssembly("WorldObject");
@@ -238,5 +238,23 @@ static class Engine
 			return "";
 		}
 		return (string)StartupScene.Invoke(null, null)!;
+	}
+
+	public static void OnLaunchInternally()
+	{
+		var ProjectType = LoadTypeFromAssembly("Project");
+		if (ProjectType == null)
+		{
+			EngineLog.Print("Failed to load project type");
+			return;
+		}
+		var OnLaunch = ProjectType.GetMethod("GetStartupScene");
+		if (OnLaunch == null)
+		{
+			EngineLog.Print("Failed to load Project.GetStartupScene()");
+			return;
+		}
+		OnLaunch.Invoke(null, null);
+		return;
 	}
 }
