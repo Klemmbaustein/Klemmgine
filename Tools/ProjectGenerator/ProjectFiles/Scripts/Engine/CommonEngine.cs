@@ -13,16 +13,16 @@ namespace Engine
 		}
 	}
 
-	namespace Console
+	public static class Command
 	{
-		private delegate bool CommandDelegate([MarshalAs(UnmanagedType.LPUTF8Str)] string Command);
+		internal delegate bool CommandDelegate([MarshalAs(UnmanagedType.LPUTF8Str)] string Command);
 		public static bool ExecuteConsoleCommand(string Command)
 		{
 			return (bool)NativeFunction.CallNativeFunction("CallConsoleCommand", typeof(CommandDelegate), new object[] { Command });
 		}
 	}
 
-	namespace Collision
+	public static class Collision
 	{
 		private delegate HitResponse LineTraceDelegate(Vector3 Start, Vector3 End, IntPtr This);
 
@@ -60,7 +60,7 @@ namespace Engine
 		}
 	}
 
-	namespace Sound
+	public static class Sound
 	{
 		private delegate IntPtr LoadSoundDelegate([MarshalAs(UnmanagedType.LPUTF8Str)] string SoundName);
 		private delegate void UnloadSoundDelegate(IntPtr SoundBuffer);
