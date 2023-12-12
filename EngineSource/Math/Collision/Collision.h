@@ -13,7 +13,7 @@ namespace Collision
 
 	struct HitResponse
 	{
-		bool Hit;
+		bool Hit = false;
 		Vector3 ImpactPoint;
 		float t = INFINITY;
 		WorldObject* HitObject = nullptr;

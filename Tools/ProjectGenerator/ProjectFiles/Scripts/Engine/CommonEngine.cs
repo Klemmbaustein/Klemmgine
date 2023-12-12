@@ -13,7 +13,7 @@ namespace Engine
 		}
 	}
 
-	public static class Console
+	namespace Console
 	{
 		private delegate bool CommandDelegate([MarshalAs(UnmanagedType.LPUTF8Str)] string Command);
 		public static bool ExecuteConsoleCommand(string Command)
@@ -22,13 +22,14 @@ namespace Engine
 		}
 	}
 
-	public static class Collision
+	namespace Collision
 	{
 		private delegate HitResponse LineTraceDelegate(Vector3 Start, Vector3 End, IntPtr This);
 
 		[StructLayout(LayoutKind.Sequential)]
 		public struct HitResponse
 		{
+			[MarshalAs(UnmanagedType.U1)]
 			public bool Hit;
 			public Vector3 ImpactPoint;
 			public float t;
@@ -59,7 +60,7 @@ namespace Engine
 		}
 	}
 
-	public static class Sound
+	namespace Sound
 	{
 		private delegate IntPtr LoadSoundDelegate([MarshalAs(UnmanagedType.LPUTF8Str)] string SoundName);
 		private delegate void UnloadSoundDelegate(IntPtr SoundBuffer);

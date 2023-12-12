@@ -129,8 +129,8 @@ void EditorUI::LaunchInEditor()
 			Build::BuildCurrentSolution("Debug");
 		}
 
-		if (Project::UseNetworkFunctions && !std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
-			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
+		if (Project::UseNetworkFunctions && (!std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
+			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
 		{
 			Build::BuildCurrentSolution("Server");
 		}

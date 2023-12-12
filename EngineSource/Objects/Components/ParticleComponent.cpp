@@ -19,8 +19,8 @@ void ParticleComponent::Begin()
 void ParticleComponent::Tick()
 {
 #if !SERVER
-	Emitter->Position = Vector3::TranslateVector(Position, GetParent()->GetTransform());
-	Emitter->Rotation = Rotation;
+	Emitter->Position = RelativeTransform.Location;
+	Emitter->Rotation = RelativeTransform.Rotation;
 #endif
 }
 void ParticleComponent::Destroy()
