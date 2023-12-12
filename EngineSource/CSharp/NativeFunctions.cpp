@@ -247,6 +247,7 @@ namespace NativeFunctions
 #if !EDITOR
 		return Vector3(Target->GetUsedSize(), 0);
 #endif
+		return 0;
 	}
 
 	static Vector3 GetUIBoxPosition(UIBox* Target)
@@ -254,6 +255,7 @@ namespace NativeFunctions
 #if !EDITOR
 		return Vector3(Target->GetPosition(), 0);
 #endif
+		return 0;
 	}
 
 	static void AddUIBoxChild(UIBox* Child, UIBox* Target)
