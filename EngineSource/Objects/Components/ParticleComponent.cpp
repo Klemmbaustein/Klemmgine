@@ -95,29 +95,3 @@ void ParticleComponent::Reset()
 	Emitter->Reset();
 #endif
 }
-void ParticleComponent::SetRelativeRotation(Vector3 NewRotation)
-{
-#if !SERVER
-	this->Rotation = NewRotation;
-#endif
-}
-Vector3 ParticleComponent::GetRelativeRotation()
-{
-#if !SERVER
-	return Rotation;
-#endif
-	return 0;
-}
-void ParticleComponent::SetRelativePosition(Vector3 NewPos)
-{
-#if !SERVER
-	Position = NewPos;
-#endif
-}
-Vector3 ParticleComponent::GetRelativePosition()
-{
-#if !SERVER
-	return Position;
-#endif
-	return 0;
-}

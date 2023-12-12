@@ -17,7 +17,6 @@ void ParticleObject::Destroy()
 
 void ParticleObject::Tick()
 {
-	Particle->SetRelativeRotation(GetTransform().Rotation);
 	if (Particle->GetIsFinished() && !IsInEditor)
 	{
 		Objects::DestroyObject(this);
