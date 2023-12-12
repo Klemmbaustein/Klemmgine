@@ -76,7 +76,6 @@ if ($args[0] -eq "CI_BUILD")
 	rm Dependencies/ -r -force
 	rm EngineSource/ -r -force
 	rm Tools/ProjectGenerator/x64 -r -force
-	rm Tools/ProjectGenerator/x64 -r -force
 	rm Tools/BuildTool -r -force
 	rm Tools/bin -r -force
 	rm Tools/ProjectGenerator/ProjectFiles/Code -r -force
