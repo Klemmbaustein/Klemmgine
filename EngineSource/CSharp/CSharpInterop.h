@@ -56,6 +56,8 @@ namespace CSharp
 	Vector3 GetObjectVectorField(CSharpWorldObject Obj, std::string Field);
 	void SetObjectVectorField(CSharpWorldObject Obj, std::string Field, Vector3 Value);
 
+	std::string GetNetVersion();
+
 	void ReloadCSharpAssembly();
 
 	template<typename T, typename... Args> 

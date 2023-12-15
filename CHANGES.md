@@ -1,17 +1,14 @@
 # Changelog
 
-## Version 1.6.1
+## Version 1.6.2
 
-- Exposed more Functions to C#:
-	- `CollisionComponent::OverlapCheck`
-	- `UIBackground` class.
-	- `UIText` class.
-	- Added `Log.Print.Severity` enum (Info, Warning, Error).
-- Changed some static C# classes to namespaces to avoid name conflicts.
-- Fixed an issue that would cause C# projects to fail to build.
-- Fixed an íssue where `Project.OnLaunch()` Would never be called.
-- Fixed an issue with the `Collision.HitResponse` C# struct.
-- Fixed an issue with ParticleComponents ignoring position in C#.
-- Fixed an issue that would cause C++ projects to fail to launch if		
-  [ProjectName]-Server.exe didn't exist and 'Launch with Server' was disabled.
-- Fixed multiple issues with the fallback material.
+### C#
+- Upgraded .net version to .net 8.0
+- The .net runtime is no longer packaged with the engine but pulled from the installed .net sdk when creating a standalone build.
+- Added `-netVersion` argument to ProjectGenerator (default value `.net8.0`)
+- Added `Project.GetProjectName()` function.
+
+### Fixes
+- Fixed `Project.OnLaunch()` never being called.
+- Fixed multiple issues related to light mode.
+- When using pre-built binaries, you no longer have the uneccesary option to disable C#.

@@ -7,7 +7,7 @@ A simple 3D game engine written in C++ using OpenGL and SDL2 for Windows. It has
 
 ### Requirements
 
-The .NET 7 SDK is required.
+The .NET 8 SDK is required.
 
 For shaders, I recommend [this Visual Studio extension](https://marketplace.visualstudio.com/items?itemName=DanielScherzer.GLSL2022).
 

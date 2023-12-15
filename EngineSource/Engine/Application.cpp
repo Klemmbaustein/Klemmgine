@@ -71,6 +71,27 @@ static Vector2 GetMousePosition()
 	return Vector2((x / Size.X - 0.5f) * 2, 1 - (y / Size.Y * 2));
 }
 
+static std::string ToAppTitle(std::string Name)
+{
+	std::string ApplicationTitle = Name;
+	if (IsInEditor)
+	{
+		ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
+	}
+#if ENGINE_CSHARP && !RELEASE
+	if (CSharp::GetUseCSharp())
+	{
+		ApplicationTitle.append(" (C#)");
+	}
+#endif
+
+	if (EngineDebug && !IsInEditor)
+	{
+		ApplicationTitle.append(" (Debug)");
+	}
+	return ApplicationTitle;
+}
+
 namespace Application
 {
 	PostProcess::Effect* UIMergeEffect = nullptr;
@@ -881,23 +902,7 @@ int Application::Initialize(int argc, char** argv)
 	SDL_GetCurrentDisplayMode(0, &DM);
 	Graphics::WindowResolution = Vector2((float)DM.w, (float)DM.h) / 1.5f;
 
-	std::string ApplicationTitle = Project::ProjectName;
-	if (IsInEditor)
-	{
-		ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
-	}
-#if ENGINE_CSHARP && !RELEASE
-	if (CSharp::GetUseCSharp())
-	{
-		ApplicationTitle.append(" (C#)");
-	}
-#endif
-
-	if (EngineDebug && !IsInEditor)
-	{
-		ApplicationTitle.append(" (Debug)");
-	}
-	Application::Window = SDL_CreateWindow(ApplicationTitle.c_str(),
+	Application::Window = SDL_CreateWindow(ToAppTitle(Project::ProjectName).c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		(int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y,
 		flags);
@@ -961,6 +966,14 @@ int Application::Initialize(int argc, char** argv)
 #endif
 #if ENGINE_CSHARP
 	CSharp::Init();
+
+#if ENGINE_NO_SOURCE
+	SDL_SetWindowTitle(Window, ToAppTitle(
+		CSharp::StaticCall<const char*>(
+			CSharp::LoadCSharpFunction("GetNameInternally", "Engine", "StringDelegate")
+		)
+	).c_str());
+#endif
 #endif
 	Cubemap::RegisterCommands();
 #if !SERVER

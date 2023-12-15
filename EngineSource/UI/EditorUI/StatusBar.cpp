@@ -71,7 +71,6 @@ StatusBar::StatusBar(Vector3* Colors)
 	: EditorPanel(Colors, Vector2(-1, 0.95f), Vector2(2, 0.05f), Vector2(2, 0.05f), Vector2(2, 0.05f))
 {
 	CurrentStatusBar = this;
-
 	BarBoxes[0] = new UIBox(true, 0);
 	BarBoxes[1] = new UIBox(true, 0);
 	TabBackground->SetHorizontal(true);
@@ -131,7 +130,6 @@ void StatusBar::GenerateMenuBarDropdown(int ButtonIndex)
 	auto Background = new UIBackground(false, 0, Vector3::Lerp(UIColors[0], UIColors[2], 0.5f), 0);
 	MenuBarDropdown->AddChild(Background
 		->SetPadding(0));
-
 	int it = 0;
 	for (auto& i : MenuBarItems[ButtonIndex].Entries)
 	{
@@ -153,6 +151,10 @@ void StatusBar::UpdateLayout()
 {
 	std::vector<int> Buttons;
 	TabBackground->SetColor(UIColors[0] * 0.75);
+	for (UIButton* i : MenuBarButtons)
+	{
+		i->SetColor(UIColors[0] * 0.75f);
+	}
 }
 
 void StatusBar::Tick()

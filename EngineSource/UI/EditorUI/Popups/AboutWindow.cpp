@@ -108,8 +108,8 @@ AboutWindow::AboutWindow()
 				->SetPadding(0));
 		}
 	}
-	CreditsBox->SetMinSize(Vector2(0.5f, 0.375f));
-	CreditsBox->SetMaxSize(Vector2(0.5f, 0.375f));
+	CreditsBox->SetMinSize(Vector2(0.5f, 0.365f));
+	CreditsBox->SetMaxSize(Vector2(0.5f, 0.365f));
 	UpdateLayout();
 }
 

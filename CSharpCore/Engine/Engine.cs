@@ -228,13 +228,13 @@ static class Engine
 		var ProjectType = LoadTypeFromAssembly("Project");
 		if (ProjectType == null)
 		{
-			EngineLog.Print("Failed to load project type");
+			EngineLog.Print("Failed to load project type", 2);
 			return "";
 		}
 		var StartupScene = ProjectType.GetMethod("GetStartupScene");
 		if (StartupScene == null)
 		{
-			EngineLog.Print("Failed to load Project.GetStartupScene()");
+			EngineLog.Print("Failed to load Project.GetStartupScene()", 2);
 			return "";
 		}
 		return (string)StartupScene.Invoke(null, null)!;
@@ -245,16 +245,34 @@ static class Engine
 		var ProjectType = LoadTypeFromAssembly("Project");
 		if (ProjectType == null)
 		{
-			EngineLog.Print("Failed to load project type");
+			EngineLog.Print("Failed to load project type", 2);
 			return;
 		}
-		var OnLaunch = ProjectType.GetMethod("GetStartupScene");
+		var OnLaunch = ProjectType.GetMethod("OnLaunch");
 		if (OnLaunch == null)
 		{
-			EngineLog.Print("Failed to load Project.GetStartupScene()");
+			EngineLog.Print("Failed to load Project.OnLaunch()", 2);
 			return;
 		}
 		OnLaunch.Invoke(null, null);
 		return;
 	}
+
+	public static string GetNameInternally()
+	{
+		var ProjectType = LoadTypeFromAssembly("Project");
+		if (ProjectType == null)
+		{
+			EngineLog.Print("Failed to load project type", 2);
+			return "";
+		}
+		var GetProjectName = ProjectType.GetMethod("GetProjectName");
+		if (GetProjectName == null)
+		{
+			EngineLog.Print("Failed to load Project.GetProjectName()", 2);
+			return "";
+		}
+		return (string)GetProjectName.Invoke(null, null)!;
+	}
+
 }

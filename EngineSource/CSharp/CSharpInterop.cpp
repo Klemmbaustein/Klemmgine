@@ -143,7 +143,7 @@ namespace CSharp
 		char_t buffer[MAX_PATH];
 		size_t buffer_size = sizeof(buffer) / sizeof(char_t);
 #if RELEASE
-		std::wstring Path = std::filesystem::current_path().wstring() + L"/bin/CSharp";
+		std::wstring Path = std::filesystem::current_path().wstring() + L"/bin";
 		std::wstring NetPath = Path + L"/NetRuntime";
 
 		get_hostfxr_parameters parameters = 
@@ -176,7 +176,7 @@ namespace CSharp
 		void* load_assembly_and_get_function_pointer = nullptr;
 
 #if RELEASE
-		std::wstring Path = std::filesystem::current_path().wstring() + L"/bin/CSharp";
+		std::wstring Path = std::filesystem::current_path().wstring() + L"/bin";
 		std::wstring NetPath = Path + L"/NetRuntime";
 
 		hostfxr_initialize_parameters parameters = 
@@ -217,7 +217,7 @@ static void WriteCSProj(std::string Name)
 	std::ofstream out = std::ofstream(Name);
 	out << "<Project Sdk=\"Microsoft.NET.Sdk\">\n\
 	<PropertyGroup>\n\
-		<TargetFramework>net7.0</TargetFramework>\n\
+		<TargetFramework>net" + CSharp::GetNetVersion() + ".0</TargetFramework>\n\
 		<EnableDynamicLoading>true</EnableDynamicLoading>\n\
 	</PropertyGroup>\n\
 	<PropertyGroup>\n\
@@ -285,6 +285,9 @@ std::vector<std::string> CSharp::GetAllClasses()
 
 bool CSharp::GetUseCSharp()
 {
+#if ENGINE_NO_SOURCE
+	return true;
+#endif
 	if (!LoadedUseCSharp)
 	{
 		LoadedUseCSharp = true;
@@ -337,6 +340,11 @@ Vector3 CSharp::GetObjectVectorField(CSharpWorldObject Obj, std::string Field)
 void CSharp::SetObjectVectorField(CSharpWorldObject Obj, std::string Field, Vector3 Value)
 {
 	return CSharp::StaticCall<void, int32_t, const char*, Vector3>(SetPosFunction, Obj.ID, Field.c_str(), Value);
+}
+
+std::string CSharp::GetNetVersion()
+{
+	return "8";
 }
 
 void CSharp::ReloadCSharpAssembly()

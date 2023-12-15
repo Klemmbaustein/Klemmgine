@@ -29,6 +29,7 @@ int main(int argc, char** argv)
 	std::map<std::string, std::string> LaunchArgs =
 	{
 		std::pair("winSdk", "10.0"),
+		std::pair("netVersion", "net8.0"),
 		std::pair("toolset", "v143"),
 		std::pair("projectName", ""),
 		std::pair("includeEngine", "true"),
@@ -170,7 +171,7 @@ int main(int argc, char** argv)
 	if (LaunchArgs["includeCsharp"] == "true")
 	{
 		std::cout << "- Including C# project in solution" << std::endl;
-		std::string CsGUID = VSProj::WriteCSProj(LaunchArgs["projectPath"] + "/Scripts", "CSharpAssembly", "net7.0");
+		std::string CsGUID = VSProj::WriteCSProj(LaunchArgs["projectPath"] + "/Scripts", "CSharpAssembly", LaunchArgs["netVersion"]);
 
 		SLN::Project CSProject;
 		CSProject.Name = "CSharpAssembly";

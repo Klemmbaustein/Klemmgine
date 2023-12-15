@@ -61,7 +61,7 @@ class PreferenceTab : public EditorTab
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Run", std::stoi(NewValue));
 			}),
-#ifdef ENGINE_CSHARP
+#if ENGINE_CSHARP
 			SettingsCategory::Setting("Toolbar:Show reload C# button", Type::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Reload C#", std::stoi(NewValue));
@@ -100,7 +100,7 @@ class PreferenceTab : public EditorTab
 					EditorUI::NumLaunchClients = std::stoi(NewValue);
 				}),
 
-#ifdef ENGINE_CSHARP
+#if ENGINE_CSHARP && !ENGINE_NO_SOURCE
 				SettingsCategory::Setting("C#:Use C# in project (Requires restart)", Type::Bool, "1", [](std::string NewValue)
 				{
 				}),

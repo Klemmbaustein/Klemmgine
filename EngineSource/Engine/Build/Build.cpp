@@ -26,7 +26,10 @@ namespace Build
 		{
 			perror("Error deleting temporary file");
 		}
-		ret.erase(std::remove(ret.begin(), ret.end(), '\n'), ret.cend()); //remove newline from the end of the file
+		if (!ret.empty() && ret[ret.size() - 1] == '\n')
+		{
+			ret.pop_back();
+		}
 		return ret;
 	}
 	std::string GetVSLocation()
@@ -63,6 +66,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 	{
 		if (std::filesystem::exists(TargetFolder))
 		{
+			Log::Print("[Build]: -- Starting build --");
 			const auto DirectoryCopyOptions = std::filesystem::copy_options::recursive;
 			Debugging::EngineStatus = "[Build]: Clearing folder";
 			Log::Print("[Build]: Clearing folder");
@@ -114,7 +118,6 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 #endif
 #else
 			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
-			Log::Print("Pleasse recompile the program manually with the RELASE preprocessor definition (Release config).", Vector3(1, 0, 0));
 #endif
 #ifdef ENGINE_CSHARP
 
@@ -129,7 +132,56 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				system("cd Scripts && dotnet publish -r win-x64 --self-contained false");
 
 				std::filesystem::copy("CSharp/Build/win-x64/publish", TargetFolder + "/bin/CSharp");
-				std::filesystem::copy(Application::GetEditorPath() + "/CSharpCore/NetRuntime", TargetFolder + "/bin/CSharp/NetRuntime", DirectoryCopyOptions);
+
+				std::string NetRuntimePath = GetSystemCommandReturnValue("dotnet --list-runtimes");
+
+				std::vector<std::string> NetRuntimes = { "" };
+				for (char c : NetRuntimePath)
+				{
+					if (c == '\n')
+					{
+						NetRuntimes.push_back("");
+					}
+					else
+					{
+						NetRuntimes[NetRuntimes.size() - 1].push_back(c);
+					}
+				}
+
+				Log::Print("[Build]: Copying .net runtime. Avaliable runtimes: ");
+
+				std::string LatestRuntimePath;
+				std::string LatestRuntimeVersion;
+
+				for (std::string Runtime : NetRuntimes)
+				{
+					if (Runtime.substr(0, 21) != "Microsoft.NETCore.App")
+					{
+						continue;
+					}
+					Runtime = Runtime.substr(22);
+
+
+					std::string VersionNumber = Runtime.substr(0, Runtime.find_first_of(" "));
+					std::string Path = Runtime.substr(Runtime.find_first_of(" ") + 2);
+					Path.pop_back();
+
+					if (VersionNumber.substr(0, VersionNumber.find_first_of(".")) != CSharp::GetNetVersion())
+					{
+						continue;
+					}
+
+					Log::Print("[Build]: \t" + Path + " : " + VersionNumber);
+					LatestRuntimePath = Path + "/" + VersionNumber;
+					LatestRuntimeVersion = VersionNumber;
+				}
+				std::string ToDir = TargetFolder + "/bin/NetRuntime/shared/Microsoft.NETCore.App/" + LatestRuntimeVersion;
+				Log::Print("Using .net runtime version " + LatestRuntimeVersion);
+				std::filesystem::create_directories(ToDir);
+				std::filesystem::copy(LatestRuntimePath, ToDir, DirectoryCopyOptions);
+
+				std::filesystem::create_directories(TargetFolder + "/bin/NetRuntime/host");
+				std::filesystem::copy(LatestRuntimePath + "/../../../host", TargetFolder + "/bin/NetRuntime/host", DirectoryCopyOptions);
 			}
 #endif
 
