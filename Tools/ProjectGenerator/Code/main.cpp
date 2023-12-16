@@ -17,9 +17,11 @@ std::vector<std::string> DependencyDlls =
 int main(int argc, char** argv)
 {
 	std::string ExecPath = argv[0];
-	ExecPath = ExecPath.substr(0, ExecPath.find_last_of("\\/"));
-	std::filesystem::current_path(ExecPath);
-
+	if (ExecPath.find_last_of("/\\") != std::string::npos)
+	{
+		ExecPath = ExecPath.substr(0, ExecPath.find_last_of("\\/"));
+		std::filesystem::current_path(ExecPath);
+	}
 	std::cout << "Klemmgine Project Generator v1.0";
 #if ENGINE_NO_SOURCE
 	std::cout << " - without engine source";
