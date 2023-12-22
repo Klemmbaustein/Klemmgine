@@ -91,7 +91,6 @@ static std::string ToAppTitle(std::string Name)
 	{
 		ApplicationTitle.append(" (Debug)");
 	}
-	std::cout << ApplicationTitle << std::endl;
 	return ApplicationTitle;
 }
 

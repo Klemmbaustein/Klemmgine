@@ -166,7 +166,7 @@ void EditorUI::LaunchInEditor()
 #endif
 #if _WIN32
 
-	std::string CommandLine = "bash bin\\" + ProjectName + "-Debug.exe -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
+	std::string CommandLine = "bin\\" + ProjectName + "-Debug.exe -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
 #else
 	std::string CommandLine = "./bin/" + ProjectName + "-Debug -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
 #endif

@@ -387,7 +387,7 @@ void CSharp::LoadRuntime()
 	}
 
 #if !RELEASE
-	const string_t config_path = root_path + STR("/") + string_t(CSHARP_LIBRARY_PATH) + STR(".runtimeconfig.json");
+	const string_t config_path = std::filesystem::absolute(root_path).fs_string() + STR("/") + string_t(CSHARP_LIBRARY_PATH) + STR(".runtimeconfig.json");
 #else
 	const string_t config_path = root_path + STR("/") + string_t(CSHARP_LIBRARY_PATH) + STR(".runtimeconfig.json");
 #endif
