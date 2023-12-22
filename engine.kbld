@@ -1,0 +1,73 @@
+{
+#if Debug
+#define NAME "Klemmgine-Debug"
+#elif Editor
+#define NAME "Klemmgine-Editor"
+#elif Release
+#define NAME "Klemmgine-Release"
+#elif Server
+#define NAME "Klemmgine-Server"
+#elif Generator
+#define NAME "Klemmgine-Editor"
+#else
+#error "Neither Debug, Editor, Server nor Release have been defined"
+#endif
+
+#if Generator
+  "defaultProject": "ProjectGenerator",
+#else
+  "defaultProject": NAME,
+#endif
+
+  "projects": [
+    {
+      "dependencies": "BuildTool",
+      "name": NAME,
+      "outputPath": "lib/",
+#if MSVC_WINDOWS
+      "preBuildCommand": "Tools\\bin\\BuildTool.exe in=EngineSource/Objects out=Tools/BuildTool/Output",
+#else
+      "preBuildCommand": "Tools/bin/BuildTool in=EngineSource/Objects out=Tools/BuildTool/Output",
+#endif
+      "sources": [
+        "EngineSource/*.cpp"
+      ],
+      "includes": [
+        "EngineSource",
+        "Dependencies/glm",
+        "Dependencies/assimp/include",
+        "Dependencies/glew-cmake/include",
+        "Dependencies/openal-soft/include",
+        "Dependencies/SDL/include",
+        "Dependencies/SDL_net/include",
+        "Tools/BuildTool/Output"
+      ],
+      "defines": [
+#if Editor
+        "EDITOR",
+#elif Release
+        "RELEASE",
+#elif Server
+        "SERVER",
+#endif
+        "ENGINE_CSHARP",
+        "GLEW_STATIC"
+      ],
+      "type": "staticLib",
+      "optimization": "fast"
+    },
+    {
+      "name": "BuildTool",
+      "sources": [
+        "Tools/BuildTool/Code/*.cpp"
+      ],
+      "outputPath": "Tools/bin"
+    },
+    {
+      "name": "ProjectGenerator",
+      "sources": [
+        "Tools/ProjectGenerator/Code/*.cpp"
+      ]
+    }
+  ]
+}

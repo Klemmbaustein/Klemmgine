@@ -1,0 +1,69 @@
+{
+#if Debug
+#define NAME "Klemmgine-Debug"
+#define LIB_PATH "../../lib/Klemmgine-Debug"
+#elif Editor
+#define NAME "Klemmgine-Editor"
+#define LIB_PATH "../../lib/Klemmgine-Editor"
+#elif Release
+#define NAME "Klemmgine-Release"
+#define LIB_PATH "../../lib/Klemmgine-Release"
+#elif Server
+#define NAME "Klemmgine-Server"
+#define LIB_PATH "../../lib/Klemmgine-Server"
+#else
+#error "Neither Debug, Editor nor Release have been defined"
+#endif  
+
+  "defaultProject": NAME,
+  "projects": [
+    {
+      "dependencies": "Engine",
+      "name": NAME,
+      "sources": [
+        "Code/*.cpp"
+      ],
+
+#if MSVC_WINDOWS
+      "preBuildCommand": "..\\..\\Tools\\bin\\BuildTool.exe in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes",
+#else
+      "preBuildCommand": "../../Tools/bin/BuildTool.exe in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes",
+#endif
+
+      "outputPath": "bin",
+      "includes": [
+        "Code",
+        "../../EngineSource",
+        "../../Dependencies/glm",
+        "GeneratedIncludes"
+      ],
+      "defines": [
+#if Editor
+            "EDITOR",
+#elif Release
+            "RELEASE",
+#elif Server
+            "SERVER",
+#endif
+        "ENGINE_CSHARP",
+        "GLEW_STATIC"
+      ],
+      "libs": [
+        LIB_PATH,
+        "SDL2_net",
+        "SDL2",
+        "GL",
+        "assimp",
+        "dl",
+        "libGLEW.a",
+        "../../Dependencies/openal-soft/Ln_Build/openal",
+        "../../CSharpCore/lib/nethost"
+      ],
+      "optimization": "fast"
+    },
+    {
+      "name": "Engine",
+      "makefile": "../../engine.kbld"
+    }
+  ]
+}

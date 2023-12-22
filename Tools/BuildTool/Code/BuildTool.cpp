@@ -128,7 +128,7 @@ void RecursiveSearch(std::string InLoc, std::vector<Object>& Objects, std::strin
 		else
 		{
 			std::string Filename = entry.path().string();
-			auto Begin = std::max(Filename.find_last_of("/"), Filename.find_last_of("\\"));
+			auto Begin = Filename.find_last_of("/\\");
 			std::string Name = Filename.substr(Begin + 1, Filename.find_last_of(".") - Begin - 1);
 			// Ignore Objects.h header
 			if (Name != "Objects" && Name != "WorldObject")

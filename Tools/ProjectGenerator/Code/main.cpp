@@ -5,6 +5,7 @@
 #include <map>
 #include <filesystem>
 
+#if _WIN32
 std::vector<std::string> DependencyDlls =
 {
 	"bDependencies/assimp/bin/Release/assimp-vc143-mt.dll",
@@ -13,6 +14,7 @@ std::vector<std::string> DependencyDlls =
 	"aDependencies/SDL_net/Build/Release/SDL2_net.dll",
 	"aCSharpCore/lib/nethost.dll"
 };
+#endif
 
 int main(int argc, char** argv)
 {
@@ -122,12 +124,22 @@ int main(int argc, char** argv)
 		std::filesystem::copy("Tools/ProjectGenerator/ProjectFiles", LaunchArgs["projectPath"],
 			std::filesystem::copy_options::recursive
 			| std::filesystem::copy_options::overwrite_existing);
+#if _WIN32
+		std::filesystem::copy("Tools/ProjectGenerator/WindowsFiles", LaunchArgs["projectPath"],
+			std::filesystem::copy_options::recursive
+			| std::filesystem::copy_options::overwrite_existing);
+#else
+		std::filesystem::copy("Tools/ProjectGenerator/LinuxFiles", LaunchArgs["projectPath"],
+			std::filesystem::copy_options::recursive
+			| std::filesystem::copy_options::overwrite_existing);
+#endif
 #if ENGINE_NO_SOURCE
 		std::filesystem::copy("Tools/ProjectGenerator/ProjectFilesNoSource", LaunchArgs["projectPath"],
 			std::filesystem::copy_options::recursive
 			| std::filesystem::copy_options::overwrite_existing);
 #endif
 
+#if _WIN32
 #if ENGINE_NO_SOURCE
 		if (LaunchArgs["ciBuild"] != "false")
 #endif
@@ -151,6 +163,7 @@ int main(int argc, char** argv)
 				std::cout << (LaunchArgs["projectPath"] + Path) << std::endl;;
 			}
 		}
+#endif
 	}
 
 	std::string CppGUID = VSProj::WriteVCXProj(LaunchArgs["projectPath"] + "/Code", ProjectName, "10.0", "v143", true);
@@ -159,7 +172,7 @@ int main(int argc, char** argv)
 
 	std::vector<SLN::Project> Projects;
 
-#if ENGINE_NO_SOURCE
+#if ENGINE_NO_SOURCE || __linux__
 	if (LaunchArgs["ciBuild"] != "false")
 #endif
 	{
@@ -180,13 +193,13 @@ int main(int argc, char** argv)
 		CSProject.Path = "Scripts";
 		CSProject.GUID = CsGUID;
 		CSProject.Type = "csproj";
-#if !ENGINE_NO_SOURCE
+#if !ENGINE_NO_SOURCE && !__linux__
 		Projects[0].Dependencies.push_back(CsGUID);
 #endif
 		Projects.push_back(CSProject);
 	}
 
-#if !ENGINE_NO_SOURCE
+#if !ENGINE_NO_SOURCE && !__linux__
 	if (LaunchArgs["includeEngine"] == "true")
 	{
 		std::cout << "- Including engine project in solution" << std::endl;

@@ -1,6 +1,7 @@
 #include <set>
 #include <filesystem>
 #include <vector>
+#include <atomic>
 
 #ifdef _WIN32
 #define MAX_PATH_LENGTH 260

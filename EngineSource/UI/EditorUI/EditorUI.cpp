@@ -191,7 +191,7 @@ void EditorUI::LaunchInEditor()
 	for (int i = 0; i < NumLaunchClients; i++)
 	{
 		LaunchCommandLine = CommandLine;
-		new BackgroundTask([](){system((LaunchCommandLine).c_str()});
+		new BackgroundTask([]() {system((LaunchCommandLine).c_str()); });
 	}
 #endif
 	if (LaunchWithServer)

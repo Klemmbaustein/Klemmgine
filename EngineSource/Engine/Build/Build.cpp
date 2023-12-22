@@ -119,7 +119,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 #else
 			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
 #endif
-#ifdef ENGINE_CSHARP && _WIN32
+#if ENGINE_CSHARP && _WIN32
 			if (CSharp::GetUseCSharp())
 			{
 				Log::Print("[Build]: Building C# core...");
