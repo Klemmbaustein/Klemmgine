@@ -158,8 +158,10 @@ namespace CSharp
 		int rc = get_hostfxr_path(buffer, &buffer_size, nullptr);
 #endif
 		if (rc != 0)
+		{
+			Log::Print("Could not get hostfxr path", Log::LogColor::Red);
 			return false;
-
+		}
 		// Load hostfxr and get desired exports
 		hostfxr_lib = load_library(buffer);
 		init_fptr = (hostfxr_initialize_for_runtime_config_fn)get_export(hostfxr_lib, "hostfxr_initialize_for_runtime_config");

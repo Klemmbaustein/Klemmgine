@@ -76,7 +76,6 @@ static Vector2 GetMousePosition()
 
 static std::string ToAppTitle(std::string Name)
 {
-	std::cout << Name << " --- ";
 	std::string ApplicationTitle = Name;
 #if EDITOR
 	ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
