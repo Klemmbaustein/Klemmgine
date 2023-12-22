@@ -2,6 +2,7 @@
 #include <map>
 #include <Engine/OS.h>
 #include <iostream>
+#include <mutex>
 
 namespace Log
 {
@@ -14,9 +15,13 @@ namespace Log
 		std::pair(OS::ConsoleColor::Blue, Log::LogColor::Blue),
 		std::pair(OS::ConsoleColor::Yellow, Log::LogColor::Yellow),
 	};
+
+	std::mutex LogMutex;
 	std::vector<Message> Messages;
+
 	void Print(std::string Text, Vector3 Color)
 	{
+		LogMutex.lock();
 		if (Messages.size() > 0)
 		{
 			if (Messages.at(Messages.size() - 1).Text == Text && Messages.at(Messages.size() - 1).Color == Color)
@@ -32,6 +37,7 @@ namespace Log
 		{
 			Messages.push_back(Message(Text, Color));
 		}
+
 		OS::ConsoleColor NearestColor = OS::ConsoleColor::White;
 		float NearestValue = 15;
 		for (const auto& c : ConsoleColors)
@@ -49,6 +55,7 @@ namespace Log
 		OS::SetConsoleColor(NearestColor);
 		std::cout << Text << std::endl;
 		OS::SetConsoleColor(OS::ConsoleColor::Gray);
+		LogMutex.unlock();
 	}
 
 
@@ -71,5 +78,12 @@ namespace Log
 		{
 			Log::Print(Prefix + CurrentLine, Color);
 		}
+	}
+	std::vector<Message> GetMessages()
+	{
+		LogMutex.lock();
+		auto MessageCopy = Messages;
+		LogMutex.unlock();
+		return MessageCopy;
 	}
 }

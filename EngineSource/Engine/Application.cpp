@@ -801,7 +801,6 @@ static void ApplicationLoop()
 	{
 		DrawFramebuffer(Buffer);
 	}
-
 	Debugging::EngineStatus = "Responding to button events";
 	for (ButtonEvent b : Application::ButtonEvents)
 	{

@@ -77,7 +77,7 @@ UIBox::~UIBox()
 		{
 			if (Parent->Children[i] == this)
 			{
-				Parent->Children.erase(Parent->Children.begin() + i);
+				Parent->Children.erase(Parent->Children.begin() + i--);
 			}
 		}
 	}
@@ -277,7 +277,6 @@ UIBox* UIBox::SetPosition(Vector2 NewPosition)
 	if (NewPosition != Position)
 	{
 		Position = NewPosition;
-		UpdateSelfAndChildren();
 		InvalidateLayout();
 	}
 	return this;

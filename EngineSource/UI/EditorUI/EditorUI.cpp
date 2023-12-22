@@ -34,7 +34,6 @@
 
 int EditorUI::NumLaunchClients = 1;
 
-
 namespace Editor
 {
 	EditorUI* CurrentUI = nullptr;

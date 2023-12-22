@@ -376,7 +376,7 @@ void ContextMenu::UpdateLayout()
 	if (Editor::CurrentUI->UIElements[4] && ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size() > 0)
 	{
 		Properties.clear();
-		WorldObject* SelectedObject = ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0];
+		WorldObject* SelectedObject = ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.at(0);
 		BackgroundBox->AddChild((new UIText(0.5f, UIColors[2], "Object: " + SelectedObject->GetName(), Editor::CurrentUI->EngineUIText))
 			->SetPadding(0.01f));
 		GenerateSection(
@@ -386,7 +386,7 @@ void ContextMenu::UpdateLayout()
 				ContextMenuSection(&SelectedObject->GetTransform().Scale, Type::Vector3, "Scale"),
 				ContextMenuSection(&SelectedObject->Name, Type::String, "Name"),
 			},
-			"Object", ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0], 0);
+			"Object", ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.at(0), 0);
 
 		std::map<std::string, std::vector<ContextMenuSection>> Categories;
 

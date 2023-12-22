@@ -53,6 +53,7 @@ bool DebugUI::ConsoleReadInput(Input::Key KeyCode)
 
 void DebugUI::Tick()
 {
+	auto LogMessages = Log::GetMessages();
 	if (StatsRedrawTimer >= 1)
 	{
 		DebugTexts[0]->SetText("FPS: " + std::to_string(FPS - 1));
@@ -86,13 +87,13 @@ void DebugUI::Tick()
 
 	LogPrompt->IsVisible = LogPrompt->GetIsEdited();
 	LogBackground->IsVisible = LogPrompt->GetIsEdited();
-	if (Log::Messages.size() != LogLength || (!Log::Messages.empty() && LastLogMessageAmount != Log::Messages[Log::Messages.size() - 1].Amount))
+	if (LogMessages.size() != LogLength || (!LogMessages.empty() && LastLogMessageAmount != LogMessages[LogMessages.size() - 1].Amount))
 	{
-		if (!Log::Messages.empty())
+		if (!LogMessages.empty())
 		{
-			LastLogMessageAmount = Log::Messages[Log::Messages.size() - 1].Amount;
+			LastLogMessageAmount = LogMessages[LogMessages.size() - 1].Amount;
 		}
-		LogLength = Log::Messages.size();
+		LogLength = LogMessages.size();
 		GenerateLog();
 	}
 }
@@ -116,21 +117,23 @@ void DebugUI::OnButtonClicked(int Index)
 }
 void DebugUI::GenerateLog()
 {
+	auto LogMessages = Log::GetMessages();
+
 	LogBackground->DeleteChildren();
 
-	if (Log::Messages.empty())
+	if (LogMessages.empty())
 	{
 		return;
 	}
 
-	for (int64_t i = Log::Messages.size() - 1; i >= std::max((int64_t)0, (int64_t)Log::Messages.size() - 23); i--)
+	for (int64_t i = LogMessages.size() - 1; i >= std::max((int64_t)0, (int64_t)LogMessages.size() - 23); i--)
 	{
-		std::string str = Log::Messages[i].Text;
-		if (Log::Messages[i].Amount >= 1)
+		std::string str = LogMessages[i].Text;
+		if (LogMessages[i].Amount >= 1)
 		{
-			str.append(" (x" + std::to_string(Log::Messages[i].Amount + 1) + ")");
+			str.append(" (x" + std::to_string(LogMessages[i].Amount + 1) + ")");
 		}
-		LogBackground->AddChild((new UIText(0.5f, Log::Messages[i].Color, str, Text))->SetPadding(0));
+		LogBackground->AddChild((new UIText(0.5f, LogMessages[i].Color, str, Text))->SetPadding(0));
 	}
 }
 #endif

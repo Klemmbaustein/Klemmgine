@@ -42,14 +42,9 @@ void LogUI::UpdateLayout()
 	UpdateLogBoxSize();
 	if (LogTexts.size())
 	{
-		float TextDifference = LogScrollBox->GetPosition().Y - LogTexts[LogTexts.size() - 1]->GetPosition().Y;
+		float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
 		LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.025f, 0.0f);
 		LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025f, 0.0f));
-
-		for (auto& i : LogTexts)
-		{
-			i->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative);
-		}
 	}
 }
 
@@ -69,25 +64,26 @@ void LogUI::OnButtonClicked(int Index)
 void LogUI::Tick()
 {
 	UpdatePanel();
-	if (Log::Messages.size() != PrevLogLength || (Log::Messages.size() && PrevAmount != Log::Messages[Log::Messages.size() - 1].Amount))
+	auto LogMessages = Log::GetMessages();
+	if (LogMessages.size() != PrevLogLength || (LogMessages.size() && PrevAmount != LogMessages.at(LogMessages.size() - 1).Amount))
 	{
 		TabBackground->UpdateSelfAndChildren();
-		PrevLogLength = Log::Messages.size();
+		PrevLogLength = LogMessages.size();
 		float PrevPos = 0;
-		if (Log::Messages.size())
+		if (LogMessages.size())
 		{
-			PrevAmount = Log::Messages[Log::Messages.size() - 1].Amount;
+			PrevAmount = LogMessages.at(LogMessages.size() - 1).Amount;
 		}
 		LogScrollBox->DeleteChildren();
-		for (size_t i = 0; i < Log::Messages.size(); i++)
+		for (size_t i = 0; i < LogMessages.size(); i++)
 		{
-			std::string Text = Log::Messages[i].Text;
-			if (Log::Messages[i].Amount >= 1)
+			std::string Text = LogMessages.at(i).Text;
+			if (LogMessages.at(i).Amount >= 1)
 			{
-				Text.append(" (x" + std::to_string(Log::Messages[i].Amount + 1) + ")");
+				Text.append(" (x" + std::to_string(LogMessages.at(i).Amount + 1) + ")");
 			}
-			LogTexts.push_back((new UIText(LogTextSize, Log::Messages[i].Color, Text, Editor::CurrentUI->EngineUIText)));
-			LogScrollBox->AddChild(LogTexts[LogTexts.size() - 1]
+			LogTexts.push_back((new UIText(LogTextSize, LogMessages.at(i).Color, Text, Editor::CurrentUI->EngineUIText)));
+			LogScrollBox->AddChild(LogTexts.at(LogTexts.size() - 1)
 				->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(-0.003f));
 		}
@@ -97,7 +93,7 @@ void LogUI::Tick()
 			// Update positions of everything first
 			UIBox::DrawAllUIElements();
 
-			float TextDifference = LogScrollBox->GetPosition().Y - LogTexts[LogTexts.size() - 1]->GetPosition().Y;
+			float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
 			LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.025f, 0.0f);
 			LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025f, 0.0f));
 			UIBox::RedrawUI();

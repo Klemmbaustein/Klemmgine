@@ -21,7 +21,7 @@ void Toolbar::GenerateButtons()
 	for (size_t i = 0; i < Buttons.size(); i++)
 	{
 		bool IsVisible = false;
-		for (auto& btn : Buttons[i].Buttons)
+		for (auto& btn : Buttons.at(i).Buttons)
 		{
 			if (btn.IsVisible)
 			{
@@ -43,7 +43,7 @@ void Toolbar::GenerateButtons()
 		ButtonBackground->SetPadding(0);
 
 		size_t j = 0;
-		for (auto& btn : Buttons[i].Buttons)
+		for (auto& btn : Buttons.at(i).Buttons)
 		{
 			if (!btn.IsVisible)
 			{

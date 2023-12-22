@@ -26,7 +26,9 @@ void UIBackground::ScrollTick(Shader* UsedShader)
 void UIBackground::MakeGLBuffers(bool InvertTextureCoordinates)
 {
 	if(BoxVertexBuffer)
-	delete BoxVertexBuffer;
+	{
+		delete BoxVertexBuffer;
+	}
 	std::vector<Vertex> Vertices;
 	Vertex vertex1;
 	vertex1.Position.x = 0;

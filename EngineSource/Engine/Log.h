@@ -16,7 +16,9 @@ namespace Log
 			this->Text = Text;
 		}
 	};
-	extern std::vector<Message> Messages;
+	
+	std::vector<Message> GetMessages();
+
 	namespace LogColor
 	{
 		const inline Vector3 White = Vector3(1);

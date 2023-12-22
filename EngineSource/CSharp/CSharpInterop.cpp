@@ -143,8 +143,8 @@ namespace CSharp
 		char_t buffer[MAX_PATH];
 		size_t buffer_size = sizeof(buffer) / sizeof(char_t);
 #if RELEASE
-		string_t Path = std::filesystem::current_path().fs_string() + L"/bin";
-		string_t NetPath = Path + L"/NetRuntime";
+		string_t Path = std::filesystem::current_path().fs_string() + STR("/bin");
+		string_t NetPath = Path + STR("/NetRuntime");
 
 		get_hostfxr_parameters parameters = 
 		{
