@@ -108,7 +108,7 @@ void WriteHeaderForObject(std::string TargetFolder, Object Object)
 	OutStream << "#define " << UppercaseName << "_GENERATED(Category) "
 		<< Object.Name << "() : WorldObject(ObjectDescription(\"" << Object.Name << "\", " << std::to_string(ID) << ")) {}\\\n"
 		<< "static std::string GetCategory() { return Category; }\\\n";
-	OutStream << "static uint32_t GetID() { return " << std::to_string(ID) << ";}";
+	OutStream << "static uint32_t GetID() { return " << std::to_string(ID) << ";}\n";
 	WriteToFile(OutStream.str(), TargetFolder + "/" + Object.Name + ".h");
 }
 

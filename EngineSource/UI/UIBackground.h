@@ -11,7 +11,7 @@ class UIBackground : public UIBox
 {
 	VertexBuffer* BoxVertexBuffer = nullptr;
 	Vector3 Color;
-	Shader* BackgroundShader;
+	Shader* BackgroundShader = nullptr;
 	void ScrollTick(Shader* UsedShader);
 	void MakeGLBuffers(bool InvertTextureCoordinates = false);
 	// 0 = none, 1 = texture, 2 texture that should be unloaded with the box

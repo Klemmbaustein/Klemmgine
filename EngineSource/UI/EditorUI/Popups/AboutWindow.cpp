@@ -26,8 +26,8 @@ static std::vector<std::pair<std::string, std::vector<std::pair<std::string, std
 };
 
 AboutWindow::AboutWindow()
-	: EditorPanel(Editor::CurrentUI->UIColors, Position, Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), true, "About")
-{
+	: EditorPanel(Editor::CurrentUI->UIColors, 0, Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), true, "About")
+{	
 	auto* Text = Editor::CurrentUI->EngineUIText;
 
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5);
@@ -50,6 +50,12 @@ AboutWindow::AboutWindow()
 		->SetMinSize(0.3f);
 	TabBackground->AddChild(ContentBox);
 
+#if _WIN32
+	std::string OsString = " for Windows (x64)";
+#else
+	std::string OsString = " for Linux (x64)";
+#endif
+
 	ContentBox->AddChild((new UIBox(true, 0))
 		->SetPadding(0)
 		->AddChild((new UIBackground(true, 0, 1, 0.1f))
@@ -58,7 +64,7 @@ AboutWindow::AboutWindow()
 			->SetSizeMode(UIBox::SizeMode::PixelRelative))
 		->AddChild((new UIBox(false, 0))
 			->SetPadding(0)
-			->AddChild((new UIText(0.5f, UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING), Text))
+			->AddChild((new UIText(0.5f, UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING) + OsString, Text))
 				->SetPadding(0.005f))
 #if ENGINE_CSHARP
 			->AddChild((new UIText(0.4f, UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), Text))
@@ -115,7 +121,6 @@ AboutWindow::AboutWindow()
 
 void AboutWindow::UpdateLayout()
 {
-
 	ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075f));
 }
 

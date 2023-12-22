@@ -29,4 +29,6 @@ EngineRelease
 EditorContent/Config/EditorPrefs.pref
 Build
 ProjectGenerator
-/Tools/bin/BuildTool
+./Tools/bin/BuildTool
+.vscode
+Tools/bin/BuildTool

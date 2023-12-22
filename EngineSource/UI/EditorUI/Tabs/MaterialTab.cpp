@@ -1,5 +1,4 @@
 #if EDITOR
-#pragma once
 #include "MaterialTab.h"
 #include <fstream>
 #include <filesystem>

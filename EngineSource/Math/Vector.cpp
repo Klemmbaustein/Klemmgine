@@ -233,17 +233,17 @@ Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
 	if (Radiants)
-		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0);
+		return Vector3(atan2f(1 - Dir.Y, Dir.Y), atan2f(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0);
 	else
-		return Vector3(atan2(1 - Dir.Y, Dir.Y), atan2(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0).RadiantsToDegrees();
+		return Vector3(atan2f(1 - Dir.Y, Dir.Y), atan2f(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0).RadiantsToDegrees();
 }
 Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
 	if (Radiants)
-		return Vector3(sin(Dir.Y), atan2(Dir.Z, Dir.X), 0);
+		return Vector3(sinf(Dir.Y), atan2f(Dir.Z, Dir.X), 0);
 	else
-		return Vector3(sin(Dir.Y), atan2(Dir.Z, Dir.X), 0).RadiantsToDegrees();
+		return Vector3(sinf(Dir.Y), atan2f(Dir.Z, Dir.X), 0).RadiantsToDegrees();
 }
 
 Vector3 Vector3::QuatToEuler(glm::quat quat)
@@ -321,17 +321,17 @@ Vector3 Vector3::GetScaledAxis(Vector3 Rot, unsigned int Dir)
 	float z = -Rot.Z;
 	Axes matX = {
 	  {1,     0,     0 },
-	  {0, cos(x),sin(x)},
-	  {0,-sin(x),cos(x)}
+	  {0, cosf(x),sinf(x)},
+	  {0,-sinf(x),cosf(x)}
 	};
 	Axes matY = {
-	  {cos(y),0,-sin(y)},
+	  {cosf(y),0,-sinf(y)},
 	  {     0,1,      0},
-	  {sin(y),0, cos(y)}
+	  {sinf(y),0, cosf(y)}
 	};
 	Axes matZ = {
-	  { cos(z),sin(z),0},
-	  {-sin(z),cos(z),0},
+	  { cosf(z),sinf(z),0},
+	  {-sinf(z),cosf(z),0},
 	  {      0,     0,1}
 	};
 	Axes axes = {

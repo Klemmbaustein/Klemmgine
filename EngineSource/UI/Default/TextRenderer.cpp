@@ -103,7 +103,7 @@ size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, fl
 {
 	float originalScale = Scale;
 	Scale *= 2.5f;
-	std::wstring TextString = OS::Utf8ToWstring(TextSegment::CombineToString(Text));
+	std::wstring TextString = GetUnicodeString(TextSegment::CombineToString(Text));
 	TextString.append(L" ");
 	float MaxHeight = 0.0f;
 	float x = 0.f, y = 0.f;
@@ -150,7 +150,12 @@ TextRenderer::TextRenderer(std::string filename)
 	Filename = "Fonts/" + filename;
 #endif
 
-	fread(ttfBuffer, 1, 1 << 20, fopen(Filename.c_str(), "rb"));
+	size_t ret = fread(ttfBuffer, 1, 1 << 20, fopen(Filename.c_str(), "rb"));
+	if (!ret)
+	{
+		Log::Print("Failed to loat font: " + filename);
+		return;
+	}
 	stbtt_fontinfo finf;
 	stbtt_InitFont(&finf, ttfBuffer, stbtt_GetFontOffsetForIndex(ttfBuffer, 0));
 

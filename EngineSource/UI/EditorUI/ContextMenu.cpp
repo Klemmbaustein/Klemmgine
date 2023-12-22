@@ -37,10 +37,11 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 
 	std::string Prefix = ContextObject ? "OBJ_CAT_" : "SCN_";
 
-	auto SeperatorArrow = new UIBackground(true, Vector2(0), 0, Vector2(1, Graphics::AspectRatio) / 45);
+	auto SeperatorArrow = new UIBackground(true, Vector2(0), 0, 0.035);
 	SeperatorArrow->SetPadding(0, 0, 0.01f, 0);
 	SeperatorArrow->SetUseTexture(true,
-		Editor::CurrentUI->CollapsedItems.contains(Prefix + Name) ? Editor::CurrentUI->Textures[14] : Editor::CurrentUI->Textures[13]);
+		Editor::CurrentUI->CollapsedItems.contains(Prefix + Name) ? Editor::CurrentUI->Textures[14] : Editor::CurrentUI->Textures[13])
+		->SetSizeMode(UIBox::SizeMode::PixelRelative);
 	SeperatorBorder->AddChild(SeperatorArrow);
 
 	auto SeperatorText = new UIText(0.45f, 0, Name, Editor::CurrentUI->EngineUIText);
@@ -210,7 +211,7 @@ void ContextMenu::Tick()
 
 void ContextMenu::OnButtonClicked(int Index)
 {
-
+	Log::Print(Vector3::GetForwardVector(Graphics::WorldSun.Rotation).ToString());
 	if (Index >= 0)
 	{
 		std::string Name = ContextCategories.at(Index);

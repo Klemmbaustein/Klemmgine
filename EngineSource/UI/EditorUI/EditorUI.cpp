@@ -122,7 +122,7 @@ void EditorUI::LaunchInEditor()
 	std::string ProjectName = Build::GetProjectBuildName();
 	try
 	{
-#if !ENGINE_NO_SOURCE
+#if !ENGINE_NO_SOURCE && !__linux__
 		if (!std::filesystem::exists("bin/" + ProjectName + "-Debug.exe")
 			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Debug.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
 		{
@@ -186,25 +186,25 @@ void EditorUI::LaunchInEditor()
 			Command.append(" && ");
 		}
 	}
-	system(Command.c_str());
+	int ret = system(Command.c_str());
 #else
 	for (int i = 0; i < NumLaunchClients; i++)
 	{
 		LaunchCommandLine = CommandLine;
-		new BackgroundTask([]() {system((LaunchCommandLine).c_str()); });
+		new BackgroundTask([]() { system((LaunchCommandLine).c_str()); });
 	}
 #endif
 	if (LaunchWithServer)
 	{
 #if _WIN32
-		system(("start bin\\"
+		ret = system(("start bin\\"
 			+ ProjectName
 			+ "-Server.exe -nostartupinfo -quitondisconnect -editorPath "
 			+ Application::GetEditorPath()
 			+ " "
 			+ Args).c_str());
 #else
-		system(("bash ./bin/"
+		int ret = system(("bash ./bin/"
 		 + ProjectName 
 		 + "-Server -nostartupinfo -quitondisconnect -editorPath "
 		 + Application::GetEditorPath()
