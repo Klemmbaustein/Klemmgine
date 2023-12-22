@@ -27,7 +27,7 @@
 #if MSVC_WINDOWS
       "preBuildCommand": "..\\..\\Tools\\bin\\BuildTool.exe in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes",
 #else
-      "preBuildCommand": "../../Tools/bin/BuildTool.exe in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes",
+      "preBuildCommand": "../../Tools/bin/BuildTool in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes",
 #endif
 
       "outputPath": "bin",
