@@ -1,5 +1,4 @@
 #ifdef EDITOR
-#pragma once
 #include "MeshTab.h"
 #include <fstream>
 #include <Engine/Utility/FileUtility.h>

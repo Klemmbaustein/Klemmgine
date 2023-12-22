@@ -19,6 +19,7 @@
 #include <atomic>
 #include <thread>
 #include <Engine/Log.h>
+#include <Engine/BackgroundTask.h>
 #include <Engine/Input.h>
 #include <UI/EditorUI/Popups/DialogBox.h>
 #include <Engine/Console.h>
@@ -115,7 +116,7 @@ bool ChangedScene = false;
 
 std::string EditorUI::LaunchInEditorArgs;
 bool EditorUI::LaunchWithServer = false;
-
+static std::string LaunchCommandLine;
 void EditorUI::LaunchInEditor()
 {
 	std::string ProjectName = Build::GetProjectBuildName();
@@ -160,14 +161,14 @@ void EditorUI::LaunchInEditor()
 		Args.append(" -scene " + FileUtil::GetFileNameFromPath(Scene::CurrentScene));
 	}
 
-#if ENGINE_NO_SOURCE
+#if ENGINE_NO_SOURCE || __linux__
 	ProjectName = "Klemmgine";
 #endif
 #if _WIN32
 
-	std::string CommandLine = "bin\\" + ProjectName + "-Debug.exe -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
+	std::string CommandLine = "bash bin\\" + ProjectName + "-Debug.exe -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
 #else
-	std::string CommandLine = "./" + ProjectName + "-Debug -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args + " &";
+	std::string CommandLine = "./bin/" + ProjectName + "-Debug -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
 #endif
 	if (LaunchWithServer)
 	{
@@ -189,7 +190,8 @@ void EditorUI::LaunchInEditor()
 #else
 	for (int i = 0; i < NumLaunchClients; i++)
 	{
-		system(CommandLine.c_str());
+		LaunchCommandLine = CommandLine;
+		new BackgroundTask([](){system((LaunchCommandLine).c_str()});
 	}
 #endif
 	if (LaunchWithServer)
@@ -202,7 +204,12 @@ void EditorUI::LaunchInEditor()
 			+ " "
 			+ Args).c_str());
 #else
-		system(("./" + ProjectName + "-Server.exe -nostartupinfo -quitondisconnect " + Args + " &").c_str());
+		system(("bash ./bin/"
+		 + ProjectName 
+		 + "-Server -nostartupinfo -quitondisconnect -editorPath "
+		 + Application::GetEditorPath()
+		 + " "
+		 + Args).c_str());
 #endif
 	}
 }

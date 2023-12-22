@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <Engine/Utility/FileUtility.h>
+#include <Engine/Application.h>
 
 #if EDITOR
 #include <Engine/Stats.h>
@@ -42,7 +43,6 @@ namespace Build
 
 #define NOMINMAX
 #include <Windows.h>
-#include <Engine/Application.h>
 
 LONG GetStringRegKey(HKEY hKey, const std::wstring& strValueName, std::wstring& strValue, const std::wstring& strDefaultValue)
 {
@@ -119,8 +119,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 #else
 			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
 #endif
-#ifdef ENGINE_CSHARP
-
+#ifdef ENGINE_CSHARP && _WIN32
 			if (CSharp::GetUseCSharp())
 			{
 				Log::Print("[Build]: Building C# core...");
@@ -199,8 +198,12 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 }
 int Build::BuildCurrentSolution(std::string Configuration)
 {
+#if _WIN32
 	std::string VSLocation = GetVSLocation();
-	std::string MSBuildPath = VSLocation + "\\MSBuild\\Current\\Bin\\msbuild.exe";
+	std::string MSBuildPath = "\"" + VSLocation + "\\MSBuild\\Current\\Bin\\msbuild.exe\"";
+#else
+	std::string MSBuildPath = "dotnet msbuild";
+#endif
 	std::string SolutionName;
 	for (auto& i : std::filesystem::directory_iterator("."))
 	{
@@ -219,7 +222,7 @@ int Build::BuildCurrentSolution(std::string Configuration)
 
 	std::filesystem::create_directories("Build\\");
 
-	std::string Command = ("\"" + MSBuildPath + "\" " + SolutionName + ".sln /p:Platform=x64 /p:Configuration=" + Configuration);
+	std::string Command = (MSBuildPath + " " + SolutionName + ".sln /p:Platform=x64 /p:Configuration=" + Configuration);
 
 	std::cout << Command << std::endl;
 

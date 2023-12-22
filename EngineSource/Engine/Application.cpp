@@ -54,6 +54,7 @@
 #include <thread>
 #include <deque>
 #include <mutex>
+#include <chrono>
 #include <condition_variable>
 
 #if _WIN32
@@ -77,10 +78,9 @@ static std::string ToAppTitle(std::string Name)
 {
 	std::cout << Name << " --- ";
 	std::string ApplicationTitle = Name;
-	if (IsInEditor)
-	{
-		ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
-	}
+#if EDITOR
+	ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
+#endif
 #if ENGINE_CSHARP && !RELEASE
 	if (CSharp::GetUseCSharp())
 	{
@@ -311,7 +311,6 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 		p->Update(Buffer->FramebufferCamera);
 	}
 	Debugging::EngineStatus = "Rendering (Framebuffer: Shadows)";
-
 	FrustumCulling::Active = false;
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
@@ -918,7 +917,6 @@ int Application::Initialize(int argc, char** argv)
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
 	Graphics::WindowResolution = Vector2((float)DM.w, (float)DM.h) / 1.5f;
-	std::cout << "- Creating Window - ";
 	Application::Window = SDL_CreateWindow(ToAppTitle(Project::ProjectName).c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		(int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y,
@@ -926,8 +924,6 @@ int Application::Initialize(int argc, char** argv)
 
 	SDL_GL_CreateContext(Application::Window);
 	SDL_SetWindowResizable(Application::Window, SDL_TRUE);
-	std::cout << " Window created (No error)" << std::endl;
-
 
 	std::cout << "- Starting GLEW - ";
 	if (glewInit() != GLEW_OK)
@@ -941,9 +937,9 @@ int Application::Initialize(int argc, char** argv)
 	if (!glewIsSupported(OPENGL_MIN_REQUIRED_VERSION))
 	{
 		SDL_DestroyWindow(Application::Window);
-		std::cout << std::string("OpenGL version ")
-			+ std::string((const char*)glGetString(GL_VERSION))
-			+ std::string(" is not supported. Minimum: ") + OPENGL_MIN_REQUIRED_VERSION << std::endl;
+		std::cout << std::string("OpenGL version ");
+		std::cout << (const char*)glGetString(GL_VERSION);
+		std::cout << std::string(" is not supported. Minimum: ") + OPENGL_MIN_REQUIRED_VERSION << std::endl;
 		std::cout << "Press enter to continue";
 		std::cin.get();
 		std::cout << std::endl;

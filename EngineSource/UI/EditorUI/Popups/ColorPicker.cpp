@@ -233,6 +233,7 @@ void ColorPicker::OnButtonClicked(int Index)
 		delete this;
 		return;
 	case 2:
+	{
 		for (size_t i = 0; i < 3; i++)
 		{
 			try
@@ -245,6 +246,7 @@ void ColorPicker::OnButtonClicked(int Index)
 		SelectedHue = c.h / 255.f;
 		SV = Vector2(c.s / 255.f, c.v / 255.f);
 		UpdateColors();
+	}
 		return;
 	default:
 		return;

@@ -231,7 +231,7 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 		std::string Instruction;
 		CurrentLine >> Instruction;
 #if !RELEASE
-		if (!CurrentLine.eof())
+		if (!CurrentLine.eof() && 0)
 		{
 			Log::Print("--------------------------------------------------------------------------------", Log::LogColor::Red);
 			Log::Print("ShaderParseError: Unexpected arguments after '" + Instruction + "'", Log::LogColor::Red);

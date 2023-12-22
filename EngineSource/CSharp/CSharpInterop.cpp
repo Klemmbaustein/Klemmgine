@@ -89,7 +89,7 @@ using string_t = std::basic_string<char_t>;
 
 
 namespace CSharp
-{
+{	
 	// Globals to hold hostfxr exports
 	hostfxr_initialize_for_runtime_config_fn init_fptr;
 	hostfxr_get_runtime_delegate_fn get_delegate_fptr;
@@ -235,7 +235,6 @@ static void CSharpInternalPrint(const char* Msg, int Severity)
 
 void CSharp::Init()
 {
-	std::cout << "LOADING C# RUNTIME" << std::endl;
 	if (!GetUseCSharp())
 	{
 		return;

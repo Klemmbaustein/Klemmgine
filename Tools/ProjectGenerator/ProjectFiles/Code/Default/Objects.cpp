@@ -5,7 +5,7 @@
 // This file needs to be compiled per project since the objects are different for each project.
 
 template<typename T>
-inline T* Objects::SpawnObject(Transform ObjectTransform, uint64_t NetID)
+T* Objects::SpawnObject(Transform ObjectTransform, uint64_t NetID)
 {
 	T* NewObject = new T();
 	return dynamic_cast<T*>(NewObject->Start(NewObject->GetObjectDescription().Name, ObjectTransform, NetID));
