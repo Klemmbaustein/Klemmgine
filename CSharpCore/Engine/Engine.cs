@@ -66,7 +66,7 @@ static class Engine
 
 		LoadedAsm = Assembly.Load(File.ReadAllBytes(Path));
 
-		LoadTypeFromAssembly("Engine.Log.Log")!.GetMethod("LoadLogFunction")!.Invoke(null, new object[] { new Action<string, int>(EngineLog.Print) });
+		LoadTypeFromAssembly("Engine.Log")!.GetMethod("LoadLogFunction")!.Invoke(null, [new Action<string, int>(EngineLog.Print)]);
 
 
 		var WorldObjectType = LoadTypeFromAssembly("WorldObject");

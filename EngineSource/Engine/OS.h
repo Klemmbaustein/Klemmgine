@@ -29,7 +29,6 @@ namespace OS
 	void SetConsoleWindowVisible(bool Visible);
 	std::string ShowOpenFileDialog();
 	std::string GetOSString();
-	void ClearConsoleWindow();
 	void SetConsoleColor(ConsoleColor NewColor);
 	void OpenFile(std::string Path);
 }

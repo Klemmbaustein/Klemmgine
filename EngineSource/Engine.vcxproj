@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\BackgroundTask.cpp" />
+    <ClCompile Include="Engine\Gamepad.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\AboutWindow.cpp" />
     <ClCompile Include="CSharp\CSharpInterop.cpp" />
     <ClCompile Include="CSharp\NativeFunctions.cpp" />
@@ -102,7 +103,6 @@
     <ClCompile Include="UI\EditorUI\EditorUI.cpp" />
     <ClCompile Include="UI\EditorUI\ItemBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\LogUI.cpp" />
-    <ClCompile Include="UI\EditorUI\MaterialFunctions.cpp" />
     <ClCompile Include="UI\EditorUI\ObjectList.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\BakeMenu.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\ClassCreator.cpp" />
@@ -129,6 +129,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\BackgroundTask.h" />
+    <ClInclude Include="Engine\Gamepad.h" />
     <ClInclude Include="UI\EditorUI\Popups\AboutWindow.h" />
     <ClInclude Include="CSharp\CSharpInterop.h" />
     <ClInclude Include="CSharp\NativeFunctions.h" />
@@ -216,7 +217,6 @@
     <ClInclude Include="UI\EditorUI\EditorUI.h" />
     <ClInclude Include="UI\EditorUI\ItemBrowser.h" />
     <ClInclude Include="UI\EditorUI\LogUI.h" />
-    <ClInclude Include="UI\EditorUI\MaterialFunctions.h" />
     <ClInclude Include="UI\EditorUI\ObjectList.h" />
     <ClInclude Include="UI\EditorUI\Popups\BakeMenu.h" />
     <ClInclude Include="UI\EditorUI\Popups\ClassCreator.h" />

@@ -4,6 +4,13 @@
 #include <Math/Vector.h>
 #include <Engine/EngineError.h>
 
+#if defined(_WIN32)
+#define NET_CALLTYPE __stdcall
+#else
+#define NET_CALLTYPE
+#endif
+
+
 class WorldObject;
 
 namespace CSharp
@@ -14,7 +21,6 @@ namespace CSharp
 	};
 
 	void LoadRuntime();
-	void UnloadRuntime();
 
 	void LoadAssembly();
 	CSharpWorldObject InstantiateObject(std::string Typename, Transform t, WorldObject* NativeObject);
@@ -64,7 +70,7 @@ namespace CSharp
 	T StaticCall(void* Function, Args... argument)
 	{
 		ENGINE_ASSERT(Function, "Function cannot be null");
-		typedef T(__stdcall* f)(Args...);
+		typedef T(NET_CALLTYPE*f)(Args...);
 		f fPtr = (f)Function;
 		return fPtr(argument...);
 	}

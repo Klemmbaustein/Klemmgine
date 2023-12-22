@@ -254,7 +254,7 @@ namespace CSM
 			maxZ *= zMult;
 		}
 
-		float zoom = 2;
+		float zoom = 1.75;
 
 		const glm::mat4 lightProjection = glm::ortho(minX / zoom, maxX / zoom, minY / zoom, maxY / zoom, minZ / zoom, maxZ / zoom);
 

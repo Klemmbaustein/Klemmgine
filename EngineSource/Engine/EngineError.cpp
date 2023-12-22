@@ -1,11 +1,13 @@
 #include "EngineError.h"
 #include <Engine/Log.h>
-#include <stacktrace>
 #include <iostream>
 #include <csignal>
 #include <Engine/OS.h>
 #include <Engine/Stats.h>
 
+#if __cpp_lib_stacktrace >= 202011L
+#include <stacktrace>
+#endif
 static void HandleSigSegV(int SignalID)
 {
 	Error::AssertFailure("Access violation", "Status: " + Debugging::EngineStatus);

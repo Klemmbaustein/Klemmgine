@@ -21,7 +21,7 @@ class Component;
 #define REGISTER_EVENT(InFunction, InType) do {\
 NetEvent e;\
 e.Name = # InFunction;\
-e.Function = static_cast<NetEvent::NetEventFunction>(& ## InFunction);\
+e.Function = static_cast<NetEvent::NetEventFunction>(& InFunction);\
 e.Parent = this;\
 e.Type = InType;\
 this->NetEvents.push_back(e);\

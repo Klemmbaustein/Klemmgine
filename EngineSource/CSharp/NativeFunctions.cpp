@@ -20,7 +20,21 @@
 #include <UI/UIBox.h>
 #include <UI/UIBackground.h>
 #include <UI/UIText.h>
+#include <Engine/Gamepad.h>
 #include <Engine/Application.h>
+#include <cstring>
+
+#if _WIN32
+#define strdup(...) _strdup(__VA_ARGS__)
+#endif
+
+#if SERVER
+class UIBox;
+class UIBackground;
+class UIButton;
+class UIText;
+class TextRenderer;
+#endif
 
 namespace NativeFunctions
 {
@@ -163,10 +177,9 @@ namespace NativeFunctions
 		TargetObject->SetTransform(NewTransform);
 	}
 
-#if !SERVER
 	static UIBox* CreateUIBox(bool Horizontal, Vector2 Position)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		return new UIBox(Horizontal, Position);
 #endif
 		return nullptr;
@@ -174,77 +187,77 @@ namespace NativeFunctions
 
 	static void DestroyUIBox(UIBox* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		delete Target;
 #endif
 	}
 
 	static void SetUIBoxMinSize(Vector2 NewMinSize, UIBox* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->SetMinSize(NewMinSize);
 #endif
 	}
 
 	static void SetUIBoxMaxSize(Vector2 NewMaxSize, UIBox* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->SetMaxSize(NewMaxSize);
 #endif
 	}
 
 	static void SetUIBoxPosition(Vector2 Position, UIBox* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->SetPosition(Position);
 #endif
 	}
 
-	static void SetUIBoxVerticalAlign(UIBox::Align NewAlign, UIBox* Target)
+	static void SetUIBoxVerticalAlign(int NewAlign, UIBox* Target)
 	{
-#if !EDITOR
-		Target->SetVerticalAlign(NewAlign);
+#if !EDITOR && !SERVER
+		Target->SetVerticalAlign((UIBox::Align)NewAlign);
 #endif
 	}
 
-	static void SetUIBoxHorizontalAlign(UIBox::Align NewAlign, UIBox* Target)
+	static void SetUIBoxHorizontalAlign(int NewAlign, UIBox* Target)
 	{
-#if !EDITOR
-		Target->SetHorizontalAlign(NewAlign);
+#if !EDITOR && !SERVER
+		Target->SetHorizontalAlign((UIBox::Align)NewAlign);
 #endif
 	}
 
-	static void SetUIBoxSizeMode(UIBox::SizeMode Mode, UIBox* Target)
+	static void SetUIBoxSizeMode(int Mode, UIBox* Target)
 	{
-#if !EDITOR
-		Target->SetSizeMode(Mode);
+#if !EDITOR && !SERVER
+		Target->SetSizeMode((UIBox::SizeMode)Mode);
 #endif
 	}
 
-	static void SetUIBoxBorder(UIBox::BorderType NewBorder, float Size, UIBox* Target)
+	static void SetUIBoxBorder(int NewBorder, float Size, UIBox* Target)
 	{
-#if !EDITOR
-		Target->SetBorder(NewBorder, Size);
+#if !EDITOR && !SERVER
+		Target->SetBorder((UIBox::BorderType)NewBorder, Size);
 #endif
 	}
 
 	static void SetUIBoxPadding(float Up, float Down, float Left, float Right, UIBox* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->SetPadding(Up, Down, Left, Right);
 #endif
 	}
 
-	static void SetUIBoxPaddingSizeMode(UIBox::SizeMode Mode, UIBox* Target)
+	static void SetUIBoxPaddingSizeMode(int Mode, UIBox* Target)
 	{
-#if !EDITOR
-		Target->SetPaddingSizeMode(Mode);
+#if !EDITOR && !SERVER
+		Target->SetPaddingSizeMode((UIBox::SizeMode)Mode);
 #endif
 	}
 
 	static Vector3 GetUIBoxSize(UIBox* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		return Vector3(Target->GetUsedSize(), 0);
 #endif
 		return 0;
@@ -252,7 +265,7 @@ namespace NativeFunctions
 
 	static Vector3 GetUIBoxPosition(UIBox* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		return Vector3(Target->GetPosition(), 0);
 #endif
 		return 0;
@@ -260,7 +273,7 @@ namespace NativeFunctions
 
 	static void AddUIBoxChild(UIBox* Child, UIBox* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->AddChild(Child);
 #endif
 	}
@@ -268,22 +281,22 @@ namespace NativeFunctions
 
 	static UIBackground* CreateUIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale)
 	{
-#if EDITOR
-		return nullptr;
-#endif
+#if !EDITOR && !SERVER
 		return (UIBackground*)(new UIBackground(Horizontal, Position, Color, MinScale))->SetTryFill(true);
+#endif
+		return nullptr;
 	}
 
 	static void SetUIBackgroundColor(UIBackground* Target, Vector3 Color)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->SetColor(Color);
 #endif
 	}
 
 	static Vector3 GetUIBackgroundColor(UIBackground* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		return Target->GetColor();
 #endif
 		return 0;
@@ -291,7 +304,7 @@ namespace NativeFunctions
 
 	static void SetUIBackgroundTexture(UIBackground* Target, const char* Texture)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->SetUseTexture(true, Texture);
 #endif
 		return;
@@ -299,44 +312,63 @@ namespace NativeFunctions
 
 	static TextRenderer* CreateTextRenderer(const char* Font)
 	{
-#if EDITOR
-		return nullptr;
-#endif
+#if !EDITOR && !SERVER
 		return new TextRenderer(Font);
-	}
+#endif
+		return nullptr;
+}
 
 	static UIText* CreateUIText(float Scale, Vector3 Color, const char* Text, TextRenderer* Renderer)
 	{
-#if EDITOR
-		return nullptr;
-#endif
+#if !EDITOR && !SERVER
 		return new UIText(Scale, Color, Text, Renderer);
+#endif
+		return nullptr;
 	}
 
 	static void SetUITextText(const char* Text, UIText* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->SetText(Text);
 #endif
 	}
 
 	static void SetUITextColor(Vector3 Color, UIText* Target)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Target->SetColor(Color);
 #endif
 	}
 
 	static void SetCursorVisible(bool NewVisible)
 	{
-#if !EDITOR
+#if !EDITOR && !SERVER
 		Input::CursorVisible = NewVisible;
 #endif
 	}
-#endif
+
+	static int32_t GetNumGamepads()
+	{
+		return (int32_t)Input::Gamepads.size();
+	}
+
+	static Input::Gamepad GetGamepadIndex(int32_t Index)
+	{
+		int32_t it = 0;
+		for (const auto& i : Input::Gamepads)
+		{
+			if (Index == it++)
+			{
+				Input::Gamepad g;
+				g.DeviceName = strdup(i.second.DeviceName);
+				return g;
+			}
+		}
+		return Input::Gamepad();
+	}
 }
 
-#define REGISTER_FUNCTION(func) CSharp::RegisterNativeFunction(# func, func)
+#define REGISTER_FUNCTION(func) CSharp::RegisterNativeFunction(# func, (void*)func)
 
 void NativeFunctions::RegisterNativeFunctions()
 {
@@ -379,7 +411,6 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(Vector3::GetScaledAxis);
 	REGISTER_FUNCTION(PrintStackTrace);
 
-#if !SERVER
 	REGISTER_FUNCTION(SetCursorVisible);
 
 	REGISTER_FUNCTION(CreateUIBox);
@@ -406,8 +437,9 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(CreateTextRenderer);
 	REGISTER_FUNCTION(SetUITextColor);
 	REGISTER_FUNCTION(SetUITextText);
-#endif
 
+	REGISTER_FUNCTION(GetNumGamepads);
+	REGISTER_FUNCTION(GetGamepadIndex);
 }
 
 #endif

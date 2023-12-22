@@ -10,6 +10,7 @@
 #include <Engine/EngineError.h>
 #include <Engine/File/Assets.h>
 #include <Engine/Stats.h>
+#include <Engine/Gamepad.h>
 #include <Engine/BackgroundTask.h>
 
 #include <Sound/Sound.h>
@@ -53,6 +54,7 @@
 #include <thread>
 #include <deque>
 #include <mutex>
+#include <condition_variable>
 
 #if _WIN32
 #define NOMINMAX
@@ -73,6 +75,7 @@ static Vector2 GetMousePosition()
 
 static std::string ToAppTitle(std::string Name)
 {
+	std::cout << Name << " --- ";
 	std::string ApplicationTitle = Name;
 	if (IsInEditor)
 	{
@@ -89,6 +92,7 @@ static std::string ToAppTitle(std::string Name)
 	{
 		ApplicationTitle.append(" (Debug)");
 	}
+	std::cout << ApplicationTitle << std::endl;
 	return ApplicationTitle;
 }
 
@@ -440,6 +444,7 @@ namespace ConsoleInput
 static void PollInput()
 {
 #if !SERVER
+	Debugging::EngineStatus = "Reading Input";
 	Input::MouseMovement = Vector2();
 	SDL_Event Event;
 	while (SDL_PollEvent(&Event))
@@ -452,9 +457,20 @@ static void PollInput()
 			Application::Quit();
 #endif
 		}
+		else if (Event.type == SDL_JOYBUTTONDOWN
+			|| Event.type == SDL_JOYBUTTONUP
+			|| Event.type == SDL_JOYAXISMOTION
+			|| Event.type == SDL_JOYHATMOTION) 
+		{
+			Input::HandleGamepadEvent(&Event);
+		}
 		else if (Event.type == SDL_MOUSEMOTION)
 		{
 			Input::MouseMovement += Vector2(Event.motion.xrel / 12.f, -Event.motion.yrel / 12.f);
+		}
+		else if (Event.type == SDL_JOYDEVICEADDED)
+		{
+			Input::AddGamepad(Event.jdevice.which);
 		}
 		else if (Event.type == SDL_KEYDOWN)
 		{
@@ -752,6 +768,7 @@ static void ApplicationLoop()
 	const Application::Timer FrameTimer;
 	const Application::Timer LogicTimer;
 #if !SERVER
+	Input::GamepadUpdate();
 	PollInput();
 	CameraShake::Tick();
 	Sound::Update();
@@ -875,7 +892,7 @@ int Application::Initialize(int argc, char** argv)
 
 	std::cout << "Starting..." << std::endl;
 	std::cout << "- Starting SDL2 - ";
-	int SDLReturnValue = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
+	int SDLReturnValue = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK);
 	Application::Timer StartupTimer;
 	if (SDLReturnValue != 0)
 	{
@@ -901,7 +918,7 @@ int Application::Initialize(int argc, char** argv)
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
 	Graphics::WindowResolution = Vector2((float)DM.w, (float)DM.h) / 1.5f;
-
+	std::cout << "- Creating Window - ";
 	Application::Window = SDL_CreateWindow(ToAppTitle(Project::ProjectName).c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		(int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y,
@@ -909,7 +926,8 @@ int Application::Initialize(int argc, char** argv)
 
 	SDL_GL_CreateContext(Application::Window);
 	SDL_SetWindowResizable(Application::Window, SDL_TRUE);
-	
+	std::cout << " Window created (No error)" << std::endl;
+
 
 	std::cout << "- Starting GLEW - ";
 	if (glewInit() != GLEW_OK)
@@ -934,7 +952,7 @@ int Application::Initialize(int argc, char** argv)
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
 
-	std::cout << "GLEW started (No error)\n";
+	std::cout << "GLEW started (No error)" << std::endl;
 
 #endif
 	Console::InitializeConsole();

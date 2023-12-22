@@ -12,6 +12,7 @@
 #include <Engine/Scene.h>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 
 const int Packet::MAX_PACKET_SIZE = 512;
 uint64_t Packet::PacketID = 0;

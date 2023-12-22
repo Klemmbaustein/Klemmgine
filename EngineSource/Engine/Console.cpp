@@ -13,6 +13,7 @@
 #include <filesystem>
 #include <Engine/Application.h>
 #include <CSharp/CSharpInterop.h>
+#include <cstring>
 
 #include <Rendering/Graphics.h>
 #include <Engine/Stats.h>

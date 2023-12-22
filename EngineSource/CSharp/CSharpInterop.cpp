@@ -47,6 +47,11 @@
 
 #endif
 
+#if _WIN32
+#define fs_string() wstring()
+#else
+#define fs_string() string()
+#endif
 static_assert(sizeof(Vector3) == sizeof(float) * 3);
 static_assert(sizeof(Transform) == sizeof(Vector3) * 3);
 
@@ -84,7 +89,7 @@ using string_t = std::basic_string<char_t>;
 
 
 namespace CSharp
-{	
+{
 	// Globals to hold hostfxr exports
 	hostfxr_initialize_for_runtime_config_fn init_fptr;
 	hostfxr_get_runtime_delegate_fn get_delegate_fptr;
@@ -110,11 +115,6 @@ namespace CSharp
 		void* f = ::GetProcAddress((HMODULE)h, name);
 		ENGINE_ASSERT(f != nullptr, "Could not export library: " + std::string(name));
 		return f;
-	}
-
-	static void UnloadLibrary(void* Library)
-	{
-		::FreeLibrary((HMODULE)Library);
 	}
 #else
 	void* load_library(const char_t* path)
@@ -143,8 +143,8 @@ namespace CSharp
 		char_t buffer[MAX_PATH];
 		size_t buffer_size = sizeof(buffer) / sizeof(char_t);
 #if RELEASE
-		std::wstring Path = std::filesystem::current_path().wstring() + L"/bin";
-		std::wstring NetPath = Path + L"/NetRuntime";
+		string_t Path = std::filesystem::current_path().fs_string() + L"/bin";
+		string_t NetPath = Path + L"/NetRuntime";
 
 		get_hostfxr_parameters parameters = 
 		{
@@ -235,6 +235,7 @@ static void CSharpInternalPrint(const char* Msg, int Severity)
 
 void CSharp::Init()
 {
+	std::cout << "LOADING C# RUNTIME" << std::endl;
 	if (!GetUseCSharp())
 	{
 		return;
@@ -254,7 +255,7 @@ void CSharp::Init()
 	CSharp::LoadRuntime();
 	void* LogRegister = CSharp::LoadCSharpFunction("LoadLogFunction", "EngineLog", "LoadFunctionDelegate");
 
-	CSharp::StaticCall<void, void*>(LogRegister, CSharpInternalPrint);
+	CSharp::StaticCall<void, void*>(LogRegister, (void*)CSharpInternalPrint);
 
 	ExecuteOnObjectFunction = CSharp::LoadCSharpFunction("ExecuteFunctionOnObject", "Engine", "ExecuteOnDelegate");
 	InstantiateFunction = CSharp::LoadCSharpFunction("Instantiate", "Engine", "InstantiateDelegate");
@@ -311,7 +312,6 @@ bool CSharp::GetUseCSharp()
 		return UseCSharp;
 	}
 }
-
 bool CSharp::IsAssemblyLoaded()
 {
 	return hostfxr_lib;
@@ -368,7 +368,7 @@ void CSharp::LoadRuntime()
 		return;
 	}
 	CSharpLog("Loading .net runtime...", CS_Log_Runtime);
-	string_t root_path = std::filesystem::current_path().wstring();
+	string_t root_path = std::filesystem::current_path().fs_string();
 	auto pos = root_path.find_last_of(DIR_SEPARATOR);
 	ENGINE_ASSERT(pos != string_t::npos, "Root path isn't valid");
 
@@ -377,7 +377,11 @@ void CSharp::LoadRuntime()
 	if (Application::GetEditorPath() != std::filesystem::current_path().string())
 	{
 #if !RELEASE
+#if _WIN32
 		root_path = OS::Utf8ToWstring(Application::GetEditorPath());
+#else
+		root_path = Application::GetEditorPath();
+#endif
 #endif
 	}
 
@@ -394,15 +398,6 @@ void CSharp::LoadRuntime()
 	}
 }
 
-void CSharp::UnloadRuntime()
-{
-	if (!GetUseCSharp())
-	{
-		return;
-	}
-	UnloadLibrary(hostfxr_lib);
-}
-
 void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, std::string DelegateName)
 {
 	if (!GetUseCSharp())
@@ -412,7 +407,7 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 	typedef void (CORECLR_DELEGATE_CALLTYPE* StaticFunction)();
 	StaticFunction fCallback = nullptr;
 
-	string_t root_path = std::filesystem::current_path().wstring();
+	string_t root_path = std::filesystem::current_path().fs_string();
 	auto pos = root_path.find_last_of(DIR_SEPARATOR);
 	ENGINE_ASSERT(pos != string_t::npos, "Root path isn't valid");
 
@@ -421,7 +416,11 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 	if (Application::GetEditorPath() != std::filesystem::current_path().string())
 	{
 #if !RELEASE
+#if _WIN32
 		root_path = OS::Utf8ToWstring(Application::GetEditorPath());
+#else
+		root_path = Application::GetEditorPath();
+#endif
 #endif
 	}
 

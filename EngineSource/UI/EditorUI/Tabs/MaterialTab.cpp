@@ -1,7 +1,6 @@
 #if EDITOR
 #pragma once
 #include "MaterialTab.h"
-#include "../MaterialFunctions.h"
 #include <fstream>
 #include <filesystem>
 #include <Engine/Log.h>

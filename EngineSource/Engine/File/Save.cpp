@@ -5,14 +5,6 @@
 #include <sstream>
 #include <iostream>
 
-class InvalidTypeException : public std::exception
-{
-public:
-	const char* what() const override
-	{
-		return "Loaded invalid type from file";
-	};
-};
 
 SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolder, bool ShouldSaveOnClose)
 {
@@ -224,7 +216,6 @@ SaveGame::SaveProperty SaveGame::GetPropertyOfType(std::string Name, Type::TypeE
 	if (P.Type != PropertyType)
 	{
 		Log::Print("Incorrect property - Expected " + Type::Types[PropertyType] + ", found: " + Type::Types[P.Type], Log::LogColor::Red);
-		throw InvalidTypeException();
 	}
 	return P;
 }

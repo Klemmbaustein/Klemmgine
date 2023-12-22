@@ -30,7 +30,7 @@ namespace Input
 {
 	bool IsLMBDown = false;
 	bool IsRMBDown = false;
-	Vector2 Input::MouseMovement;
+	Vector2 MouseMovement;
 }
 
 namespace TextInput

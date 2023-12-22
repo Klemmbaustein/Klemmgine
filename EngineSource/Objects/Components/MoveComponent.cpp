@@ -86,10 +86,14 @@ void MoveComponent::Tick()
 		return;
 	}
 	InputDirection.Y = 0;
-	InputDirection.Normalize();
+	if (InputDirection.Length() > 1)
+	{
+		InputDirection = InputDirection.Normalize();
+	}
 	MovementVelocity.X += InputDirection.X * Performance::DeltaTime * Velocity * (IsOnGround ? 1 : 0.1f);
 	MovementVelocity.Y += InputDirection.Z * Performance::DeltaTime * Velocity * (IsOnGround ? 1 : 0.1f);
 	MovementVelocity *= IsOnGround ? powf(0.5f, Performance::DeltaTime * 50) : powf(0.5f, Performance::DeltaTime * 5);
+	InputDirection = 0;
 	TryMove(Vector3(MovementVelocity.X, 0, MovementVelocity.Y), MovementVelocity.Length());
 	auto MoveHit = TryMove(Vector3(0, 1, 0), VerticalVelocity, false);
 	if (MoveHit.Hit && (Vector3::Dot(MoveHit.Normal, Vector3(0, 1, 0)) > 0.4f))
@@ -123,7 +127,6 @@ void MoveComponent::Tick()
 			// if we are touching a wall that we can't stand on
 		}
 	}
-	InputDirection = 0;
 }
 
 void MoveComponent::Destroy()

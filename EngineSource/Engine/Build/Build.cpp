@@ -32,7 +32,7 @@ namespace Build
 		}
 		return ret;
 	}
-	std::string GetVSLocation()
+	static std::string GetVSLocation()
 	{
 		auto test = GetSystemCommandReturnValue("cmd /C \"%ProgramFiles(x86)%\\Microsoft Visual Studio\\Installer\\vswhere.exe\"\
  -latest -property installationPath");
@@ -184,7 +184,6 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				std::filesystem::copy(LatestRuntimePath + "/../../../host", TargetFolder + "/bin/NetRuntime/host", DirectoryCopyOptions);
 			}
 #endif
-
 			Log::Print("[Build]: Complete", Log::LogColor::Green);
 			return "Success";
 		}

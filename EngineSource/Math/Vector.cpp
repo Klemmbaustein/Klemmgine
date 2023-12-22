@@ -119,12 +119,12 @@ Vector3 Vector3::Normalize() const
 	return Vector3(0);
 }
 
-float Vector2::Length()
+float Vector2::Length() const
 {
 	return sqrt(X * X + Y * Y);
 }
 
-Vector2 Vector2::Clamp(Vector2 Min, Vector2 Max)
+Vector2 Vector2::Clamp(Vector2 Min, Vector2 Max) const
 {
 	float NewX = std::min(Max.X, std::max(Min.X, X));
 	float NewY = std::min(Max.Y, std::max(Min.Y, Y));
@@ -171,7 +171,7 @@ std::string Vector3::ToString() const
 	return std::string(std::to_string(X) + " " + std::to_string(Y) + " " + std::to_string(Z));
 }
 
-std::string Vector2::ToString()
+std::string Vector2::ToString() const
 {
 	return std::string(std::to_string(X) + " " + std::to_string(Y));
 }

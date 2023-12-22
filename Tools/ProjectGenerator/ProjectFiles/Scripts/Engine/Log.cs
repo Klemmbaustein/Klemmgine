@@ -1,7 +1,7 @@
 ﻿using System;
 #nullable enable
 
-namespace Engine.Log
+namespace Engine
 {
 	public static class Log
 	{

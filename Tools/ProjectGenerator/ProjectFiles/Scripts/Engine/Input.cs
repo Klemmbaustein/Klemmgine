@@ -1,5 +1,9 @@
-﻿
-namespace Engine.Input
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+
+namespace Engine
 {
 	public static class Input
 	{
@@ -113,6 +117,9 @@ namespace Engine.Input
 		private delegate bool NativeIsKeyDown(int k);
 		private delegate Vector3 NativeGetMouseMovement();
 		private delegate void SetCursorVisibleDelegate(bool NewVisible);
+		[return: MarshalAs(UnmanagedType.LPArray)]
+		private delegate Int32 GetNumGamepads();
+		private delegate Gamepad GetGamepadIndex(Int32 GamepadIndex);
 
 		public static bool IsKeyDown(Key k)
 		{
@@ -127,6 +134,39 @@ namespace Engine.Input
 		public static void SetCursorVisible(bool NewVisible)
 		{
 			NativeFunction.CallNativeFunction("SetCursorVisible", typeof(SetCursorVisibleDelegate), new object[] { NewVisible });
+		}
+
+		public static void UpdateGamepadList()
+		{
+			Int32 NumGamepads = (Int32)NativeFunction.CallNativeFunction("GetNumGamepads", typeof(GetNumGamepads), null);
+			Gamepads.Clear();
+			for (Int32 i = 0; i < NumGamepads; i++)
+			{
+				Gamepads.Add((Gamepad)NativeFunction.CallNativeFunction("GetGamepadIndex", typeof(GetGamepadIndex), new object[] { i }));
+			}
+
+			foreach (var i in Gamepads)
+			{
+				Log.Print(i.LeftStickPosition.ToString());
+			}
+		}
+
+		public static List<Gamepad> Gamepads { get; private set; }
+
+		[StructLayout(LayoutKind.Sequential)]
+		public struct Gamepad
+		{
+			public Gamepad()
+			{
+
+			}
+
+			public Int32 ID = 0;
+			public Vector2 LeftStickPosition = 0;
+			public Vector2 RightStickPosition = 0;
+			public float LeftBumper = 0, RightBumper = 0;
+			// Corresponds to bool* Input::Gamepad::Buttons in C++, this is only here so the struct has the same size
+			private readonly IntPtr ButtonsArrayPtr;
 		}
 	}
 }

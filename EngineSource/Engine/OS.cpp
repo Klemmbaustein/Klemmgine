@@ -197,19 +197,6 @@ std::string OS::GetOSString()
 }
 #endif
 
-#if _WIN32
-void OS::ClearConsoleWindow()
-{
-	system("CLS");
-}
-#endif
-
-#if __linux__
-void OS::ClearConsoleWindow()
-{
-	system("reset");
-}
-#endif
 
 #if _WIN32
 
@@ -250,6 +237,6 @@ void OS::OpenFile(std::string Path)
 #if __linux__
 void OS::OpenFile(std::string Path)
 {
-	system(("xdg-open " + Path).c_str());
+	int ret = system(("xdg-open " + Path).c_str());
 }
 #endif

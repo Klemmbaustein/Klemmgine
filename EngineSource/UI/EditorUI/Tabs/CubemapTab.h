@@ -2,7 +2,6 @@
 #pragma once
 #include <UI/EditorUI/Tabs/EditorTab.h>
 #include <UI/UITextField.h>
-#include "../MaterialFunctions.h"
 #include <Engine/File/Save.h>
 
 class FramebufferObject;
