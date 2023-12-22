@@ -15,7 +15,9 @@ Tools/BuildTool/Release/
 # binary files
 *.exe
 *.pdb
-./lib/
+*.a
+*.pdb
+*.lib
 # Generated engine files
 paths.txt
 cppinfo.txt
@@ -25,6 +27,5 @@ CSharpCore/Build
 *.lastcodeanalysissucceeded
 EngineRelease
 EditorContent/Config/EditorPrefs.pref
-lib
 Build
-/ProjectGenerator
+ProjectGenerator
