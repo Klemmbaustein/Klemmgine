@@ -159,7 +159,7 @@ namespace CSharp
 #endif
 		if (rc != 0)
 		{
-			Log::Print("Could not get hostfxr path", Log::LogColor::Red);
+			Log::Print("Could not get hostfxr path - Error code: " + std::to_string(rc), Log::LogColor::Red);
 			return false;
 		}
 		// Load hostfxr and get desired exports
