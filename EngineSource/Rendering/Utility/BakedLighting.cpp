@@ -219,12 +219,12 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	for (auto& i : Bake::Lights)
 	{
 		glm::vec3 pointLightDir = (i.Position - StartPos);
-		float dirLength = length(pointLightDir);
-		float NewIntensity = i.Falloff / (1 + 0.09f * dirLength + 0.032f * (dirLength * dirLength));
+		float dist = length(pointLightDir);
+		float NewIntensity = std::pow(std::max((i.Falloff * 10.0f) - dist, 0.0f) / (i.Falloff * 10.0f), 16.0f) * i.Intensity * 16.0f;
 		if (NewIntensity > 0)
 		{
 			r = Bake::BakeLine(i.Position, StartPos, true);
-			if (r.Hit && r.t < 0.9)
+			if (r.Hit && r.t < 0.9f)
 			{
 				NewIntensity = 0;
 			}

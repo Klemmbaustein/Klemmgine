@@ -1,0 +1,161 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Build binaries
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+    - CHANGES.md
+    - .github/workflows/**'
+
+
+env:
+  # Path to the solution file relative to the root of the project.
+  SOLUTION_FILE_PATH: .
+
+  # Configuration type to build.
+  # You can convert this to a build matrix if you need coverage of multiple configuration types.
+  # https://docs.github.com/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+  BUILD_CONFIGURATION: Release
+
+permissions:
+  write-all
+
+jobs:
+#  build-windows:
+#    runs-on: windows-latest
+#
+#    steps:
+#    - uses: actions/checkout@v3
+#    
+#    - name: Checkout submodules
+#      run: git submodule update --init --recursive
+#      
+#    - name: Add MSBuild to PATH
+#      uses: microsoft/setup-msbuild@v1.0.2
+#
+#    - name: Build
+#      working-directory: ${{env.GITHUB_WORKSPACE}}
+#      # Add additional options to the MSBuild command line here (like platform or verbosity level).
+#      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+#      run: |
+#        
+#        ./setup.ps1 CI_BUILD
+#
+#    - name: package
+#      run: |
+#          mkdir Release
+#          cp -r -force ./EditorContent Release/EditorContent
+#          cp -r -force ./CSharpCore Release/CSharpCore
+#          cp -r -force ./Tools Release/Tools
+#          cp -r -force ./ProjectGenerator.exe Release
+#    - name: upload artifact
+#      uses: actions/upload-artifact@v3
+#      env:
+#        GITHUB_TOKEN: ${{ github.token }}
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        path: Release
+#        name: Klemmgine-Windows-${{ github.run_number }}.zip
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+
+    - name: install dependencies
+      run: |
+          sudo apt-get install libsdl2-2.0-0
+          sudo apt-get install libsdl2-dev
+          sudo apt-get install libglew-dev
+          cd Dependencies
+          git clone https://github.com/Klemmbaustein/KlemmBuild.git
+          cd KlemmBuild
+          sudo make install
+          cd ../SDL_net
+          cmake -S . -B Build/
+          cd Build && make
+          cd ../../assimp/
+          cmake -S . -B Build/
+          cd Build && make
+    - name: build
+      run: |
+          KlemmBuild engine.kbld -DGenerator -DCiBuild
+          ./ProjectGenerator -projetName Klemmgine -includeEngine false -ciBuild true
+          cd Games/Klemmgine
+          KlemmBuild makefile.kbld -DEditor -DCiBuild
+          KlemmBuild makefile.kbld -DDebug -DCiBuild
+          KlemmBuild makefile.kbld -DRelease -DCiBuild
+          KlemmBuild makefile.kbld -DServer -DCiBuild
+          rm -rf Build
+    - name: make-release
+      run: |
+          ls -R
+          mkdir Release
+          cp -rf ./EditorContent Release/EditorContent
+          cp -rf ./CSharpCore Release/CSharpCore
+          cp -rf ./Tools Release/Tools
+          cp -rf ./ProjectGenerator Release
+    - name: upload artifact
+      uses: actions/upload-artifact@v3
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        path: Release
+        name: Klemmgine-Linux-${{ github.run_number }}.zip
+  Release:
+    runs-on: ubuntu-latest
+    needs: [build-linux] #build-windows
+    steps:
+    - name: Retrieve Release Artifacts
+      uses: actions/download-artifact@v2
+      with:
+        path: Release
+
+    - name: "zip artifacts"
+      run: |
+        cd ${{ github.workspace }}/Release/Klemmgine-Windows-${{ github.run_number }}.zip
+        zip -r ${{ github.workspace }}/klemmgine-win.zip ./*
+        cd ${{ github.workspace }}/Release/Klemmgine-Linux-${{ github.run_number }}.zip
+        zip -r ${{ github.workspace }}/klemmgine-linux.zip ./
+
+    - name: list-directory
+      run: "ls -R"
+
+    - name: Create release
+      uses: actions/create-release@v1
+      id: create_release
+      with:
+        draft: false
+        prerelease: false
+        release_name: "Build #${{ github.run_number }}"
+        tag_name: Build-${{ github.run_number }}
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+    - name: upload linux artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: klemmgine-linux.zip
+        asset_name: Klemmgine-Linux-${{ github.run_number }}.zip
+        asset_content_type: application/zip
+
+#    - name: upload windows artifact
+#      uses: actions/upload-release-asset@v1
+#      env:
+#        GITHUB_TOKEN: ${{ github.token }}
+#      with:
+#        upload_url: ${{ steps.create_release.outputs.upload_url }}
+#        asset_path: klemmgine-win.zip
+#        asset_name: Klemmgine-Windows-${{ github.run_number }}.zip
+#        asset_content_type: application/zip

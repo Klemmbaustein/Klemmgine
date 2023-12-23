@@ -3,6 +3,7 @@
 #include <Engine/Utility/StringUtility.h>
 
 #include <SDL.h>
+#include <iostream>
 
 std::unordered_map<int32_t, Input::Gamepad> Input::Gamepads;
 Vector2 GetHatState(Uint8 hat);
@@ -39,7 +40,7 @@ void Input::HandleGamepadEvent(void* EventPtr)
 		Log::Print(StrUtil::Format("Unknowm gamepad ID: %i", e->jdevice.which));
 		return;
 	}
-	Gamepad g = Gamepads[e->jdevice.which];
+	Gamepad& g = Gamepads[e->jdevice.which];
 
 	switch (e->type)
 	{
@@ -65,21 +66,21 @@ void Input::HandleGamepadEvent(void* EventPtr)
 		case 0:
 			if (Axis == 0)
 			{
-				g.LeftStickPosition.X = AxisVal;
+				g.LeftStickPosition.X = AxisVal / 2.0f;
 			}
 			else
 			{
-				g.LeftStickPosition.Y = -AxisVal;
+				g.LeftStickPosition.Y = -AxisVal / 2.0f;
 			}
 			break;
 		case 1:
 			if (Axis == 0)
 			{
-				g.RightStickPosition.X = AxisVal;
+				g.RightStickPosition.X = AxisVal / 2.0f;
 			}
 			else
 			{
-				g.RightStickPosition.Y = -AxisVal;
+				g.RightStickPosition.Y = -AxisVal / 2.0f;
 			}
 			break;
 		case 2:

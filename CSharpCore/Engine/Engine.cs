@@ -45,6 +45,7 @@ static class Engine
 	public static Assembly? LoadedAsm = null;
 	static Int64 CurrentObjectIndex = 0;
 	static Type? StatsObject = null;
+	static Type? InputObject = null;
 
 	static readonly Dictionary<Int32, Object> WorldObjects = new();
 	static readonly List<Type> WorldObjectTypes = new();
@@ -89,6 +90,7 @@ static class Engine
 
 		StatsObject = LoadTypeFromAssembly("Engine.Stats");
 		StatsObject!.GetField("InEditor")!.SetValue(null, InEditor);
+		InputObject = LoadTypeFromAssembly("Engine.Input");
 	}
 
 	public static Int32 Instantiate(string obj, EngineTransform t, IntPtr NativeObject)
@@ -201,6 +203,7 @@ static class Engine
 	public static void SetDelta(float NewDelta)
 	{
 		StatsObject!.GetField("DeltaTime")?.SetValue(null, NewDelta);
+		InputObject!.GetMethod("UpdateGamepadList")?.Invoke(null, null);
 	}
 
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]

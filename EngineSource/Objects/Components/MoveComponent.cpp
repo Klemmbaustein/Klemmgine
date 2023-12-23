@@ -86,10 +86,14 @@ void MoveComponent::Tick()
 		return;
 	}
 	InputDirection.Y = 0;
-	if (InputDirection.Length() > 1)
+	float Length = InputDirection.Length();
+	InputDirection = InputDirection * Vector3(powf(Length, 2.0f));
+	if (Length > 1)
 	{
 		InputDirection = InputDirection.Normalize();
+		Length = 1;
 	}
+
 	MovementVelocity.X += InputDirection.X * Performance::DeltaTime * Velocity * (IsOnGround ? 1 : 0.1f);
 	MovementVelocity.Y += InputDirection.Z * Performance::DeltaTime * Velocity * (IsOnGround ? 1 : 0.1f);
 	MovementVelocity *= IsOnGround ? powf(0.5f, Performance::DeltaTime * 50) : powf(0.5f, Performance::DeltaTime * 5);

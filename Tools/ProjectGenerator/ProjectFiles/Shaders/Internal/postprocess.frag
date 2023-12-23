@@ -51,7 +51,7 @@ float blurssao()
 	}
 	result = mix(result, 16, min(max(LinearizeDepth(texture(u_depth, v_texcoords).z), 0), 1) / 3);
 	result += LinearizeDepth(texture(u_depth, v_texcoords).z) / 6.f;
-	return pow(min((result + 1) / 16, 1), 1.1);
+	return pow(min((result + 1) / 16, 1), 2);
 }
 
 vec4 sampleUI()

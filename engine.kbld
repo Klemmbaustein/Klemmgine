@@ -51,6 +51,9 @@
 #elif Server
         "SERVER",
 #endif
+#if CiBuild
+        "ENGINE_NO_SOURCE",
+#endif
         "ENGINE_CSHARP",
         "GLEW_STATIC"
       ],
@@ -66,6 +69,10 @@
     },
     {
       "name": "ProjectGenerator",
+#if CiBuild
+        "defines": [ "ENGINE_NO_SOURCE" ],
+#endif
+
       "sources": [
         "Tools/ProjectGenerator/Code/*.cpp"
       ]

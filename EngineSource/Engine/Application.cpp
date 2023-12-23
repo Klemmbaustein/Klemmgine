@@ -637,7 +637,7 @@ static void PollInput()
 	}
 	else
 	{
-		//SDL_SetRelativeMouseMode(SDL_TRUE);
+		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
 #endif
 }

@@ -45,18 +45,21 @@
 #elif Server
             "SERVER",
 #endif
+#if CiBuild
+        "ENGINE_NO_SOURCE",
+#endif
         "ENGINE_CSHARP",
         "GLEW_STATIC"
       ],
       "libs": [
         LIB_PATH,
-        "SDL2_net",
+        "../../Dependencies/SDL_net/Build/libSDL2_net.so",
         "SDL2",
         "GL",
         "assimp",
         "dl",
         "libGLEW.a",
-        "../../Dependencies/openal-soft/Ln_Build/openal",
+        "openal",
         "../../CSharpCore/lib/nethost"
       ],
       "optimization": "fast"

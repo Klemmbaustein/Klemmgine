@@ -247,6 +247,9 @@
     <ClInclude Include="Utility\stb_image.hpp" />
     <ClInclude Include="Utility\stb_truetype.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\engine.kbld" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

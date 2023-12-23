@@ -211,7 +211,6 @@ void ContextMenu::Tick()
 
 void ContextMenu::OnButtonClicked(int Index)
 {
-	Log::Print(Vector3::GetForwardVector(Graphics::WorldSun.Rotation).ToString());
 	if (Index >= 0)
 	{
 		std::string Name = ContextCategories.at(Index);

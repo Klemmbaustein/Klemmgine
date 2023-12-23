@@ -359,7 +359,7 @@ namespace NativeFunctions
 		{
 			if (Index == it++)
 			{
-				Input::Gamepad g;
+				Input::Gamepad g = i.second;
 				g.DeviceName = strdup(i.second.DeviceName);
 				return g;
 			}
