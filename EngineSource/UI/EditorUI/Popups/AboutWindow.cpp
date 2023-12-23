@@ -51,9 +51,9 @@ AboutWindow::AboutWindow()
 	TabBackground->AddChild(ContentBox);
 
 #if _WIN32
-	std::string OsString = " for Windows (x64)";
+	std::string OsString = "Windows (x64)";
 #else
-	std::string OsString = " for Linux (x64)";
+	std::string OsString = "Linux (x64)";
 #endif
 
 	ContentBox->AddChild((new UIBox(true, 0))
@@ -64,7 +64,9 @@ AboutWindow::AboutWindow()
 			->SetSizeMode(UIBox::SizeMode::PixelRelative))
 		->AddChild((new UIBox(false, 0))
 			->SetPadding(0)
-			->AddChild((new UIText(0.5f, UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING) + OsString, Text))
+			->AddChild((new UIText(0.5f, UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING), Text))
+				->SetPadding(0.005f))
+			->AddChild((new UIText(0.4f, UIColors[2], "  " + OsString, Text))
 				->SetPadding(0.005f))
 #if ENGINE_CSHARP
 			->AddChild((new UIText(0.4f, UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), Text))

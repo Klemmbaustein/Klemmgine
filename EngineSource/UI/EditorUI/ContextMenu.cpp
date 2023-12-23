@@ -37,7 +37,7 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 
 	std::string Prefix = ContextObject ? "OBJ_CAT_" : "SCN_";
 
-	auto SeperatorArrow = new UIBackground(true, Vector2(0), 0, 0.035);
+	auto SeperatorArrow = new UIBackground(true, Vector2(0), 0, 0.035f);
 	SeperatorArrow->SetPadding(0, 0, 0.01f, 0);
 	SeperatorArrow->SetUseTexture(true,
 		Editor::CurrentUI->CollapsedItems.contains(Prefix + Name) ? Editor::CurrentUI->Textures[14] : Editor::CurrentUI->Textures[13])
