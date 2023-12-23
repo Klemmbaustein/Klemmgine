@@ -93,7 +93,9 @@ jobs:
       run: |
           KlemmBuild engine.kbld -DGenerator -DCiBuild
           ./ProjectGenerator -projectName Klemmgine -includeEngine false -ciBuild true
-          cd Games/Klemmgine
+          cd CSharpCore
+          dotnet build
+          cd ../Games/Klemmgine
           KlemmBuild makefile.kbld -DEditor -DCiBuild
           KlemmBuild makefile.kbld -DDebug -DCiBuild
           KlemmBuild makefile.kbld -DRelease -DCiBuild
