@@ -10,7 +10,7 @@
 #endif
 
 #if __linux__
-//Currently no linux implementation needs to include anything
+#include <Engine/Utility/StringUtility.h>
 #endif
 
 #include <Engine/Log.h>
@@ -131,8 +131,18 @@ std::string OS::ShowOpenFileDialog()
 #if __linux__
 std::string OS::ShowOpenFileDialog()
 {
-	Log::Print("Creating an \"Open File-Dialog\" is not currently supported on Linux", Vector3(1, 1, 0));
-	return std::string();
+	char filename[4096];
+	FILE *f = popen("zenity --file-selection", "r");
+	char* buf = fgets(filename, 4096, f);
+	if (!buf)
+	{
+		return "";
+	}
+	pclose(f);
+	Log::Print(filename);
+	std::string FilenameString = filename;
+	StrUtil::ReplaceChar(FilenameString, '\n', "");
+	return FilenameString;
 }
 #endif
 
