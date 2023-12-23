@@ -85,7 +85,6 @@ jobs:
           cd ../../assimp/
           cmake CMakeLists.txt
           make
-          cd Build && make
     - name: build
       run: |
           KlemmBuild engine.kbld -DGenerator -DCiBuild
