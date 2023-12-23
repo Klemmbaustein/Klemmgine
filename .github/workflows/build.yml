@@ -26,41 +26,41 @@ permissions:
   write-all
 
 jobs:
-#  build-windows:
-#    runs-on: windows-latest
-#
-#    steps:
-#    - uses: actions/checkout@v3
-#    
-#    - name: Checkout submodules
-#      run: git submodule update --init --recursive
-#      
-#    - name: Add MSBuild to PATH
-#      uses: microsoft/setup-msbuild@v1.0.2
-#
-#    - name: Build
-#      working-directory: ${{env.GITHUB_WORKSPACE}}
-#      # Add additional options to the MSBuild command line here (like platform or verbosity level).
-#      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
-#      run: |
-#        
-#        ./setup.ps1 CI_BUILD
-#
-#    - name: package
-#      run: |
-#          mkdir Release
-#          cp -r -force ./EditorContent Release/EditorContent
-#          cp -r -force ./CSharpCore Release/CSharpCore
-#          cp -r -force ./Tools Release/Tools
-#          cp -r -force ./ProjectGenerator.exe Release
-#    - name: upload artifact
-#      uses: actions/upload-artifact@v3
-#      env:
-#        GITHUB_TOKEN: ${{ github.token }}
-#      with:
-#        upload_url: ${{ steps.create_release.outputs.upload_url }}
-#        path: Release
-#        name: Klemmgine-Windows-${{ github.run_number }}.zip
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Checkout submodules
+      run: git submodule update --init --recursive
+      
+    - name: Add MSBuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Build
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      # Add additional options to the MSBuild command line here (like platform or verbosity level).
+      # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
+      run: |
+        
+        ./setup.ps1 CI_BUILD
+
+    - name: package
+      run: |
+          mkdir Release
+          cp -r -force ./EditorContent Release/EditorContent
+          cp -r -force ./CSharpCore Release/CSharpCore
+          cp -r -force ./Tools Release/Tools
+          cp -r -force ./ProjectGenerator.exe Release
+    - name: upload artifact
+      uses: actions/upload-artifact@v3
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        path: Release
+        name: Klemmgine-Windows-${{ github.run_number }}.zip
   build-linux:
     runs-on: ubuntu-latest
 
@@ -119,7 +119,7 @@ jobs:
         name: Klemmgine-Linux-${{ github.run_number }}.zip
   Release:
     runs-on: ubuntu-latest
-    needs: [build-linux] #build-windows
+    needs: [ build-windows, build-linux ]
     steps:
     - name: Retrieve Release Artifacts
       uses: actions/download-artifact@v2
@@ -156,12 +156,12 @@ jobs:
         asset_name: Klemmgine-Linux-${{ github.run_number }}.zip
         asset_content_type: application/zip
 
-#    - name: upload windows artifact
-#      uses: actions/upload-release-asset@v1
-#      env:
-#        GITHUB_TOKEN: ${{ github.token }}
-#      with:
-#        upload_url: ${{ steps.create_release.outputs.upload_url }}
-#        asset_path: klemmgine-win.zip
-#        asset_name: Klemmgine-Windows-${{ github.run_number }}.zip
-#        asset_content_type: application/zip
+    - name: upload windows artifact
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: klemmgine-win.zip
+        asset_name: Klemmgine-Windows-${{ github.run_number }}.zip
+        asset_content_type: application/zip
