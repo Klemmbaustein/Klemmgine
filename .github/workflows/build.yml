@@ -83,7 +83,8 @@ jobs:
           cmake -S . -B Build/
           cd Build && make
           cd ../../assimp/
-          cmake -S . -B Build/
+          cmake CMakeLists.txt
+          make
           cd Build && make
     - name: build
       run: |
