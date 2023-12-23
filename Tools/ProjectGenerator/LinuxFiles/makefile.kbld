@@ -53,13 +53,13 @@
       ],
       "libs": [
         LIB_PATH,
-        "../../Dependencies/SDL_net/Build/libSDL2_net.so",
+        "SDL2_net",
         "SDL2",
         "GL",
-        "assimp",
+        "../../Dependencies/assimp/bin/assimp",
         "dl",
         "libGLEW.a",
-        "openal",
+        "../../Dependencies/openal-soft/Build/openal",
         "../../CSharpCore/lib/nethost"
       ],
       "optimization": "fast"

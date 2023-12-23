@@ -75,6 +75,7 @@ jobs:
           sudo apt-get install libsdl2-2.0-0
           sudo apt-get install libsdl2-dev
           sudo apt-get install libglew-dev
+          sudo apt-get install libopenal-dev
           cd Dependencies
           git clone https://github.com/Klemmbaustein/KlemmBuild.git --recurse-submodules
           cd KlemmBuild
@@ -94,6 +95,7 @@ jobs:
           KlemmBuild makefile.kbld -DDebug -DCiBuild
           KlemmBuild makefile.kbld -DRelease -DCiBuild
           KlemmBuild makefile.kbld -DServer -DCiBuild
+          cp ./bin/* ../../Tools/ProjectGenerator/ProjectFilesNoSource/bin/
           rm -rf Build
     - name: make-release
       run: |
