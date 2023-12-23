@@ -82,7 +82,9 @@ jobs:
           sudo make install
           cd ../SDL_net
           cmake -S . -B Build/
-          cd Build && make
+          cd Build
+          make
+          ls
           cd ../../assimp/
           cmake CMakeLists.txt
           make
