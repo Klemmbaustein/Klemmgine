@@ -29,7 +29,9 @@
 #else
       "preBuildCommand": "../../Tools/bin/BuildTool in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes",
 #endif
-
+#if !CiBuild
+      "debug": true,
+#endif
       "outputPath": "bin",
       "includes": [
         "Code",

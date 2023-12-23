@@ -32,7 +32,9 @@
       "sources": [
         "EngineSource/*.cpp"
       ],
+#if !CiBuild
       "debug": true,
+#endif
       "includes": [
         "EngineSource",
         "Dependencies/glm",
