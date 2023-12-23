@@ -53,7 +53,7 @@
       ],
       "libs": [
         LIB_PATH,
-        "SDL2_net",
+        "../../Dependencies/SDL2_net/Build/SDL2_net",
         "SDL2",
         "GL",
         "../../Dependencies/assimp/bin/assimp",
