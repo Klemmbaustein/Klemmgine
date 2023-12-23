@@ -76,7 +76,7 @@ jobs:
           sudo apt-get install libsdl2-dev
           sudo apt-get install libglew-dev
           cd Dependencies
-          git clone https://github.com/Klemmbaustein/KlemmBuild.git
+          git clone https://github.com/Klemmbaustein/KlemmBuild.git --recurse-submodules
           cd KlemmBuild
           sudo make install
           cd ../SDL_net
