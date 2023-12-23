@@ -98,7 +98,8 @@ jobs:
           KlemmBuild makefile.kbld -DDebug -DCiBuild
           KlemmBuild makefile.kbld -DRelease -DCiBuild
           KlemmBuild makefile.kbld -DServer -DCiBuild
-          cp ./bin/* ../../Tools/ProjectGenerator/ProjectFilesNoSource/bin/
+          mkdir ../../Tools/ProjectGenerator/ProjectFilesNoSource/bin
+          cp ./bin/* ../../Tools/ProjectGenerator/ProjectFilesNoSource/bin
           rm -rf Build
     - name: make-release
       run: |
