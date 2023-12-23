@@ -32,3 +32,5 @@ ProjectGenerator
 ./Tools/bin/BuildTool
 .vscode
 Tools/bin/BuildTool
+Tools/BuildTool/Output/GENERATED
+

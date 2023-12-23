@@ -68,7 +68,7 @@ namespace FileUtil
 
 	std::string GetExtension(std::string FileName)
 	{
-		FileName = std::filesystem::absolute(FileName).string();
+		FileName = GetFileNameFromPath(std::filesystem::absolute(FileName).u8string());
 		if (FileName.find_last_of(".") != std::string::npos)
 		{
 			FileName = FileName.substr(FileName.find_last_of(".") + 1);
