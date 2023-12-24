@@ -28,7 +28,7 @@ CSharpCore/Build
 EngineRelease
 EditorContent/Config/EditorPrefs.pref
 Build
-ProjectGenerator
+/ProjectGenerator
 ./Tools/bin/BuildTool
 .vscode
 Tools/bin/BuildTool

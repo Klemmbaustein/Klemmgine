@@ -117,13 +117,13 @@ namespace CSharp
 		return f;
 	}
 #else
-	void* load_library(const char_t* path)
+	static void* load_library(const char_t* path)
 	{
 		void* h = dlopen(path, RTLD_LAZY | RTLD_LOCAL);
 		ENGINE_ASSERT(h != nullptr, "Could not load library.");
 		return h;
 	}
-	void* get_export(void* h, const char* name)
+	static void* get_export(void* h, const char* name)
 	{
 		void* f = dlsym(h, name);
 		ENGINE_ASSERT(f != nullptr, "Could not export library");
