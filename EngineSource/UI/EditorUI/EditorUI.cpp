@@ -203,12 +203,12 @@ void EditorUI::LaunchInEditor()
 			+ " "
 			+ Args).c_str());
 #else
-		int ret = system(("bash ./bin/"
+		int ret = system(("./bin/"
 		 + ProjectName 
 		 + "-Server -nostartupinfo -quitondisconnect -editorPath "
 		 + Application::GetEditorPath()
 		 + " "
-		 + Args).c_str());
+		 + Args + " &").c_str());
 #endif
 	}
 }

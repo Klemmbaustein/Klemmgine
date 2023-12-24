@@ -30,7 +30,8 @@
 std::vector<ItemBrowser::FileEntry> ItemBrowser::CurrentFiles;
 std::vector<UIButton*> ItemBrowser::Buttons;
 size_t ItemBrowser::SelectedButton = 0;
-
+std::vector<EditorClassesItem> ItemBrowser::CPPClasses;
+std::vector<size_t> ItemBrowser::CPPPath;
 
 std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
 {

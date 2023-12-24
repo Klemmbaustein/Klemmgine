@@ -8,6 +8,7 @@
 #include <thread>
 #include <Engine/BackgroundTask.h>
 #include <Engine/Log.h>
+#include <UI/EditorUI/ItemBrowser.h>
 
 bool replace(std::string& str, const std::string& from, const std::string& to) {
 	size_t start_pos = str.find(from);
@@ -37,8 +38,6 @@ ClassCreator::ClassCreator() : EditorPanel(Editor::CurrentUI->UIColors, 0.15f, 1
 			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Editor::CurrentUI->EngineUIText))
 				->SetPadding(0.005f)));
 
-	// TODO: Implement actual functionality
-
 	ClassFields[0] = new UITextField(0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
 	ClassFields[1] = new UITextField(0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
 
@@ -51,6 +50,7 @@ ClassCreator::ClassCreator() : EditorPanel(Editor::CurrentUI->UIColors, 0.15f, 1
 		->AddChild((new UIText(0.4f, UIColors[2], "Path: ", Editor::CurrentUI->EngineUIText))
 			->SetPadding(0.01f, 0.01f, 0.02f, 0))
 		->AddChild(ClassFields[1]
+			->SetText(ItemBrowser::GetCurrentCPPPathString().substr(std::string("Classes/").length()))
 			->SetTextSize(0.4f)
 			->SetPadding(0.01f, 0.01f, 0, 0)
 			->SetMinSize(Vector2(0.2f, 0.01f))));
@@ -112,12 +112,14 @@ void ClassCreator::Create(std::string Name, std::string Namespace, ClassType New
 {
 	switch (NewType)
 	{
+#if _WIN32
 	case ClassCreator::ClassType::CPlusPlus:
 		std::filesystem::copy(Application::GetEditorPath() + "/EditorContent/CodeTemplates/Class.h", "Code/Objects/Class.h");
 		std::filesystem::copy(Application::GetEditorPath() + "/EditorContent/CodeTemplates/Class.cpp", "Code/Objects/Class.cpp");
-		system("\"..\\..\\Tools\\bin\\BuildTool.exe\" in=../../EngineSource/Objects in=Code/Objects out=GeneratedIncludes");
+		system("\"..\\..\\Tools\\bin\\Bui.ldToolexe\" in=../../EngineSource/Objects in=Code/Objects out=GeneratedIncludes");
 		system(("cd ../.. && ProjectGenerator.exe -projectName " + Build::GetProjectBuildName() + " -onlyBuildFiles").c_str());
 		break;
+#endif
 #if ENGINE_CSHARP
 	case ClassCreator::ClassType::CSharp:
 	{

@@ -29,8 +29,8 @@ class ItemBrowser : public EditorPanel
 	UIBox* ContentBox = nullptr;
 public:
 	void ScanForAssets();
-	std::vector<EditorClassesItem> CPPClasses;
-	std::vector<size_t> CPPPath;
+	static std::vector<EditorClassesItem> CPPClasses;
+	static std::vector<size_t> CPPPath;
 
 	int SelectedTab = 0;
 	std::vector<std::string> Tabs =
@@ -40,7 +40,7 @@ public:
 	};
 	std::vector<EditorClassesItem> GetEditorUIClasses();
 	std::vector<EditorClassesItem> GetContentsOfCurrentCPPFolder();
-	std::string GetCurrentCPPPathString();
+	static std::string GetCurrentCPPPathString();
 
 	UIScrollBox* BrowserScrollBox;
 	ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale);

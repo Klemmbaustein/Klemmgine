@@ -1,5 +1,15 @@
 # Changes
 
+## Version 1.7.1
+
+### Changes
+- When adding a C# class, the path will now default to the path opened in the class browser.
+
+### Fixes
+- Fixed the `Mem` display in the editor being broken on Linux.
+- Fixed server not launching on Linux when pressing `Run` in the editor.
+
+
 ## Version 1.7.0
 
 ### Changes

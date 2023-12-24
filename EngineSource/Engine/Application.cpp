@@ -743,7 +743,6 @@ static void DrawPostProcessing()
 	Application::PostProcessShader->SetInt("u_uialpha", 8);
 	Application::PostProcessShader->SetFloat("u_time", Stats::Time);
 	Application::PostProcessShader->SetFloat("u_vignette", Graphics::Vignette);
-	Application::PostProcessShader->SetInt("u_fxaa", Graphics::FXAA);
 	Application::PostProcessShader->SetInt("u_bloom", Graphics::Bloom);
 	Application::PostProcessShader->SetInt("u_ssao", Graphics::SSAO);
 	Application::PostProcessShader->SetInt("u_editor", IS_IN_EDITOR);
