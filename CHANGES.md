@@ -1,5 +1,11 @@
 # Changes
 
+## Version 1.7.2
+
+### Fixes
+
+- Fixed a crash with the server
+
 ## Version 1.7.1
 
 ### Changes

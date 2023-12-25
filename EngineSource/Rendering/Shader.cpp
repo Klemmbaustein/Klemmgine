@@ -10,6 +10,7 @@
 #include <Math/Vector.h>
 #include <Rendering/Utility/ShaderPreprocessor.h>
 #include <glm/mat4x4.hpp>
+#include <filesystem>
 
 
 extern const bool IsInEditor;
@@ -138,7 +139,8 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 	gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	fSharedFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
-	if (EngineDebug || IsInEditor)
+#if !RELEASE
+	if (EngineDebug || IsInEditor || !std::filesystem::exists("Assets"))
 	{
 		// open files
 		vShaderFile.open(VertexShader);
@@ -164,6 +166,7 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 		}
 	}
 	else
+#endif
 	{
 		vertexCode = Preprocessor::ParseGLSL(Pack::GetFile(VertexShader), Paths[0]).Code;
 		fragmentCode = Preprocessor::ParseGLSL(Pack::GetFile(FragmentShader), Paths[1]).Code;
