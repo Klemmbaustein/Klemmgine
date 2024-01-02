@@ -34,7 +34,7 @@ void MeshComponent::Destroy()
 	delete MeshModel;
 #endif
 }
-void MeshComponent::Tick()
+void MeshComponent::Update()
 {
 #if !SERVER
 	if (AutomaticallyUpdateTransform)

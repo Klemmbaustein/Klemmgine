@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+namespace Engine;
 
 public class ParticleComponent : ObjectComponent
 {

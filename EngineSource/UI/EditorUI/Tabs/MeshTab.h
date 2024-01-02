@@ -1,3 +1,4 @@
+#if EDITOR
 #pragma once
 #include "EditorTab.h"
 #include <UI/UITextField.h>
@@ -13,7 +14,7 @@ class MeshTab : public EditorTab
 public:
 	UIBackground* PreviewWindow = nullptr;
 
-	MeshTab(Vector3* UIColors, TextRenderer* Renderer);
+	MeshTab(EditorPanel* Parent, std::string File);
 	void Tick() override;
 	void Load(std::string File) override;
 	void ReloadMesh();
@@ -21,6 +22,7 @@ public:
 	void Generate();
 	void OnButtonClicked(int Index) override;
 	virtual ~MeshTab();
+	virtual void OnResized() override;
 protected:
 	void UpdatePreviewModel();
 	FramebufferObject* PreviewBuffer = nullptr;
@@ -30,18 +32,17 @@ protected:
 	bool HasCollision = true;
 	bool TwoSided = true;
 	std::string MeshPath;
+	Camera* PreviewCamera = nullptr;
 
-	UIText* TabName = nullptr;;
-	TextRenderer* Renderer;
 	UIBox* Rows[2];
 	std::vector<UITextField*> MaterialTextFields;
 	std::string Filepath;
 	std::string InitialName;
 	std::string Options[3] =
 	{
-		"Cast shadow   :",
-		"Has collision :",
-		"Two sided     :"
+		"Cast shadow:",
+		"Has collision:",
+		"Two sided:"
 	};
 	bool* OptionVariables[3] =
 	{
@@ -51,3 +52,4 @@ protected:
 	};
 	Transform CameraTransform;
 };
+#endif

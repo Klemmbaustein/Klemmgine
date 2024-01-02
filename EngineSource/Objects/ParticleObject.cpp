@@ -15,7 +15,7 @@ void ParticleObject::Destroy()
 {
 }
 
-void ParticleObject::Tick()
+void ParticleObject::Update()
 {
 	if (Particle->GetIsFinished() && !IsInEditor)
 	{

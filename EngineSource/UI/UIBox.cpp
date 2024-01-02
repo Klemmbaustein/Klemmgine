@@ -11,6 +11,7 @@
 #include <UI/EditorUI/EditorUI.h>
 #endif
 #include <Engine/EngineError.h>
+#include <Engine/Application.h>
 
 class UIButton;
 
@@ -21,8 +22,25 @@ namespace UI
 	bool RequiresRedraw = true;
 	unsigned int UIBuffer = 0;
 	unsigned int UITextures[2] = {0, 0};
+}
 
-	float CurrentUIDepth = 0;
+std::string UIBox::GetAsString()
+{
+	return typeid(*this).name();
+}
+
+void UIBox::DebugPrintTree(uint8_t Depth)
+{
+	for (uint8_t i = 0; i < Depth; i++)
+	{
+		std::cout << "    ";
+	}
+	std::cout << GetAsString() << std::endl;
+
+	for (UIBox* i : Children)
+	{
+		i->DebugPrintTree(Depth + 1);
+	}
 }
 
 UIBox* UIBox::SetSizeMode(SizeMode NewMode)
@@ -35,11 +53,11 @@ UIBox* UIBox::SetSizeMode(SizeMode NewMode)
 	return this;
 }
 
-UIBox::UIBox(bool Horizontal, Vector2 Position)
+UIBox::UIBox(Orientation BoxOritentation, Vector2 Position)
 {
 	this->Position = Position;
 	this->Size = Size;
-	this->ChildrenHorizontal = Horizontal;
+	this->ChildrenOrientation = BoxOritentation;
 	InvalidateLayout();
 	for (UIBox* elem : UI::UIElements)
 	{
@@ -102,11 +120,7 @@ void UIBox::UpdateTickState()
 
 void UIBox::UpdateHoveredState()
 {
-#if EDITOR
-	if (!Editor::DraggingTab && IsHovered() && HasMouseCollision && IsVisibleInHierarchy())
-#else
 	if (IsHovered() && HasMouseCollision && IsVisibleInHierarchy())
-#endif
 	{
 		UI::NewHoveredBox = this;
 	}
@@ -145,7 +159,7 @@ void UIBox::ForceUpdateUI()
 		i->InvalidateLayout();
 	}
 #if EDITOR
-	Editor::CurrentUI->OnResized();
+	Application::EditorInstance->OnResized();
 #endif
 }
 
@@ -212,12 +226,12 @@ bool UIBox::IsHovered()
 
 	}
 	// If the mouse is on top of the box
-	return Math::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation) 
+	return Math::IsPointIn2DBox(OffsetPosition + Offset, OffsetPosition + Size + Offset, Input::MouseLocation)
 		&& (!CurrentScrollObject // Check if we have a scroll object
 			|| Math::IsPointIn2DBox( // do some very questionable math to check if the mouse is inside the scroll area
 				CurrentScrollObject->Position - CurrentScrollObject->Scale,
 				CurrentScrollObject->Position,
-				Input::MouseLocation)); 
+				Input::MouseLocation));
 }
 
 Vector2 UIBox::GetUsedSize()
@@ -333,14 +347,19 @@ UIBox* UIBox::SetPaddingSizeMode(SizeMode NewSizeMode)
 	return this;
 }
 
-UIBox* UIBox::SetHorizontal(bool IsHorizontal)
+UIBox* UIBox::SetOrientation(Orientation NewOrientation)
 {
-	if (IsHorizontal != ChildrenHorizontal)
+	if (NewOrientation != ChildrenOrientation)
 	{
-		ChildrenHorizontal = IsHorizontal;
+		ChildrenOrientation = NewOrientation;
 		InvalidateLayout();
 	}
 	return this;
+}
+
+UIBox::Orientation UIBox::GetOrientation()
+{
+	return ChildrenOrientation;
 }
 
 bool UIBox::GetTryFill()
@@ -352,11 +371,6 @@ void UIBox::Update()
 {
 }
 
-float UIBox::GetCurrentUIDepth()
-{
-	return UI::CurrentUIDepth;
-}
-
 void UIBox::UpdateSelfAndChildren()
 {
 	UpdateScale();
@@ -364,6 +378,36 @@ void UIBox::UpdateSelfAndChildren()
 	UpdateScale();
 
 	Update();
+}
+
+std::vector<UIBox*> UIBox::GetChildren()
+{
+	return Children;
+}
+
+void UIBox::SetRenderOrderIndex(size_t OrderIndex)
+{
+	UI::UIElements.erase(UI::UIElements.begin() + GetRenderOrderIndex());
+	if (OrderIndex < UI::UIElements.size())
+	{
+		UI::UIElements.insert(UI::UIElements.begin() + OrderIndex, this);
+	}
+	else
+	{
+		UI::UIElements.push_back(this);
+	}
+}
+
+size_t UIBox::GetRenderOrderIndex()
+{
+	for (size_t i = 0; i < UI::UIElements.size(); i++)
+	{
+		if (UI::UIElements[i] == this)
+		{
+			return i;
+		}
+	}
+	return 0;
 }
 
 void UIBox::UpdateScale()
@@ -375,17 +419,36 @@ void UIBox::UpdateScale()
 	Size = 0;
 	for (auto c : Children)
 	{
-		if (ChildrenHorizontal)
+		if (ChildrenOrientation == Orientation::Horizontal)
 		{
 			Size.X += c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y;
-			Size.Y = std::max(Size.Y, c->Size.Y + c->UpPadding + c->DownPadding);
+			if (!c->TryFill)
+			{
+				Size.Y = std::max(Size.Y, c->Size.Y + c->UpPadding + c->DownPadding);
+			}
 		}
 		else
 		{
 			Size.Y += c->Size.Y + c->UpPadding + c->DownPadding;
-			Size.X = std::max(Size.X, c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y);
+			if (!c->TryFill)
+			{
+				Size.X = std::max(Size.X, c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y);
+			}
 		}
 	}
+
+	if (TryFill && Parent)
+	{
+		if (Parent->ChildrenOrientation == Orientation::Horizontal)
+		{
+			Size.Y = Parent->Size.Y - (UpPadding + DownPadding);
+		}
+		else
+		{
+			Size.X = Parent->Size.X - (GetLeftRightPadding(this).X + GetLeftRightPadding(this).Y);
+		}
+	}
+
 
 	Vector2 AdjustedMinSize = MinSize;
 	Vector2 AdjustedMaxSize = MaxSize;
@@ -399,19 +462,6 @@ void UIBox::UpdateScale()
 	for (auto c : Children)
 	{
 		c->UpdateScale();
-		if (c->TryFill)
-		{
-			if (ChildrenHorizontal)
-			{
-				c->Size.Y = Size.Y - (c->UpPadding + c->DownPadding);
-				c->Size = c->Size.Clamp(c->MinSize, c->MaxSize);
-			}
-			else
-			{
-				c->Size.X = Size.X - (GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y);
-				c->Size = c->Size.Clamp(c->MinSize, c->MaxSize);
-			}
-		}
 	}
 }
 
@@ -424,7 +474,7 @@ void UIBox::UpdatePosition()
 		OffsetPosition = Position;
 	}
 	
-	Align PrimaryAlign = ChildrenHorizontal ? HorizontalBoxAlign : VerticalBoxAlign;
+	Align PrimaryAlign = ChildrenOrientation == Orientation::Horizontal ? HorizontalBoxAlign : VerticalBoxAlign;
 
 	float ChildrenSize = 0;
 
@@ -433,7 +483,9 @@ void UIBox::UpdatePosition()
 		for (auto c : Children)
 		{
 			Vector2 LeftRight = GetLeftRightPadding(c);
-			ChildrenSize += ChildrenHorizontal ? (c->Size.X + LeftRight.X + LeftRight.Y) : (c->Size.Y + c->UpPadding + c->DownPadding);
+			ChildrenSize += ChildrenOrientation == Orientation::Horizontal 
+				? (c->Size.X + LeftRight.X + LeftRight.Y)
+				: (c->Size.Y + c->UpPadding + c->DownPadding);
 		}
 	}
 
@@ -442,7 +494,7 @@ void UIBox::UpdatePosition()
 	{
 		if (PrimaryAlign == Align::Centered)
 		{
-			if (ChildrenHorizontal)
+			if (ChildrenOrientation == Orientation::Horizontal)
 			{
 				c->OffsetPosition = OffsetPosition + Vector2(Size.X / 2 - ChildrenSize / 2 + GetLeftRightPadding(c).X, c->GetVerticalOffset());
 				Offset += c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y;
@@ -455,7 +507,7 @@ void UIBox::UpdatePosition()
 		}
 		else
 		{
-			if (ChildrenHorizontal)
+			if (ChildrenOrientation == Orientation::Horizontal)
 			{	
 				if (PrimaryAlign == Align::Reverse)
 				{
@@ -551,16 +603,19 @@ void UIBox::DrawAllUIElements()
 			UI::RequiresRedraw = true;
 			elem->PrevIsVisible = elem->IsVisible;
 		}
-		if (elem->ShouldBeTicked)
-		{
-			elem->Tick();
-		}
 		if (!elem->Parent)
 		{
 			elem->UpdateHoveredState();
 		}
 	}
 	UI::HoveredBox = UI::NewHoveredBox;
+	for (UIBox* elem : UI::UIElements)
+	{
+		if (elem->ShouldBeTicked)
+		{
+			elem->Tick();
+		}
+	}
 	if (UI::RequiresRedraw)
 	{
 		UI::RequiresRedraw = false;
@@ -570,8 +625,8 @@ void UIBox::DrawAllUIElements()
 		}
 		UI::ElementsToUpdate.clear();
 		glViewport(0, 0, (size_t)Graphics::WindowResolution.X, (size_t)Graphics::WindowResolution.Y);
-		UI::CurrentUIDepth = 0;
 		glEnable(GL_BLEND);
+		glDisable(GL_DEPTH_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, UI::UIBuffer);
 		glClearColor(0, 0, 0, 0);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -635,7 +690,6 @@ void UIBox::DrawThisAndChildren()
 	if (IsVisible)
 	{
 		Draw();
-		UI::CurrentUIDepth += 0.1f;
 		for (auto c : Children)
 		{
 			c->DrawThisAndChildren();
@@ -654,7 +708,10 @@ void UIBox::DeleteChildren()
 
 bool UIBox::IsVisibleInHierarchy()
 {
-	if (!Parent) return IsVisible;
+	if (!Parent)
+	{
+		return IsVisible;
+	}
 	if (IsVisible) return Parent->IsVisibleInHierarchy();
 	return false;
 }

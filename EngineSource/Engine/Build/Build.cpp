@@ -123,14 +123,17 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			if (CSharp::GetUseCSharp())
 			{
 				Log::Print("[Build]: Building C# core...");
-				system(("cd " + Application::GetEditorPath() + "/CSharpCore && dotnet publish -r win-x64 --self-contained false").c_str());
+				system(("cd " + Application::GetEditorPath() + "/CSharp/Core && dotnet publish -r win-x64 --self-contained false").c_str());
+				system(("cd " + Application::GetEditorPath() + "/CSharp/Engine && dotnet publish -r win-x64 --self-contained false").c_str());
 
 				std::filesystem::create_directories(TargetFolder + "/bin/CSharp/Core");
-				std::filesystem::copy(Application::GetEditorPath() + "/CSharpCore/Build/win-x64/publish", TargetFolder + "/bin/CSharp/Core");
+				std::filesystem::create_directories(TargetFolder + "/bin/CSharp/Engine");
+				std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Core/Build", TargetFolder + "/bin/CSharp/Core");
+				std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build", TargetFolder + "/bin/CSharp/Engine");
 				Log::Print("[Build]: Building game C# assembly...");
 				system("cd Scripts && dotnet publish -r win-x64 --self-contained false");
 
-				std::filesystem::copy("CSharp/Build/win-x64/publish", TargetFolder + "/bin/CSharp");
+				std::filesystem::copy("CSharp/Build/", TargetFolder + "/bin/CSharp");
 
 				std::string NetRuntimePath = GetSystemCommandReturnValue("dotnet --list-runtimes");
 
@@ -175,7 +178,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 					LatestRuntimeVersion = VersionNumber;
 				}
 				std::string ToDir = TargetFolder + "/bin/NetRuntime/shared/Microsoft.NETCore.App/" + LatestRuntimeVersion;
-				Log::Print("Using .net runtime version " + LatestRuntimeVersion);
+				Log::Print("[Build]: Using .net runtime version " + LatestRuntimeVersion);
 				std::filesystem::create_directories(ToDir);
 				std::filesystem::copy(LatestRuntimePath, ToDir, DirectoryCopyOptions);
 

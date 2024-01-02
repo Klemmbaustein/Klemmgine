@@ -8,7 +8,7 @@ class InstancedMeshComponent : public Component
 public:
 	InstancedMeshComponent(std::string File);
 	void Begin() override;
-	void Tick() override;
+	void Update() override;
 	void Destroy() override;
 	size_t AddInstance(Transform T);
 	bool RemoveInstance(size_t Index);

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <Math/Vector.h>
+
 namespace Sound
 {
 	struct SoundSource

@@ -17,16 +17,14 @@
 #include <UI/EditorUI/Tabs/MaterialTab.h>
 #include <UI/EditorUI/Tabs/ParticleEditorTab.h>
 #include <UI/EditorUI/Tabs/CubemapTab.h>
-#include <UI/EditorUI/Tabs/PreferenceTab.h>
 #include <Engine/Utility/FileUtility.h>
-
+#include <Objects/MeshObject.h>
+#include <Objects/CSharpObject.h>
+#include "ContextMenu.h"
 
 Viewport* Viewport::ViewportInstance = nullptr;
 
 // Collision model for the arrows
-
-
-
 Collision::Box ArrowBoxX
 (
 	0.0f, 1.0f,
@@ -53,7 +51,7 @@ Collision::Box ArrowBoxZ
 
 UIBackground* TestCursor = nullptr;
 
-Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, 0, 2)
+Viewport::Viewport(EditorPanel* Parent) : EditorPanel(Parent, "Viewport")
 {
 	ViewportInstance = this;
 
@@ -65,89 +63,92 @@ Viewport::Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPan
 	ArrowsModel->ModelTransform.Scale = Vector3(1, 1, 1);
 	ArrowsModel->ModelTransform.Rotation.Y = -Math::PI_F / 2.0f;
 	ArrowsBuffer->Renderables.push_back(ArrowsModel);
-	TabBackground->IsVisible = false;
-	TabInstances =
-	{
-		// 00
-		nullptr,
-		// 01
-		new MeshTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
-		// 02
-		new MaterialTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
-		// 03
-		nullptr,
-		// 04
-		new ParticleEditorTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText, Editor::CurrentUI->Textures[4], Editor::CurrentUI->Textures[12]),
-		// 05
-		new CubemapTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText),
-		// 06
-		new PreferenceTab(Editor::CurrentUI->UIColors, Editor::CurrentUI->EngineUIText)
-	};
-
-	TabBox = new UIBackground(true, Position + Vector2(0, Scale.Y - 0.05f), UIColors[1], Vector2(Scale.X, 0.05f));
-
-	UpdateTabBar();
+	BackgroundVisible = false;
 }
 
 void Viewport::ClearSelectedObjects()
 {
-	for (auto i : SelectedObjects)
+	for (auto i : EditorUI::SelectedObjects)
 	{
 		i->IsSelected = false;
 	}
-	SelectedObjects.clear();
+	EditorUI::SelectedObjects.clear();
 }
 
-
-void Viewport::UpdateLayout()
+void Viewport::OnItemDropped(DroppedItem Item)
 {
-	UpdateTabBar();
-	for (size_t i = 0; i < TabInstances.size(); i++)
+	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Position + (Scale * 0.5));
+	Vector3 Direction = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
+
+	Vector3 Point = (Direction * 100.0f) + Graphics::MainCamera->Position;
+
+	auto hit = Collision::LineTrace(Graphics::MainCamera->Position, Point);
+
+	if (hit.Hit)
 	{
-		if (Tabs[SelectedTab].Index == i && TabInstances[i])
-		{
-			TabInstances[i]->TabBackground->SetPosition(Position);
-			TabInstances[i]->TabBackground->SetMinSize(Scale);
-			TabInstances[i]->TabBackground->SetMaxSize(Scale);
-			TabInstances[i]->TabBackground->IsVisible = true;
-			TabInstances[i]->UpdateLayout();
-		}
-		else if (TabInstances[i])
-		{
-			TabInstances[i]->TabBackground->IsVisible = false;
-		}
+		Point = hit.ImpactPoint;
+	}
+
+	if (Item.TypeID == CSharpObject::GetID())
+	{
+		auto Obj = Objects::SpawnObject<CSharpObject>(Transform(Point, 0, 1));
+		Obj->LoadClass(Item.Path);
+		Obj->IsSelected = true;
+		return;
+	}
+	else if (!std::filesystem::exists(Item.Path))
+	{
+		Objects::SpawnObjectFromID(Item.TypeID, Transform(Point, 0, 1))->IsSelected = true;
+		return;
+	}
+
+	ClearSelectedObjects();
+	std::string Ext = FileUtil::GetExtension(Item.Path);
+
+	if (Ext == "jsm")
+	{
+		auto Obj = Objects::SpawnObject<MeshObject>(Transform(Point, 0, 1));
+		Obj->LoadFromFile(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
+		Obj->IsSelected = true;
+	}
+
+	if (Ext == "jscn")
+	{
+		EditorUI::OpenScene(Item.Path);
 	}
 }
+
+void Viewport::OnResized()
+{
+}
+
 void Viewport::Tick()
 {
-	CurrentTab = TabInstances[Tabs[SelectedTab].Index];
-
-	bool TabHas3DView = (!Editor::HoveringPopup	&& !CurrentTab)
-		|| Tabs[SelectedTab].Index == 1
-		|| Tabs[SelectedTab].Index == 4
-		|| Tabs[SelectedTab].Index == 5;
+	TickPanel();
 	Graphics::MainCamera->FOV = Math::PI_F / 1.2f;
-	UpdatePanel();
 
-	TabTexts[0]->SetText(ChangedScene ? "*Viewport " : " Viewport ");
+	if (EditorPanel::Dragged)
+	{
+		return;
+	}
 
 	OutlineBuffer->Renderables.clear();
 	OutlineBuffer->FramebufferCamera = Graphics::MainCamera;
 	ArrowsBuffer->FramebufferCamera = Graphics::MainCamera;
 
-	ArrowsModel->Visible = SelectedObjects.size();
-	if (SelectedObjects.size())
+	ArrowsModel->Visible = EditorUI::SelectedObjects.size();
+	if (EditorUI::SelectedObjects.size())
 	{
-		ArrowsModel->ModelTransform.Location = SelectedObjects[0]->GetTransform().Location;
+		ArrowsModel->ModelTransform.Location = EditorUI::SelectedObjects[0]->GetTransform().Location;
 		ArrowsModel->ModelTransform.Scale = Vector3(1, 1, -1) * Vector3::Distance(Graphics::MainCamera->Position, ArrowsModel->ModelTransform.Location) * 0.03f;
 		ArrowsModel->UpdateTransform();
 	}
 
-	SelectedObjects.clear();
+	EditorUI::SelectedObjects.clear();
 	for (auto i : Objects::AllObjects)
 	{
 		if (!i->IsSelected) continue;
-		SelectedObjects.push_back(i);
+		EditorUI::SelectedObjects.push_back(i);
 
 		for (auto j : i->GetComponents())
 		{
@@ -168,23 +169,20 @@ void Viewport::Tick()
 			}
 		}
 	}
-	if (PreviousSelectedObject && !SelectedObjects.size())
+	if (PreviousSelectedObject && !EditorUI::SelectedObjects.size())
 	{
 		PreviousSelectedObject = nullptr;
-		Editor::CurrentUI->UIElements[5]->UpdateLayout();
-		Editor::CurrentUI->UIElements[6]->UpdateLayout();
+		EditorUI::OnObjectSelected();
 	}
-	else if (SelectedObjects.size() && PreviousSelectedObject != SelectedObjects[0])
+	else if (EditorUI::SelectedObjects.size() && PreviousSelectedObject != EditorUI::SelectedObjects[0])
 	{
-		PreviousSelectedObject = SelectedObjects[0];
-		Editor::CurrentUI->UIElements[5]->UpdateLayout();
-		Editor::CurrentUI->UIElements[6]->UpdateLayout();
+		PreviousSelectedObject = EditorUI::SelectedObjects[0];
+		EditorUI::OnObjectSelected();
 	}
-	else if (PreviousSelectedObjectSize != SelectedObjects.size())
+	else if (PreviousSelectedObjectSize != EditorUI::SelectedObjects.size())
 	{
-		PreviousSelectedObjectSize = SelectedObjects.size();
-		Editor::CurrentUI->UIElements[5]->UpdateLayout();
-		Editor::CurrentUI->UIElements[6]->UpdateLayout();
+		PreviousSelectedObjectSize = EditorUI::SelectedObjects.size();
+		EditorUI::OnObjectSelected();
 	}
 
 	if (Input::IsKeyDown(Input::Key::ESCAPE))
@@ -204,18 +202,16 @@ void Viewport::Tick()
 		}
 	}
 
-	auto Viewport = Editor::CurrentUI->UIElements[4];
-	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Viewport->Position + (Viewport->Scale * 0.5));
+	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Position + (Scale * 0.5));
 	Vector3 Rotation = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
-	if (Math::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation)
-		&& !Dragging
-		&& TabHas3DView)
+	if (UI::HoveredBox == PanelMainBackground
+		&& !Dragging)
 	{
-
-		if (!(int)Editor::CurrentUI->CurrentCursor && !CurrentTab) // Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
+		// Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
+		if (!(int)Application::EditorInstance->CurrentCursor)
 		{
-			Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Cross;
+			Application::EditorInstance->CurrentCursor = EditorUI::CursorType::Cross;
 		}
 
 		if (Input::IsRMBDown && !ViewportLock)
@@ -231,7 +227,7 @@ void Viewport::Tick()
 		{
 			IsCopying = true;
 			std::vector<WorldObject*> CopiedObjects;
-			for (WorldObject* i : SelectedObjects)
+			for (WorldObject* i : EditorUI::SelectedObjects)
 			{
 				WorldObject* o = Objects::SpawnObjectFromID(i->GetObjectDescription().ID, i->GetTransform());
 				o->SetName(i->GetName());
@@ -242,7 +238,7 @@ void Viewport::Tick()
 				CopiedObjects.push_back(o);
 			}
 			ClearSelectedObjects();
-			SelectedObjects = CopiedObjects;
+			EditorUI::SelectedObjects = CopiedObjects;
 			ChangedScene = true;
 		}
 	}
@@ -255,50 +251,52 @@ void Viewport::Tick()
 		Application::SetCursorPosition(InitialMousePosition);
 		ViewportLock = false;
 	}
-	if (Input::IsLMBDown && !PressedLMB && !CurrentTab)
+	if (Input::IsLMBDown && !PressedLMB)
 	{
 		PressedLMB = true;
-		if (TabHas3DView && Math::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation) && !UI::HoveredBox)
+		if (Math::IsPointIn2DBox(Position, Position + Scale, Input::MouseLocation) && UI::HoveredBox == PanelMainBackground)
 		{
 			Vector3 DistanceScaleMultiplier;
-			if (SelectedObjects.size() > 0)
-				DistanceScaleMultiplier = Vector3((SelectedObjects.at(0)->GetTransform().Location - Vector3::Vec3ToVector(Graphics::MainCamera->Position)).Length() * 0.15f);
+			if (EditorUI::SelectedObjects.size() > 0)
+				DistanceScaleMultiplier = Vector3((EditorUI::SelectedObjects.at(0)->GetTransform().Location 
+					- Vector3(Graphics::MainCamera->Position)).Length() * 0.15f);
 
 			bool Hit = false;
-			if (SelectedObjects.size() > 0)
+			if (EditorUI::SelectedObjects.size() > 0)
 			{
 				float t = INFINITY;
 				Collision::HitResponse CollisionTest 
-					= Collision::LineCheckForAABB((ArrowBoxZ * DistanceScaleMultiplier) + SelectedObjects.at(0)->GetTransform().Location,
+					= Collision::LineCheckForAABB((ArrowBoxZ * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Location,
 						Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 				if (CollisionTest.Hit)
 				{
-					PreviousLocation = SelectedObjects[0]->GetTransform().Location;
+					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Location;
 					Hit = true;
 					Dragging = true;
-					Axis = Vector3(0, 0, 1.f);
-					BoxAxis = Vector3(0, 1, 1);
+					Axis = Vector3(0, 0, 1.0f);
+					BoxAxis = 2;
 					t = CollisionTest.t;
 				}
-				CollisionTest = Collision::LineCheckForAABB((ArrowBoxY * DistanceScaleMultiplier) + SelectedObjects.at(0)->GetTransform().Location,
+				CollisionTest = Collision::LineCheckForAABB((ArrowBoxY * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Location,
 					Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 				if (CollisionTest.Hit && CollisionTest.t < t)
 				{
-					PreviousLocation = SelectedObjects[0]->GetTransform().Location;
+					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Location;
 					Hit = true;
 					Dragging = true;
-					Axis = Vector3(0, 1.f, 0);
+					BoxAxis = 1;
+					Axis = Vector3(0, 1.0f, 0);
 					t = CollisionTest.t;
 				}
-				CollisionTest = Collision::LineCheckForAABB((ArrowBoxX * DistanceScaleMultiplier) + SelectedObjects.at(0)->GetTransform().Location,
+				CollisionTest = Collision::LineCheckForAABB((ArrowBoxX * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Location,
 					Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 				if (CollisionTest.Hit && CollisionTest.t < t)
 				{
-					PreviousLocation = SelectedObjects[0]->GetTransform().Location;
+					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Location;
 					Hit = true;
 					Dragging = true;
-					Axis = Vector3(1.f, 0, 0);
-					BoxAxis = Vector3(1, 1, 0);
+					Axis = Vector3(1.0f, 0, 0);
+					BoxAxis = 0;
 					t = CollisionTest.t;
 				}
 				FirstDragFrame = true;
@@ -324,8 +322,8 @@ void Viewport::Tick()
 		PressedLMB = false;
 		if (Dragging)
 		{
+			EditorUI::UpdateAllInstancesOf<ContextMenu>();
 			Dragging = false;
-			Editor::CurrentUI->UIElements[6]->UpdateLayout();
 		}
 	}
 
@@ -379,27 +377,41 @@ void Viewport::Tick()
 	if (Dragging)
 	{
 		Vector3 DistanceScaleMultiplier;
-		if (SelectedObjects.size() > 0)
-			DistanceScaleMultiplier = Vector3((SelectedObjects.at(0)->GetTransform().Location - Vector3::Vec3ToVector(Graphics::MainCamera->Position)).Length() * 0.15f);
+		if (EditorUI::SelectedObjects.size() > 0)
+			DistanceScaleMultiplier = Vector3((EditorUI::SelectedObjects.at(0)->GetTransform().Location 
+				- Vector3(Graphics::MainCamera->Position)).Length() * 0.15f);
 
 		Collision::Box TransformBox
 		(
 			-100000.0f, 100000.0f,
 			-100000.0f, 100000.0f,
 			-100000.0f, 100000.0f
-
 		);
-		TransformBox = TransformBox.TransformBy(Transform(SelectedObjects[0]->GetTransform().Location, 0, BoxAxis));
+
+		Vector3 BoxScale = 1;
+		int Prev = -1;
+		Vector3 Forward = Vector3::GetForwardVector(Graphics::MainCamera->Rotation);
+		for (int i = 0; i < 3; i++)
+		{
+			if (i != BoxAxis)
+			{
+				if (Prev == -1)
+				{
+					Prev = i;
+				}
+				else
+				{
+					BoxScale.at(i) = Forward.at(Prev) > Forward.at(i) ? 0.0f : 1.0f;
+					BoxScale.at(Prev) = Forward.at(Prev) > Forward.at(i) ? 1.0f : 0.0f;
+				}
+			}
+		}
+
+		TransformBox = TransformBox.TransformBy(Transform(EditorUI::SelectedObjects[0]->GetTransform().Location, 0, BoxScale));
 
 		auto h = Collision::LineCheckForAABB(TransformBox, Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 
-		//if (h.Hit)
-		//{
-		//	Objects::SpawnObject<MeshObject>(Transform(h.ImpactPoint, 0, 1))->LoadFromFile("Skybox");
-		//}
-		//return;
-
-		Vector3 TransformToAdd = (h.ImpactPoint - SelectedObjects[0]->GetTransform().Location) * Axis - DragOffset;
+		Vector3 TransformToAdd = (h.ImpactPoint - EditorUI::SelectedObjects[0]->GetTransform().Location) * Axis - DragOffset;
 
 		if (FirstDragFrame)
 		{
@@ -418,86 +430,8 @@ void Viewport::Tick()
 	}
 
 }
-void Viewport::UpdateTabBar()
-{
-	TabBox->SetPosition(Position + Vector2(0, Scale.Y - 0.045f));
-	TabBox->SetMinSize(Vector2(Scale.X, 0.045f));
-	TabBox->SetMaxSize(Vector2(Scale.X, 0.045f));
-	TabTexts.clear();
-	TabBox->DeleteChildren();
-	for (size_t i = 0; i < Tabs.size(); i++)
-	{
-		auto NewText = new UIText(0.4f, UIColors[2], FileUtil::GetFileNameWithoutExtensionFromPath(Tabs[i].Name), Editor::CurrentUI->EngineUIText);
-		TabTexts.push_back(NewText);
-		auto elem = (new UIButton(true, 0, UIColors[0] * (SelectedTab == i ? 3 : 1.5f), this, (int)i * 2))
-			->SetVerticalAlign(UIBox::Align::Centered)
-			->SetBorder(UIBox::BorderType::Rounded, 0.25f)
-			->SetPadding(0, 0, 0, 0.02f)
-			->AddChild((new UIBackground(true, 0, Editor::ItemColors[Tabs[i].Type], Vector2(0.01f, 0.045f)))
-				->SetPadding(0))
-			->AddChild(NewText
-				->SetPadding(0.005f, 0.005f, 0.005f, 0.005f));
-		elem->SetTryFill(true);
-		if (Tabs[i].CanBeClosed)
-		{
-			elem->AddChild((new UIButton(true, 0, UIColors[2], this, (int)i * 2 + 1))
-				->SetUseTexture(true, Editor::CurrentUI->Textures[4])
-				->SetMinSize(0.035f)
-				->SetPadding(0.005f)
-				->SetSizeMode(UIBox::SizeMode::PixelRelative));
-		}
-		TabBox->AddChild(elem);
-	}
-}
 
 void Viewport::OnButtonClicked(int Index)
 {
-	if (Index % 2)
-	{
-		if (TabInstances[Tabs[SelectedTab].Index] && Index / 2 == SelectedTab)
-		{
-			TabInstances[Tabs[SelectedTab].Index]->Save();
-			TabInstances[Tabs[SelectedTab].Index]->TabBackground->IsVisible = false;
-			UIBox::RedrawUI();
-		}
-		if (SelectedTab >= Index / 2)
-		{
-			SelectedTab--;
-		}
-		if (TabInstances[Tabs[SelectedTab].Index])
-		{
-			TabInstances[Tabs[SelectedTab].Index]->Load(Tabs[SelectedTab].Name);
-		}
-		Tabs.erase(Tabs.begin() + Index / 2);
-		UpdateLayout();
-		return;
-	}
-	else
-	{
-		if (TabInstances[Tabs[SelectedTab].Index])
-		{
-			TabInstances[Tabs[SelectedTab].Index]->Save();
-			TabInstances[Tabs[SelectedTab].Index]->TabBackground->IsVisible = false;
-			TabInstances[Tabs[SelectedTab].Index]->TabBackground->Update();
-			UIBox::RedrawUI();
-		}
-		SelectedTab = Index / 2;
-		if (TabInstances[Tabs[SelectedTab].Index])
-		{
-			TabInstances[Tabs[SelectedTab].Index]->Load(Tabs[SelectedTab].Name);
-		}
-		UpdateLayout();
-	}
 }
-void Viewport::OpenTab(size_t TabID, std::string File)
-{
-	Tabs.push_back(Tab(TabID, File, true, FileUtil::GetExtension(File)));
-	SelectedTab = Tabs.size() - 1;
-	if (TabInstances[Tabs[SelectedTab].Index])
-	{
-		TabInstances[Tabs[SelectedTab].Index]->Load(Tabs[SelectedTab].Name);
-	}
-	UpdateLayout();
-}
-
 #endif

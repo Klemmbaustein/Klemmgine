@@ -53,7 +53,7 @@ namespace NativeFunctions
 		Parent->Attach(NewCollider);
 		ModelGenerator::ModelData m;
 		m.LoadModelFromFile(ModelFile);
-		NewCollider->Init(m.GetMergedVertices(), m.GetMergedIndices());
+		NewCollider->Load(m.GetMergedVertices(), m.GetMergedIndices());
 		return NewCollider;
 	}
 
@@ -180,7 +180,7 @@ namespace NativeFunctions
 	static UIBox* CreateUIBox(bool Horizontal, Vector2 Position)
 	{
 #if !EDITOR && !SERVER
-		return new UIBox(Horizontal, Position);
+		return new UIBox(Horizontal ? UIBox::Orientation::Horizontal : UIBox::Orientation::Vertical, Position);
 #endif
 		return nullptr;
 	}
@@ -282,7 +282,7 @@ namespace NativeFunctions
 	static UIBackground* CreateUIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale)
 	{
 #if !EDITOR && !SERVER
-		return (UIBackground*)(new UIBackground(Horizontal, Position, Color, MinScale))->SetTryFill(true);
+		return (UIBackground*)(new UIBackground(Horizontal ? UIBox::Orientation::Horizontal : UIBox::Orientation::Vertical, Position, Color, MinScale))->SetTryFill(true);
 #endif
 		return nullptr;
 	}
@@ -305,6 +305,10 @@ namespace NativeFunctions
 	static void SetUIBackgroundTexture(UIBackground* Target, const char* Texture)
 	{
 #if !EDITOR && !SERVER
+		if (std::strlen(Texture) == 0)
+		{
+			Target->SetUseTexture(false, "");
+		}
 		Target->SetUseTexture(true, Texture);
 #endif
 		return;

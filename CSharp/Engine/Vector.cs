@@ -2,8 +2,13 @@
 using System.Globalization;
 using System.Runtime.InteropServices;
 
-/*
- * A structure containing single precision X, Y and Z coordinates.
+namespace Engine;
+
+/**
+ * @ingroup CSharp
+ * @brief
+ * A structure containing X, Y and Z coordinates.
+ * 
  * Equivalent to 'struct Vector3' in 'Math/Vector.h'
  */
 [StructLayout(LayoutKind.Sequential)]
@@ -31,7 +36,9 @@ public struct Vector3
 		Z = xyz;
 	}
 
-	public float Length()
+	/***
+	 */
+	public readonly float Length()
 	{
 		return MathF.Sqrt(X * X + Y * Y + Z * Z);
 	}
@@ -121,8 +128,10 @@ public struct Vector3
 	}
 }
 
-/*
+/**
+ * @brief
  * A structure containing single precision X and Y coordinates.
+ * 
  * Equivalent to 'struct Vector2' in 'Math/Vector.h'
  */
 [StructLayout(LayoutKind.Sequential)]

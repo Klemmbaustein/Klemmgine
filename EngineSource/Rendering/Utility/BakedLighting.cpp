@@ -364,7 +364,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 		}
 
 		BakeLog("Finished baking lightmap.");
-		BakeLog("Bake took " + std::to_string((int)BakeTimer.TimeSinceCreation()) + " seconds.");
+		BakeLog("Bake took " + std::to_string((int)BakeTimer.Get()) + " seconds.");
 
 		// Simple RLE for lightmap compression.
 		std::byte* TexPtr = Bake::Texture;

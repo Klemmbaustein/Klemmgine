@@ -313,7 +313,7 @@ void Console::InitializeConsole()
 		{
 			Application::Timer t;
 			std::string FoundFile = Assets::GetAsset(CommandArgs()[0]);
-			float Duration = t.TimeSinceCreation();
+			float Duration = t.Get();
 			if (FoundFile.empty())
 			{
 				FoundFile = "Not found";
@@ -338,7 +338,7 @@ void Console::InitializeConsole()
 
 	RegisterCommand(Command("getclass", []()
 		{
-			for (const auto& i : Objects::EditorObjects)
+			for (const auto& i : Objects::ObjectTypes)
 			{
 				if (i.Name == CommandArgs()[0])
 				{

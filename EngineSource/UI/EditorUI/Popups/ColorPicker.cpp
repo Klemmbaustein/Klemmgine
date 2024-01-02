@@ -1,4 +1,4 @@
-#if EDITOR
+#if EDITOR && 0
 #include "ColorPicker.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Log.h>
@@ -100,7 +100,7 @@ HsvColor RgbToHsv(RgbColor rgb)
 
 
 ColorPicker::ColorPicker(UIVectorField* Color)
-	: EditorPanel(Editor::CurrentUI->UIColors, 0, Vector2(0.5f, 0.35f), Vector2(0.5f, 0.35f), Vector2(0.45f, 0.35f), true, "Color picker")
+	: EditorPanel(Application::EditorInstance->UIColors, 0, Vector2(0.5f, 0.35f), Vector2(0.5f, 0.35f), Vector2(0.45f, 0.35f), true, "Color picker")
 {
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
@@ -120,7 +120,7 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 			(new UIButton(true, 0, UIColors[2], this, (int)i))
 			->SetPadding(0.01f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-			->AddChild((new UIText(0.45f, 1 - UIColors[2], Answers[i], Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.45f, 1 - UIColors[2], Answers[i], Application::EditorInstance->EngineUIText))
 				->SetPadding(0.005f)));
 	}
 	SelectedColor = Color->GetValue();
@@ -207,7 +207,7 @@ void ColorPicker::Tick()
 			SV = RelativeMousePosition;
 			UpdateColors();
 		}
-		Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Cross;
+		Application::EditorInstance->CurrentCursor = EditorUI::CursorType::Cross;
 	}
 
 	if (ColorPickerBackgrounds[1]->IsHovered())
@@ -219,7 +219,7 @@ void ColorPicker::Tick()
 			SelectedHue = RelativeMousePosition.Y;
 			UpdateColors();
 		}
-		Editor::CurrentUI->CurrentCursor = EditorUI::CursorType::Cross;
+		Application::EditorInstance->CurrentCursor = EditorUI::CursorType::Cross;
 	}
 }
 void ColorPicker::OnButtonClicked(int Index)
@@ -260,7 +260,7 @@ void ColorPicker::GenerateRGBDisplay()
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		RGBTexts[i] = new UITextField(0, UIColors[1], this, 2, Editor::CurrentUI->EngineUIText);
+		RGBTexts[i] = new UITextField(0, UIColors[1], this, 2, Application::EditorInstance->EngineUIText);
 		RGBTexts[i]
 			->SetTextSize(0.4f)
 			->SetMinSize(Vector2(0.06f, 0.04f))
@@ -268,7 +268,7 @@ void ColorPicker::GenerateRGBDisplay()
 		RGBTexts[i]->SetText(EditorUI::ToShortString(SelectedColor[(int)i]));
 		RGBBox->AddChild((new UIBox(true, 0))
 				->SetPadding(0)
-				->AddChild((new UIText(0.4f, UIColors[2], xyz[i], Editor::CurrentUI->EngineUIText))
+				->AddChild((new UIText(0.4f, UIColors[2], xyz[i], Application::EditorInstance->EngineUIText))
 					->SetPadding(0.015f, 0.015f, 0.01f, 0.005f))
 				->AddChild(RGBTexts[i]
 					->SetPadding(0.01f, 0.01f, 0, 0)));

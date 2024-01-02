@@ -1,6 +1,13 @@
 #if EDITOR
 #pragma once
 #include <UI/EditorUI/EditorPanel.h>
+
+/**
+* @brief
+* Toolbar panel in the editor.
+* 
+* @ingroup Editor
+*/
 class Toolbar : public EditorPanel
 {
 public:
@@ -20,6 +27,7 @@ public:
 	static Toolbar* ToolbarInstance;
 
 protected:
+	UIBox* ButtonsBox = nullptr;
 	void GenerateButtons();
 	std::vector<ButtonCategory> Buttons;
 public:
@@ -27,8 +35,8 @@ public:
 	void RemoveButton(std::string Name);
 	void SetButtonVisibility(std::string Name, bool IsVisible);
 
-	Toolbar(Vector3* Colors, Vector2 Position, Vector2 Scale);
-	void UpdateLayout() override;
+	Toolbar(EditorPanel* Parent);
+	void OnResized() override;
 	void Tick() override;
 
 	void OnButtonClicked(int Index) override;

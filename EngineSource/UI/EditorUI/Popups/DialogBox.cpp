@@ -1,10 +1,10 @@
-#if EDITOR
+#if EDITOR && 0
 #include "DialogBox.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Log.h>
 
 DialogBox::DialogBox(std::string Title, Vector2 Position, std::string Message, std::vector<Answer> Answers)
-	: EditorPanel(Editor::CurrentUI->UIColors, Position, Vector2(0.4f, 0.15f), Vector2(0.25f, 0.15f), 2, true, Title)
+	: EditorPanel(Application::EditorInstance->UIColors, Position, Vector2(0.4f, 0.15f), Vector2(0.25f, 0.15f), 2, true, Title)
 {
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5);
 	ButtonBackground->SetPadding(0);
@@ -19,10 +19,10 @@ DialogBox::DialogBox(std::string Title, Vector2 Position, std::string Message, s
 			(new UIButton(true, 0, UIColors[2], this, (int)i))
 			->SetPadding(0.01f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-			->AddChild((new UIText(0.45f, 1 - UIColors[2], Answers[i].Name, Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.45f, 1 - UIColors[2], Answers[i].Name, Application::EditorInstance->EngineUIText))
 				->SetPadding(0.005f)));
 	}
-	TabBackground->AddChild(new UIText(0.5f, UIColors[2], Message, Editor::CurrentUI->EngineUIText));
+	TabBackground->AddChild(new UIText(0.5f, UIColors[2], Message, Application::EditorInstance->EngineUIText));
 	UpdateLayout();
 }
 

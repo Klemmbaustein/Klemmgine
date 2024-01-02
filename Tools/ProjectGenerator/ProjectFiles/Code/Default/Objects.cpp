@@ -45,7 +45,7 @@ std::string Objects::GetCategoryFromID(uint32_t ID)
 
 namespace Objects
 {
-	const std::vector<ObjectDescription> EditorObjects
+	const std::vector<ObjectDescription> ObjectTypes
 	{
 #include <GENERATED/GENERATED_ListOfObjects.h>
 	};

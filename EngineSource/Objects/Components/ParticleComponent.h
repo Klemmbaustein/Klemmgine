@@ -11,7 +11,7 @@ class ParticleComponent : public Component
 	Particles::ParticleEmitter* Emitter = nullptr;
 public:
 	void Begin() override;
-	void Tick() override;
+	void Update() override;
 	void Destroy() override;
 	
 	void LoadParticle(std::string Name);

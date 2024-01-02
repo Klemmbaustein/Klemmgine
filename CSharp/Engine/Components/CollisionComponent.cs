@@ -1,6 +1,7 @@
-﻿using Engine;
-using System;
+﻿using System;
 using System.Runtime.InteropServices;
+namespace Engine;
+
 
 public class CollisionComponent : ObjectComponent
 {

@@ -11,38 +11,28 @@
 #include <Objects/CSharpObject.h>
 #endif
 #include <Engine/Input.h>
+#include <Engine/Application.h>
 
-ObjectList::ObjectList(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2f, 0.5f), Vector2(0.8f, 1.25f))
+ObjectList::ObjectList(EditorPanel* Parent) : EditorPanel(Parent, "Objects")
 {
-	TabBackground->SetHorizontal(false);
-	ObjectListBox = new UIScrollBox(false, 0, true);
-	HeaderBox = new UIBackground(false, 0, Vector3(UIColors[0]), 0);
-	HeaderBox->SetBorder(UIBox::BorderType::DarkenedEdge, 0.25);
-	ObjectListBox
-		->SetPadding(0.005f, 0.005f, 0.005f / Graphics::AspectRatio, 0.005f / Graphics::AspectRatio)
-		->SetMinSize(Vector2(Scale.X - (0.005f / Graphics::AspectRatio), Scale.Y - Editor::CurrentUI->UIElements[2]->Scale.Y - 0.01f))
-		->SetMaxSize(Vector2(Scale.X - (0.005f / Graphics::AspectRatio), Scale.Y - Editor::CurrentUI->UIElements[2]->Scale.Y - 0.01f));
-	TabBackground->SetVerticalAlign(UIBox::Align::Reverse);
-	TabBackground
-		->AddChild(HeaderBox
-			->SetPadding(0)
-			->SetMinSize(Vector2(Scale.X, Editor::CurrentUI->UIElements[2]->Scale.Y))
-			->SetMaxSize(Vector2(Scale.X, Editor::CurrentUI->UIElements[2]->Scale.Y)))
+	ObjectListBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
+	PanelMainBackground
 		->AddChild(ObjectListBox);
 }
 
 void ObjectList::Tick()
 {
-	UpdatePanel();
+	TickPanel();
 	if (Objects::AllObjects.size() != ObjectSize)
 	{
 		ObjectSize = Objects::AllObjects.size();
-		UpdateLayout();
+		OnResized();
 	}
 }
 
 void ObjectList::OnButtonClicked(int Index)
 {
+	HandlePanelButtons(Index);
 	if (Index >= 0)
 	{
 		if (!Input::IsKeyDown(Input::Key::LSHIFT))
@@ -53,56 +43,52 @@ void ObjectList::OnButtonClicked(int Index)
 			};
 		}
 		Objects::AllObjects[Index]->IsSelected = true;
+		OnResized();
 	}
-	if (Index < 0)
+	if (Index < 0 && Index > -1000)
 	{
-		std::string Elem = "OBJ_CAT_" + Editor::CurrentUI->ObjectCategories[-Index - 1];
-		if (Editor::CurrentUI->CollapsedItems.contains(Elem))
+		std::string Elem = "OBJ_CAT_" + Application::EditorInstance->ObjectCategories[-Index - 1];
+		if (Application::EditorInstance->CollapsedItems.contains(Elem))
 		{
-			Editor::CurrentUI->CollapsedItems.erase(Elem);
+			Application::EditorInstance->CollapsedItems.erase(Elem);
 		}
 		else
 		{
-			Editor::CurrentUI->CollapsedItems.insert(Elem);
+			Application::EditorInstance->CollapsedItems.insert(Elem);
 		}
-		UpdateLayout();
+		OnResized();
 	}
 }
 
-void ObjectList::UpdateLayout()
+void ObjectList::OnResized()
 {
 	ObjectListBox
 		->SetPadding(0.005f, 0.005f, 0.005f / Graphics::AspectRatio, 0.005f / Graphics::AspectRatio)
-		->SetMinSize(Vector2(Scale.X - (0.005f / Graphics::AspectRatio), Scale.Y - Editor::CurrentUI->UIElements[2]->Scale.Y - 0.01f))
-		->SetMaxSize(Vector2(Scale.X - (0.005f / Graphics::AspectRatio), Scale.Y - Editor::CurrentUI->UIElements[2]->Scale.Y - 0.01f));
-	HeaderBox
-		->SetMinSize(Vector2(Scale.X, Editor::CurrentUI->UIElements[2]->Scale.Y))
-		->SetMaxSize(Vector2(Scale.X, Editor::CurrentUI->UIElements[2]->Scale.Y));
+		->SetMinSize(Vector2(Scale.X - (0.01f / Graphics::AspectRatio), Scale.Y - 0.01f))
+		->SetMaxSize(Vector2(Scale.X - (0.01f / Graphics::AspectRatio), Scale.Y - 0.01f));
 
 	ObjectListBox->DeleteChildren();
 	ObjectListBox->SetVerticalAlign(UIBox::Align::Reverse);
 	ListIterator = 0;
 
-	auto ObjectList = Editor::CurrentUI->GetObjectList();
+	auto ObjectList = Application::EditorInstance->GetObjectList();
 	GenerateObjectListSection(ObjectList, 0);
 }
 
 void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem> Section, float Depth)
 {
-	TextRenderer* Renderer = Editor::CurrentUI->EngineUIText;
-
 	for (auto& Object : Section)
 	{
-		UIButton* ElementButton = (new UIButton(true,
+		UIButton* ElementButton = (new UIButton(UIBox::Orientation::Horizontal,
 			0,
-			(ListIterator++ % 2) ? UIColors[0] : Vector3::Lerp(UIColors[0], 0.5f, 0.2f),
+			(ListIterator++ % 2) ? EditorUI::UIColors[0] : Vector3::Lerp(EditorUI::UIColors[0], 0.5f, 0.2f),
 			this,
 			Object.Object ? Object.ListIndex : -1 - Object.ListIndex));
 
 		bool IsCSObj = false;
 #if ENGINE_CSHARP
 		IsCSObj = Object.Object && Object.Object->GetObjectDescription().ID == CSharpObject::GetID();
-		Vector3 ObjectColor = IsCSObj ? Editor::ItemColors.at("cs") : Editor::ItemColors.at("cpp");
+		Vector3 ObjectColor = IsCSObj ? EditorUI::ItemColors.at("cs") : EditorUI::ItemColors.at("cpp");
 #else
 		Vector3 ObjectColor = Editor::ItemColors["cpp"];
 #endif
@@ -124,19 +110,19 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 
 		ObjectListBox->AddChild(ElementButton
 			->SetVerticalAlign(UIBox::Align::Centered)
-			->SetMinSize(Vector2(TabBackground->GetUsedSize().X - 0.02f, 0.045f))
+			->SetMinSize(Vector2(Scale.X - 0.005f, 0.045f))
 			->SetPadding(0, 0, 0, 0.01f));
 
 		if (!Object.Object && !Object.IsScene)
 		{
-			ElementButton->AddChild((new UIBackground(true, 0, UIColors[2], 0.03f))
-				->SetUseTexture(true, Editor::CurrentUI->Textures[13ull + (size_t)Object.IsCollapsed])
+			ElementButton->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], 0.03f))
+				->SetUseTexture(true, Application::EditorInstance->Textures[13ull + (size_t)Object.IsCollapsed])
 				->SetPadding(0, 0.01f, Depth - 0.04f / Graphics::AspectRatio + 0.005f, 0.001f)
 				->SetSizeMode(UIBox::SizeMode::PixelRelative));
 		}
 
-		auto Icon = (new UIBackground(true, 0, UIColors[2], 0.04f))
-			->SetUseTexture(true, Editor::CurrentUI->Textures[ElemIcon])
+		auto Icon = (new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], 0.04f))
+			->SetUseTexture(true, Application::EditorInstance->Textures[ElemIcon])
 			->SetPadding(0, 0, 0, 0.005f)
 			->SetSizeMode(UIBox::SizeMode::PixelRelative);
 		ElementButton->AddChild(Icon);
@@ -146,14 +132,12 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 			Icon->SetPadding(0, 0, Depth, 0.005f);
 		}
 
-		ElementButton->AddChild((new UIText(0.4f, UIColors[2], Object.Name, Renderer))
+		ElementButton->AddChild((new UIText(0.4f, EditorUI::UIColors[2], Object.Name, EditorUI::Text))
 			->SetPadding(0.005f, 0.005f, 0, 0));
 
-		auto v = dynamic_cast<Viewport*>(Editor::CurrentUI->UIElements[4]);
 		if (Object.IsSelected)
 		{
 			ElementButton->SetColor(ElementButton->GetColor() * 3 * Vector3(1, 0.75f, 0));
-			ElementButton->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
 		}
 
 		if (Object.Object)

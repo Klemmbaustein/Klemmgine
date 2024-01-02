@@ -8,7 +8,7 @@
 #include <sstream>
 #include <Engine/Log.h>
 #include <Engine/Application.h>
-#include <UI/EditorUI/Popups/ColorPicker.h>
+#include <UI/EditorUI/EditorUI.h>
 
 void UIVectorField::SendNotifyEvent()
 {
@@ -42,12 +42,14 @@ void UIVectorField::SetValue(Vector3 NewValue)
 	UpdateValues();
 }
 
-UIVectorField::UIVectorField(Vector2 Position, Vector3 StartValue, UICanvas* ParentUI, int Index, TextRenderer* Renderer) : UIBox(false, Position)
+UIVectorField::UIVectorField(float Size, Vector3 StartValue, UICanvas* ParentUI, int Index, TextRenderer* Renderer) 
+	: UIBox(UIBox::Orientation::Vertical, Position)
 {
 	this->Renderer = Renderer;
 	Value = StartValue;
 	this->ParentUI = ParentUI;
 	this->Index = Index;
+	this->Size = Size;
 	Generate();
 }
 
@@ -55,10 +57,10 @@ UIVectorField::~UIVectorField()
 {
 	for (auto i : Graphics::UIToRender)
 	{
-		if (dynamic_cast<ColorPicker*>(i) && dynamic_cast<ColorPicker*>(i)->ColorPtr == this)
-		{
-			delete i;
-		}
+		//if (dynamic_cast<ColorPicker*>(i) && dynamic_cast<ColorPicker*>(i)->ColorPtr == this)
+		//{
+		//	delete i;
+		//}
 	}
 }
 
@@ -110,25 +112,29 @@ void UIVectorField::Generate()
 
 	};
 	DeleteChildren();
-	FieldBox = new UIBox(true, 0);
+	FieldBox = new UIBox(UIBox::Orientation::Horizontal, 0);
 	FieldBox->SetPadding(0);
 	AddChild(FieldBox);
+	float ElementSize = Size / 3.0f - 0.015f;
 	for (int i = 0; i < 3; i++)
 	{
-		auto NewItemColor = new UIBackground(false, 0, Colors[i], 0);
-		NewItemColor->SetPadding(0);
-		NewItemColor->SetMinSize(Vector2(0, 0.04f));
+		auto NewItemColor = new UIBackground(UIBox::Orientation::Vertical, 0, Colors[i], 0);
+		NewItemColor
+			->SetPadding(0)
+			->SetVerticalAlign(UIBox::Align::Centered)
+			->SetHorizontalAlign(UIBox::Align::Centered)
+			->SetMinSize(Vector2(0.015f, 0.04f))
+			->SetMaxSize(Vector2(0.015f, 0.04f));
 		auto ItemName = new UIText(0.4f, 1, DimensionStrings[(int)Type][i], Renderer);
 		ItemName->SetPadding(0.0075f, 0.005f, 0.005f, 0.005f);
-		NewItemColor->SetBorder(UIBox::BorderType::Rounded, 0.25f);
-		auto NewTextField = new UITextField(0, Vector3(0.2f), nullptr, i, Renderer);
+		auto NewTextField = new UITextField(0, EditorUI::UIColors[1], nullptr, i, Renderer);
 		FieldBox->AddChild(NewItemColor);
 		NewItemColor->AddChild(ItemName);
 		NewTextField->HintText = DimensionStrings[(int)Type][i];
 		NewTextField->SetPadding(0);
-		NewTextField->SetMinSize(Vector2(0.07f, 0.04f));
-		NewTextField->SetMaxSize(Vector2(0.07f, 0.04f));
-		NewTextField->SetBorder(UIBox::BorderType::DarkenedEdge, 0.25f);
+		NewTextField->SetTextColor(EditorUI::UIColors[2]);
+		NewTextField->SetMinSize(Vector2(ElementSize, 0.04f));
+		NewTextField->SetMaxSize(Vector2(ElementSize, 0.04f));
 		NewTextField->SetTextSize(0.4f);
 		NewTextField->ParentOverride = this;
 		std::stringstream stream;
@@ -136,11 +142,10 @@ void UIVectorField::Generate()
 		NewTextField->SetText(stream.str());
 		TextFields[i] = NewTextField;
 		FieldBox->AddChild(NewTextField);
-		this->SetMaxSize(Vector2(0.3f, 0.075f));
 	}
 	if (Type == VecType::rgb)
 	{
-		ColorDisplay = new UIButton(true, 0, Value, nullptr, 3);
+		ColorDisplay = new UIButton(UIBox::Orientation::Horizontal, 0, Value, nullptr, 3);
 		ColorDisplay->ParentOverride = this;
 		ColorDisplay
 			->SetHorizontalAlign(UIBox::Align::Centered)
@@ -148,10 +153,11 @@ void UIVectorField::Generate()
 		ColorText = new UIText(0.35f, std::max(Value.Length(), 0.0f) < 0.2f ? 1.0f : 0.0f, "Color picker", Renderer);
 		ColorDisplay->AddChild(ColorText->SetPadding(0));
 		AddChild(ColorDisplay);
-		ColorDisplay->SetTryFill(true);
-		ColorDisplay->SetMinSize(Vector2(0.26f, 0.03f));
-		ColorDisplay->SetBorder(BorderType::Rounded, 0.25f);
-		ColorDisplay->SetPadding(0);
+		ColorDisplay
+			->SetMinSize(Vector2(Size, 0.03f))
+			->SetBorder(BorderType::Rounded, 0.25f)
+			->SetTryFill(true)
+			->SetPadding(0);
 	}
 }
 
@@ -159,11 +165,11 @@ void UIVectorField::OnChildClicked(int Index)
 {
 	try
 	{
-		if (Index == 3)
-		{
-			new ColorPicker(this);
-			return;
-		}
+		//if (Index == 3)
+		//{
+		//	new ColorPicker(this);
+		//	return;
+		//}
 		if (Value[Index] != std::stof(TextFields[Index]->GetText()))
 		{
 			Value[Index] = std::stof(TextFields[Index]->GetText());

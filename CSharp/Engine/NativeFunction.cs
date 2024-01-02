@@ -8,6 +8,11 @@ public static class NativeFunction
 {
 	static Dictionary<string, IntPtr> LoadedNativeFunctions = new Dictionary<string, IntPtr>();
 
+	public static void UnloadAll()
+	{
+		LoadedNativeFunctions.Clear();
+	}
+
 	public static void RegisterNativeFunction(string Name, IntPtr FunctionPtr)
 	{
 		LoadedNativeFunctions.Add(Name, FunctionPtr);

@@ -41,7 +41,7 @@ BillboardSprite* BillboardComponent::GetSprite()
 #endif
 }
 
-void BillboardComponent::Tick()
+void BillboardComponent::Update()
 {
 #if !SERVER
 	if (!Sprite) return;

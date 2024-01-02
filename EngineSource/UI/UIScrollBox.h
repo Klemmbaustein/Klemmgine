@@ -6,6 +6,10 @@ class ScrollObject;
 class UIButton;
 class UIBackground;
 
+/**
+* @brief
+* A scroll box. Children of this box can be scrolled.
+*/
 class UIScrollBox : public UIBox
 {
 	ScrollObject ScrollClass = ScrollObject(OffsetPosition, Size, 15);
@@ -36,7 +40,7 @@ public:
 	float GetScrollSpeed();
 	void Update() override;
 	void UpdateTickState() override;
-	UIScrollBox(bool Horizontal, Vector2 Position, bool DisplayScrollBar);
+	UIScrollBox(Orientation BoxOrientation, Vector2 Position, bool DisplayScrollBar);
 	~UIScrollBox();
 };
 #endif

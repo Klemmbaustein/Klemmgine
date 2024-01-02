@@ -5,25 +5,25 @@
 #include <Engine/Stats.h>
 
 class UIBox;
-class UIRenderingException : public std::exception
-{
-public:
-	UIRenderingException(std::string UIType, std::string ErrorType)
-	{
-		Exception = "UI rendering exception thrown: " + UIType + ": " + ErrorType;
-	}
 
-	virtual const char* what() const throw()
-	{
-		return Exception.c_str();
-	}
-
-	std::string Exception;
-};
-
+/**
+* @brief
+* A class for managing multiple UIBoxes.
+* 
+* This class responds to button events with the OnButtonClicked() function.
+* 
+* @ingroup UI
+*/
 class UICanvas
 {
 public:
+	/**
+	* @brief
+	* Creates a new UICanvas. Returns `nullptr` if in editor or server.
+	* 
+	* @tparam T
+	* The type of the new UICanvas.
+	*/
 	template<typename T>
 	static T* CreateNewCanvas()
 	{
@@ -42,9 +42,28 @@ public:
 		//Insert all UI Elements in UIElements
 	}
 
+	/**
+	* @brief
+	* Called each frame.
+	*/
 	virtual void Tick();
 
+	/**
+	* @brief
+	* Called when a UIButton belonging to this UICanvas gets clicked.
+	* 
+	* @param Index
+	* The Index of the button that has been clicked.
+	*/
 	virtual void OnButtonClicked(int Index);
+
+	/**
+	* @brief
+	* Called when a draggable UIButton belonging to this UICanvas gets dragged.
+	* 
+	* @param Index
+	* The Index of the button that has been dragged.
+	*/
 	virtual void OnButtonDragged(int Index);
 	virtual ~UICanvas();
 protected:

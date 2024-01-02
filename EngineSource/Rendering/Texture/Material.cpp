@@ -8,22 +8,10 @@
 #include <Engine/Utility/FileUtility.h>
 #include <Engine/EngineError.h>
 #include <Engine/Application.h>
-
-class MaterialException : public std::exception
-{
-public:
-	MaterialException(std::string ErrorType)
-	{
-		Exception = "Material loading error thrown: " + ErrorType;
-	}
-
-	virtual const char* what() const throw()
-	{
-		return Exception.c_str();
-	}
-
-	std::string Exception;
-};
+#include <Rendering/Mesh/Model.h>
+#include <Rendering/Mesh/Mesh.h>
+#include <Rendering/Graphics.h>
+#include <Rendering/Utility/Framebuffer.h>
 
 void Material::SetPredefinedMaterialValue(std::string Value, char* ptr, std::string Name)
 {
@@ -77,11 +65,12 @@ Material Material::LoadMaterialFile(std::string Name)
 #ifdef RELEASE
 		ENGINE_ASSERT(std::filesystem::exists(File), "Could not load material: " + Name + ".\n\
 This is a fatal error on release builds.\n\
-Ensure that none of your models have a material assigned.");
+Ensure that all of your models have a material assigned.");
 #endif
 	}
 
 	Material OutMaterial;
+	OutMaterial.Name = File;
 	std::ifstream In = std::ifstream(File);
 	
 	char CurrentBuff[100];
@@ -199,4 +188,23 @@ void Material::SaveMaterialFile(std::string Path, Material m)
 		}
 	}
 	Out.close();
+}
+
+void Material::ReloadMaterial(std::string MaterialPath)
+{
+	Material NewMaterial = LoadMaterialFile(MaterialPath);
+	for (Renderable* m : Graphics::MainFramebuffer->Renderables)
+	{
+		Model* RenderableModel = dynamic_cast<Model*>(m);
+		if (RenderableModel)
+		{
+			for (Mesh* i : RenderableModel->Meshes)
+			{
+				if (i->RenderContext.Mat.Name == MaterialPath)
+				{
+					i->RenderContext = ObjectRenderContext(NewMaterial);
+				}
+			}
+		}
+	}
 }

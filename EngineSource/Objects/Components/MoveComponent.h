@@ -20,7 +20,7 @@ public:
 	bool GetIsOnGround();
 	Vector3 GetVelocity();
 	void Begin() override;
-	void Tick() override;
+	void Update() override;
 	void Destroy() override;
 	void AddMovementInput(Vector3 Direction);
 

@@ -4,10 +4,33 @@
 #include <filesystem>
 #include <set>
 
+/**
+* @file
+* 
+* @brief
+* Utility functions for files.
+*/
+
+/**
+* Namespace containing utility functions for files.
+*/
 namespace FileUtil
 {
 	std::string GetFileNameFromPath(std::string FilePath);
 
+	/**
+	* @brief
+	* It is a scientific fact that this function has the best name.
+	* 
+	* Returns the given FilePath, without the path or extension.
+	* Example: `Content/Meshes/Cube.jsm` -> `Cube`
+	* 
+	* @param FilePath
+	* The path to the file
+	* 
+	* @return
+	* The given FilePath, without the path or extension.
+	*/
 	std::string GetFileNameWithoutExtensionFromPath(std::string FilePath);
 
 	std::string GetFilePathWithoutExtension(std::string FilePath);
@@ -16,10 +39,22 @@ namespace FileUtil
 
 	std::vector<char> StringToCharVector(std::string In);
 
-	std::string VectorToString(std::vector<char> In);
-
+	/**
+	* @brief
+	* Gets the extension from a file name.
+	*/
 	std::string GetExtension(std::string FileName);
 
+	/**
+	* @brief
+	* Gets the content of a file, as a string.
+	* 
+	* @param FilePath
+	* The file to load
+	* 
+	* @return
+	* The content of the file, as a string.
+	*/
 	std::string GetFileContent(std::string FilePath);
 
 	// Returns a vector containing all files in the folder. If ext != "", only 

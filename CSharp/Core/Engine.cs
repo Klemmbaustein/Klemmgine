@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using System.IO;
+using System.Xml.Linq;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct EngineVector
@@ -47,8 +49,8 @@ static class Engine
 	static Type? StatsObject = null;
 	static Type? InputObject = null;
 
-	static readonly Dictionary<Int32, Object> WorldObjects = new();
-	static readonly List<Type> WorldObjectTypes = new();
+	static readonly Dictionary<Int32, Object> WorldObjects = [];
+	static readonly List<Type> WorldObjectTypes = [];
 
 	public static object? GetObjectFromID(Int32 Id)
 	{
@@ -58,19 +60,28 @@ static class Engine
 		}
 		return null;
 	}
-	
-	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path, bool InEditor)
+	static bool LoadedEngine = false;
+
+	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path, [MarshalAs(UnmanagedType.LPUTF8Str)] string EngineDllPath, bool InEditor)
 	{
 		WorldObjectTypes.Clear();
 		CoreNativeFunction.UnloadNativeFunctions();
 		EngineLog.Print("Loading C# assembly...");
 
+		if (!LoadedEngine)
+		{
+			Assembly.LoadFrom(EngineDllPath);
+			LoadedEngine = true;
+		}
+		else
+		{
+			LoadTypeFromAssembly("NativeFunction")?.GetMethod("UnloadAll")?.Invoke(null, null);
+		}
 		LoadedAsm = Assembly.Load(File.ReadAllBytes(Path));
-
 		LoadTypeFromAssembly("Engine.Log")!.GetMethod("LoadLogFunction")!.Invoke(null, [new Action<string, int>(EngineLog.Print)]);
 
 
-		var WorldObjectType = LoadTypeFromAssembly("WorldObject");
+		var WorldObjectType = LoadTypeFromAssembly("Engine.WorldObject");
 
 		if (WorldObjectType == null)
 		{
@@ -138,10 +149,20 @@ static class Engine
 	{
 		if (LoadedAsm == null)
 		{
-			EngineLog.Print("Tried to call method while the C# assembly is unloaded!");
+			EngineLog.Print("Tried to call method while the C# assembly is unloaded!", 2);
 			return null;
 		}
-		return LoadedAsm?.GetType(Type);
+
+		foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().Reverse())
+		{
+			var tt = assembly.GetType(Type);
+			if (tt != null)
+			{
+				return tt;
+			}
+		}
+		EngineLog.Print("Failed to load type " + Type, 2);
+		return null;
 	}
 
 
@@ -159,7 +180,7 @@ static class Engine
 			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name));
 			return;
 		}
-		func.Invoke(obj, Array.Empty<object>());
+		func.Invoke(obj, []);
 	}
 
 	public static object? Get(object obj, string member)

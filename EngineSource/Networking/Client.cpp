@@ -107,7 +107,7 @@ void Client::OnConnected(Packet* p)
 
 void Client::Update()
 {
-	if (IsConnecting && ConnectionTimer.TimeSinceCreation() > 2)
+	if (IsConnecting && ConnectionTimer.Get() > 2)
 	{
 		if (ConnectionAttempts >= MAX_CONNECTION_ATTEMPTS)
 		{
@@ -198,19 +198,19 @@ bool Client::HandleValueUpdate(uint64_t ObjNetID, std::string Name, std::string 
 
 	if (Name == "_pos")
 	{
-		obj->GetTransform().Location = Vector3::stov(Value);
+		obj->GetTransform().Location = Vector3::FromString(Value);
 		return true;
 	}
 
 	if (Name == "_rot")
 	{
-		obj->GetTransform().Rotation = Vector3::stov(Value);
+		obj->GetTransform().Rotation = Vector3::FromString(Value);
 		return true;
 	}
 
 	if (Name == "_scl")
 	{
-		obj->GetTransform().Scale = Vector3::stov(Value);
+		obj->GetTransform().Scale = Vector3::FromString(Value);
 		return true;
 	}
 
@@ -237,7 +237,7 @@ bool Client::HandleValueUpdate(uint64_t ObjNetID, std::string Name, std::string 
 		case Type::Vector3:
 		case Type::Vector3Color:
 		case Type::Vector3Rotation:
-			*(Vector3*)i.Data = Vector3::stov(Value);
+			*(Vector3*)i.Data = Vector3::FromString(Value);
 			break;
 		default:
 			break;

@@ -1,7 +1,7 @@
 ﻿#ifdef EDITOR
 #include "EditorUI.h"
-#include "Utility/stb_image.hpp"
 #include "Engine/Utility/FileUtility.h"
+#include <Objects/CSharpObject.h>
 #include <filesystem>
 #include "Math/Math.h"
 #include "Math/Collision/Collision.h"
@@ -11,7 +11,8 @@
 #include <UI/EditorUI/UIVectorField.h>
 #include <UI/EditorUI/LogUI.h>
 #include <UI/EditorUI/Toolbar.h>
-#include <UI/EditorUI/ItemBrowser.h>
+#include <UI/EditorUI/AssetBrowser.h>
+#include <UI/EditorUI/ClassesBrowser.h>
 #include <UI/EditorUI/StatusBar.h>
 #include <UI/EditorUI/Viewport.h>
 #include <UI/EditorUI/ObjectList.h>
@@ -30,18 +31,27 @@
 #include <SDL.h>
 #include <Rendering/Texture/Texture.h>
 #include <Engine/Application.h>
+#include <UI/EditorUI/SettingsPanel.h>
 #include <Networking/Networking.h>
 
 int EditorUI::NumLaunchClients = 1;
+TextRenderer* EditorUI::Text = nullptr;
+TextRenderer* EditorUI::MonoText = nullptr;
+EditorPanel* EditorUI::RootPanel = nullptr;
+std::vector<unsigned int> EditorUI::Textures;
+std::vector<WorldObject*> EditorUI::SelectedObjects;
+EditorUI::CursorType EditorUI::CurrentCursor = CursorType::Default;
+
+Vector3 EditorUI::UIColors[NumUIColors] =
+{
+	Vector3(0.125f, 0.125f, 0.13f),	// Default background
+	Vector3(0.08f),					// Dark background
+	Vector3(1),						// Highlight color
+	Vector3(0.2f),					// Brighter background
+};
 
 namespace Editor
 {
-	EditorUI* CurrentUI = nullptr;
-	bool DraggingTab = false;
-	bool TabDragHorizontal = false;
-	bool DraggingPopup = false;
-	bool HoveringPopup = false;
-	bool PrevHoveringPopup = false;
 	Vector2 DragMinMax;
 	Vector2 NewDragMinMax = DragMinMax;
 	bool IsSavingScene = false;
@@ -63,7 +73,7 @@ namespace Editor
 	{
 		for (uint8_t i = 0; i < EditorUI::NumUIColors; i++)
 		{
-			if (Editor::CurrentUI->UIColors[i] == PrevColor)
+			if (Application::EditorInstance->UIColors[i] == PrevColor)
 			{
 				return Editor::NewUIColors[i];
 			}
@@ -140,7 +150,7 @@ void EditorUI::LaunchInEditor()
 			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
 			&& CSharp::GetUseCSharp())
 		{
-			RebuildAndHotReload();
+			RebuildAssembly();
 		}
 	}
 	catch (std::exception& e)
@@ -219,7 +229,7 @@ void EditorUI::SetSaveSceneOnLaunch(bool NewValue)
 }
 
 #ifdef ENGINE_CSHARP
-void EditorUI::RebuildAndHotReload()
+void EditorUI::RebuildAssembly()
 {
 	Log::Print("Rebuilding C# assembly...", Log::LogColor::Green);
 	PipeProcessToLog("cd Scripts && dotnet build", false);
@@ -253,6 +263,7 @@ void EditorUI::OpenScene(std::string NewScene)
 	if (ChangedScene)
 	{
 		EditorSceneToOpen = NewScene;
+		/*
 		new DialogBox(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), 0, "Scene has unsaved changes. Save?",
 			{
 				DialogBox::Answer("Yes", []()
@@ -262,8 +273,8 @@ void EditorUI::OpenScene(std::string NewScene)
 					Scene::LoadNewScene(EditorSceneToOpen);
 					Viewport::ViewportInstance->ClearSelectedObjects();
 					Scene::Tick();
-					Editor::CurrentUI->UIElements[5]->UpdateLayout();
-					Editor::CurrentUI->UIElements[6]->UpdateLayout();
+					Application::EditorInstance->UIElements[5]->UpdateLayout();
+					Application::EditorInstance->UIElements[6]->UpdateLayout();
 				}),
 
 				DialogBox::Answer("No", []() 
@@ -272,20 +283,19 @@ void EditorUI::OpenScene(std::string NewScene)
 					Scene::LoadNewScene(EditorSceneToOpen);
 					Viewport::ViewportInstance->ClearSelectedObjects();
 					Scene::Tick();
-					Editor::CurrentUI->UIElements[5]->UpdateLayout();
-					Editor::CurrentUI->UIElements[6]->UpdateLayout();
+					Application::EditorInstance->UIElements[5]->UpdateLayout();
+					Application::EditorInstance->UIElements[6]->UpdateLayout();
 				}),
 
 				DialogBox::Answer("Cancel", nullptr)
-			});
+			});*/
 		return;
 	}
-	Viewport::ViewportInstance->ClearSelectedObjects();
 	ChangedScene = false; 
 	Scene::LoadNewScene(NewScene);
 	Scene::Tick();
-	Editor::CurrentUI->UIElements[5]->UpdateLayout();
-	Editor::CurrentUI->UIElements[6]->UpdateLayout();
+
+	UpdateAllInstancesOf<ContextMenu>();
 }
 
 bool EditorUI::GetUseLightMode()
@@ -317,7 +327,7 @@ void EditorUI::SetUseLightMode(bool NewLightMode)
 				dynamic_cast<UITextField*>(i)->SetTextColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UITextField*>(i)->GetTextColor()));
 			}
 		}
-		std::swap(Editor::CurrentUI->UIColors, Editor::NewUIColors);
+		std::swap(Application::EditorInstance->UIColors, Editor::NewUIColors);
 		Editor::LightMode = NewLightMode;
 		Log::Print("Toggled light mode", Log::LogColor::Yellow);
 	}
@@ -363,10 +373,39 @@ void EditorUI::CreateFile(std::string Path, std::string Name, std::string Ext)
 
 EditorUI::EditorUI()
 {
+	Application::EditorInstance = this;
+	Text = new TextRenderer(Application::GetEditorPath() + "/EditorContent/EditorFont.ttf");
+	MonoText = new TextRenderer(Application::GetEditorPath() + "/EditorContent/EditorMonospace.ttf");
+	Input::CursorVisible = true;
+	LoadEditorTextures();
 
-	Editor::CurrentUI = this;
+	RootPanel = new EditorPanel(-1, Vector2(2, 1.95f), "root");
+	RootPanel->ChildrenAlign = EditorPanel::ChildrenType::Horizontal;
 
-	GenUITextures();
+	EditorPanel* RightPanel = new EditorPanel(RootPanel, "panel");
+	RightPanel->Size = 0.3f;
+
+	(new AssetBrowser(RightPanel));
+	(new ClassesBrowser(RightPanel));
+
+	EditorPanel* CenterPanel = new EditorPanel(RootPanel, "panel");
+	CenterPanel->ChildrenAlign = EditorPanel::ChildrenType::Vertical;
+	CenterPanel->Size = 1.425f;
+	(new LogUI(CenterPanel))->Size = 0.4f;
+	(new Viewport(CenterPanel))->Size = 1.425f;
+	new Toolbar(CenterPanel);
+	delete new SettingsPanel(nullptr);
+	EditorPanel* LeftPanel = new EditorPanel(RootPanel, "panel");
+	LeftPanel->ChildrenAlign = EditorPanel::ChildrenType::Vertical;
+	EditorPanel* BottomLeftPanel = new EditorPanel(LeftPanel, "panel");
+	new ContextMenu(BottomLeftPanel, false);
+	new ContextMenu(BottomLeftPanel, true);
+	BottomLeftPanel->Size = 0.8f;
+	new ObjectList(LeftPanel);
+
+	new StatusBar();
+
+	RootPanel->OnPanelResized();
 
 	Cursors[0] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 	Cursors[1] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
@@ -376,27 +415,16 @@ EditorUI::EditorUI()
 	Cursors[5] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZENS);
 	Cursors[6] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 	Cursors[7] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
-	//new UIBackground(true, -1, 0.5, 2);
-
-	UIElements[0] = new StatusBar(UIColors);
-	UIElements[1] = new LogUI(UIColors, Vector2(-0.7f, -1), Vector2(1.4f, 0.4f));
-	UIElements[2] = new Toolbar(UIColors, Vector2(-0.7f, 0.8f), Vector2(1.4f, 0.15f));
-	UIElements[3] = new ItemBrowser(UIColors, Vector2(-1, -1), Vector2(0.3f, 1.95f));
-	UIElements[4] = new Viewport(UIColors, Vector2(-0.7f, -0.6f), Vector2(1.4f, 1.4f));
-	UIElements[5] = new ObjectList(UIColors, Vector2(0.7f, -0.2f), Vector2(0.3f, 1.15f));
-	UIElements[6] = new ContextMenu(UIColors, Vector2(0.7f, -1), Vector2(0.3f, 0.8f));
-
-	// Load preferences from the preference tab after the UI is finished setting up
-	Viewport::ViewportInstance->TabInstances[6]->Load("");
 
 	Console::RegisterCommand(Console::Command("build", []() {new std::thread(Build::TryBuildProject, "Build/"); }, {}));
 	Console::RegisterCommand(Console::Command("save", EditorUI::SaveCurrentScene, {}));
 #ifdef ENGINE_CSHARP
-	Console::RegisterCommand(Console::Command("reload", EditorUI::RebuildAndHotReload, {}));
+	Console::RegisterCommand(Console::Command("reload", EditorUI::RebuildAssembly, {}));
 	Console::RegisterCommand(Console::Command("run", EditorUI::LaunchInEditor, {}));
+	Console::RegisterCommand(Console::Command("toggle_light", []() { EditorUI::SetUseLightMode(!EditorUI::GetUseLightMode()); }, {}));
 	Console::RegisterCommand(Console::Command("classtree", []()
 		{
-			auto Items = dynamic_cast<ItemBrowser*>(Editor::CurrentUI->UIElements[3])->GetEditorUIClasses();
+			//auto Items = dynamic_cast<ItemBrowser*>(Application::EditorInstance->UIElements[3])->GetEditorUIClasses();
 		}, {}));
 
 #endif
@@ -409,7 +437,7 @@ void EditorUI::OnLeave(void(*ReturnF)())
 	QuitFunction = ReturnF;
 	if (ChangedScene)
 	{
-		new DialogBox("Scene", 0,
+		/*new DialogBox("Scene", 0,
 			"Save changes to scene before quitting?",
 			{
 				DialogBox::Answer("Yes", []() {
@@ -422,13 +450,14 @@ void EditorUI::OnLeave(void(*ReturnF)())
 				DialogBox::Answer("No", ReturnF),
 				DialogBox::Answer("Cancel", nullptr)
 			});
+		*/
 	}
 	else
 	{
-		if (Viewport::ViewportInstance->CurrentTab)
+		/*if (Viewport::ViewportInstance->CurrentTab)
 		{
 			Viewport::ViewportInstance->CurrentTab->Save();
-		}
+		}*/
 		ReturnF();
 	}
 }
@@ -448,28 +477,19 @@ void EditorUI::Tick()
 			break;
 		}
 	}
-
+	EditorPanel::TickPanels();
 #ifdef ENGINE_CSHARP
 	if (Editor::CanHotreload == true)
 	{
 		Log::Print("Finished building assembly. Hotreloading .dll file.", Log::LogColor::Yellow);
 		CSharp::ReloadCSharpAssembly();
-		ItemBrowser* Browser = dynamic_cast<ItemBrowser*>(UIElements[3]);
-		Browser->CPPClasses = Browser->GetEditorUIClasses();
-		Browser->UpdateLayout();
+		//ItemBrowser* Browser = dynamic_cast<ItemBrowser*>(UIElements[3]);
+		//Browser->CPPClasses = Browser->GetEditorUIClasses();
+		//Browser->UpdateLayout();
 
 		Editor::CanHotreload = false;
 	}
 #endif
-
-	Editor::HoveringPopup = Editor::PrevHoveringPopup;
-	Editor::PrevHoveringPopup = false;
-	Editor::DraggingPopup = false;
-	if (!Editor::DraggingTab)
-	{
-		Editor::NewDragMinMax = Vector2(-1, 1);
-	}
-	Editor::DragMinMax = Editor::NewDragMinMax;
 
 	if (BakedLighting::FinishedBaking)
 	{
@@ -495,7 +515,7 @@ void EditorUI::Tick()
 	{
 		SDL_SetCursor(Cursors[(int)CurrentCursor]);
 	}
-	CurrentCursor = Editor::DraggingTab ? (Editor::TabDragHorizontal ? CursorType::Resize_WE : CursorType::Resize_NS) : CursorType::Default;
+	CurrentCursor = CursorType::Default;
 
 	if (Input::IsLMBDown && Dropdown && !Dropdown->IsHovered())
 	{
@@ -533,33 +553,36 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 	{
 		delete Dropdown;
 	}
-
 	CurrentDropdown = Menu;
-	Dropdown = new UIBackground(false, Position, UIColors[0] * 2);
-	Dropdown->SetBorder(UIBox::BorderType::Rounded, 0.4f);
+	Dropdown = new UIBox(UIBox::Orientation::Vertical, Position);
+	auto Background = new UIBackground(UIBox::Orientation::Vertical, 0, Vector3::Lerp(EditorUI::UIColors[0], EditorUI::UIColors[2], 0.5f), 0);
+	Dropdown->AddChild(Background
+		->SetPadding(0));
+
 	for (size_t i = 0; i < Menu.size(); i++)
 	{
-		UIBox* NewElement = nullptr;
-		if (Menu[i].Title[0] == '#')
-		{
-			NewElement = new UIBackground(true, 0, UIColors[0] * 2);
-			Menu[i].Title = " " + Menu[i].Title.substr(Menu[i].Title.find_first_not_of("# "));
-		}
-		else
-		{
-			NewElement = new UIButton(true, 0, UIColors[0] * 2, this, (int)i);
-			Menu[i].Title = "   " + Menu[i].Title;
-		}
-		NewElement->SetBorder(UIBox::BorderType::Rounded, 0.4f);
-		NewElement->SetMinSize(Vector2(0.16f, 0));
-		NewElement->SetPadding(0);
-		NewElement->AddChild((new UIText(0.45f, UIColors[2], Menu[i].Title, EngineUIText))
-			->SetPadding(0));
-		Dropdown->AddChild(NewElement);
+		float PaddingSize = 2.0f / Graphics::WindowResolution.Y;
+		bool Upper = i == 0;
+		bool Lower = i == Menu.size() - 1 || Menu[i].Seperator;
+
+		float Horizontal = 2.0f / Graphics::WindowResolution.X;
+
+		Background->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 1.5f, this, (int)i))
+			->SetPadding(PaddingSize * (float)Upper, PaddingSize * (float)Lower, Horizontal, Horizontal)
+			->SetMinSize(Vector2(0.15f, 0))
+			->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Menu[i].Title, EditorUI::Text))
+				->SetPadding(0.005f)));
 	}
 
 	UIBox::DrawAllUIElements();
-	Dropdown->SetPosition(Dropdown->GetPosition() - Vector2(0, Dropdown->GetUsedSize().Y));
+	Dropdown->SetPosition((Dropdown->GetPosition() - Vector2(0, Dropdown->GetUsedSize().Y))
+		.Clamp(Vector2(-1, -1), Vector2(1 - Dropdown->GetUsedSize().X, 1 - Dropdown->GetUsedSize().Y)));
+}
+
+void EditorUI::OnObjectSelected()
+{
+	UpdateAllInstancesOf<ContextMenu>();
+	UpdateAllInstancesOf<ObjectList>();
 }
 
 std::string EditorUI::ToShortString(float val)
@@ -570,7 +593,7 @@ std::string EditorUI::ToShortString(float val)
 }
 
 
-void EditorUI::GenUITextures()
+void EditorUI::LoadEditorTextures()
 {
 	const int ImageSize = 28;
 	std::string Images[ImageSize]
@@ -580,13 +603,13 @@ void EditorUI::GenUITextures()
 		"Save.png",					//02 -> Save Button
 		"Build.png",				//03 -> Package button
 		"X.png",					//04 -> X Symbol
-		"Folder.png",				//05 -> Folder symbol for item browser
-		"Sound.png",				//06 -> Sound symbol for item browser
-		"Scene.png",				//07 -> Scene symbol for item browser
+		"Folder.png",				//05 -> Folder symbol for asset browser
+		"Sound.png",				//06 -> Sound symbol for asset browser
+		"Scene.png",				//07 -> Scene symbol for asset browser
 		"ExitFolder.png",			//08 -> Icon used to navigate back one folder
-		"Material.png",				//09 -> Material symbol for item browser
-		"MaterialTemplate.png",		//10 -> Material Template symbol for item browser
-		"Model.png",				//11 -> Model symbol for item browser
+		"Material.png",				//09 -> Material symbol for asset browser
+		"MaterialTemplate.png",		//10 -> Material Template symbol for asset browser
+		"Model.png",				//11 -> Model symbol for asset browser
 		"Reload.png",				//12 -> Reload symbol
 		"ExpandedArrow.png",		//13 -> Expanded arrow
 		"CollapsedArrow.png",		//14 -> Collapsed arrow
@@ -613,11 +636,6 @@ void EditorUI::GenUITextures()
 	{
 		Textures.push_back(Texture::LoadTexture(Application::GetEditorPath() + "/EditorContent/Images/" + Images[i]));
 	}
-}
-
-bool EditorUI::IsTitleBarHovered()
-{
-	return StatusBar::IsHovered();
 }
 
 std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
@@ -648,6 +666,26 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 
 		// Seperate the Object's category into multiple strings
 		std::string CurrentPath = Objects::GetCategoryFromID(o->GetObjectDescription().ID);
+		if (o->GetObjectDescription().ID == CSharpObject::GetID() && static_cast<CSharpObject*>(o)->CS_Obj.ID != 0)
+		{
+			auto Classes = CSharp::GetAllClasses();
+			for (auto& i : Classes)
+			{
+				size_t LastSlash = i.find_last_of("/");
+				std::string Path;
+				std::string Name = i;
+				if (LastSlash != std::string::npos)
+				{
+					Path = i.substr(0, LastSlash);
+					Name = i.substr(LastSlash);
+				}
+				if (Name == static_cast<CSharpObject*>(o)->CSharpClass)
+				{
+					CurrentPath = Path;
+				}
+			}
+		}
+
 		std::vector<std::string> PathElements;
 		size_t Index = CurrentPath.find_first_of("/");
 		while (Index != std::string::npos)
@@ -727,13 +765,7 @@ void EditorUI::BakeScene()
 
 void EditorUI::OnResized()
 {
-	for (auto i : UIElements)
-	{
-		if (i)
-		{
-			i->UpdateLayout();
-		}
-	}
+	RootPanel->OnPanelResized();
 }
 
 #endif

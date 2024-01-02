@@ -14,7 +14,7 @@ void UIText::Tick()
 	SetMinSize(NewMin);
 }
 
-Vector3 UIText::GetColor()
+Vector3 UIText::GetColor() const
 {
 	return Color;
 }
@@ -54,7 +54,7 @@ UIText* UIText::SetTextSize(float Size)
 }
 
 
-float UIText::GetTextSize()
+float UIText::GetTextSize() const
 {
 	return TextSize;
 }
@@ -92,12 +92,12 @@ void UIText::SetText(ColoredText NewText)
 			float Distance = WrapDistance;
 			if (WrapSizeMode == SizeMode::PixelRelative)
 			{
-				WrapDistance /= Graphics::AspectRatio;
+				Distance /= Graphics::AspectRatio;
 			}
 			Vector2 s = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, Distance)
 				/ (15.0f * 60.0f);
 
-			if (s.X < WrapDistance)
+			if (s.X < Distance)
 			{
 				Update();
 				RedrawUI();
@@ -114,12 +114,12 @@ size_t UIText::GetNearestLetterAtLocation(Vector2 Location)
 	return Depth;
 }
 
-std::string UIText::GetText()
+std::string UIText::GetText() const
 {
 	return TextSegment::CombineToString(RenderedText);
 }
 
-UIText::UIText(float Scale, Vector3 Color, std::string Text, TextRenderer* Renderer) : UIBox(true, Position)
+UIText::UIText(float Scale, Vector3 Color, std::string Text, TextRenderer* Renderer) : UIBox(UIBox::Orientation::Horizontal, Position)
 {
 	this->TextSize = Scale;
 	this->Color = Color;
@@ -127,7 +127,7 @@ UIText::UIText(float Scale, Vector3 Color, std::string Text, TextRenderer* Rende
 	RenderedText = { TextSegment(Text, Color) };
 }
 
-UIText::UIText(float Scale, ColoredText Text, TextRenderer* Renderer) : UIBox(true, Position)
+UIText::UIText(float Scale, ColoredText Text, TextRenderer* Renderer) : UIBox(UIBox::Orientation::Horizontal, Position)
 {
 	this->TextSize = Scale;
 	this->Color = Color;
@@ -145,7 +145,7 @@ Vector2 UIText::GetLetterLocation(size_t Index)
 	float Distance = WrapDistance;
 	if (WrapSizeMode == SizeMode::PixelRelative)
 	{
-		WrapDistance /= Graphics::AspectRatio;
+		Distance /= Graphics::AspectRatio;
 	}
 	return Renderer->GetLetterPosition(
 		RenderedText,
@@ -156,12 +156,17 @@ Vector2 UIText::GetLetterLocation(size_t Index)
 	) + OffsetPosition;
 }
 
+std::string UIText::GetAsString()
+{
+	return "UIText '" + TextSegment::CombineToString(RenderedText) + "'";
+}
+
 void UIText::Draw()
 {
 	if (Text)
 	{
 		Text->Opacity = Opacity;
-		Text->Draw(CurrentScrollObject, GetCurrentUIDepth());
+		Text->Draw(CurrentScrollObject);
 	}
 }
 
@@ -173,7 +178,7 @@ void UIText::Update()
 		float Distance = WrapDistance;
 		if (WrapSizeMode == SizeMode::PixelRelative)
 		{
-			WrapDistance /= Graphics::AspectRatio;
+			Distance /= Graphics::AspectRatio;
 		}
 		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
 			TextSize * 2, Color, Opacity, Distance);
@@ -194,7 +199,7 @@ Vector2 UIText::GetUsedSize()
 	float Distance = WrapDistance;
 	if (WrapSizeMode == SizeMode::PixelRelative)
 	{
-		WrapDistance /= Graphics::AspectRatio;
+		Distance /= Graphics::AspectRatio;
 	}
 	return Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, WrapDistance);
 }

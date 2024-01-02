@@ -7,7 +7,7 @@ class CameraComponent : public Component
 {
 public:
 	virtual void Begin() override;
-	virtual void Tick() override;
+	virtual void Update() override;
 	virtual void Destroy() override;
 
 	void SetFOV(float FOV);

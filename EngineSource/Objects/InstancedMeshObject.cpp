@@ -6,7 +6,7 @@ void InstancedMeshObject::Destroy()
 }
 
 
-void InstancedMeshObject::Tick()
+void InstancedMeshObject::Update()
 {
 	if (!Initialized)
 	{

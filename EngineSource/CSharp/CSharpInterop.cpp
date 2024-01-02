@@ -23,7 +23,7 @@
 #define CSHARP_LIBRARY_NAME "CSharpCore"
 
 #if !RELEASE
-#define CSHARP_LIBRARY_PATH STR("CSharpCore/Build/CSharpCore")
+#define CSHARP_LIBRARY_PATH STR("CSharp/Core/Build/CSharpCore")
 #else
 #define CSHARP_LIBRARY_PATH STR("bin/CSharp/Core/CSharpCore")
 #endif
@@ -227,6 +227,11 @@ static void WriteCSProj(std::string Name)
 		<OutputPath>" + std::filesystem::current_path().string() + "/CSharp/Build</OutputPath>\n\
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>\n\
 	</PropertyGroup>\n\
+  <ItemGroup>\n\
+	<Reference Include=\"KlemmgineCSharp.dll\">\n\
+	  <HintPath>" + Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCSharp.dll</HintPath>\n\
+	</Reference>\n\
+  </ItemGroup>\n\
 </Project>";
 	out.close();
 }
@@ -470,11 +475,17 @@ void CSharp::LoadAssembly()
 		return;
 	}
 
-	StaticCall<void, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
-		AssemblyPath.c_str(), IsInEditor);
+	std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCsharp.dll",
+		"bin/KlemmgineCsharp.dll",
+		std::filesystem::copy_options::update_existing);
+
+	StaticCall<void, const char*, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
+		AssemblyPath.c_str(), "bin/KlemmgineCsharp.dll", IsInEditor);
 #else
-	StaticCall<void, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
-		(std::filesystem::current_path().string() + "/bin/CSharp/CSharpAssembly.dll").c_str(), IsInEditor);
+	StaticCall<void, const char*, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
+		(std::filesystem::current_path().string() + "/bin/CSharp/CSharpAssembly.dll").c_str(),
+		(std::filesystem::current_path().string() + "/bin/CSharp/Engine/KlemmgineCsharp.dll").c_str(),
+		IsInEditor);
 #endif
 
 	AllClasses.clear();

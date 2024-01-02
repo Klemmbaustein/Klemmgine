@@ -1,7 +1,17 @@
 ﻿using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
+namespace Engine;
 
+/**
+ * @brief
+ * MeshComponent in C#.
+ * 
+ * Can be attached to any Engine.WorldObject.
+ * 
+ * C++ equivalent: MeshComponent.
+ * 
+ * @ingroup CSharp-Components
+ */
 public class MeshComponent : ObjectComponent
 {
 	private delegate IntPtr NewModel([MarshalAs(UnmanagedType.LPUTF8Str)] string Filename, IntPtr Parent);
@@ -11,6 +21,13 @@ public class MeshComponent : ObjectComponent
 	{
 	}
 
+	/**
+	* @brief
+	* Loads a mesh file (.jsm) from the given file name. (without path or extension)
+	* 
+	* @param Filename
+	* 
+	*/
 	public void Load(string File)
 	{
 		if (Parent == null)

@@ -30,3 +30,14 @@ std::string StrUtil::Format(std::string Format, ...)
 	va_end(va);
 	return buf;
 }
+
+
+std::string StrUtil::VectorToString(std::vector<char> In)
+{
+	std::string Out;
+	for (int i = 0; i < In.size(); i++)
+	{
+		Out.push_back(In.at(i));
+	}
+	return Out;
+}

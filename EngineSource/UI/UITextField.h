@@ -1,22 +1,27 @@
 #pragma once
-#include <UI/UIBox.h>
+#include <UI/UIBackground.h>
 #include <UI/Default/UICanvas.h>
-#include <Rendering/Graphics.h>
 
 class TextRenderer;
 class UIText;
 struct VertexBuffer;
 class UIBackground;
 
-class UITextField : public UIBox
+/**
+ * @brief
+ * Functions like a UIButton, but you can input text into it.
+ *
+ * The Text field can have a color and opacity.
+ *
+ * @ingroup UI
+ */
+class UITextField : public UIBackground
 {
-	VertexBuffer* ButtonVertexBuffer = nullptr;
 	bool IsHovered = false;
 	bool IsPressed = false;
 	Vector2 IBeamPosition;
 	Vector2 IBeamScale = Vector2(0.001f, 0.03f);
 	bool ShowIBeam = false;
-	Vector3 Color = Vector3(0.5);
 	Vector3 TextColor = 1;
 	Shader* ButtonShader = nullptr;
 	UICanvas* ParentUI;
@@ -25,10 +30,7 @@ class UITextField : public UIBox
 	bool IsEdited = false;
 	std::string EnteredText = "";
 	float TextSize = 0.5f;
-	void ScrollTick(Shader* UsedShader);
-	void MakeGLBuffers();
 	void Tick() override;
-	float ButtonColorMultiplier = 1;
 	float TextFieldTimer = 0;
 public:
 	Vector3 GetColor() const;
@@ -36,18 +38,29 @@ public:
 	UITextField* SetTextColor(Vector3 NewColor);
 	Vector3 GetTextColor() const;
 	UIBox* ParentOverride = nullptr;
+	/**
+	* @brief
+	* Takes keyboard focus to let the user input text.
+	* 
+	* This functions the same as clickin on the field.
+	*/
 	void Edit();
-	bool GetIsEdited() { return IsEdited; }
+	bool GetIsEdited() const { return IsEdited; }
 	UITextField* SetText(std::string NewText);
 	UITextField* SetTextSize(float NewTextSize);
 	float GetTextSize() const;
+	
+	/**
+	* @brief
+	* Gets the text currently typed into the text field.
+	*/
 	std::string GetText();
-	std::string HintText; // Will be displayed when the text field is empty
+	/// Will be displayed when the text field is empty
+	std::string HintText;
 	bool GetIsHovered() const;
 	bool GetIsPressed() const;
 
 	UITextField(Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, TextRenderer* Renderer, Shader* ButtonShader = Graphics::UIShader);
 	~UITextField() override;
-	void Draw() override;
-	void Update() override;
+	void DrawBackground() override;
 };

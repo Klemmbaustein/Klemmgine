@@ -128,7 +128,8 @@ UIBackground* UIBackground::SetUseTexture(bool UseTexture, std::string TextureNa
 	return this;
 }
 
-UIBackground::UIBackground(bool Horizontal, Vector2 Position, Vector3 Color, Vector2 MinScale, Shader* UsedShader) : UIBox(Horizontal, Position)
+UIBackground::UIBackground(Orientation BoxOrientation, Vector2 Position, Vector3 Color, Vector2 MinScale, Shader* UsedShader) 
+	: UIBox(BoxOrientation, Position)
 {
 	SetMinSize(MinScale);
 	this->Color = Vector3::Clamp(Color, 0, 1);
@@ -148,25 +149,33 @@ UIBackground::~UIBackground()
 
 void UIBackground::Draw()
 {
+	if (Opacity == 0 && typeid(*this) == typeid(UIBackground))
+	{
+		return;
+	}
 	BackgroundShader->Bind();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	BoxVertexBuffer->Bind();
 	ScrollTick(BackgroundShader);
 	glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_texture"), 0);
-	glUniform4f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_color"), Color.X, Color.Y, Color.Z, 1.f);
+	BackgroundShader->SetVector4("u_color", Vector4(Color.X * ColorMultiplier.X, Color.Y * ColorMultiplier.Y, Color.Z * ColorMultiplier.Z, 1.f));
 	glUniform4f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_transform"), OffsetPosition.X, OffsetPosition.Y, Size.X, Size.Y);
 	BackgroundShader->SetFloat("u_opacity", Opacity);
 	BackgroundShader->SetInt("u_borderType", (int)BoxBorder);
 	BackgroundShader->SetFloat("u_borderScale", BorderRadius / 20.0f);
 	BackgroundShader->SetFloat("u_aspectratio", Graphics::AspectRatio);
-	BackgroundShader->SetFloat("u_depth", GetCurrentUIDepth());
 
 	BackgroundShader->SetInt("u_useTexture", (bool)TextureMode);
 	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	BoxVertexBuffer->Unbind();
+	DrawBackground();
+}
+
+void UIBackground::DrawBackground()
+{
 }
 
 void UIBackground::Update()

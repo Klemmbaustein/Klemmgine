@@ -13,6 +13,11 @@
 
 class WorldObject;
 
+/**
+* @brief
+* File containing logic related to interoperability between C# and C++.
+*/
+
 namespace CSharp
 {
 	struct CSharpWorldObject
@@ -55,6 +60,10 @@ namespace CSharp
 	bool GetUseCSharp();
 
 	bool IsAssemblyLoaded();
+	/**
+	* @brief
+	* Function used by 
+	*/
 	void CSharpLog(std::string Msg, CSharpLogType Type, CSharpLogSev Severity = CS_Log_Info);
 	void RegisterNativeFunction(std::string Name, void* Function);
 

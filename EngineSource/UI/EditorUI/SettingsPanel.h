@@ -7,8 +7,9 @@
 #include <Engine/EngineProperties.h>
 #include <Engine/Application.h>
 
-class PreferenceTab : public EditorTab
+class SettingsPanel : public EditorPanel
 {
+	UIBox* HorizontalBox = nullptr;
 	struct SettingsCategory
 	{
 		std::string Name;
@@ -28,7 +29,6 @@ class PreferenceTab : public EditorTab
 	std::vector<UIBox*> LoadedSettingElements;
 
 	size_t SelectedSetting = 0;
-	TextRenderer* Renderer;
 	UIScrollBox* SettingsBox = nullptr;
 	UIBackground* SettingsCategoryBox;
 	std::vector<SettingsCategory::Setting> LoadedSettings;
@@ -39,7 +39,7 @@ class PreferenceTab : public EditorTab
 			{
 			SettingsCategory::Setting("UI:Light mode [Experimental]", Type::Bool, "0", [](std::string NewValue)
 			{
-				Editor::CurrentUI->SetUseLightMode(std::stoi(NewValue));
+				Application::EditorInstance->SetUseLightMode(std::stoi(NewValue));
 			}),
 			SettingsCategory::Setting("Toolbar:Show Save Button", Type::Bool, "1", [](std::string NewValue)
 			{
@@ -114,12 +114,11 @@ class PreferenceTab : public EditorTab
 	void GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value);
 public:
 	void OpenSettingsPage(std::string Name);
-
-	void UpdateLayout() override;
+	void Load();
+	void Save();
+	void OnResized() override;
 
 	void OnButtonClicked(int Index) override;
-	PreferenceTab(Vector3* UIColors, TextRenderer* Renderer);
-	void Load(std::string File) override;
-	void Save() override;
+	SettingsPanel(EditorPanel* Parent);
 };
 #endif

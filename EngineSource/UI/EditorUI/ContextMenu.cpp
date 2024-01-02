@@ -11,49 +11,55 @@
 #include <Engine/Scene.h>
 #include <Engine/Log.h>
 #include <Rendering/Utility/BakedLighting.h>
+#include <Engine/Utility/StringUtility.h>
+#include <Engine/Application.h>
 
-ContextMenu::ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.3f, 0.5f))
+ContextMenu::ContextMenu(EditorPanel* Parent, bool IsScene) : EditorPanel(Parent, IsScene ? "Scene" : "Object Properties")
 {
-	BackgroundBox = new UIScrollBox(false, 0, true);
-	BackgroundBox->SetPadding(0.01f);
-	UpdateLayout();
+	IsObject = !IsScene;
+	BackgroundBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
+	BackgroundBox->SetPadding(0);
+	PanelMainBackground->AddChild(BackgroundBox);
 }
 
 UITextField* ContextMenu::GenerateTextField(std::string Content, int Index)
 {
-	auto NewElement = new UITextField(0, 0.2f, this, Index, Editor::CurrentUI->EngineUIText);
+	auto NewElement = new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text);
 	((UITextField*)NewElement)->SetText(Content);
 	((UITextField*)NewElement)->SetTextSize(0.4f);
+	NewElement->SetTextColor(EditorUI::UIColors[2]);
 	NewElement->SetPadding(0.005f, 0.005f, 0.02f, 0.005f);
-	NewElement->SetBorder(UIBox::BorderType::Rounded, 0.5f);
-	NewElement->SetMinSize(Vector2(0.265f, 0.04f));
-	NewElement->SetMaxSize(Vector2(0.3f, 0.04f));
+	NewElement->SetMinSize(Vector2(Scale.X - 0.04f, 0.04f));
+	NewElement->SetMaxSize(Vector2(Scale.X - 0.04f, 0.04f));
 	return NewElement;
 }
 
 void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index)
 {
-	auto SeperatorBorder = new UIButton(true, 0, 0.5f, this, Index);
+	auto SeperatorBorder = new UIButton(UIBox::Orientation::Horizontal, 0, 0.5f, this, Index);
 
 	std::string Prefix = ContextObject ? "OBJ_CAT_" : "SCN_";
 
-	auto SeperatorArrow = new UIBackground(true, Vector2(0), 0, 0.035f);
-	SeperatorArrow->SetPadding(0, 0, 0.01f, 0);
+	auto SeperatorArrow = new UIBackground(UIBox::Orientation::Horizontal, Vector2(0), EditorUI::UIColors[2], 0.035f);
+	SeperatorArrow->SetPadding(0, 0, 0.005f, 0);
 	SeperatorArrow->SetUseTexture(true,
-		Editor::CurrentUI->CollapsedItems.contains(Prefix + Name) ? Editor::CurrentUI->Textures[14] : Editor::CurrentUI->Textures[13])
+		Application::EditorInstance->CollapsedItems.contains(Prefix + Name) ? Application::EditorInstance->Textures[14] : Application::EditorInstance->Textures[13])
 		->SetSizeMode(UIBox::SizeMode::PixelRelative);
-	SeperatorBorder->AddChild(SeperatorArrow);
-
-	auto SeperatorText = new UIText(0.45f, 0, Name, Editor::CurrentUI->EngineUIText);
-	SeperatorText->SetTryFill(true);
+	SeperatorBorder
+		->SetVerticalAlign(UIBox::Align::Centered)
+		->AddChild(SeperatorArrow);
+	StrUtil::ReplaceChar(Name, '\n', "");
+	auto SeperatorText = new UIText(0.45f, EditorUI::UIColors[2], Name, EditorUI::Text);
 	SeperatorText->SetPadding(0.005f);
-	SeperatorBorder->SetPadding(0.015f, 0.015f, 0, 0);
+	SeperatorBorder->SetPadding(0.015f, 0, 0, 0);
 	SeperatorBorder->SetMinSize(Vector2(Scale.X, 0));
+	SeperatorBorder->SetOpacity(0);
 	BackgroundBox->AddChild(SeperatorBorder);
 	SeperatorBorder->AddChild(SeperatorText);
-
+	BackgroundBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], Vector2(Scale.X - 0.005f, 2.0f / Graphics::WindowResolution.Y)))
+		->SetPadding(0, 0.005f, 0.0025f, 0));
 	ContextCategories.push_back(Name);
-	if (Editor::CurrentUI->CollapsedItems.contains(Prefix + Name))
+	if (Application::EditorInstance->CollapsedItems.contains(Prefix + Name))
 	{
 		return;
 	}
@@ -78,7 +84,7 @@ std::vector<T>& GetVec(void* vec)
 void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject* ContextObject, std::string Name)
 {
 	UIBox* NewElement = nullptr;
-	UIText* NewElementText = new UIText(0.4f, UIColors[2], Element.Name, Editor::CurrentUI->EngineUIText);
+	UIText* NewElementText = new UIText(0.4f, EditorUI::UIColors[2], Element.Name, EditorUI::Text);
 	NewElementText->SetPadding(0.01f, 0.005f, 0.02f, 0.005f);
 	BackgroundBox->AddChild(NewElementText);
 	int ElemIndex = Name == "Object" ? -2 : -1;
@@ -154,7 +160,7 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 			}
 			[[fallthrough]];
 		case Type::Vector3:
-			NewElement = new UIVectorField(0, *(Vector3*)val, this, ElemIndex, Editor::CurrentUI->EngineUIText);
+			NewElement = new UIVectorField(Scale.X - 0.04f, *(Vector3*)val, this, ElemIndex, EditorUI::Text);
 			NewElement->SetPadding(0.005f, 0, 0.02f, 0);
 			((UIVectorField*)NewElement)->SetValueType(VectorType);
 			break;
@@ -179,14 +185,14 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 			{
 				Value = *((bool*)val);
 			}
-			NewElement = new UIButton(true, 0, 0.75f, this, ElemIndex);
+			NewElement = new UIButton(UIBox::Orientation::Horizontal, 0, 0.75f, this, ElemIndex);
 			NewElement->SetSizeMode(UIBox::SizeMode::PixelRelative);
 			NewElement->SetMinSize(0.04f);
 			NewElement->SetBorder(UIBox::BorderType::Rounded, 0.3f);
 			NewElement->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
 			if (Value)
 			{
-				((UIButton*)NewElement)->SetUseTexture(true, Editor::CurrentUI->Textures[16]);
+				((UIButton*)NewElement)->SetUseTexture(true, Application::EditorInstance->Textures[16]);
 			}
 		}
 			break;
@@ -204,9 +210,8 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 
 void ContextMenu::Tick()
 {
-	UpdatePanel();	
-	BackgroundBox->SetPosition(TabBackground->GetPosition());
-
+	TickPanel();
+	BackgroundBox->IsVisible = PanelMainBackground->IsVisible;
 }
 
 void ContextMenu::OnButtonClicked(int Index)
@@ -214,16 +219,16 @@ void ContextMenu::OnButtonClicked(int Index)
 	if (Index >= 0)
 	{
 		std::string Name = ContextCategories.at(Index);
-		Name = (Viewport::ViewportInstance->SelectedObjects.size() ? "OBJ_CAT_" : "SCN_") + Name;
-		if (Editor::CurrentUI->CollapsedItems.contains(Name))
+		Name = (EditorUI::SelectedObjects.size() ? "OBJ_CAT_" : "SCN_") + Name;
+		if (Application::EditorInstance->CollapsedItems.contains(Name))
 		{
-			Editor::CurrentUI->CollapsedItems.erase(Name);
+			Application::EditorInstance->CollapsedItems.erase(Name);
 		}
 		else
 		{
-			Editor::CurrentUI->CollapsedItems.insert(Name);
+			Application::EditorInstance->CollapsedItems.insert(Name);
 		}
-		UpdateLayout();
+		OnResized();
 	}
 	if (Index == -1 || Index == -2)
 	{
@@ -282,12 +287,7 @@ void ContextMenu::OnButtonClicked(int Index)
 							break;
 						case Type::String:
 							GetVec<std::string>(Element.Variable).at(j) = ((UITextField*)ContextButtons[i])->GetText();
-
-							if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-								&& ContextSettings[IteratedElement].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
-							{
-								Editor::CurrentUI->UIElements[5]->UpdateLayout();
-							}
+							EditorUI::UpdateAllInstancesOf<ContextMenu>();
 							break;
 						case Type::Bool:
 							if (((UIButton*)ContextButtons[i])->GetIsHovered())
@@ -328,10 +328,10 @@ void ContextMenu::OnButtonClicked(int Index)
 						break;
 					case Type::String:
 						*(std::string*)(ContextSettings[IteratedElement].Variable) = ((UITextField*)ContextButtons[i])->GetText();
-						if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-							&& ContextSettings[IteratedElement].Variable == &((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Name)
+						if (EditorUI::SelectedObjects.size()
+							&& ContextSettings[IteratedElement].Variable == &EditorUI::SelectedObjects[0]->Name)
 						{
-							Editor::CurrentUI->UIElements[5]->UpdateLayout();
+							//Application::EditorInstance->UIElements[5]->UpdateLayout();
 						}
 						break;
 					case Type::Bool:
@@ -350,34 +350,53 @@ void ContextMenu::OnButtonClicked(int Index)
 			}
 			IteratedElement++;
 }
-		if (((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size()
-			&& ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->Properties.size()
+		if (EditorUI::SelectedObjects.size()
 			&& Index == -1)
 		{
-			((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0]->OnPropertySet();
+			EditorUI::SelectedObjects[0]->OnPropertySet();
 		}
 		ChangedScene = true;
-		UpdateLayout();
+		OnResized();
 	}
 }
 
-void ContextMenu::UpdateLayout()
+void ContextMenu::OnResized()
 {
-	BackgroundBox->SetPosition(TabBackground->GetPosition());
-	BackgroundBox->SetMinSize(Scale);
-	BackgroundBox->SetMaxSize(Scale);
+	BackgroundBox->SetMinSize(Scale - Vector2(0.005f / Graphics::AspectRatio, 0.01f));
+	BackgroundBox->SetMaxSize(BackgroundBox->GetMinSize());
 	BackgroundBox->DeleteChildren();
 	ContextSettings.clear();
 	ContextButtons.clear();
 	ContextCategories.clear();
 
-
-	if (Editor::CurrentUI->UIElements[4] && ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.size() > 0)
+	if (IsObject)
 	{
 		Properties.clear();
-		WorldObject* SelectedObject = ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.at(0);
-		BackgroundBox->AddChild((new UIText(0.5f, UIColors[2], "Object: " + SelectedObject->GetName(), Editor::CurrentUI->EngineUIText))
-			->SetPadding(0.01f));
+		WorldObject* SelectedObject = nullptr;
+		if (!EditorUI::SelectedObjects.empty())
+		{
+			SelectedObject = EditorUI::SelectedObjects[0];
+
+		}
+
+		if (!SelectedObject)
+		{
+			BackgroundBox->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "No object selected", EditorUI::Text)));
+			return;
+		}
+
+		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Object: " + SelectedObject->GetName(), EditorUI::Text))
+			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
+			->SetPadding(0.01f, 0, 0.01f, 0.01f));
+		BackgroundBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], "Class: " + SelectedObject->GetObjectDescription().Name, EditorUI::Text))
+			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
+			->SetPadding(0.005f, 0, 0.01f, 0.01f));
+		BackgroundBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal,
+			0,
+			EditorUI::UIColors[2],
+			Vector2(Scale.X - 0.005f, 2.0f / Graphics::WindowResolution.Y)))
+			->SetPadding(0, 0.005f, 0.0025f, 0));
+
 		GenerateSection(
 			{
 				ContextMenuSection(&SelectedObject->GetTransform().Location, Type::Vector3, "Location"),
@@ -385,7 +404,7 @@ void ContextMenu::UpdateLayout()
 				ContextMenuSection(&SelectedObject->GetTransform().Scale, Type::Vector3, "Scale"),
 				ContextMenuSection(&SelectedObject->Name, Type::String, "Name"),
 			},
-			"Object", ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects.at(0), 0);
+			"Object", nullptr, 0);
 
 		std::map<std::string, std::vector<ContextMenuSection>> Categories;
 
@@ -400,6 +419,10 @@ void ContextMenu::UpdateLayout()
 			if (Colon != std::string::npos)
 			{
 				CategoryName = i.Name.substr(0, Colon);
+				if (CategoryName.empty())
+				{
+					CategoryName = SelectedObject->GetObjectDescription().Name;
+				}
 				i.Name = i.Name.substr(Colon + 1);
 			}
 			if (!Categories.contains(CategoryName))
@@ -414,15 +437,26 @@ void ContextMenu::UpdateLayout()
 		char Iterator = 1;
 		for (auto& i : Categories)
 		{
-			GenerateSection(i.second, i.first, ((Viewport*)Editor::CurrentUI->UIElements[4])->SelectedObjects[0], Iterator);
+			GenerateSection(i.second, i.first, SelectedObject, Iterator);
 			Iterator++;
 		}
 	}
 	else
 	{
-		BackgroundBox->AddChild((new UIText(0.5f, UIColors[2], "Scene: "
-			+ FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), Editor::CurrentUI->EngineUIText))
-			->SetPadding(0.01f));
+		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Scene: "
+			+ FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), EditorUI::Text))
+			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
+			->SetPadding(0.01f, 0, 0.01f, 0.01f));
+		BackgroundBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], "Path: " + Scene::CurrentScene + ".jscn", EditorUI::Text))
+			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
+			->SetPadding(0.005f, 0, 0.01f, 0.01f));
+		BackgroundBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal,
+			0, 
+			EditorUI::UIColors[2], 
+			Vector2(Scale.X - 0.005f, 2.0f / Graphics::WindowResolution.Y)))
+			->SetPadding(0, 0.005f, 0.0025f, 0));
+
+
 		GenerateSection(
 			{
 				ContextMenuSection(&Graphics::WorldSun.Rotation, Type::Vector3Rotation, "Rotation"),

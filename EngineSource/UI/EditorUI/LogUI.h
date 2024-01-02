@@ -5,14 +5,20 @@
 class UITextField;
 class UIText;
 
+/**
+* @brief
+* Console panel in the editor.
+* 
+* @ingroup Editor
+*/
 class LogUI : public EditorPanel
 {
 	std::vector<UIText*> LogTexts;
 
 	void UpdateLogBoxSize();
 public:
-	LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale);
-	void UpdateLayout() override;
+	LogUI(EditorPanel* Parent);
+	void OnResized() override;
 
 	UITextField* LogPrompt = nullptr;
 	UIScrollBox* LogScrollBox;

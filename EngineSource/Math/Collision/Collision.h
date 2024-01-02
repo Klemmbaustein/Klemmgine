@@ -8,16 +8,35 @@
 
 class CollisionComponent;
 
+/**
+* @file
+* @brief
+* File containing functions and variables for Collision.
+*/
+
+/**
+* @brief
+* Namespace containing functions related to Collision
+*/
 namespace Collision
 {
-
+	/**
+	* @brief
+	* Describes the result of a collision check.
+	*/
 	struct HitResponse
 	{
+		/// True if the collision check hit something, false if not.
 		bool Hit = false;
+		/// The point where the collision check hit something.
 		Vector3 ImpactPoint;
+		/// t variable for LineTrace() function. ImpactPoint = Start + Direction * t.
 		float t = INFINITY;
+		/// The object that was hit.
 		WorldObject* HitObject = nullptr;
+		/// The component that was hit.
 		CollisionComponent* HitComponent = nullptr;
+		/// The normal vector of the collision.
 		Vector3 Normal;
 		HitResponse()
 		{
@@ -62,6 +81,22 @@ namespace Collision
 
 	HitResponse BoxOverlapCheck(Box a, Vector3 Offset);
 	bool IsPointIn3DBox(Box a, Vector3 p);
+	/**
+	* @brief
+	* Traces a line from RayStart to RayEnd.
+	* 
+	* @param RayStart
+	* Where the ray should start.
+	* 
+	* @param RayEnd
+	* Where the ray should end.
+	* 
+	* @param ObjectsToIgnore
+	* Objects that should be ignored in the collision check.
+	* 
+	* @param MeshesToIgnore
+	* Collision meshes that should be ignored in the collision check.
+	*/
 	HitResponse LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<WorldObject*> ObjectsToIgnore = {}, std::set<CollisionComponent*> MeshesToIgnore = {});
 
 	HitResponse LineCheckForAABB(Box b, Vector3 RayStart, Vector3 RayEnd);

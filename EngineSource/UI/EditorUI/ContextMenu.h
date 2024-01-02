@@ -7,12 +7,19 @@
 
 class WorldObject;
 
+/**
+* @brief
+* EditorPanel displaying information about a selected object or the currently loaded scene.
+* 
+* @ingroup Editor
+*/
 class ContextMenu : public EditorPanel
 {
+	bool IsObject = false;
 public:
 	UIScrollBox* BackgroundBox;
 	std::vector<WorldObject::Property> Properties;
-	ContextMenu(Vector3* Colors, Vector2 Position, Vector2 Scale);
+	ContextMenu(EditorPanel* Parent, bool IsScene);
 	struct ContextMenuSection
 	{
 		void* Variable;
@@ -38,6 +45,6 @@ public:
 
 	void Tick() override;
 	void OnButtonClicked(int Index) override;
-	void UpdateLayout() override;
+	void OnResized() override;
 };
 #endif

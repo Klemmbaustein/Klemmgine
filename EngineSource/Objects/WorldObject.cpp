@@ -53,7 +53,7 @@ WorldObject::~WorldObject()
 WorldObject* WorldObject::Start(std::string ObjectName, Transform Transform, uint64_t NetID)
 {
 #if !EDITOR
-	if ((!Client::GetIsConnected() && !Server::IsServer()) || (!GetIsReplicated() || NetID != Networking::ServerID))
+	if ((!Client::GetIsConnected() && !Server::IsServer()) || (!GetIsReplicated() || NetID != UINT64_MAX))
 #endif
 	{
 		this->NetID = NetID;
@@ -83,7 +83,7 @@ void WorldObject::Destroy()
 {
 }
 
-void WorldObject::Tick()
+void WorldObject::Update()
 {
 }
 
@@ -129,11 +129,11 @@ ObjectDescription WorldObject::GetObjectDescription()
 	return ObjectDescription(TypeName, TypeID);
 }
 
-void WorldObject::TickComponents()
+void WorldObject::UpdateComponents()
 {
 	for (size_t i = 0; i < Components.size(); i++)
 	{
-		Components.at(i)->Tick();
+		Components.at(i)->Update();
 	}
 }
 
@@ -286,7 +286,7 @@ void WorldObject::LoadProperties(std::string in)
 						case Type::Vector3Color:
 						case Type::Vector3Rotation:
 						case Type::Vector3:
-							AssignStringToPtr<Vector3>(p.Type, current, p.Data, [](std::string val) {return Vector3::stov(val); });
+							AssignStringToPtr<Vector3>(p.Type, current, p.Data, [](std::string val) {return Vector3::FromString(val); });
 							break;
 						case Type::Bool:
 							AssignStringToPtr<bool>(p.Type, current, p.Data, [](std::string val) {return (bool)std::stoi(val); });

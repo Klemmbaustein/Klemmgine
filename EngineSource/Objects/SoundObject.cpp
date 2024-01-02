@@ -10,7 +10,7 @@ void SoundObject::Begin()
 	AddEditorProperty(Property("Sound:Volume", Type::Float, &Volume));
 	AddEditorProperty(Property("Sound:Looping", Type::Bool, &IsLooping));
 
-	AddEditorProperty(Property("3D-Sound:In 3D-Space", Type::Bool, &IsSpacialSound));
+	AddEditorProperty(Property("3D-Sound:In 3D-Space", Type::Bool, &IsSpatialSound));
 	AddEditorProperty(Property("3D-Sound:Falloff Range", Type::Float, &FalloffRange));
 
 #if EDITOR
@@ -22,12 +22,12 @@ void SoundObject::Begin()
 
 	auto EditorCollision = new CollisionComponent();
 	Attach(EditorCollision);
-	EditorCollision->Init(m.GetMergedVertices(), m.GetMergedIndices());
+	EditorCollision->Load(m.GetMergedVertices(), m.GetMergedIndices());
 	EditorCollision->RelativeTransform.Scale = 0.25;
 #endif
 }
 
-void SoundObject::Tick()
+void SoundObject::Update()
 {
 }
 
@@ -55,7 +55,7 @@ void SoundObject::LoadSound(std::string SoundName)
 	}
 #if !EDITOR
 	Buffer = Sound::LoadSound(Filename);
-	if (IsSpacialSound && Buffer)
+	if (IsSpatialSound && Buffer)
 	{
 		Source = Sound::PlaySound3D(Buffer, GetTransform().Location, FalloffRange, Pitch, Volume, IsLooping);
 	}

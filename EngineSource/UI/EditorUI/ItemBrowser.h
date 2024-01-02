@@ -3,51 +3,86 @@
 #include <UI/EditorUI/EditorPanel.h>
 #include <UI/UIfwd.h>
 #include <Objects/WorldObject.h>
+#include <UI/EditorUI/EditorUI.h>
 
-struct EditorClassesItem
-{
-	std::string Name;
-	ObjectDescription Object = ObjectDescription("", 0);
-	std::vector<EditorClassesItem> SubItems;
-	bool IsFolder = false;
-};
 
+/**
+* @brief
+* Editor panel that displays a list of items.
+* 
+* Used for class and asset view panels.
+* 
+* @ingroup Editor
+*/
 class ItemBrowser : public EditorPanel
 {
 	UITextField* PathField = nullptr;
-	struct FileEntry
-	{
-		std::string Name;
-		bool IsDirectory;
-	};
-	static size_t SelectedButton;
-	static std::vector<FileEntry> CurrentFiles;
-	int IsDraggingButton = 0;
-	static std::vector<UIButton*> Buttons;
-	int DraggedButton = 0;
 	bool RMBDown = false;
-	UIBox* ContentBox = nullptr;
+	UIBackground* SeperatorLine = nullptr;
+	UIBox* TopBox = nullptr;
+protected:
+	static ItemBrowser* DropdownBrowser;
 public:
-	void ScanForAssets();
-	static std::vector<EditorClassesItem> CPPClasses;
-	static std::vector<size_t> CPPPath;
+	UIBackground* DraggedButton = nullptr;
 
-	int SelectedTab = 0;
-	std::vector<std::string> Tabs =
+	/**
+	* @brief
+	* 
+	* The path displayed in the top section of the item browser.
+	*/
+	std::string Path;
+
+	struct BrowserItem
 	{
-		"Assets",
-		"Classes"
+		unsigned int Texture = 0;
+		std::string Name;
+		std::string Path;
+		Vector3 Color;
+		uint32_t TypeID = 0;
+		bool Selected = false;
+		bool Deleteable = true;
+		bool Renameable = true;
+		bool Openable = true;
 	};
-	std::vector<EditorClassesItem> GetEditorUIClasses();
-	std::vector<EditorClassesItem> GetContentsOfCurrentCPPFolder();
-	static std::string GetCurrentCPPPathString();
+
+	std::vector<EditorUI::DropdownItem> DefaultDropdown;
+	std::vector<EditorUI::DropdownItem> ContextOptions;
+
+	std::string EmptyText = "No items";
+	/**
+	* @brief
+	* Gets displayed items.
+	* 
+	* @return
+	* A list of items that should be displayed in the item browser.
+	*/
+	virtual std::vector<BrowserItem> GetBrowserContents() = 0;
+
+	/**
+	* @brief
+	* Called when an item in the browser has been clicked.
+	* 
+	* @param Item
+	* The clicked item.
+	*/
+	virtual void OnItemClicked(BrowserItem Item) = 0;
+
+	virtual void GoBack() = 0;
 
 	UIScrollBox* BrowserScrollBox;
-	ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale);
-	void UpdateLayout() override;
+	ItemBrowser(EditorPanel* Parent, std::string Name);
+	void OnResized() override;
 	void Tick() override;
+	virtual void DeleteItem(BrowserItem Item);
 
-	void OnButtonDragged(int Index) override;
-	void OnButtonClicked(int Index) override;
+	void OnPathChanged();
+	void GenerateTopBox();
+	void GenerateAssetList();
+
+	virtual void OnButtonDragged(int Index) override;
+	virtual void OnButtonClicked(int Index) override;
+private:
+	std::vector<UIButton*> Buttons;
+	std::vector<BrowserItem> LoadedItems;
 };
 #endif

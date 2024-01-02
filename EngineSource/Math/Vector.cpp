@@ -193,12 +193,6 @@ Vector3 Vector3::Abs()
 	return Vector3(abs(X), abs(Y), abs(Z));
 }
 
-Vector3 Vector3::Vec3ToVector(glm::vec3 In)
-{
-	return Vector3(In.x, In.y, In.z);
-}
-
-
 Vector3 Vector3::GetForwardVector(Vector3 In)
 {
 	return Vector3::GetScaledAxis(In.DegreesToRadiants(), 2);
@@ -222,6 +216,7 @@ Vector3 Vector3::Cross(Vector3 a, Vector3 b)
 		a.Z * b.X - a.X * b.Z,
 		a.X * b.Y - a.Y * b.X);
 }
+
 float Vector3::Dot(Vector3 a, Vector3 b)
 {
 	float result = 0.0;
@@ -229,6 +224,7 @@ float Vector3::Dot(Vector3 a, Vector3 b)
 		result += a[i] * b[i];
 	return result;
 }
+
 Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
@@ -237,6 +233,7 @@ Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 	else
 		return Vector3(atan2f(1 - Dir.Y, Dir.Y), atan2f(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0).RadiantsToDegrees();
 }
+
 Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
@@ -292,27 +289,6 @@ static void mul(Axes& mat, Axes& b)
 	}
 	copy(result, mat);
 }
-static void showAxis(const char* desc, const Axis& axis, Float sign)
-{
-	std::cout << "  " << desc << " = (";
-	for (size_t i = 0; i != 3; ++i)
-	{
-		if (i != 0)
-		{
-			std::cout << ",";
-		}
-		std::cout << axis[i] * sign;
-	}
-	std::cout << ")\n";
-}
-
-	static void showAxes(const char* desc, Axes& axes)
-	{
-		std::cout << desc << ":\n";
-		showAxis("front", axes[2], 1);
-		showAxis("right", axes[0], -1);
-		showAxis("up", axes[1], 1);
-	}
 
 Vector3 Vector3::GetScaledAxis(Vector3 Rot, unsigned int Dir)
 {
@@ -368,9 +344,7 @@ Vector3 Vector3::TranslateVector(Vector3 Vec, Transform Transform)
 	return glm::vec3(Matrix * glm::vec4((glm::vec3)Vec, 1));
 }
 
-	
-
-Vector3 Vector3::stov(std::string In)
+Vector3 Vector3::FromString(std::string In)
 {
 	if (In.size() == 0)
 	{

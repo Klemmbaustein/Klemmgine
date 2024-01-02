@@ -97,7 +97,7 @@ namespace _TextRenderer
 
 constexpr int FONT_BITMAP_WIDTH = 2700;
 constexpr int FONT_BITMAP_PADDING = 32;
-constexpr int FONT_MAX_UNICODE_CHARS = 1200;
+constexpr int FONT_MAX_UNICODE_CHARS = 700;
 
 size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale)
 {
@@ -144,11 +144,18 @@ TextRenderer::TextRenderer(std::string filename)
 	_TextRenderer::Renderers.push_back(this);
 	Uint8* ttfBuffer = (Uint8*)malloc(1 << 20);
 	ENGINE_ASSERT(ttfBuffer != nullptr, "The allocated buffer should never be null");
+	if (!std::filesystem::exists(filename))
+	{
 #if RELEASE
-	Filename = "Assets/" + filename;
+		Filename = "Assets/" + filename;
 #else
-	Filename = "Fonts/" + filename;
+		Filename = "Fonts/" + filename;
 #endif
+	}
+	else
+	{
+		Filename = filename;
+	}
 
 	size_t ret = fread(ttfBuffer, 1, 1 << 20, fopen(Filename.c_str(), "rb"));
 	if (!ret)
@@ -504,10 +511,6 @@ TextRenderer::~TextRenderer()
 	//delete[] cdatapointer;
 }
 
-void OnWindowResized()
-{
-}
-
 DrawableText::DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumVerts, unsigned int Texture,
 	Vector2 Position, float Scale, Vector3 Color, float opacity)
 {
@@ -521,13 +524,12 @@ DrawableText::DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumV
 	this->Color = Color;
 }
 
-void DrawableText::Draw(ScrollObject* CurrentScrollObject, float Depth)
+void DrawableText::Draw(ScrollObject* CurrentScrollObject)
 {
 	glBindVertexArray(VAO);
 	Graphics::TextShader->Bind();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture);
-	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_depth"), Depth);
 	glUniform1i(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_texture"), 0);
 	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "textColor"), Color.X, Color.Y, Color.Z);
 	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);

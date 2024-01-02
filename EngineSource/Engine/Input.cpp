@@ -8,6 +8,8 @@ namespace Input
 	bool Keys[351];
 	bool BlockInputConsole = false;
 	bool BlockInput = false;
+	bool IsLMBClicked = false;
+	bool IsRMBClicked = false;
 }
 
 bool Input::IsKeyDown(Key InputKey)

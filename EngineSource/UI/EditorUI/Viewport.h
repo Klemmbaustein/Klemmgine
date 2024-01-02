@@ -6,50 +6,38 @@ class WorldObject;
 class Model;
 class EditorTab;
 
+/**
+* @brief
+* EditorPanel showing the scene view.
+* 
+* @ingroup Editor
+*/
 class Viewport : public EditorPanel
 {
 	bool ViewportLock = false;
 	bool PressedLMB = false;
 	Vector2 InitialMousePosition = 0;
-	UIBox* TabBox = nullptr;
 	bool Dragging = false;
 	Vector3 Axis;
-	Vector3 BoxAxis = Vector3(1, 1, 0);
+	int BoxAxis = 1;
 	bool FirstDragFrame = 0;
 	Vector3 DragOffset = 0;
 	Vector3 PreviousLocation;
 	Model* ArrowsModel = nullptr;
-	size_t SelectedTab = 0;
-	struct Tab
-	{
-		size_t Index;
-		std::string Name;
-		bool CanBeClosed;
-		std::string Type;
-	};
 	bool IsCopying = false;
-	std::vector<UIText*> TabTexts;
-	std::vector<Tab> Tabs = { Tab(0, "Viewport", false, "jscn")};
 public:
-
-	std::vector<EditorTab*> TabInstances;
 	static Viewport* ViewportInstance;
 	WorldObject* PreviousSelectedObject = nullptr;
 	size_t PreviousSelectedObjectSize = 0;
-	std::vector<WorldObject*> SelectedObjects;
 
-	Viewport(Vector3* Colors, Vector2 Position, Vector2 Scale);
+	Viewport(EditorPanel* Parent);
 	void ClearSelectedObjects();
-	void OpenTab(size_t TabID, std::string File);
+	virtual void OnItemDropped(DroppedItem Item) override;
 	void OnButtonClicked(int Index);
-
-	EditorTab* CurrentTab = nullptr;
-
-	void UpdateTabBar();
 
 	FramebufferObject* OutlineBuffer = nullptr, *ArrowsBuffer = nullptr;
 
-	void UpdateLayout() override;
+	void OnResized() override;
 	void Tick() override;
 };
 #endif

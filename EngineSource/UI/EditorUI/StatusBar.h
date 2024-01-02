@@ -3,7 +3,15 @@
 #include <UI/EditorUI/EditorPanel.h>
 #include <UI/UIfwd.h>
 
-class StatusBar : public EditorPanel
+/**
+* @brief
+* Status bar in the editor.
+* 
+* Displays 'File' 'Edit' 'View' 'Help', Memory usage and performance statistics.
+* 
+* @ingroup Editor
+*/
+class StatusBar : public UICanvas
 {
 	UIText* StatusText;
 	UIBox* BarBoxes[2];
@@ -11,19 +19,14 @@ class StatusBar : public EditorPanel
 	unsigned int DisplayedFPS = 60;
 	int Selected = 0;
 public:
-	StatusBar(Vector3* Colors);
-
-	void GenerateWindowButtons(std::vector<int> ButtonIndices);
-
+	UIBackground* StatusBackground = nullptr;
+	StatusBar();
 	UIBox* WindowButtonBox = nullptr;
 
 	UIBox* MenuBarDropdown = nullptr;
 
-	static bool IsHovered();
-
 	void GenerateMenuBarDropdown(int ButtonIndex);
 
-	void UpdateLayout() override;
 	void Tick() override;
 	void OnButtonClicked(int Index) override;
 };

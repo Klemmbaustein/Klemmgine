@@ -16,7 +16,7 @@ void ParticleComponent::Begin()
 #endif
 }
 
-void ParticleComponent::Tick()
+void ParticleComponent::Update()
 {
 #if !SERVER
 	Emitter->Position = RelativeTransform.Location + GetParent()->GetTransform().Location;

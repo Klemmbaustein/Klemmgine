@@ -27,7 +27,7 @@ void InstancedMeshComponent::Begin()
 {
 }
 
-void InstancedMeshComponent::Tick()
+void InstancedMeshComponent::Update()
 {
 }
 

@@ -15,43 +15,31 @@ class ParticleEditorTab : public EditorTab
 	std::vector<std::string> ElementMaterials = 
 	{
 	};
-	const std::vector <std::string> ElementParametersColumn1 =
-	{
-		"Direction",
-		"Direction Random",
-		"Scale",
-		"Lifetime",
-		"Spawn Delay",
-		"Num Loops",
-		"Material"
-	};
-	const std::vector <std::string> ElementParametersColumn2 =
-	{
-		"Position Range",
-		"Force",
-		"Start Scale",
-		"End Scale"
-	}; 
-	std::vector<UIBox*> GeneratedUI;
-	std::vector<UIBox*> SettingsButtons;
 
-	TextRenderer* TabText = nullptr;
+	struct ParticleParam
+	{
+		void* ValuePointer;
+		Type::TypeEnum ParamType;
+		std::string Name;
+
+		ParticleParam(void* ValuePointer, Type::TypeEnum ParamType, std::string Name);
+	};
+	UIScrollBox* ChildBox = nullptr;
+	std::vector<std::vector<ParticleParam>> Parameters;
+	std::vector<std::vector<UIBox*>> ParameterButtons;
+
+	void GenerateElementButtons(const std::vector<ParticleParam>& ElementParams, UIBox* Target);
+	void AddParametersForElement(Particles::ParticleElement* Element, std::string* MaterialPtr);
 	UIBackground* ParticleViewport = nullptr;
-	UIScrollBox* ParticleSettingsScrollBox = nullptr;
 	FramebufferObject* ParticleFramebufferObject = nullptr;
 	Particles::ParticleEmitter* Particle;
 	std::string CurrentSystemFile;
-	unsigned int SelectedElement = 0;
-	unsigned int RemoveTexture = 0;
-	float ReactivateDelay = 1.f;
-	UIText* ParticleViewportText = nullptr;
-	UIText* SelectedElementText = nullptr;
+	float ReActivateDelay = 1.f;
 public:
-	void UpdateLayout() override;
-	ParticleEditorTab(Vector3* UIColors, TextRenderer* Text, unsigned int RemoveTexture, unsigned int ReloadTexture);
+	void OnResized() override;
+	ParticleEditorTab(EditorPanel* Parent, std::string File);
 	void Tick() override;
 	void Load(std::string File) override;
-	void ReloadMesh();
 	void Save() override;
 	void Generate();
 	void OnButtonClicked(int Index) override;

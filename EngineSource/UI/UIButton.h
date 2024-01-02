@@ -2,49 +2,39 @@
 #pragma once
 #include <UI/UIBox.h>
 #include <UI/Default/UICanvas.h>
-#include <Rendering/Graphics.h>
+#include <UI/UIBackground.h>
 
-struct VertexBuffer;
-
-class UIButton : public UIBox
+/**
+* @brief
+* A button.
+* 
+* If the Parent UICanvas has been specified, the UIButton will call the OnClicked(int Index)
+* function with the given ButtonIndex.
+* 
+* Buttons function like a UIBackground and can have color, opacity and texture.
+*/
+class UIButton : public UIBackground
 {
 protected:
-	float ButtonColorMultiplier = 1.f;
 	Vector2 Offset;
-	VertexBuffer* ButtonVertexBuffer;
 	bool IsHovered = false;
 	bool IsPressed = false;
-	Vector3 Color = Vector3(0.5);
-	Shader* ButtonShader = nullptr;
 	UICanvas* ParentUI;
 	int ButtonIndex;
-	bool IsSelected = false;
-	bool NeedsToBeSelected = false;
 	bool CanBeDragged = false;
-	float Opacity = 1;
-	bool UseTexture = false;
 	unsigned int TextureID = 0;
-	void ScrollTick(Shader* UsedShader);
-	void MakeGLBuffers();
 	virtual void Tick() override;
 	virtual void Update() override;
-	virtual void Draw() override;
 	virtual void OnClicked();
+	bool ClickStartedOnButton = false;
 public:
-	bool GetUseTexture();
-	UIButton* SetOpacity(float NewOpacity);
-	float GetOpacity();
-	void SetCanBeDragged(bool NewCanBeDragged);
-	bool GetIsSelected();
-	void SetNeedsToBeSelected(bool NeedsToBeSelected);
-	bool GetIsHovered();
-	bool GetIsPressed();
-	int GetIndex();
-	UIButton* SetColor(Vector3 NewColor);
-	Vector3 GetColor();
-	UIButton* SetUseTexture(bool UseTexture, unsigned int TextureID = 0);
+	virtual std::string GetAsString() override;
+	UIButton* SetCanBeDragged(bool NewCanBeDragged);
+	bool GetIsHovered() const;
+	bool GetIsPressed() const;
+	int GetIndex() const;
 
-	UIButton(bool Horizontal, Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, Shader* ButtonShader = Graphics::UIShader);
+	UIButton(Orientation BoxOrientation, Vector2 Position, Vector3 Color, UICanvas* Parent, int ButtonIndex, Shader* ButtonShader = Graphics::UIShader);
 	~UIButton();
 	UIBox* ParentOverride = nullptr;
 };

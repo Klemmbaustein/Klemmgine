@@ -20,12 +20,12 @@ void Importer::Import(std::string InputFile, std::string CurrentFilePath)
 	{
 		From = InputFile;
 		To = OutputFileName;
-		new DialogBox("File Import", 0, "File already exists!", { DialogBox::Answer("Replace", []()
+		/*new DialogBox("File Import", 0, "File already exists!", {DialogBox::Answer("Replace", []()
 			{
 				std::filesystem::remove(To);
 				std::filesystem::copy(From, To);
 			}
-		), DialogBox::Answer("Cancel", nullptr) });
+		), DialogBox::Answer("Cancel", nullptr) });*/
 	}
 	else
 	{

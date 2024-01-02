@@ -273,7 +273,7 @@ Vector3 SaveGame::GetVector(std::string Name) const
 {
 	try
 	{
-		return Vector3::stov(GetPropertyOfType(Name, Type::Vector3).Value);
+		return Vector3::FromString(GetPropertyOfType(Name, Type::Vector3).Value);
 	}
 	catch (std::exception&)
 	{

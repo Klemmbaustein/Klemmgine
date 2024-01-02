@@ -120,7 +120,7 @@ void Packet::EvaluatePacket()
 			break;
 		}
 		
-		for (auto& i : Objects::EditorObjects)
+		for (auto& i : Objects::ObjectTypes)
 		{
 			if (i.ID == ObjTypeID)
 			{

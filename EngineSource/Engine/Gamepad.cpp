@@ -4,9 +4,13 @@
 
 #include <SDL.h>
 #include <iostream>
-
 std::unordered_map<int32_t, Input::Gamepad> Input::Gamepads;
 Vector2 GetHatState(Uint8 hat);
+
+Input::GamepadType Input::GetGamepadType(Gamepad* From)
+{
+	return (GamepadType)SDL_GameControllerTypeForIndex(From->ID);
+}
 
 void Input::AddGamepad(int32_t ID)
 {

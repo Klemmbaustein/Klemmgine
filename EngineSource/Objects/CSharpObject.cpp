@@ -7,16 +7,16 @@ void CSharpObject::Begin()
 	AddEditorProperty(Property("C#:Object class", Type::String, &CSharpClass));
 }
 
-void CSharpObject::Tick()
+void CSharpObject::Update()
 {
 	if (!CS_Obj.ID)
 	{
 		return;
 	}
 
-	CSharp::ExectuteFunctionOnObject(CS_Obj, "TickComponents");
+	CSharp::ExectuteFunctionOnObject(CS_Obj, "UpdateComponents");
 #if !EDITOR
-	CSharp::ExectuteFunctionOnObject(CS_Obj, "Tick");
+	CSharp::ExectuteFunctionOnObject(CS_Obj, "Update");
 #endif
 }
 

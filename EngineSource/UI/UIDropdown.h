@@ -2,6 +2,12 @@
 #include <UI/UIButton.h>
 #include <UI/UIfwd.h>
 
+/**
+* @brief
+* UI dropdown element.
+* 
+* @ingroup UI
+*/
 class UIDropdown : public UIButton
 {
 	TextRenderer* Renderer;

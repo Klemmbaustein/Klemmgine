@@ -18,7 +18,6 @@ namespace Graphics
 	Sun WorldSun;
 	Fog WorldFog;
 	int ShadowResolution = 2000;
-	std::vector<Renderable*> ModelsToRender;
 	std::vector<UICanvas*> UIToRender;
 	Vector2 WindowResolution(1600, 900);
 	unsigned int PCFQuality = 0;

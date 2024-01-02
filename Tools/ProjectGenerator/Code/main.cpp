@@ -12,7 +12,7 @@ std::vector<std::string> DependencyDlls =
 	"bDependencies/openal-soft/Release/OpenAL32.dll",
 	"aDependencies/SDL/VisualC/SDL/x64/Release/SDL2.dll",
 	"aDependencies/SDL_net/Build/Release/SDL2_net.dll",
-	"aCSharpCore/lib/nethost.dll"
+	"aCSharp/lib/nethost.dll"
 };
 #endif
 

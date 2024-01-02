@@ -143,6 +143,26 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 		if (Uniforms[i].Type == u.Type && Uniforms[i].Name == u.UniformName)
 		{
 			UniformIndex = i;
+			switch (u.Type)
+			{
+			case Type::Int:
+			case Type::Bool:
+				delete (int*)Uniforms[i].Content;
+				break;
+			case Type::Vector3Color:
+			case Type::Vector3Rotation:
+			case Type::Vector3:
+				delete (Vector3*)Uniforms[i].Content;
+				break;
+			case Type::Float:
+				delete (float*)Uniforms[UniformIndex].Content;
+				break;
+			case Type::GL_Texture:
+				delete (unsigned int*)Uniforms[i].Content;
+				break;
+			default:
+				break;
+			}
 			return;
 		}
 	}
@@ -165,8 +185,9 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 			Uniforms[UniformIndex].Content = new float(std::stof(u.Value));
 			break;
 		case Type::Vector3Color:
+		case Type::Vector3Rotation:
 		case Type::Vector3:
-			Uniforms[UniformIndex].Content = new Vector3(Vector3::stov(u.Value));
+			Uniforms[UniformIndex].Content = new Vector3(Vector3::FromString(u.Value));
 			break;
 		case Type::GL_Texture:
 		{

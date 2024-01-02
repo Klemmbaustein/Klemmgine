@@ -27,8 +27,6 @@ public:
 
 	virtual void Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass) override;
 
-	void LoadMaterials(std::vector<std::string> Materials);
-
 	virtual void UpdateTransform()
 	{
 		MatModel = glm::mat4(1.f);

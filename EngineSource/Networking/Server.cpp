@@ -160,7 +160,7 @@ void Server::DisconnectPlayer(void* IP)
 	}
 }
 
-void Server::DisconnectPlayer(size_t UID)
+void Server::DisconnectPlayer(uint64_t UID)
 {
 	for (auto& i : Clients)
 	{

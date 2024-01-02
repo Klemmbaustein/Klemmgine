@@ -14,7 +14,7 @@ public:
 
 	BillboardSprite* GetSprite();
 
-	void Tick() override;
+	void Update() override;
 
 	float Rotation = 0;
 	Vector3 Color = 1;

@@ -43,14 +43,13 @@ jobs:
       # Add additional options to the MSBuild command line here (like platform or verbosity level).
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: |
-        
         ./setup.ps1 CI_BUILD
 
     - name: package
       run: |
           mkdir Release
           cp -r -force ./EditorContent Release/EditorContent
-          cp -r -force ./CSharpCore Release/CSharpCore
+          cp -r -force ./CSharp Release/CSharp
           cp -r -force ./Tools Release/Tools
           cp -r -force ./ProjectGenerator.exe Release
     - name: upload artifact
@@ -93,9 +92,11 @@ jobs:
       run: |
           KlemmBuild engine.kbld -DGenerator -DCiBuild
           ./ProjectGenerator -projectName Klemmgine -includeEngine false -ciBuild true
-          cd CSharpCore
+          cd CSharp/Core
           dotnet build
-          cd ../Games/Klemmgine
+          cd ../Engine
+          dotnet build
+          cd ../../Games/Klemmgine
           KlemmBuild makefile.kbld -DEditor -DCiBuild
           KlemmBuild makefile.kbld -DDebug -DCiBuild
           KlemmBuild makefile.kbld -DRelease -DCiBuild
@@ -108,7 +109,7 @@ jobs:
           ls -R
           mkdir Release
           cp -rf ./EditorContent Release/EditorContent
-          cp -rf ./CSharpCore Release/CSharpCore
+          cp -rf ./CSharp Release/CSharp
           cp -rf ./Tools Release/Tools
           cp -rf ./ProjectGenerator Release
     - name: upload artifact

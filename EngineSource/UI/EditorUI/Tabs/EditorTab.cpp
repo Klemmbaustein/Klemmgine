@@ -1,17 +1,24 @@
 #if EDITOR
 #include "EditorTab.h"
 #include <UI/EditorUI/Viewport.h>
+#include <Engine/Utility/FileUtility.h>
 
-void EditorTab::UpdateLayout()
+void EditorTab::Save()
 {
 }
 
-EditorTab::EditorTab(Vector3* UIColors)
+void EditorTab::Load(std::string File)
 {
-	this->UIColors = UIColors;
-	TabBackground = new UIBackground(false, Viewport::ViewportInstance->Position, UIColors[0], Viewport::ViewportInstance->Scale);
-	TabBackground->SetMaxSize(Viewport::ViewportInstance->Scale);
-	TabBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-	TabBackground->IsVisible = false;
+}
+
+EditorTab::EditorTab(EditorPanel* Parent, std::string Name, std::string File)
+	: EditorPanel(Parent, Name + ": " + FileUtil::GetFileNameWithoutExtensionFromPath(File))
+{
+	CanBeClosed = true;
+}
+EditorTab::EditorTab(Vector2 Position, Vector2 Scale, std::string Name, std::string File)
+	: EditorPanel(Position, Scale, Name + ": " + FileUtil::GetFileNameWithoutExtensionFromPath(File))
+{
+	CanBeClosed = true;
 }
 #endif

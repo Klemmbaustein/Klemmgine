@@ -9,17 +9,23 @@ class FramebufferObject;
 class Model;
 class Camera;
 
+/**
+* @brief
+* Tab for editing material (.jsmat) files.
+* 
+* @ingroup Editor
+*/
 class MaterialTab : public EditorTab
 {
 public:
 	virtual void OnButtonClicked(int Index) override;
 
-	MaterialTab(Vector3* UIColors, TextRenderer* Text);
-
+	MaterialTab(EditorPanel* Parent, std::string File);
+	~MaterialTab() override;
 
 	void Tick() override; //Render and Update
 	void Load(std::string File) override;
-	void UpdateLayout() override;
+	void OnResized() override;
 	void Save();
 	void GenerateUI();
 	void GenerateMaterialProperties();
@@ -35,9 +41,7 @@ private:
 	UITextField* ShaderTextFields[2];
 	std::vector<UIBox*> TextFields;
 	std::vector<UIBox*> TextureDropdowns;
-	UIText* TabName = nullptr;
 	UIBox* Rows[2];
-	TextRenderer* Renderer;
 	std::string Filepath;
 
 	Material LoadedMaterial;

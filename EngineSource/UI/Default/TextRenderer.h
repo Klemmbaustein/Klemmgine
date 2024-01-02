@@ -27,7 +27,7 @@ class DrawableText
 	DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumVerts, unsigned int Texture, Vector2 Position, float Scale, Vector3 Color, float opacity);
 public:
 	float Opacity = 1.f;
-	void Draw(ScrollObject* CurrentScrollObject, float Depth);
+	void Draw(ScrollObject* CurrentScrollObject);
 	~DrawableText();
 };
 

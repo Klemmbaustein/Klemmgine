@@ -21,6 +21,8 @@
   <ItemGroup>
     <ClCompile Include="Engine\BackgroundTask.cpp" />
     <ClCompile Include="Engine\Gamepad.cpp" />
+    <ClCompile Include="UI\EditorUI\AssetBrowser.cpp" />
+    <ClCompile Include="UI\EditorUI\ClassesBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\AboutWindow.cpp" />
     <ClCompile Include="CSharp\CSharpInterop.cpp" />
     <ClCompile Include="CSharp\NativeFunctions.cpp" />
@@ -115,7 +117,7 @@
     <ClCompile Include="UI\EditorUI\Tabs\MaterialTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\MeshTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\ParticleEditorTab.cpp" />
-    <ClCompile Include="UI\EditorUI\Tabs\PreferenceTab.cpp" />
+    <ClCompile Include="UI\EditorUI\SettingsPanel.cpp" />
     <ClCompile Include="UI\EditorUI\Toolbar.cpp" />
     <ClCompile Include="UI\EditorUI\UIVectorField.cpp" />
     <ClCompile Include="UI\EditorUI\Viewport.cpp" />
@@ -130,6 +132,8 @@
   <ItemGroup>
     <ClInclude Include="Engine\BackgroundTask.h" />
     <ClInclude Include="Engine\Gamepad.h" />
+    <ClInclude Include="UI\EditorUI\AssetBrowser.h" />
+    <ClInclude Include="UI\EditorUI\ClassesBrowser.h" />
     <ClInclude Include="UI\EditorUI\Popups\AboutWindow.h" />
     <ClInclude Include="CSharp\CSharpInterop.h" />
     <ClInclude Include="CSharp\NativeFunctions.h" />
@@ -229,7 +233,7 @@
     <ClInclude Include="UI\EditorUI\Tabs\MaterialTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\MeshTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\ParticleEditorTab.h" />
-    <ClInclude Include="UI\EditorUI\Tabs\PreferenceTab.h" />
+    <ClInclude Include="UI\EditorUI\SettingsPanel.h" />
     <ClInclude Include="UI\EditorUI\Toolbar.h" />
     <ClInclude Include="UI\EditorUI\UIVectorField.h" />
     <ClInclude Include="UI\EditorUI\Viewport.h" />

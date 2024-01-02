@@ -8,7 +8,7 @@ void MeshObject::Destroy()
 {
 }
 
-void MeshObject::Tick()
+void MeshObject::Update()
 {
 	
 }
@@ -61,7 +61,7 @@ void MeshObject::LoadFromFile(std::string Filename)
 			CollisionComponent* NewCollider = new CollisionComponent();
 			NewCollider = new CollisionComponent();
 			Attach(NewCollider);
-			NewCollider->Init(i.Vertices, i.Indices, Transform(Vector3(), Vector3(), Vector3(1)));
+			NewCollider->Load(i.Vertices, i.Indices, Transform(Vector3(), Vector3(), Vector3(1)));
 			MeshCollision.push_back(NewCollider);
 		}
 	}

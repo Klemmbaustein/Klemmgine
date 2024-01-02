@@ -1,4 +1,4 @@
-#if EDITOR
+#if EDITOR && 0
 #include "BakeMenu.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <Rendering/Utility/BakedLighting.h>
@@ -12,7 +12,7 @@
 bool BakeMenu::BakeMenuActive = false;
 
 BakeMenu::BakeMenu()
-	: EditorPanel(Editor::CurrentUI->UIColors, Position, Vector2(0.5f, 0.55f), Vector2(0.5f, 0.55f), 2, true, "Bake Lightmap")
+	: EditorPanel(Application::EditorInstance->UIColors, Position, Vector2(0.5f, 0.55f), Vector2(0.5f, 0.55f), 2, true, "Bake Lightmap")
 {
 	if (BakeMenuActive)
 	{
@@ -29,22 +29,22 @@ BakeMenu::BakeMenu()
 	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
 		->SetPadding(0.01f)
 		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Bake", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Bake", Application::EditorInstance->EngineUIText))
 			->SetPadding(0.005f)))
 		->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
 			->SetPadding(0.01f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Application::EditorInstance->EngineUIText))
 				->SetPadding(0.005f)));
 
-	InputFields[0] = new UITextField(0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
-	InputFields[1] = new UITextField(0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
+	InputFields[0] = new UITextField(0, UIColors[1], this, 0, Application::EditorInstance->EngineUIText);
+	InputFields[1] = new UITextField(0, UIColors[1], this, 0, Application::EditorInstance->EngineUIText);
 
 
 
 	TabBackground->AddChild((new UIBox(true, 0))
 		->SetPadding(0.01f, 0.3f, 0.01f, 0.01f)
-		->AddChild((new UIText(0.55f, UIColors[2], "Lightmap scale:      ", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.55f, UIColors[2], "Lightmap scale:      ", Application::EditorInstance->EngineUIText))
 			->SetPadding(0.005f))
 		->AddChild(InputFields[0]
 			->SetText(EditorUI::ToShortString(BakedLighting::LightmapScaleMultiplier))
@@ -54,7 +54,7 @@ BakeMenu::BakeMenu()
 
 	TabBackground->AddChild((new UIBox(true, 0))
 		->SetPadding(0.01f)
-		->AddChild((new UIText(0.55f, UIColors[2], "Lightmap resolution: ", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.55f, UIColors[2], "Lightmap resolution: ", Application::EditorInstance->EngineUIText))
 			->SetPadding(0.005f))
 		->AddChild(InputFields[1]
 			->SetText(std::to_string(BakedLighting::LightmapResolution))
@@ -89,7 +89,7 @@ void BakeMenu::OnButtonClicked(int Index)
 	{
 		BakedLighting::LightmapScaleMultiplier = std::stof(InputFields[0]->GetText());
 		BakedLighting::LightmapResolution = std::stoull(InputFields[1]->GetText());
-		Editor::CurrentUI->BakeScene();
+		Application::EditorInstance->BakeScene();
 		StartBake();
 		return;
 	}
@@ -108,7 +108,7 @@ void BakeMenu::Tick()
 			TabBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
 				->SetPadding(0.01f)
 				->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-				->AddChild((new UIText(0.45f, 1 - UIColors[2], "Close", Editor::CurrentUI->EngineUIText))
+				->AddChild((new UIText(0.45f, 1 - UIColors[2], "Close", Application::EditorInstance->EngineUIText))
 					->SetPadding(0.005f)));
 		}
 		else if (Editor::IsBakingScene)
@@ -133,7 +133,7 @@ void BakeMenu::GenerateBakeLog()
 	LogScrollBox->DeleteChildren();
 	for (auto& i : BakedLighting::GetBakeLog())
 	{
-		LogScrollBox->AddChild((new UIText(0.45f, UIColors[2], i, Editor::CurrentUI->EngineUIText))
+		LogScrollBox->AddChild((new UIText(0.45f, UIColors[2], i, Application::EditorInstance->EngineUIText))
 			->SetPadding(0, 0, 0.01f, 0));
 	}
 }
@@ -145,10 +145,10 @@ void BakeMenu::StartBake()
 	
 	TabBackground->SetVerticalAlign(UIBox::Align::Reverse);
 
-	TabBackground->AddChild((new UIText(0.6f, UIColors[2], "Baking lighting...", Editor::CurrentUI->EngineUIText))
+	TabBackground->AddChild((new UIText(0.6f, UIColors[2], "Baking lighting...", Application::EditorInstance->EngineUIText))
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.005f));
 
-	BakeProgressText = new UIText(0.5, UIColors[2], "Progress: 0%", Editor::CurrentUI->EngineUIText);
+	BakeProgressText = new UIText(0.5, UIColors[2], "Progress: 0%", Application::EditorInstance->EngineUIText);
 	TabBackground->AddChild(BakeProgressText
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.005f));
 

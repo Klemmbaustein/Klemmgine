@@ -13,19 +13,17 @@ static float LogTextSize = 0.38f;
 
 void LogUI::UpdateLogBoxSize()
 {
-	LogPrompt->SetColor(UIColors[1] * 0.5f);
-	LogScrollBox->SetMinSize((Scale - Vector2(0.2f, 0.1f)).Clamp(Vector2(0.7f, 0.1f), Vector2(1.4f, 1.0f)));
-	LogScrollBox->SetMaxSize((Scale - Vector2(0.2f, 0.1f)).Clamp(Vector2(0.7f, 0.1f), Vector2(1.4f, 1.0f)));
-	LogPrompt->SetMinSize(Vector2(LogScrollBox->GetMinSize().X, 0));
+	LogPrompt->SetColor(EditorUI::UIColors[1] * 0.5f);
+	LogScrollBox->SetMinSize((Scale - Vector2(0.06f, 0.1f)));
+	LogScrollBox->SetMaxSize((Scale - Vector2(0.06f, 0.1f)));
 }
 
-LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(UIColors, Position, Scale, Vector2(0.8f, 0.35f), Vector2(2, 0.6f))
+LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console")
 {
-	LogScrollBox = new UIScrollBox(false, 0, true);
-	LogScrollBox->SetTryFill(true);
-	LogPrompt = new UITextField(0, UIColors[1] * 0.5f, this, 0, Editor::CurrentUI->EngineUIText);
-	LogPrompt->HintText = "Enter command here";
-	TabBackground->AddChild((new UIBackground(false, 0, UIColors[1] * 0.99f, 0))
+	LogScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
+	LogPrompt = new UITextField(0, EditorUI::UIColors[1] * 0.5f, this, 0, EditorUI::MonoText);
+	LogPrompt->HintText = "Console";
+	PanelMainBackground->AddChild((new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[1] * 0.99f, 0))
 		->AddChild(LogScrollBox
 			->SetScrollSpeed(4)
 			->SetPadding(0, 0, 0.01f, 0))
@@ -37,19 +35,25 @@ LogUI::LogUI(Vector3* UIColors, Vector2 Position, Vector2 Scale) : EditorPanel(U
 	UpdateLogBoxSize();
 }
 
-void LogUI::UpdateLayout()
+void LogUI::OnResized()
 {
 	UpdateLogBoxSize();
 	if (LogTexts.size())
 	{
 		float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
-		LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.025f, 0.0f);
-		LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025f, 0.0f));
+		LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.05f, 0.0f);
+		LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.05f, 0.0f));
+
+		for (UIText* i : LogTexts)
+		{
+			i->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative);
+		}
 	}
 }
 
 void LogUI::OnButtonClicked(int Index)
 {
+	HandlePanelButtons(Index);
 	if (Index == 0)
 	{
 		if (Input::IsKeyDown(Input::Key::RETURN))
@@ -63,17 +67,18 @@ void LogUI::OnButtonClicked(int Index)
 
 void LogUI::Tick()
 {
-	UpdatePanel();
+	TickPanel();
 	auto LogMessages = Log::GetMessages();
 	if (LogMessages.size() != PrevLogLength || (LogMessages.size() && PrevAmount != LogMessages.at(LogMessages.size() - 1).Amount))
 	{
-		TabBackground->UpdateSelfAndChildren();
+		PanelMainBackground->UpdateSelfAndChildren();
 		PrevLogLength = LogMessages.size();
 		float PrevPos = 0;
 		if (LogMessages.size())
 		{
 			PrevAmount = LogMessages.at(LogMessages.size() - 1).Amount;
 		}
+		LogTexts.clear();
 		LogScrollBox->DeleteChildren();
 		for (size_t i = 0; i < LogMessages.size(); i++)
 		{
@@ -82,10 +87,10 @@ void LogUI::Tick()
 			{
 				Text.append(" (x" + std::to_string(LogMessages.at(i).Amount + 1) + ")");
 			}
-			LogTexts.push_back((new UIText(LogTextSize, LogMessages.at(i).Color, Text, Editor::CurrentUI->EngineUIText)));
+			LogTexts.push_back((new UIText(LogTextSize, LogMessages.at(i).Color, Text, EditorUI::MonoText)));
 			LogScrollBox->AddChild(LogTexts.at(LogTexts.size() - 1)
 				->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative)
-				->SetPadding(-0.003f));
+				->SetPadding(-0.001f));
 		}
 		// If NewLogTexts is emtpy too, we skip calculating scroll related stuff.
 		if (LogTexts.size())

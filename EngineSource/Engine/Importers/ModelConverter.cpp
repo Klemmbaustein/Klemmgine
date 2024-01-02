@@ -94,7 +94,7 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 		{
 			Importer::From = Name;
 			Importer::To = OutputFileName;
-			new DialogBox("Model Import", 0, "\"" + FileUtil::GetFileNameWithoutExtensionFromPath(OutputFileName) + "\" already exists.",
+			/*new DialogBox("Model Import", 0, "\"" + FileUtil::GetFileNameWithoutExtensionFromPath(OutputFileName) + "\" already exists.",
 			{
 				DialogBox::Answer("Replace", []()
 				{
@@ -103,7 +103,7 @@ std::string ModelImporter::Import(std::string Name, std::string CurrentFilepath)
 					Import(Importer::From, TargetPath);
 				}), 
 				DialogBox::Answer("Cancel", nullptr) 
-			});
+			});*/
 			return "";
 		}
 		std::ofstream Output(OutputFileName, std::ios::out | std::ios::binary);

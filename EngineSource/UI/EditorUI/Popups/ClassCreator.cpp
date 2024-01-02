@@ -1,4 +1,4 @@
-#if EDITOR
+#if EDITOR && 0
 #include "ClassCreator.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <filesystem>
@@ -18,7 +18,7 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 	return true;
 }
 
-ClassCreator::ClassCreator() : EditorPanel(Editor::CurrentUI->UIColors, 0.15f, 1, 0.3f, 0.3f, true, "Class creator")
+ClassCreator::ClassCreator() : EditorPanel(Application::EditorInstance->UIColors, 0.15f, 1, 0.3f, 0.3f, true, "Class creator")
 {
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
 	ButtonBackground->SetPadding(0);
@@ -30,24 +30,24 @@ ClassCreator::ClassCreator() : EditorPanel(Editor::CurrentUI->UIColors, 0.15f, 1
 	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
 		->SetPadding(0.01f)
 		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Create", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Create", Application::EditorInstance->EngineUIText))
 			->SetPadding(0.005f)))
 		->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
 			->SetPadding(0.01f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Editor::CurrentUI->EngineUIText))
+			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Application::EditorInstance->EngineUIText))
 				->SetPadding(0.005f)));
 
-	ClassFields[0] = new UITextField(0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
-	ClassFields[1] = new UITextField(0, UIColors[1], this, 0, Editor::CurrentUI->EngineUIText);
+	ClassFields[0] = new UITextField(0, UIColors[1], this, 0, Application::EditorInstance->EngineUIText);
+	ClassFields[1] = new UITextField(0, UIColors[1], this, 0, Application::EditorInstance->EngineUIText);
 
-	PathText = new UIText(0.4f, UIColors[2], "File: ", Editor::CurrentUI->EngineUIText);
+	PathText = new UIText(0.4f, UIColors[2], "File: ", Application::EditorInstance->EngineUIText);
 
 	TabBackground->AddChild(PathText);
 
 	TabBackground->AddChild((new UIBox(true, 0))
 		->SetPadding(0)
-		->AddChild((new UIText(0.4f, UIColors[2], "Path: ", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.4f, UIColors[2], "Path: ", Application::EditorInstance->EngineUIText))
 			->SetPadding(0.01f, 0.01f, 0.02f, 0))
 		->AddChild(ClassFields[1]
 			->SetText(ItemBrowser::GetCurrentCPPPathString().substr(std::string("Classes/").length()))
@@ -57,7 +57,7 @@ ClassCreator::ClassCreator() : EditorPanel(Editor::CurrentUI->UIColors, 0.15f, 1
 
 	TabBackground->AddChild((new UIBox(true, 0))
 		->SetPadding(0)
-		->AddChild((new UIText(0.4f, UIColors[2], "Name: ", Editor::CurrentUI->EngineUIText))
+		->AddChild((new UIText(0.4f, UIColors[2], "Name: ", Application::EditorInstance->EngineUIText))
 			->SetPadding(0.01f, 0.01f, 0.02f, 0))
 		->AddChild(ClassFields[0]
 			->SetText("MyClass")

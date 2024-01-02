@@ -129,10 +129,10 @@ namespace Application
 	Shader* PostProcessShader = nullptr;
 	Shader* ShadowShader = nullptr;
 #if EDITOR
-	EditorUI* EditorUserInterface = nullptr;
+	EditorUI* EditorInstance = nullptr;
 #endif
 
-	float Timer::TimeSinceCreation() const
+	float Timer::Get() const
 	{
 		Uint64 PerfCounterFrequency = SDL_GetPerformanceFrequency();
 		Uint64 EndCounter = SDL_GetPerformanceCounter();
@@ -255,8 +255,8 @@ static void TickObjects()
 {
 	for (size_t i = 0; i < Objects::AllObjects.size(); i++)
 	{
-		Objects::AllObjects.at(i)->Tick();
-		Objects::AllObjects.at(i)->TickComponents();
+		Objects::AllObjects.at(i)->Update();
+		Objects::AllObjects.at(i)->UpdateComponents();
 	}
 #ifdef ENGINE_CSHARP
 	CSharp::RunPerFrameLogic();
@@ -441,6 +441,8 @@ namespace ConsoleInput
 static void PollInput()
 {
 #if !SERVER
+	Input::IsLMBClicked = false;
+	Input::IsRMBClicked = false;
 	Debugging::EngineStatus = "Reading Input";
 	Input::MouseMovement = Vector2();
 	SDL_Event Event;
@@ -449,7 +451,7 @@ static void PollInput()
 		if (Event.type == SDL_QUIT)
 		{
 #if EDITOR
-			Editor::CurrentUI->OnLeave(Application::Quit);
+			Application::EditorInstance->OnLeave(Application::Quit);
 #else
 			Application::Quit();
 #endif
@@ -571,9 +573,11 @@ static void PollInput()
 			{
 			case SDL_BUTTON_RIGHT:
 				Input::IsRMBDown = true;
+				Input::IsRMBClicked = true;
 				TextInput::PollForText = false;
 				break;
 			case SDL_BUTTON_LEFT:
+				Input::IsLMBClicked = true;
 				Input::IsLMBDown = true;
 				break;
 			}
@@ -727,10 +731,9 @@ static void DrawPostProcessing()
 	Application::PostProcessShader->Bind();
 	Application::PostProcessShader->SetFloat("u_gamma", Graphics::Gamma);
 #if EDITOR
-	const auto ViewportTab = Application::EditorUserInterface->UIElements[4];
-	const Vector2 ViewportPos = (ViewportTab->Position + ViewportTab->Scale * 0.5);
+	const Vector2 ViewportPos = (Viewport::ViewportInstance->Position + Viewport::ViewportInstance->Scale * 0.5);
 	Application::PostProcessShader->SetVector2("Position", ViewportPos);
-	const Vector2 ViewportScale = ViewportTab->Scale;
+	const Vector2 ViewportScale = 2;
 	Application::PostProcessShader->SetVector2("Scale", ViewportScale);
 #endif
 	Application::PostProcessShader->SetInt("u_texture", 1);
@@ -792,7 +795,7 @@ static void ApplicationLoop()
 
 	WorldObject::DestroyMarkedObjects();
 	TickObjects();
-	float LogicTime = LogicTimer.TimeSinceCreation();
+	float LogicTime = LogicTimer.Get();
 	const Application::Timer RenderTimer;
 #if !SERVER
 	Debugging::EngineStatus = "Rendering (Framebuffer)";
@@ -832,7 +835,7 @@ static void ApplicationLoop()
 	glDisable(GL_CULL_FACE);
 	glDisable(GL_DEPTH_TEST);
 	DrawPostProcessing();
-	float RenderTime = RenderTimer.TimeSinceCreation();
+	float RenderTime = RenderTimer.Get();
 #if !EDITOR && !RELEASE
 	if (!DebugUI::CurrentDebugUI)
 	{
@@ -852,9 +855,9 @@ static void ApplicationLoop()
 	Application::RenderTime = RenderTime;
 #endif
 	Application::LogicTime = LogicTime;
-	Application::SyncTime = SwapTimer.TimeSinceCreation();
+	Application::SyncTime = SwapTimer.Get();
 
-	Performance::DeltaTime = FrameTimer.TimeSinceCreation();
+	Performance::DeltaTime = FrameTimer.Get();
 	Performance::DeltaTime *= Performance::TimeMultiplier;
 	Performance::FPS = 1 / Performance::DeltaTime;
 	Performance::DeltaTime = std::min(Performance::DeltaTime, 0.1f);
@@ -1012,10 +1015,10 @@ int Application::Initialize(int argc, char** argv)
 
 #if EDITOR
 	// Initialize EditorUI
-	Application::EditorUserInterface = new EditorUI();
+	Application::EditorInstance = new EditorUI();
 #endif
 
-	Log::Print("Finished loading. (" + std::to_string(StartupTimer.TimeSinceCreation()) + " seconds)", Vector3(1.f, 0.75, 0.f));
+	Log::Print("Finished loading. (" + std::to_string(StartupTimer.Get()) + " seconds)", Vector3(1.f, 0.75, 0.f));
 	if (Application::ShowStartupInfo)
 	{
 		Console::ExecuteConsoleCommand("info");

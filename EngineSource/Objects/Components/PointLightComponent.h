@@ -6,7 +6,7 @@ class PointLightComponent : public Component
 {
 public:
 	void Begin() override;
-	void Tick() override;
+	void Update() override;
 	void Destroy() override;
 
 
@@ -25,6 +25,6 @@ protected:
 
 	Transform PreviousTransform;
 
-	void Update();
-	size_t GetLightIndex();
+	void UpdateLight();
+	size_t GetLightIndex() const;
 };

@@ -22,7 +22,7 @@ DebugUI::DebugUI()
 	CurrentDebugUI = this;
 	Text = new TextRenderer();
 
-	UIBox* DebugTextBackground = new UIBox(false, Vector2(-0.985f, 0.695f));
+	UIBox* DebugTextBackground = new UIBox(UIBox::Orientation::Vertical, Vector2(-0.985f, 0.695f));
 	DebugTextBackground->SetVerticalAlign(UIBox::Align::Reverse);
 
 	for (auto& i : DebugTexts)
@@ -35,7 +35,7 @@ DebugUI::DebugUI()
 	LogPrompt = new UITextField(-1, 0.1f, this, 0, Text);
 	LogPrompt->SetMinSize(Vector2(2, 0.06f));
 	LogPrompt->SetTextSize(0.6f);
-	LogBackground = new UIBackground(false, Vector2(-1, -0.94f), 0.05f, Vector2(2, 0.8f));
+	LogBackground = new UIBackground(UIBox::Orientation::Vertical, Vector2(-1, -0.94f), 0.05f, Vector2(2, 0.8f));
 	LogBackground->SetOpacity(0.9f);
 	LogBackground->SetVerticalAlign(UIBox::Align::Default);
 }

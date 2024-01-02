@@ -1,4 +1,4 @@
-#ifdef EDITOR
+#if EDITOR && 0
 #include "CubemapTab.h"
 #include <fstream>
 #include <Engine/Utility/FileUtility.h>

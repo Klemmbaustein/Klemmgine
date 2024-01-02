@@ -1,4 +1,4 @@
-#if EDITOR
+#if EDITOR && 0
 #include "AboutWindow.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Log.h>
@@ -26,9 +26,9 @@ static std::vector<std::pair<std::string, std::vector<std::pair<std::string, std
 };
 
 AboutWindow::AboutWindow()
-	: EditorPanel(Editor::CurrentUI->UIColors, 0, Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), true, "About")
+	: EditorPanel(Application::EditorInstance->UIColors, 0, Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), true, "About")
 {	
-	auto* Text = Editor::CurrentUI->EngineUIText;
+	auto* Text = Application::EditorInstance->EngineUIText;
 
 	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5);
 	ButtonBackground->SetPadding(0);
@@ -59,7 +59,7 @@ AboutWindow::AboutWindow()
 	ContentBox->AddChild((new UIBox(true, 0))
 		->SetPadding(0)
 		->AddChild((new UIBackground(true, 0, 1, 0.1f))
-			->SetUseTexture(true, Editor::CurrentUI->Textures[15])
+			->SetUseTexture(true, Application::EditorInstance->Textures[15])
 			->SetPadding(0.01f)
 			->SetSizeMode(UIBox::SizeMode::PixelRelative))
 		->AddChild((new UIBox(false, 0))

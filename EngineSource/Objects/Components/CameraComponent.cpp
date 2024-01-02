@@ -7,7 +7,7 @@ void CameraComponent::Begin()
 {
 }
 
-void CameraComponent::Tick()
+void CameraComponent::Update()
 {
 #if !SERVER
 	Vector3 ParentRotation = GetParent()->GetTransform().Rotation;

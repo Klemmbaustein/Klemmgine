@@ -70,16 +70,16 @@ void MoveComponent::Begin()
 	CollisionModel.MakeCollisionBox();
 	CollisionMeshes[0] = new CollisionComponent();
 	GetParent()->Attach(CollisionMeshes[0]);
-	CollisionMeshes[0]->Init(CollisionModel.GetMergedVertices(), CollisionModel.GetMergedIndices());
+	CollisionMeshes[0]->Load(CollisionModel.GetMergedVertices(), CollisionModel.GetMergedIndices());
 	CollisionMeshes[0]->RelativeTransform.Scale = Vector3(0.5f, 1.0f, 0.5f);
 
 	CollisionMeshes[1] = new CollisionComponent();
 	GetParent()->Attach(CollisionMeshes[1]);
-	CollisionMeshes[1]->Init(CollisionModel.GetMergedVertices(), CollisionModel.GetMergedIndices());
+	CollisionMeshes[1]->Load(CollisionModel.GetMergedVertices(), CollisionModel.GetMergedIndices());
 	CollisionMeshes[1]->RelativeTransform.Scale = Vector3(0.5f, 0.8f, 0.5f);
 }
 
-void MoveComponent::Tick()
+void MoveComponent::Update()
 {
 	if (IsInEditor || !Active || (GetParent()->GetIsReplicated() && (Client::GetIsConnected() && GetParent()->NetOwner != Client::GetClientID())))
 	{

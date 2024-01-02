@@ -14,7 +14,7 @@ UIDropdown::UIDropdown(Vector2 Position,
 	UICanvas* Parent,
 	TextRenderer* Renderer)
 	:
-	UIButton(true,
+	UIButton(UIBox::Orientation::Horizontal,
 		Position,
 		Color,
 		Parent,
@@ -33,7 +33,7 @@ UIDropdown::UIDropdown(Vector2 Position,
 	AddChild(SelectedText);
 	SetMinSize(Vector2(Size, 0));
 
-	OptionsBox = new UIBox(false, Position + Vector2(0, -1));
+	OptionsBox = new UIBox(UIBox::Orientation::Vertical, Position + Vector2(0, -1));
 	OptionsBox->SetMinSize(Vector2(0, 1));
 	OptionsBox->IsVisible = false;
 	GenerateOptions();
@@ -68,17 +68,20 @@ UIDropdown* UIDropdown::SetDropdownColor(Vector3 NewColor, Vector3 TextColor)
 
 void UIDropdown::GenerateOptions()
 {
+	DropdownButtons.clear();
 	OptionsBox->DeleteChildren();
 	for (size_t i = 0; i < Options.size(); i++)
 	{
-		UIButton* NewButton = new UIButton(true, 0, Vector3::Lerp(DropdownColor, Color, (i == SelectedIndex) ? 0.5f : 0), nullptr, (int)i);
+		UIButton* NewButton = new UIButton(UIBox::Orientation::Horizontal, 0, Vector3::Lerp(DropdownColor, Color, (i == SelectedIndex) ? 0.5f : 0), nullptr, (int)i);
 		NewButton->SetPadding(0);
 		NewButton->SetMinSize(Vector2(Size, 0));
 		NewButton->ParentOverride = this;
+		NewButton->CurrentScrollObject = this->CurrentScrollObject;
 
 		UIText* NewText = new UIText(TextSize, DropdownTextColor, Options[i].Name, Renderer);
 		NewText->SetPadding(TextPadding);
 		NewButton->AddChild(NewText);
+		NewText->CurrentScrollObject = this->CurrentScrollObject;
 
 		OptionsBox->AddChild(NewButton);
 		DropdownButtons.push_back(NewButton);
@@ -114,6 +117,15 @@ void UIDropdown::Tick()
 	}
 
 	OptionsBox->SetPosition(OffsetPosition + Vector2(0, -1));
+
+	for (UIButton* b : DropdownButtons)
+	{
+		b->CurrentScrollObject = CurrentScrollObject;
+		for (UIBox* c : b->GetChildren())
+		{
+			c->CurrentScrollObject = CurrentScrollObject;
+		}
+	}
 }
 
 void UIDropdown::OnClicked()

@@ -12,10 +12,19 @@ bool UIScrollBox::IsDraggingScrollBox = false;
 
 float UIScrollBox::GetDesiredChildrenSize()
 {
+	if (GetOrientation() == UIBox::Orientation::Vertical)
+	{
+		float DesiredSize = 0;
+		for (UIBox* i : Children)
+		{
+			DesiredSize += i->UpPadding + i->DownPadding + std::max({ i->GetUsedSize().Y, i->GetMinSize().Y, 0.0f });
+		}
+		return DesiredSize;
+	}
 	float DesiredSize = 0;
 	for (UIBox* i : Children)
 	{
-		DesiredSize += i->UpPadding + i->DownPadding + std::max({ i->GetUsedSize().Y, i->GetMinSize().Y, 0.0f });
+		DesiredSize = std::max(i->UpPadding + i->DownPadding + std::max({ i->GetUsedSize().Y, i->GetMinSize().Y, 0.0f }), DesiredSize);
 	}
 	return DesiredSize;
 }
@@ -51,14 +60,14 @@ UIScrollBox* UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 		DisplayScrollBar = NewDisplay;
 		if (DisplayScrollBar)
 		{
-			ScrollBarBackground = new UIButton(false, 0, 0.25f, nullptr, 0);
+			ScrollBarBackground = new UIButton(UIBox::Orientation::Vertical, 0, 0.25f, nullptr, 0);
 			ScrollBarBackground->ParentOverride = this;
 			ScrollBarBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
 			ScrollBarBackground->SetPosition(OffsetPosition + Vector2(Size.X - ScrollBarBackground->GetUsedSize().X, 0));
 #if EDITOR
-			ScrollBar = new UIBackground(true, 0, 0.55f, Vector2(0.01f, 0.1f));
+			ScrollBar = new UIBackground(UIBox::Orientation::Horizontal, 0, 0.55f, Vector2(0.01f, 0.1f));
 #else
-			ScrollBar = new UIBackground(true, 0, 0.75f, Vector2(0.01f, 0.1f));
+			ScrollBar = new UIBackground(UIBox::Orientation::Horizontal, 0, 0.75f, Vector2(0.01f, 0.1f));
 #endif
 			ScrollBarBackground->AddChild(ScrollBar);
 			ScrollBar->SetBorder(UIBox::BorderType::Rounded, 0.25);
@@ -83,7 +92,10 @@ void UIScrollBox::Tick()
 	CurrentScrollObject = nullptr;
 	bool VisibleInHierarchy = IsVisibleInHierarchy();
 	DesiredMaxScroll = GetDesiredChildrenSize();
-	ScrollBarBackground->IsVisible = VisibleInHierarchy;
+	if (ScrollBarBackground)
+	{
+		ScrollBarBackground->IsVisible = VisibleInHierarchy && DesiredMaxScroll > Size.Y;
+	}
 	if (ScrollBar && VisibleInHierarchy)
 	{
 		ScrollBarBackground->SetMinSize(Vector2(0.015f, GetUsedSize().Y));
@@ -181,7 +193,7 @@ void UIScrollBox::UpdateTickState()
 }
 
 
-UIScrollBox::UIScrollBox(bool Horizontal, Vector2 Position, bool DisplayScrollBar) : UIBox(Horizontal, Position)
+UIScrollBox::UIScrollBox(Orientation BoxOrientation, Vector2 Position, bool DisplayScrollBar) : UIBox(BoxOrientation, Position)
 {
 	this->MaxScroll = MaxScroll;
 	this->HasMouseCollision = true;

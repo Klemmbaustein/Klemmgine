@@ -1,5 +1,5 @@
 #if EDITOR
-#include "PreferenceTab.h"
+#include "SettingsPanel.h"
 #include <Engine/File/Save.h>
 #include <UI/EditorUI/UIVectorField.h>
 #include <Engine/Log.h>
@@ -7,17 +7,19 @@
 #include <filesystem>
 #include <UI/UIScrollBox.h>
 
-void PreferenceTab::GenerateUI()
+void SettingsPanel::GenerateUI()
 {
-	float SegmentSize = TabBackground->GetMinSize().X - 0.5f;
+	float SegmentSize = Scale.X - 0.25f;
 
 	if (!SettingsBox)
 	{
-		SettingsCategoryBox = new UIBackground(false, 0, UIColors[0] * 1.2f, Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
-		TabBackground->AddChild(SettingsCategoryBox);
+		SettingsCategoryBox = new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[0] * 1.2f, Vector2(0, Scale.Y - 0.2f));
+		HorizontalBox->AddChild(SettingsCategoryBox
+			->SetPadding(0.0025f));
 
-		SettingsBox = new UIScrollBox(false, 0, true);
-		TabBackground->AddChild(SettingsBox);
+		SettingsBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
+		HorizontalBox->AddChild(SettingsBox
+			->SetPadding(0.0025f));
 	}
 	SettingsBox->DeleteChildren();
 	SettingsCategoryBox->DeleteChildren();
@@ -25,23 +27,23 @@ void PreferenceTab::GenerateUI()
 	for (size_t i = 0; i < Preferences.size(); i++)
 	{
 		SettingsCategoryBox->AddChild(
-			(new UIButton(true, 0, UIColors[1] + (float)(i == SelectedSetting) / 8.f, this, (int)i))
+			(new UIButton(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[1] + (float)(i == SelectedSetting) / 8.f, this, (int)i))
 			->SetPadding(0.005f, 0.005f, 0.01f, 0.01f)->SetBorder(UIBox::BorderType::Rounded, 0.5f)
-			->AddChild((new UIText(0.5f, UIColors[2], Preferences[i].Name, Renderer))
+			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], Preferences[i].Name, EditorUI::Text))
 				->SetTextWidthOverride(0.2f)
 				->SetPadding(0.01f)));
 	}
 
-	SettingsBox->SetMinSize(Vector2(1.0f, TabBackground->GetUsedSize().Y - 0.2f));
-	SettingsBox->SetMaxSize(Vector2(1.0f, TabBackground->GetUsedSize().Y - 0.2f));
-	SettingsCategoryBox->SetMinSize(Vector2(0, TabBackground->GetUsedSize().Y - 0.2f));
-	SettingsCategoryBox->SetMaxSize(Vector2(2, TabBackground->GetUsedSize().Y - 0.2f));
-	SettingsCategoryBox->SetColor(UIColors[0] * 1.2f);
+	SettingsBox->SetMinSize(Vector2(Scale.X - 0.25f, Scale.Y - 0.005f));
+	SettingsBox->SetMaxSize(Vector2(Scale.X - 0.25f, Scale.Y - 0.005f));
+	SettingsCategoryBox->SetMinSize(Vector2(0, Scale.Y - 0.005f));
+	SettingsCategoryBox->SetMaxSize(Vector2(2, Scale.Y - 0.005f));
+	SettingsCategoryBox->SetColor(EditorUI::UIColors[0] * 1.2f);
 
-	SettingsBox->AddChild((new UIText(0.8f, UIColors[2], "Settings/" + Preferences[SelectedSetting].Name, Renderer))
-		->SetPadding(0, 0, 0, 0));
+	SettingsBox->AddChild((new UIText(0.8f, EditorUI::UIColors[2], "Settings/" + Preferences[SelectedSetting].Name, EditorUI::Text))
+		->SetPadding(0.01f, 0, 0.01f, 0));
 
-	SettingsBox->AddChild((new UIBackground(true, 0, UIColors[2], Vector2(SegmentSize, 0.005f)))
+	SettingsBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], Vector2(SegmentSize, 0.005f)))
 		->SetPadding(0, 0.05f, 0, 0));
 
 	std::map<std::string, std::vector<SettingsCategory::Setting>> Categories;
@@ -77,10 +79,10 @@ void PreferenceTab::GenerateUI()
 	for (auto& cat : Categories)
 	{
 		SettingsBox->AddChild(
-			(new UIButton(true, 0, UIColors[1], this, -400 + CurentCategory))
+			(new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[1], this, -400 + CurentCategory))
 				->SetPadding(0.01f, 0.01f, 0, 0)
 				->SetMinSize(Vector2(SegmentSize, 0))
-				->AddChild((new UIText(0.55f, UIColors[2], "> " + cat.first, Renderer))
+				->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "> " + cat.first, EditorUI::Text))
 					->SetPadding(0.01f)));
 
 		for (size_t i = 0; i < cat.second.size(); i++)
@@ -100,9 +102,9 @@ void PreferenceTab::GenerateUI()
 	}
 }
 
-void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value)
+void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value)
 {
-	Parent->AddChild((new UIText(0.5f, UIColors[2], Name, Renderer))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
+	Parent->AddChild((new UIText(0.5f, EditorUI::UIColors[2], Name, EditorUI::Text))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
 	UIBox* Element;
 	switch (SectionType)
 	{
@@ -110,16 +112,16 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 		break;
 	case Type::Int:
 	case Type::String:
-		Element = (new UITextField(0, UIColors[1], this, Index, Renderer))
+		Element = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 			->SetText(Value)
-			->SetMinSize(Vector2(TabBackground->GetMinSize().X - 1.0f, 0))
+			->SetMinSize(Vector2(std::min(Scale.X - 0.25f, 0.35f), 0))
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
 		break;
 	case Type::Vector3:
 	case Type::Vector3Color:
-		Element = (new UIVectorField(0, Vector3::stov(Value), this, Index, Renderer))
+		Element = (new UIVectorField(0, Vector3::FromString(Value), this, Index, EditorUI::Text))
 			->SetValueType(SectionType == Type::Vector3 ? UIVectorField::VecType::xyz : UIVectorField::VecType::rgb)
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f);
 		Parent->AddChild(Element);
@@ -129,8 +131,8 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 		{
 			Value = "1";
 		}
-		Element = (new UIButton(true, 0, 1, this, Index))
-			->SetUseTexture(std::stoi(Value), Editor::CurrentUI->Textures[16])
+		Element = (new UIButton(UIBox::Orientation::Horizontal, 0, 1, this, Index))
+			->SetUseTexture(std::stoi(Value), Application::EditorInstance->Textures[16])
 			->SetSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetMinSize(0.04f)
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
@@ -143,7 +145,7 @@ void PreferenceTab::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 	LoadedSettingElements.push_back(Element);
 }
 
-void PreferenceTab::OpenSettingsPage(std::string Name)
+void SettingsPanel::OpenSettingsPage(std::string Name)
 {
 	for (size_t i = 0; i < Preferences.size(); i++)
 	{
@@ -156,12 +158,12 @@ void PreferenceTab::OpenSettingsPage(std::string Name)
 	}
 }
 
-void PreferenceTab::UpdateLayout()
+void SettingsPanel::OnResized()
 {
 	GenerateUI();
 }
 
-void PreferenceTab::OnButtonClicked(int Index)
+void SettingsPanel::OnButtonClicked(int Index)
 {
 	if (Index >= 0)
 	{
@@ -200,16 +202,20 @@ void PreferenceTab::OnButtonClicked(int Index)
 		}
 		Setting.OnChanged(Setting.Value);
 
-		UpdateLayout();
+		OnResized();
 	}
+	Save();
 }
 
-PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UIColors)
+SettingsPanel::SettingsPanel(EditorPanel* Parent) : EditorPanel(Parent, "Settings")
 {
-	this->Renderer = Renderer;
-	TabBackground->SetVerticalAlign(UIBox::Align::Default);
-	TabBackground->SetHorizontal(true);
+	CanBeClosed = true;
+	HorizontalBox = new UIBox(UIBox::Orientation::Horizontal, 0);
+	PanelMainBackground->AddChild(HorizontalBox
+		->SetPadding(0));
+
 	GenerateUI();
+	Load();
 
 #if ENGINE_CSHARP
 	if (!CSharp::GetUseCSharp())
@@ -219,7 +225,7 @@ PreferenceTab::PreferenceTab(Vector3* UIColors, TextRenderer* Renderer) : Editor
 #endif
 }
 
-void PreferenceTab::Load(std::string File)
+void SettingsPanel::Load()
 {
 	SaveGame Pref = SaveGame(Application::GetEditorPath() + "/EditorContent/Config/EditorPrefs", "pref", false);
 	SaveGame Proj = SaveGame(Build::GetProjectBuildName(), "keproj", false);
@@ -247,7 +253,7 @@ void PreferenceTab::Load(std::string File)
 	}
 }
 
-void PreferenceTab::Save()
+void SettingsPanel::Save()
 {
 	std::filesystem::create_directories(Application::GetEditorPath() + "/EditorContent/Config");
 	SaveGame Pref = SaveGame(Application::GetEditorPath() + "/EditorContent/Config/EditorPrefs", "pref", false);

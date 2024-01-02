@@ -56,16 +56,6 @@ namespace FileUtil
 		return Out;
 	}
 
-	std::string VectorToString(std::vector<char> In)
-	{
-		std::string Out;
-		for (int i = 0; i < In.size(); i++)
-		{
-			Out.push_back(In.at(i));
-		}
-		return Out;
-	}
-
 	std::string GetExtension(std::string FileName)
 	{
 		FileName = GetFileNameFromPath(std::filesystem::absolute(FileName).u8string());

@@ -23,7 +23,7 @@ void CollisionComponent::Destroy()
 	delete CollMesh;
 }
 
-void CollisionComponent::Tick()
+void CollisionComponent::Update()
 {
 	if (LastParentTransform != GetParent()->GetTransform() || LastRelativeTransform != RelativeTransform)
 	{
@@ -38,7 +38,7 @@ void CollisionComponent::Tick()
 	}
 }
 
-void CollisionComponent::Init(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Transform RelativeTransform)
+void CollisionComponent::Load(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Transform RelativeTransform)
 {
 	
 	this->RelativeTransform = RelativeTransform;

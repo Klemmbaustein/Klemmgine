@@ -22,8 +22,6 @@ Tools/BuildTool/Release/
 paths.txt
 cppinfo.txt
 # C# related
-CSharpCore/obj
-CSharpCore/Build
 *.lastcodeanalysissucceeded
 EngineRelease
 EditorContent/Config/EditorPrefs.pref
@@ -33,4 +31,5 @@ Build
 .vscode
 Tools/bin/BuildTool
 Tools/BuildTool/Output/GENERATED
-/CSharp/Core/obj
+obj
+Build

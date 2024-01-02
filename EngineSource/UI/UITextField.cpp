@@ -1,63 +1,12 @@
 #if !SERVER
 #include "UITextField.h"
 #include <UI/UIText.h>
-#include <UI/UIBackground.h>
 #include <Math/Math.h>
 #include <Engine/Input.h>
 #include <Rendering/VertexBuffer.h>
 #include <GL/glew.h>
 #include <Engine/Log.h>
 #include <Engine/Application.h>
-
-void UITextField::ScrollTick(Shader* UsedShader)
-{
-	if (CurrentScrollObject != nullptr)
-	{
-		glUniform3f(glGetUniformLocation(UsedShader->GetShaderID(), "u_offset"),
-			-CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
-	}
-	else
-	{
-		glUniform3f(glGetUniformLocation(UsedShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
-	}
-}
-
-void UITextField::MakeGLBuffers()
-{
-	if (ButtonVertexBuffer)
-	{
-		delete ButtonVertexBuffer;
-	}
-	std::vector<Vertex> Vertices;
-	Vertex vertex1;
-	vertex1.Position.x = 0;
-	vertex1.Position.y = 0;
-	vertex1.Position.z = 0;
-	vertex1.TexCoord = glm::vec2(0, 0);
-	Vertices.push_back(vertex1);
-
-	Vertex vertex2;
-	vertex2.Position.x = 1;
-	vertex2.Position.y = 0;
-	vertex2.Position.z = 0;
-	vertex2.TexCoord = glm::vec2(1, 0);
-	Vertices.push_back(vertex2);
-
-	Vertex vertex3;
-	vertex3.Position.x = 0;
-	vertex3.Position.y = 1;
-	vertex3.Position.z = 0;
-	vertex3.TexCoord = glm::vec2(0, 1);
-	Vertices.push_back(vertex3);
-
-	Vertex vertex4;
-	vertex4.Position.x = 1;
-	vertex4.Position.y = 1;
-	vertex4.Position.z = 0;
-	vertex4.TexCoord = glm::vec2(1, 1);
-	Vertices.push_back(vertex4);
-	ButtonVertexBuffer = new VertexBuffer(Vertices, { 0, 1, 2, 1, 2, 3 });
-}
 
 void UITextField::Tick()
 {
@@ -71,7 +20,7 @@ void UITextField::Tick()
 	{
 		TextObject->WrapDistance = 10;
 	}
-	ButtonColorMultiplier = 1.f;
+	ColorMultiplier = 1.f;
 	if (UI::HoveredBox == this)
 	{
 		size_t Nearest = TextObject->GetNearestLetterAtLocation(Input::MouseLocation);
@@ -80,10 +29,10 @@ void UITextField::Tick()
 			RedrawUI();
 		}
 		IsHovered = true;
-		ButtonColorMultiplier = 0.8f;
+		ColorMultiplier = 0.8f;
 		if (Input::IsLMBDown)
 		{
-			ButtonColorMultiplier = 0.5f;
+			ColorMultiplier = 0.5f;
 			if (!IsPressed)
 			{
 				RedrawUI();
@@ -249,49 +198,35 @@ bool UITextField::GetIsPressed() const
 }
 
 UITextField::UITextField(Vector2 Position, Vector3 Color, UICanvas* UI, int ButtonIndex, TextRenderer* Renderer, Shader* ButtonShader)
-	: UIBox(false, Position)
+	: UIBackground(UIBox::Orientation::Vertical, Position, Color, 0)
 {
 	this->ButtonIndex = ButtonIndex;
 	this->ButtonShader = ButtonShader;
 	this->ParentUI = UI;
-	this->Color = Color;
 	TextObject = new UIText(0, Vector3(1), HintText, Renderer);
 	TextObject->SetTextSize(0.4f);
 	TextObject->SetPadding(0.005f);
 	
 	HasMouseCollision = true;
-
-	//TextObject->SetTryFill(true);
 	TextObject->Wrap = true;
 	AddChild(TextObject);
-	MakeGLBuffers();
 
 }
 
 UITextField::~UITextField()
 {
-	IsEdited = false;
-	EnteredText = TextInput::Text;
-	TextInput::PollForText = false;
-	delete ButtonVertexBuffer;
+	if (IsEdited)
+	{
+		IsEdited = false;
+		EnteredText = TextInput::Text;
+		TextInput::PollForText = false;
+	}
 }
 
-void UITextField::Draw()
+void UITextField::DrawBackground()
 {
 	ButtonShader->Bind();
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	ButtonVertexBuffer->Bind();
-	ScrollTick(ButtonShader);
-	glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_transform"), OffsetPosition.X, OffsetPosition.Y, Size.X, Size.Y);
-	glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_color"),
-		ButtonColorMultiplier * Color.X, ButtonColorMultiplier * Color.Y, ButtonColorMultiplier * Color.Z, 1.f);
-	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_opacity"), 1.0);
-	glUniform1i(glGetUniformLocation(ButtonShader->GetShaderID(), "u_useTexture"), 0);
-	ButtonShader->SetInt("u_borderType", (int)BoxBorder);
-	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_borderScale"), BorderRadius / 20.0f);
-	glUniform1f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	BoxVertexBuffer->Bind();
 	if (ShowIBeam)
 	{
 		ButtonShader->SetVector4("u_color", Vector4(TextColor, 1));
@@ -299,18 +234,6 @@ void UITextField::Draw()
 		glUniform4f(glGetUniformLocation(ButtonShader->GetShaderID(), "u_transform"), IBeamPosition.X, IBeamPosition.Y, IBeamScale.X, IBeamScale.Y);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
-	ButtonVertexBuffer->Unbind();
-}
-
-void UITextField::Update()
-{
-	if (!TryFill)
-	{
-		//TextObject->WrapDistance = std::max(std::max(TextObject->GetUsedSize().X, GetMinSize().X), 0.1f);
-		//Vector2 TextDesiredSize = TextObject->GetUsedSize();
-		//TextDesiredSize += 0.005;
-		//TextDesiredSize = TextDesiredSize.Clamp(MinSize, MaxSize);
-		//Size = TextDesiredSize;
-	}
+	BoxVertexBuffer->Unbind();
 }
 #endif

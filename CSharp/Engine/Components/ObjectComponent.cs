@@ -1,5 +1,24 @@
 ﻿using System;
+namespace Engine;
 
+/**
+ * @defgroup CSharp-Components
+ * @ingroup CSharp-Objects
+ * 
+ * @brief
+ * Functions/classes related to components in C#
+ */
+
+/**
+ * @brief
+ * WorldObject Component in C#.
+ * 
+ * Can be attached to any Engine.WorldObject.
+ * 
+ * C++ equivalent: Component.
+ * 
+ * @ingroup CSharp-Components
+ */
 public abstract class ObjectComponent
 {
 	// Points to the native version of this class

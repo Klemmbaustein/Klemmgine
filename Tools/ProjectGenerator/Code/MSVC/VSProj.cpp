@@ -39,7 +39,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 	std::vector<std::string> LibraryPaths =
 	{
 		CurrentPath.string() + "/lib",
-		CurrentPath.string() + "/CSharpCore/lib",
+		CurrentPath.string() + "/CSharp/lib",
 		CurrentPath.string() + "/Dependencies/glew-cmake/lib/Release",
 		CurrentPath.string() + "/Dependencies/assimp/lib/Release",
 		CurrentPath.string() + "/Dependencies/openal-soft/Release",
@@ -217,14 +217,23 @@ std::string VSProj::WriteCSProj(std::string Path, std::string Name, std::string 
 	std::filesystem::create_directories(Path);
 	std::filesystem::current_path(Path);
 	XML Project = XML("Project");
-
+	/*
+	*  <ItemGroup>
+	*    <Reference Include="KlemmgineCSharp.dll">
+	*      <HintPath>../../../CSharp/Assembly/Build/KlemmgineCSharp.dll</HintPath>
+	*    </Reference>
+	*  </ItemGroup>
+	*/
 	Project.AddTag("Sdk", "Microsoft.NET.Sdk")
 		.Add(XML("PropertyGroup")
 			.Add(XML("TargetFramework", TargetFramework))
 			.Add(XML("EnableDynamicLoading", "true")))
 		.Add(XML("PropertyGroup")
 			.Add(XML("OutputPath", "../CSharp/Build"))
-			.Add(XML("AppendTargetFrameworkToOutputPath", "false")));
+			.Add(XML("AppendTargetFrameworkToOutputPath", "false")))
+		.Add(XML("ItemGroup")
+			.Add(XML("Reference").AddTag("Include", "KlemmgineCSharp.dll")
+			.Add(XML("HintPath", CurrentPath.string() + "/CSharp/Assembly/Build/KlemmgineCSharp.dll"))));
 
 	std::ofstream out = std::ofstream(Name + ".csproj");
 	out << Project.Write();

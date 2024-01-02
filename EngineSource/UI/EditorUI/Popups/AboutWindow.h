@@ -1,3 +1,4 @@
+#if EDITOR && 0
 #pragma once
 #include <UI/EditorUI/EditorPanel.h>
 
@@ -13,3 +14,4 @@ public:
 protected:
 };
 
+#endif

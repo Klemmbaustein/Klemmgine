@@ -1,716 +1,281 @@
 #if EDITOR
 #include "ItemBrowser.h"
-#include <filesystem>
-#include <UI/UIButton.h>
-#include <UI/UIText.h>
 #include <UI/UIScrollBox.h>
-#include <UI/EditorUI/EditorUI.h>
+#include <UI/UIButton.h>
 #include <Engine/Log.h>
-#include <Engine/Utility/FileUtility.h>
-#include <Engine/OS.h>
-#include <Engine/Scene.h>
+#include <Engine/Application.h>
 #include <Engine/Input.h>
-#include <Math/Math.h>
-#include <Objects/MeshObject.h>
-#include <UI/EditorUI/Viewport.h>
-#include <Objects/SoundObject.h>
-#include <Objects/ParticleObject.h>
-#include <Engine/Importers/Importer.h>
-#include <Engine/Importers/ModelConverter.h>
-#include <UI/EditorUI/Popups/RenameBox.h>
-#include <Engine/File/Assets.h>
-#include <UI/EditorUI/Popups/ClassCreator.h>
-#ifdef ENGINE_CSHARP
-#include <CSharp/CSharpInterop.h>
-#include <Objects/CSharpObject.h>
-#endif
 
-#define MAX_ITEM_NAME_LENGTH 19
+static ItemBrowser::BrowserItem DropdownItem;
+static ItemBrowser::BrowserItem DraggedItem;
+ItemBrowser* ItemBrowser::DropdownBrowser = nullptr;
 
-std::vector<ItemBrowser::FileEntry> ItemBrowser::CurrentFiles;
-std::vector<UIButton*> ItemBrowser::Buttons;
-size_t ItemBrowser::SelectedButton = 0;
-std::vector<EditorClassesItem> ItemBrowser::CPPClasses;
-std::vector<size_t> ItemBrowser::CPPPath;
-
-std::vector<EditorClassesItem> ItemBrowser::GetEditorUIClasses()
+ItemBrowser::ItemBrowser(EditorPanel* Parent, std::string Name) : EditorPanel(Parent, Name)
 {
-	std::vector<std::string> IDs;
-	EditorClassesItem RootPath;
-
-	auto AllObjects = Objects::EditorObjects;
-
-#ifdef ENGINE_CSHARP
-	for (auto& i : CSharp::GetAllClasses())
-	{
-		ObjectDescription Descr = ObjectDescription(i, CSharpObject::GetID());
-		AllObjects.push_back(Descr);
-	}
-#endif
-
-
-	for (const auto& Object : AllObjects)
-	{
-		// First seperate the Category into multiple names. For example: "Default/Rendering" -> { "Default", "Rendering" }
-		std::string CurrentPath = Objects::GetCategoryFromID(Object.ID);
-		if (Object.ID == CSharpObject::GetID() && Object.Name != "CSharpObject")
-		{
-			size_t Index = Object.Name.find_last_of("/");
-			CurrentPath = Object.Name.substr(0, Index);
-			if (Index == std::string::npos)
-			{
-				CurrentPath.clear();
-			}
-		}
-		EditorClassesItem* CurrentParent = &RootPath;
-		if (CurrentPath.empty())
-		{
-			EditorClassesItem NewItem;
-			NewItem.Name = Object.Name;
-			NewItem.Object = Object;
-			CurrentParent->SubItems.push_back(NewItem);
-			continue;
-		}
-		std::vector<std::string> PathElements;
-		size_t Index = std::string::npos;
-
-		do
-		{
-			Index = CurrentPath.find_first_of("/");
-			PathElements.push_back(CurrentPath.substr(0, Index));
-			CurrentPath = CurrentPath.substr(Index + 1);
-		} while (Index != std::string::npos);
-
-		// Iterate through every 'element' we just got from the Category string
-		for (const auto& elem : PathElements)
-		{
-			bool Found = false;
-			// If that element already exists, we continue inside of it.
-			for (size_t i = 0; i < CurrentParent->SubItems.size(); i++)
-			{
-				if (elem == CurrentParent->SubItems[i].Name)
-				{
-					CurrentParent = &CurrentParent->SubItems[i];
-					Found = true;
-					break;
-				}
-			}
-			if (Found) continue;
-			// Else we create that new element.
-			EditorClassesItem NewPath;
-			NewPath.IsFolder = true;
-			NewPath.Name = elem;
-			CurrentParent->SubItems.push_back(NewPath);
-			CurrentParent = &CurrentParent->SubItems[CurrentParent->SubItems.size() - 1];
-		}
-		// Create a new item structure so we can add it to the folder "file system"
-		EditorClassesItem NewItem;
-		NewItem.Name = Object.Name;
-		NewItem.Object = Object;
-		CurrentParent->SubItems.push_back(NewItem);
-	}
-	return RootPath.SubItems;
-}
-std::string ItemBrowser::GetCurrentCPPPathString()
-{
-	std::string PathString = "Classes";
-	EditorClassesItem RootNode;
-	RootNode.SubItems = CPPClasses;
-	std::vector<EditorClassesItem> CurrentItems = RootNode.SubItems;
-	for (const auto& path : CPPPath)
-	{
-		// Reorder the content so that folders are first and items are second.
-		// It looks prettier in the item browser this way.
-		std::vector<EditorClassesItem> ReordererdSubItems;
-		for (const auto& i : CurrentItems[path].SubItems)
-		{
-			if (i.IsFolder) ReordererdSubItems.push_back(i);
-		}
-		for (const auto& i : CurrentItems[path].SubItems)
-		{
-			if (!i.IsFolder) ReordererdSubItems.push_back(i);
-		}
-		PathString.append("/" + CurrentItems[path].Name);
-		CurrentItems = ReordererdSubItems;
-	}
-	PathString.append("/");
-	return PathString;
-}
-
-std::vector<EditorClassesItem> ItemBrowser::GetContentsOfCurrentCPPFolder()
-{
-	EditorClassesItem RootNode;
-	RootNode.SubItems = CPPClasses;
-	std::vector<EditorClassesItem> CurrentItems = RootNode.SubItems;
-	for (const auto& path : CPPPath)
-	{
-		// Reorder the content so that folders are first and items are second.
-		// It looks prettier in the item browser this way.
-		std::vector<EditorClassesItem> ReordererdSubItems;
-		for (const auto& i : CurrentItems[path].SubItems)
-		{
-			if (i.IsFolder) ReordererdSubItems.push_back(i);
-		}
-		for (const auto& i : CurrentItems[path].SubItems)
-		{
-			if (!i.IsFolder) ReordererdSubItems.push_back(i);
-		}
-		CurrentItems = ReordererdSubItems;
-	}
-	return CurrentItems;
-}
-
-void ItemBrowser::ScanForAssets()
-{
-	CurrentFiles.clear();
-	for (auto& entry : std::filesystem::directory_iterator(Editor::CurrentUI->CurrentPath))
-	{
-		if (std::filesystem::is_directory(entry))
-		CurrentFiles.push_back(FileEntry(entry.path().string(), true));
-	}
-	for (auto& entry : std::filesystem::directory_iterator(Editor::CurrentUI->CurrentPath))
-	{
-		if (!std::filesystem::is_directory(entry))
-		CurrentFiles.push_back(FileEntry(entry.path().string(), false));
-	}
-}
-
-ItemBrowser::ItemBrowser(Vector3* Colors, Vector2 Position, Vector2 Scale) : EditorPanel(Colors, Position, Scale, Vector2(0.2f, 1), Vector2(0.9f, 4))
-{
-	CPPClasses = GetEditorUIClasses();
-	TabBackground->SetHorizontal(false);
-	ContentBox = new UIBox(false, 0);
-	TabBackground->AddChild(ContentBox
-		->SetPadding(0)
-		->SetVerticalAlign(UIBox::Align::Default));
-
-	UpdateLayout();
-}
-
-
-void ItemBrowser::UpdateLayout()
-{
-	Assets::ScanForAssets();
-	ContentBox->DeleteChildren();
-
-	BrowserScrollBox = new UIScrollBox(false, Scale - Vector2(0, 0.1f), true);
-	BrowserScrollBox->SetMinSize(Vector2(TabBackground->GetMinSize().X, 1.675f));
-	BrowserScrollBox->SetMaxSize(Vector2(MaxSize.X, 1.675f));
-	ContentBox->AddChild(BrowserScrollBox
+	TopBox = new UIBox(UIBox::Orientation::Horizontal, 0);
+	PanelMainBackground->AddChild(TopBox
+		->SetMinSize(Vector2(0, 0.1f))
+		->SetVerticalAlign(UIBox::Align::Centered)
+		->SetTryFill(true)
 		->SetPadding(0));
 
-	PathField = new UITextField(0, UIColors[0], this, -3, Editor::CurrentUI->EngineUIText);
+	SeperatorLine = new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, Vector2(0, 6.0f / Graphics::WindowResolution.Y));
 
-	ContentBox->AddChild((new UIBackground(true, 0, UIColors[1], Vector2(Scale.X, 0.1f)))
-		->SetPadding(0)
-		->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
-			->SetUseTexture(true, Editor::CurrentUI->Textures[8])
-			->SetMinSize(Vector2(0.06f))
-			->SetSizeMode(UIBox::SizeMode::PixelRelative)
-			->SetPadding(0.01f))
-		->AddChild(PathField
-			->SetTextColor(UIColors[2])
-			->SetText(SelectedTab == 0 ? Editor::CurrentUI->CurrentPath : GetCurrentCPPPathString())
-			->SetTextSize(0.4f)
-			->SetMinSize(Vector2(Scale.X / 1.2f - 0.12f / Graphics::AspectRatio, 0.08f))
-			->SetMaxSize(Vector2(Scale.X / 1.2f - 0.12f / Graphics::AspectRatio, 0.08f))
-			->SetBorder(UIBox::BorderType::Rounded, 0.5f)
-			->SetPadding(0.01f)));
+	PanelMainBackground->AddChild(SeperatorLine
+		->SetPadding(0, 0, 0.005f, 0.005f)
+		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
+		->SetTryFill(true));
 
+	BrowserScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
+	BrowserScrollBox->SetMinSize(PanelMainBackground->GetMinSize() - Vector2(0.004f / Graphics::AspectRatio, TabList->GetMinSize().Y - 0.1f));
+	PanelMainBackground->AddChild(BrowserScrollBox
+		->SetPadding(0));
+}
 
-	auto TabBox = new UIBox(true, 0);
-	size_t ButtonIndex = 0;
-	ContentBox->AddChild(TabBox->SetPadding(0));
-	for (auto& i : Tabs)
-	{
-		auto NewButton = new UIButton(true, 0, UIColors[0] * (ButtonIndex == SelectedTab ? 1.5f : 1.0f), this, -5 - ((int)ButtonIndex));
-		NewButton->SetHorizontalAlign(UIBox::Align::Centered);
-		TabBox->AddChild(NewButton
-			->SetBorder(UIBox::BorderType::DarkenedEdge, 0.25f)
-			->SetPadding(0)
-			->SetMinSize(Vector2(Scale.X / Tabs.size(), 0.05f))
-			->AddChild((new UIText(0.45f, UIColors[2], i, Editor::CurrentUI->EngineUIText))
-				->SetPadding(0.01f, 0.01f, 0, 0)));
-		ButtonIndex++;
-	}
-
-	ContentBox->AddChild((new UIButton(true, 0, Vector3(0.2f, 0.7f, 0), this, -1))
-		->SetBorder(UIBox::BorderType::Rounded, 0.25f)
-		->SetPadding(0.02f, 0.02f, Scale.X / 2.0f - 0.04f, 0.02f)
-		->AddChild((new UIText(0.4f, 0, SelectedTab ? "Create" : "Import", Editor::CurrentUI->EngineUIText))));
-
-	ScanForAssets();
-	Buttons.clear();
-	const int ITEMS_PER_SLICE = (int)(Scale.X / 0.17f * Graphics::AspectRatio);
-	std::vector<UIBox*> HorizontalSlices;
-
-	// if the bar isnt large enough to fit a single row of items, do nothing.
-	if (ITEMS_PER_SLICE == 0)
-	{
-		return;
-	}
-
-	std::vector<FileEntry> DisplayedFiles;
-
-	if (SelectedTab == 0)
-	{
-		DisplayedFiles = CurrentFiles;
-	}
-	else
-	{
-		auto classes = GetContentsOfCurrentCPPFolder();
-		for (auto& i : classes)
-		{
-			if (i.IsFolder)
-			{
-				DisplayedFiles.push_back(FileEntry(i.Name, true));
-			}
-			else
-			{
-#ifdef ENGINE_CSHARP
-				if (i.Object.ID == CSharpObject::GetID() && i.Object.Name != "CSharpObject")
-					DisplayedFiles.push_back(FileEntry(i.Name + ".cs", false));
-				else
-#endif
-					DisplayedFiles.push_back(FileEntry(i.Name + ".cpp", false));
-			}
-		}
-	}
-
-	HorizontalSlices.resize(DisplayedFiles.size() / ITEMS_PER_SLICE + 1);
-	for (UIBox*& i : HorizontalSlices)
-	{
-		i = new UIBox(true, 0);
-		i->SetPadding(0, 0, 0.02f, 0);
-		BrowserScrollBox->AddChild(i);
-	}
-
-
-
-	for (size_t i = 0; i < DisplayedFiles.size(); i++)
-	{
-		auto ext = FileUtil::GetExtension(DisplayedFiles[i].Name);
-
-		if (DisplayedFiles[i].IsDirectory)
-		{
-			ext = "dir";
-		}
-		unsigned int TextureID = 4; // 4 -> X symbol
-		if (Editor::ItemTextures.contains(ext))
-		{
-			TextureID = Editor::ItemTextures[ext];
-		}
-		Vector3 Color = Vector3(0.8f, 0, 0);
-		if (Editor::ItemColors.contains(ext))
-		{
-			Color = Editor::ItemColors[ext];
-		}
-
-		auto NewBackground = new UIButton(false, 0, UIColors[0] * 1.5f, this, (int)i);
-		Buttons.push_back(NewBackground);
-		NewBackground->SetCanBeDragged(true);
-		NewBackground->SetMinSize(Vector2(0.14f, 0.19f));
-		NewBackground->SetSizeMode(UIBox::SizeMode::PixelRelative);
-		NewBackground->SetPadding(0.005f * Graphics::AspectRatio, 0.005f * Graphics::AspectRatio, 0.005f, 0.005f);
-		NewBackground->SetBorder(UIBox::BorderType::Rounded, 0.5f);
-		NewBackground->SetNeedsToBeSelected(true);
-		UIBackground* ItemImage = new UIBackground(true, 0, 1, Vector2(0.12f));
-		ItemImage->SetSizeMode(UIBox::SizeMode::PixelRelative);
-		ItemImage->SetUseTexture(true, Editor::CurrentUI->Textures[TextureID]);
-		ItemImage->SetPadding(0);
-		NewBackground->AddChild((new UIBackground(true, 0, Color, 0.1f))
-			->SetBorder(UIBox::BorderType::Rounded, 0.5f)
-			->SetSizeMode(UIBox::SizeMode::PixelRelative)
-			->SetPadding(0.0025f * Graphics::AspectRatio, 0, 0.005f, 0.005f)
-			->AddChild(ItemImage));
-
-		std::string ItemName = FileUtil::GetFileNameWithoutExtensionFromPath(DisplayedFiles[i].Name);
-
-		if (ItemName.size() > MAX_ITEM_NAME_LENGTH)
-		{
-			ItemName = ItemName.substr(0, MAX_ITEM_NAME_LENGTH - 3).append("...");
-		}
-
-		auto ItemText = new UIText(0.325f, UIColors[2], ItemName, Editor::CurrentUI->EngineUIText);
-		ItemText->Wrap = true;
-		ItemText->WrapDistance = 0.13f;
-		ItemText->SetTextWidthOverride(0.0f);
-		NewBackground->AddChild(ItemText
-			->SetPadding(0.002f));
-
-		HorizontalSlices[i / ITEMS_PER_SLICE]->AddChild(NewBackground);
-	}
+void ItemBrowser::OnResized()
+{
+	SeperatorLine->SetColor(EditorUI::UIColors[0] * 0.75);
+	GenerateAssetList();
+	GenerateTopBox();
 }
 
 void ItemBrowser::Tick()
 {
-	if (Input::IsRMBDown && !RMBDown && !Editor::DraggingTab && TabBackground->IsHovered() && !SelectedTab)
+	TickPanel();
+	if (!PanelMainBackground->IsVisible)
 	{
-		bool ButtonHovered = false;
-		RMBDown = true;
-
-		for (size_t i = 0; i < Buttons.size(); i++)
-		{
-			if (Buttons[i]->GetIsHovered())
-			{
-				SelectedButton = i;
-				ButtonHovered = true;
-				Editor::CurrentUI->ShowDropdownMenu(
-				{
-					EditorUI::DropdownItem("# " + FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[i].Name)),
-					EditorUI::DropdownItem("Open", []()
-					{
-						Editor::CurrentUI->UIElements[3]->OnButtonClicked((int)SelectedButton);
-					}),
-					EditorUI::DropdownItem("Rename", []()
-					{
-						new RenameBox(CurrentFiles[SelectedButton].Name, 0);
-					}),
-					EditorUI::DropdownItem("Copy", []()
-					{
-						std::string NewFile = FileUtil::GetFilePathWithoutExtension(CurrentFiles[SelectedButton].Name) + "_Copy.";
-						NewFile.append(FileUtil::GetExtension(CurrentFiles[SelectedButton].Name));
-						if (!std::filesystem::exists(NewFile))
-						{
-							std::filesystem::copy(CurrentFiles[SelectedButton].Name, NewFile);
-						}
-						Editor::CurrentUI->UIElements[3]->UpdateLayout();
-					}),
-					EditorUI::DropdownItem("Delete", []()
-					{
-						std::filesystem::remove_all(CurrentFiles[SelectedButton].Name);
-						Editor::CurrentUI->UIElements[3]->UpdateLayout();
-					}),
-				},
-				Input::MouseLocation);
-			}
-		}
-
-		if (!ButtonHovered)
-		{
-			Editor::CurrentUI->ShowDropdownMenu(
-			{
-				EditorUI::DropdownItem("# Create"),
-				EditorUI::DropdownItem("Folder", []()
-				{
-					try
-					{
-						std::filesystem::create_directory(Editor::CurrentUI->CurrentPath + "/Folder");
-					}
-					catch(std::exception)
-					{
-
-					}
-					Editor::CurrentUI->UIElements[3]->UpdateLayout();
-				}),
-				EditorUI::DropdownItem("Material", []()
-				{
-					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Material", "jsmat");
-					Editor::CurrentUI->UIElements[3]->UpdateLayout();
-				}),
-				EditorUI::DropdownItem("Scene", []()
-				{
-					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Scene", "jscn");
-					Editor::CurrentUI->UIElements[3]->UpdateLayout();
-				}),
-				EditorUI::DropdownItem("Particle", []()
-				{
-					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Particle", "jspart");
-					Editor::CurrentUI->UIElements[3]->UpdateLayout();
-				}),
-				EditorUI::DropdownItem("Cubemap", []()
-				{
-					EditorUI::CreateFile(Editor::CurrentUI->CurrentPath, "Cubemap", "cbm");
-					Editor::CurrentUI->UIElements[3]->UpdateLayout();
-				})
-			},
-			Input::MouseLocation);
-		}
+		return;
 	}
 
-	if (!Input::IsRMBDown)
+	if (DraggedButton)
 	{
-		RMBDown = false;
-	}
-
-	UpdatePanel();
-	if (!Input::IsLMBDown && IsDraggingButton)
-	{
-		auto Viewport = Editor::CurrentUI->UIElements[4];
-
-		IsDraggingButton--;
-
-		if (Math::IsPointIn2DBox(Viewport->Position, Viewport->Position + Viewport->Scale, Input::MouseLocation))
+		DraggedButton->SetPosition(Input::MouseLocation);
+		if (!Input::IsLMBDown)
 		{
-			IsDraggingButton = 0;
-
-			Vector2 RelativeMouseLocation = Input::MouseLocation - (Viewport->Position + (Viewport->Scale * 0.5f));
-			Vector3 Direction = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
-
-			Vector3 TargetSpawnLocation = Graphics::MainCamera->Position + Direction * 25;
-
-			auto hit = Collision::LineTrace(Graphics::MainCamera->Position, Graphics::MainCamera->Position + Direction * 100);
-
-			if (hit.Hit)
+			for (UICanvas* i : Graphics::UIToRender)
 			{
-				TargetSpawnLocation = hit.ImpactPoint;
-			}
-
-			for (auto i : Objects::AllObjects)
-			{
-				i->IsSelected = false;
-			}
-
-			std::string ext;
-			if (!SelectedTab) ext = FileUtil::GetExtension(CurrentFiles[DraggedButton].Name);
-
-			bool IsCPPClass = SelectedTab == 1;
-
-			if (ext == "jsm" && !IsCPPClass)
-			{
-				auto newObject = Objects::SpawnObject<MeshObject>(Transform(TargetSpawnLocation, 0, 1));
-				newObject->LoadFromFile(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[DraggedButton].Name));
-				newObject->SetName(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[DraggedButton].Name));
-				newObject->IsSelected = true;
-				ChangedScene = true;
-			}
-			if (ext == "jscn" && !IsCPPClass)
-			{
-				EditorUI::OpenScene(CurrentFiles[DraggedButton].Name);
-				return;
-			}
-			if (ext == "wav" && !IsCPPClass)
-			{
-				auto newObject = Objects::SpawnObject<SoundObject>(Transform(TargetSpawnLocation, 0, 1));
-				newObject->LoadSound(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[DraggedButton].Name));
-				newObject->IsSelected = true;
-				ChangedScene = true;
-			}
-			if (ext == "jspart" && !IsCPPClass)
-			{
-				auto newObject = Objects::SpawnObject<ParticleObject>(Transform(TargetSpawnLocation, 0, 1));
-				newObject->LoadParticle(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[DraggedButton].Name));
-				newObject->IsSelected = true;
-				ChangedScene = true;
-			}
-
-			if (IsCPPClass)
-			{
-				auto Item = GetContentsOfCurrentCPPFolder()[DraggedButton].Object;
-				auto newObject = Objects::SpawnObjectFromID(Item.ID, Transform(TargetSpawnLocation, 0, 1));
-				newObject->IsSelected = true;
-				ChangedScene = true;
-#ifdef ENGINE_CSHARP
-				if (Item.ID == CSharpObject::GetID() && Item.Name != "CSharpObject")
+				EditorPanel* Panel = dynamic_cast<EditorPanel*>(i);
+				if (Panel 
+					&& UI::HoveredBox 
+					&& (UI::HoveredBox == Panel->PanelMainBackground 
+						|| UI::HoveredBox->IsChildOf(Panel->PanelMainBackground)))
 				{
-					dynamic_cast<CSharpObject*>(newObject)->LoadClass(Item.Name.substr(Item.Name.find_last_of("/") + 1));
+					DroppedItem i;
+					i.Path = DraggedItem.Path;
+					i.TypeID = DraggedItem.TypeID;
+					Panel->OnItemDropped(i);
 				}
-#endif
 			}
-			for (auto i : Buttons)
-			{
-				i->SetNeedsToBeSelected(true);
-			}
-			Editor::CurrentUI->UIElements[5]->UpdateLayout();
-
+			delete DraggedButton;
+			DraggedButton = nullptr;
 		}
+	}
+
+	BrowserScrollBox->SetMinSize(PanelMainBackground->GetMinSize() - Vector2(0.004f / Graphics::AspectRatio, 0.1f + 0.01f));
+	BrowserScrollBox->SetMaxSize(BrowserScrollBox->GetMinSize());
+
+	if (Input::IsLMBDown && !(dynamic_cast<UIButton*>(UI::HoveredBox) && UI::HoveredBox->IsChildOf(PanelMainBackground)))
+	{
+		bool Changed = false;
+		for (auto& i : LoadedItems)
+		{
+			if (i.Selected)
+			{
+				Changed = true;
+			}
+			i.Selected = false;
+		}
+		if (Changed)
+		{
+			GenerateAssetList();
+		}
+	}
+
+	if (Input::IsRMBDown && !RMBDown && UI::HoveredBox == BrowserScrollBox)
+	{
+		Application::EditorInstance->ShowDropdownMenu(DefaultDropdown, Input::MouseLocation);
+	}
+	else if (Input::IsRMBDown && !RMBDown && dynamic_cast<UIButton*>(UI::HoveredBox) && UI::HoveredBox->IsChildOf(PanelMainBackground))
+	{
+		size_t ButtonIndex = 0;
+		for (ButtonIndex = 0; ButtonIndex < Buttons.size(); ButtonIndex++)
+		{
+			if (Buttons[ButtonIndex] == UI::HoveredBox)
+			{
+				break;
+			}
+		}
+
+		if (ButtonIndex == Buttons.size())
+		{
+			RMBDown = Input::IsRMBDown;
+			return;
+		}
+
+		std::vector<EditorUI::DropdownItem> Items = ContextOptions;
+
+		DropdownItem = LoadedItems[ButtonIndex];
+		DropdownBrowser = this;
+		if (DropdownItem.Openable)
+		{
+			Items.push_back(EditorUI::DropdownItem("Open", []() { DropdownBrowser->OnItemClicked(DropdownItem); }));
+		}
+		if (DropdownItem.Renameable)
+		{
+			Items.push_back(EditorUI::DropdownItem("Rename", []() { }));
+		}
+		if (DropdownItem.Deleteable)
+		{
+			Items.push_back(EditorUI::DropdownItem("Delete", []() 
+				{ 
+					DropdownBrowser->DeleteItem(DropdownItem);
+					DropdownBrowser->OnPathChanged();
+				}));
+		}
+
+		if (!Items.empty())
+		{
+			Application::EditorInstance->ShowDropdownMenu(Items, Input::MouseLocation);
+		}
+	}
+
+	RMBDown = Input::IsRMBDown;
+}
+
+void ItemBrowser::DeleteItem(BrowserItem Item)
+{
+}
+
+void ItemBrowser::OnPathChanged()
+{
+	LoadedItems = GetBrowserContents();
+	GenerateAssetList();
+	GenerateTopBox();
+}
+
+void ItemBrowser::GenerateTopBox()
+{
+	TopBox->DeleteChildren();
+
+	TopBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, -1))
+		->SetUseTexture(true, EditorUI::Textures[8])
+		->SetPadding(0.01f)
+		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
+		->SetMinSize(0.05f)
+		->SetSizeMode(UIBox::SizeMode::PixelRelative));
+	TopBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Path, EditorUI::Text))
+		->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
+		->SetPadding(0.005f));
+}
+
+void ItemBrowser::GenerateAssetList()
+{
+	if (BrowserScrollBox->GetMinSize().X == 0)
+	{
+		return;
+	}
+
+	BrowserScrollBox->DeleteChildren();
+
+	std::vector<UIBox*> HorizontalBoxes;
+
+	int SlotsPerRow = (size_t)((Scale.X + 0.04f) / (0.14f / Graphics::AspectRatio)) - 1;
+	if (SlotsPerRow <= 0)
+	{
+		return;
+	}
+	for (int i = 0; i < (int)LoadedItems.size() / SlotsPerRow + 1; i++)
+	{
+		UIBox* New = (new UIBox(UIBox::Orientation::Horizontal, 0))
+			->SetPadding(0);
+		HorizontalBoxes.push_back(New);
+		BrowserScrollBox->AddChild(New);
+	}
+	Buttons.clear();
+	int Index = 0;
+	for (const auto& Item : LoadedItems)
+	{
+		UIButton* Button = new UIButton(UIBox::Orientation::Vertical, 0, Item.Selected ? Vector3(0.3f, 0.3f, 0.3f) : EditorUI::UIColors[1], this, Index);
+		Buttons.push_back(Button);
+		HorizontalBoxes[Index / SlotsPerRow]->AddChild(Button
+			->SetCanBeDragged(true)
+			->SetBorder(UIBox::BorderType::Rounded, 0.4f)
+			->SetMinSize(Vector2(0, 0.2f))
+			->SetPadding(0.01f, 0.0f, 0.01f, 0.0f)
+			->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
+			->SetSizeMode(UIBox::SizeMode::PixelRelative)
+			->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, Item.Color, 0.125f))
+				->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1.0f, 0.125f))
+					->SetUseTexture(true, Item.Texture)
+					->SetSizeMode(UIBox::SizeMode::PixelRelative)
+					->SetPadding(0))
+				->SetBorder(UIBox::BorderType::Rounded, 0.4f)
+				->SetPadding(0.005f)
+				->SetSizeMode(UIBox::SizeMode::PixelRelative)
+				->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative))
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], Item.Name, EditorUI::Text))
+				->SetWrapEnabled(true, 0.12f, UIBox::SizeMode::ScreenRelative)
+				->SetPadding(0, 0, 0.005f, 0.005f)
+				->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)));
+		Index++;
+	}
+
+	if (LoadedItems.empty())
+	{
+		HorizontalBoxes[0]->AddChild((new UIText(0.45f, EditorUI::UIColors[2], EmptyText, EditorUI::Text))
+			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative));
 	}
 }
 
 void ItemBrowser::OnButtonDragged(int Index)
 {
-	if (IsDraggingButton || Editor::DraggingTab)
+	HandlePanelDrag(Index);
+	if (DraggedButton)
 	{
 		return;
 	}
-	DraggedButton = Index;
-	IsDraggingButton = 2;
-	for (auto i : Buttons)
+	if (Index < 0)
 	{
-		i->SetNeedsToBeSelected(false);
+		return;
 	}
 
-	std::string ext;
-	if (SelectedTab == 1)
-	{
-		ext = "cpp";
-	}
-	else
-	{
-		ext = FileUtil::GetExtension(CurrentFiles[Index].Name);
+	auto& Item = LoadedItems[Index];
+	DraggedButton = new UIBackground(UIBox::Orientation::Horizontal, Input::MouseLocation, Item.Color, 0.125f);
+	DraggedButton
+		->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1.0f, 0.125f))
+			->SetUseTexture(true, Item.Texture)
+			->SetSizeMode(UIBox::SizeMode::PixelRelative)
+			->SetPadding(0))
+		->SetBorder(UIBox::BorderType::Rounded, 0.4f)
+		->SetSizeMode(UIBox::SizeMode::PixelRelative);
 
-		if (CurrentFiles[Index].IsDirectory)
-		{
-			ext = "dir";
-		}
-	}
-
-	unsigned int TextureID = 4; // 4 -> X symbol
-	if (Editor::ItemTextures.contains(ext))
-	{
-		TextureID = Editor::ItemTextures[ext];
-	}
-
-	auto DragBox = new UIBackground(true, Input::MouseLocation, 1, 0.12f);
-	DragBox->SetSizeMode(UIBox::SizeMode::PixelRelative);
-	DragBox->SetUseTexture(true, Editor::CurrentUI->Textures[TextureID]);
-
-	Editor::CurrentUI->DraggedItem = DragBox;
+	DraggedItem = Item;
 }
 
 void ItemBrowser::OnButtonClicked(int Index)
 {
-	if (Index <= -5)
+	if (Index >= 0)
 	{
-		SelectedTab = -Index - 5;
-		UpdateLayout();
-		return;
+		if (LoadedItems[Index].Selected && LoadedItems[Index].Openable)
+		{
+			OnItemClicked(LoadedItems[Index]);
+		}
+		else
+		{
+			for (auto& i : LoadedItems)
+			{
+				i.Selected = false;
+			}
+			LoadedItems[Index].Selected = true;
+		}
+		GenerateAssetList();
+		GenerateTopBox();
 	}
 	if (Index == -1)
 	{
-		if (SelectedTab)
-		{
-			new ClassCreator();
-		}
-		else
-		{
-			std::string file = OS::ShowOpenFileDialog();
-			if (std::filesystem::exists(file))
-			{
-				if (Editor::ModelFileExtensions.contains(FileUtil::GetExtension(file)))
-				{
-					ModelImporter::Import(file, Editor::CurrentUI->CurrentPath);
-				}
-				else
-				{
-					Importer::Import(file, Editor::CurrentUI->CurrentPath);
-				}
-				UpdateLayout();
-			}
-		}
-		return;
+		GoBack();
+		OnPathChanged();
 	}
-	if (Index == -2)
-	{
-		if (SelectedTab == 0)
-		{
-			if (IsDraggingButton)
-			{
-				size_t lastindex = Editor::CurrentUI->CurrentPath.find_last_of("/\\");
-				std::string rawname = Editor::CurrentUI->CurrentPath.substr(0, lastindex);
-				if (std::rename(CurrentFiles.at(DraggedButton).Name.c_str(),
-					(rawname).append("/").append(FileUtil::GetFileNameFromPath(CurrentFiles.at(DraggedButton).Name)).c_str()) < 0)
-				UpdateLayout();
-				IsDraggingButton = 0;
-			}
-			else
-			{
-				auto& p = Editor::CurrentUI->CurrentPath;
-
-				p = p.substr(0, p.find_last_of("/\\"));
-			}
-		}
-		else if (SelectedTab == 1 && CPPPath.size())
-		{
-			CPPPath.pop_back();
-		}
-		UpdateLayout();
-		return;
-	}
-	if (Index == -3)
-	{
-		if (SelectedTab == 0)
-		{
-			if (std::filesystem::exists(PathField->GetText()))
-			{
-				Editor::CurrentUI->CurrentPath = PathField->GetText();
-			}
-		}
-		UpdateLayout();
-		return;
-	}
-
-	if (Index >= 0 && IsDraggingButton)
-	{
-		if (SelectedTab == 0 && CurrentFiles[Index].IsDirectory)
-		{
-			std::string NewName = CurrentFiles[Index].Name + "/" + FileUtil::GetFileNameFromPath(CurrentFiles[DraggedButton].Name);
-
-			if (!std::filesystem::exists(NewName))
-			{
-				std::filesystem::copy(CurrentFiles[DraggedButton].Name, NewName, std::filesystem::copy_options::recursive);
-				std::filesystem::remove_all(CurrentFiles[DraggedButton].Name);
-				UpdateLayout();
-			}
-		}
-
-		return;
-	}
-
-	// If one of the item buttons was pressed
-	if (Index >= 0 && SelectedTab == 0)
-	{
-		if (CurrentFiles[Index].IsDirectory)
-		{
-			if (Editor::CurrentUI->CurrentPath.at(Editor::CurrentUI->CurrentPath.size() - 1) != '/')
-			{
-				Editor::CurrentUI->CurrentPath.append("/");
-			}
-			Editor::CurrentUI->CurrentPath.append(FileUtil::GetFileNameFromPath(CurrentFiles[Index].Name));
-			UpdateLayout();
-			return;
-		}
-
-		std::string Ext = FileUtil::GetExtension(CurrentFiles[Index].Name);
-
-		if (Ext == "jscn")
-		{
-			EditorUI::OpenScene(CurrentFiles[Index].Name);
-			return;
-		}
-		if (Ext == "png" || Ext == "jpg")
-		{
-			OS::OpenFile(CurrentFiles[Index].Name);
-		}
-		if (Ext == "wav")
-		{
-			Sound::PlaySound2D(Sound::LoadSound(FileUtil::GetFileNameWithoutExtensionFromPath(CurrentFiles[Index].Name)));
-			Log::Print("Played sound " + FileUtil::GetFileNameFromPath(CurrentFiles[Index].Name));
-		}
-		if (Ext == "jsm")
-		{
-			Viewport::ViewportInstance->OpenTab(1, CurrentFiles[Index].Name);
-		}
-		if (Ext == "jsmat")
-		{
-			Viewport::ViewportInstance->OpenTab(2, CurrentFiles[Index].Name);
-		}
-		if (Ext == "jspart")
-		{
-			Viewport::ViewportInstance->OpenTab(4, CurrentFiles[Index].Name);
-		}
-		if (Ext == "cbm")
-		{
-			Viewport::ViewportInstance->OpenTab(5, CurrentFiles[Index].Name);
-		}
-	}
-	if (Index >= 0 && SelectedTab == 1)
-	{
-		if (GetContentsOfCurrentCPPFolder()[Index].IsFolder)
-		{
-			CPPPath.push_back(Index);
-			UpdateLayout();
-		}
-#ifdef ENGINE_CSHARP
-		else
-		{
-			std::string File = "Scripts/" + GetContentsOfCurrentCPPFolder()[Index].Name + ".cs";
-			if (std::filesystem::exists(File))
-			{
-				OS::OpenFile(File);
-			}
-		}
-#endif
-	}
+	HandlePanelButtons(Index);
 }
 #endif

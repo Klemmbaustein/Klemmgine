@@ -4,7 +4,7 @@ void Component::Begin()
 {
 }
 
-void Component::Tick()
+void Component::Update()
 {
 }
 

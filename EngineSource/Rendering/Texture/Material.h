@@ -23,8 +23,11 @@ struct Material
 	std::vector<Param> Uniforms;
 	std::string VertexShader = "basic.vert", FragmentShader = "basic.frag";
 	bool UseShadowCutout = false, IsTranslucent = false;
+	std::string Name;
 
 	static void SetPredefinedMaterialValue(std::string Value, char* ptr, std::string Name);
 	static Material LoadMaterialFile(std::string Name);
 	static void SaveMaterialFile(std::string Path, Material m);
+
+	static void ReloadMaterial(std::string MaterialPath);
 };
