@@ -21,3 +21,6 @@
 	path = Dependencies/SDL_net
 	url = https://github.com/libsdl-org/SDL_net.git
 	branch = SDL2
+[submodule "Dependencies/doxygen-awesome-css"]
+	path = Dependencies/doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
