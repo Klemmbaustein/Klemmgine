@@ -25,13 +25,13 @@ public:
 	virtual void OnResized() override;
 protected:
 	void UpdatePreviewModel();
-	FramebufferObject* PreviewBuffer = nullptr;
 	Model* PreviewModel = nullptr;
 	ModelGenerator::ModelData ModelData;
 	bool CastShadow = false;
 	bool HasCollision = true;
 	bool TwoSided = true;
 	std::string MeshPath;
+	FramebufferObject* PreviewBuffer = nullptr;
 	Camera* PreviewCamera = nullptr;
 
 	UIBox* Rows[2];

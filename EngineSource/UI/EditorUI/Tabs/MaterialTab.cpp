@@ -18,6 +18,7 @@
 
 void MaterialTab::OnButtonClicked(int Index)
 {
+	HandlePanelButtons(Index);
 	if (!PanelMainBackground->IsVisible)
 	{
 		return;
@@ -275,7 +276,7 @@ void MaterialTab::GenerateUI()
 		}
 		case Type::Bool:
 		{
-			NewField = new UIButton(UIBox::Orientation::Horizontal, 0, 0.75f, this, Index);
+			NewField = new UIButton(UIBox::Orientation::Horizontal, 0, 1, this, Index);
 			NewField->SetSizeMode(UIBox::SizeMode::PixelRelative);
 			NewField->SetMinSize(0.04f);
 			NewField->SetBorder(UIBox::BorderType::Rounded, 0.3f);

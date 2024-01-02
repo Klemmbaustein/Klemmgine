@@ -24,16 +24,19 @@ class ParticleEditorTab : public EditorTab
 
 		ParticleParam(void* ValuePointer, Type::TypeEnum ParamType, std::string Name);
 	};
+	UIBackground* PreviewBackground = nullptr;
 	UIScrollBox* ChildBox = nullptr;
 	std::vector<std::vector<ParticleParam>> Parameters;
 	std::vector<std::vector<UIBox*>> ParameterButtons;
+	FramebufferObject* PreviewBuffer = nullptr;
+	Camera* PreviewCamera = nullptr;
 
-	void GenerateElementButtons(const std::vector<ParticleParam>& ElementParams, UIBox* Target);
+	void GenerateElementButtons(const std::vector<ParticleParam>& ElementParams, UIBox* Target, int ElementIndex);
 	void AddParametersForElement(Particles::ParticleElement* Element, std::string* MaterialPtr);
 	UIBackground* ParticleViewport = nullptr;
 	FramebufferObject* ParticleFramebufferObject = nullptr;
 	Particles::ParticleEmitter* Particle;
-	std::string CurrentSystemFile;
+	std::string LoadedFile;
 	float ReActivateDelay = 1.f;
 public:
 	void OnResized() override;

@@ -38,7 +38,6 @@ MeshTab::MeshTab(EditorPanel* Parent, std::string File) : EditorTab(Parent, "Mod
 		PreviewCamera->Position = Vector3(7, 3, 7);
 		PreviewCamera->SetRotation(Vector3(-15, -135, 0));
 		PreviewBuffer->FramebufferCamera = PreviewCamera;
-
 	}
 	auto RowBox = new UIBox(UIBox::Orientation::Horizontal, 0);
 	RowBox->SetVerticalAlign(UIBox::Align::Default);
@@ -189,6 +188,7 @@ void MeshTab::Generate()
 
 void MeshTab::OnButtonClicked(int Index)
 {
+	HandlePanelButtons(Index);
 	switch (Index)
 	{
 	case 1:

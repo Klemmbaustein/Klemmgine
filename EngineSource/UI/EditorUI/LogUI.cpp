@@ -40,9 +40,10 @@ void LogUI::OnResized()
 	UpdateLogBoxSize();
 	if (LogTexts.size())
 	{
+		float Offset = (Parent && Parent->ChildrenAlign == ChildrenType::Tabs) ? 0.025f : 0.05f;
 		float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
-		LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.05f, 0.0f);
-		LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.05f, 0.0f));
+		LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + Offset, 0.0f);
+		LogScrollBox->SetMaxScroll(std::max(TextDifference + Offset, 0.0f));
 
 		for (UIText* i : LogTexts)
 		{

@@ -185,10 +185,9 @@ void EditorPanel::Tick()
 
 void EditorPanel::TickPanelInternal()
 {
-	if (Children.empty() && typeid(*this) == typeid(EditorPanel))
+	if (DraggedTabPanel)
 	{
-		delete this;
-		return;
+		Dragged = nullptr;
 	}
 
 	if (Input::IsRMBClicked && UI::HoveredBox && (UI::HoveredBox->IsChildOf(TabList) || (Parent && UI::HoveredBox->IsChildOf(Parent->TabList))))
@@ -329,7 +328,7 @@ void EditorPanel::AddTab(EditorPanel* NewTab, ChildrenType Align, size_t TabPosi
 	{
 		if (NewTab->Parent)
 		{
-			NewTab->ClearParent(false);
+			NewTab->ClearParent(true);
 			{
 				NewTab->GetAbsoluteParent()->OnPanelResized();
 			}
@@ -417,9 +416,9 @@ void EditorPanel::AddTabButton(bool Selected, int Index, std::string Name, bool 
 	{
 		HorizontalBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, Index))
 			->SetUseTexture(true, EditorUI::Textures[4])
-			->SetMinSize(0.02f)
+			->SetMinSize(0.03f)
 			->SetSizeMode(UIBox::SizeMode::PixelRelative)
-			->SetPadding(0.005f));
+			->SetPadding(0, 0, 0, 0.005f));
 	}
 }
 

@@ -182,8 +182,7 @@ void Particles::ParticleEmitter::AddParticleInstance(unsigned int Element)
 		NewP.StartScale = ParticleElements[Element].StartScale;
 		NewP.EndScale = ParticleElements[Element].EndScale;
 		ParticleInstances[Element].push_back(NewP);
-		if(ParticleElements[Element].RunLoops > 0)
-		ParticleElements[Element].RunLoops--;
+		if (ParticleElements[Element].RunLoops > 0) ParticleElements[Element].RunLoops--;
 	}
 }
 
@@ -230,6 +229,8 @@ void Particles::ParticleEmitter::Reset()
 	}
 }
 
+constexpr unsigned int MAX_PARTICLES_PER_FRAME = 15;
+
 void Particles::ParticleEmitter::Update(Camera* MainCamera)
 {
 	IsActive = false;
@@ -238,7 +239,21 @@ void Particles::ParticleEmitter::Update(Camera* MainCamera)
 		SpawnDelays[i] -= Performance::DeltaTime;
 		if (SpawnDelays[i] < 0.0f)
 		{
-			AddParticleInstance(i);
+			if (ParticleElements[i].SpawnDelay == 0)
+			{
+				for (unsigned int j = 0; j < MAX_PARTICLES_PER_FRAME; j++)
+				{
+					AddParticleInstance(i);
+					if (ParticleElements[i].RunLoops == 0)
+					{
+						break;
+					}
+				}
+			}
+			else
+			{
+				AddParticleInstance(i);
+			}
 			SpawnDelays[i] = ParticleElements[i].SpawnDelay;
 		}
 		if (ParticleElements[i].RunLoops != 0 || ParticleInstances[i].size() > 0)
