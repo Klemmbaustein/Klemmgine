@@ -11,6 +11,7 @@
 - Added enum `Input::GamepadType` and `Input::GetGamepadType(Input::Gamepad* From)`.
 - `UIButton` and `UITextField` now inherit from `UIBackground`.
 
+
 ## Version 1.7.2
 
 ### Fixes
