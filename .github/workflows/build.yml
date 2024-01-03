@@ -7,7 +7,7 @@ name: Build binaries
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths:
     - CHANGES.md
     - .github/workflows/**'
