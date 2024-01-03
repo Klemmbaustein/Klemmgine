@@ -58,13 +58,13 @@ AboutWindow::AboutWindow()
 			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), EditorUI::Text))
 				->SetPadding(0.005f))
 #else
-			->AddChild((new UIText(0.4f, UIColors[2], "  C#: No", EditorUI::Text))
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  C#: No", EditorUI::Text))
 				->SetPadding(0.005f))
 #endif
 #if ENGINE_NO_SOURCE
-			->AddChild((new UIText(0.4f, UIColors[2], "  With pre-built binaries", EditorUI::Text))
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  With pre-built binaries", EditorUI::Text))
 				->SetPadding(0.005f))
-			->AddChild((new UIText(0.4f, UIColors[2], "  Build date: " 
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  Build date: "
 				+ std::string(__DATE__)
 				+ " - "
 				+ std::string(__TIME__), EditorUI::Text))
