@@ -1,3 +1,4 @@
+using Engine;
 
 public class $ : WorldObject
 {
@@ -6,7 +7,7 @@ public class $ : WorldObject
 		// Called when the object is created
 	}
 
-	public override void Tick()
+	public override void Update()
 	{
 		// Called each frame
 	}

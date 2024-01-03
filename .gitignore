@@ -33,3 +33,5 @@ Tools/bin/BuildTool
 Tools/BuildTool/Output/GENERATED
 obj
 Build
+/Tools/BuildTool/Debug
+/Tools/BuildTool/Editor

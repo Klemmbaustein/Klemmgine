@@ -233,7 +233,7 @@ std::string VSProj::WriteCSProj(std::string Path, std::string Name, std::string 
 			.Add(XML("AppendTargetFrameworkToOutputPath", "false")))
 		.Add(XML("ItemGroup")
 			.Add(XML("Reference").AddTag("Include", "KlemmgineCSharp.dll")
-			.Add(XML("HintPath", CurrentPath.string() + "/CSharp/Assembly/Build/KlemmgineCSharp.dll"))));
+			.Add(XML("HintPath", CurrentPath.string() + "/CSharp/Engine/Build/KlemmgineCSharp.dll"))));
 
 	std::ofstream out = std::ofstream(Name + ".csproj");
 	out << Project.Write();

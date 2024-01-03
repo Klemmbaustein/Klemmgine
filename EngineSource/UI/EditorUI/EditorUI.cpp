@@ -55,7 +55,6 @@ namespace Editor
 	Vector2 DragMinMax;
 	Vector2 NewDragMinMax = DragMinMax;
 	bool IsSavingScene = false;
-	bool IsBakingScene = false;
 	bool LaunchCurrentScene = true;
 	bool SaveSceneOnLaunch = false;
 
@@ -122,7 +121,7 @@ namespace UI
 }
 
 bool ChangedScene = false;
-
+bool EditorUI::IsBakingScene = false;
 std::string EditorUI::LaunchInEditorArgs;
 bool EditorUI::LaunchWithServer = false;
 static std::string LaunchCommandLine;
@@ -206,6 +205,12 @@ void EditorUI::LaunchInEditor()
 	if (LaunchWithServer)
 	{
 #if _WIN32
+		std::cout << ("start bin\\"
+			+ ProjectName
+			+ "-Server.exe -nostartupinfo -quitondisconnect -editorPath "
+			+ Application::GetEditorPath()
+			+ " "
+			+ Args) << std::endl;
 		ret = system(("start bin\\"
 			+ ProjectName
 			+ "-Server.exe -nostartupinfo -quitondisconnect -editorPath "
@@ -263,32 +268,31 @@ void EditorUI::OpenScene(std::string NewScene)
 	if (ChangedScene)
 	{
 		EditorSceneToOpen = NewScene;
-		/*
-		new DialogBox(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), 0, "Scene has unsaved changes. Save?",
+		new DialogBox(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene),
+			0, 
+			"The current scene has unsaved changes. Save these changes before loading a new scene?",
 			{
-				DialogBox::Answer("Yes", []()
+				EditorPopup::PopupOption("Yes", []()
 				{
 					SaveCurrentScene(); 
 					ChangedScene = false;
 					Scene::LoadNewScene(EditorSceneToOpen);
 					Viewport::ViewportInstance->ClearSelectedObjects();
 					Scene::Tick();
-					Application::EditorInstance->UIElements[5]->UpdateLayout();
-					Application::EditorInstance->UIElements[6]->UpdateLayout();
+					UpdateAllInstancesOf<ContextMenu>();
 				}),
 
-				DialogBox::Answer("No", []() 
+				EditorPopup::PopupOption("No", []()
 				{
 					ChangedScene = false;
 					Scene::LoadNewScene(EditorSceneToOpen);
 					Viewport::ViewportInstance->ClearSelectedObjects();
 					Scene::Tick();
-					Application::EditorInstance->UIElements[5]->UpdateLayout();
-					Application::EditorInstance->UIElements[6]->UpdateLayout();
+					UpdateAllInstancesOf<ContextMenu>();
 				}),
 
-				DialogBox::Answer("Cancel", nullptr)
-			});*/
+				EditorPopup::PopupOption("Cancel", nullptr)
+			});
 		return;
 	}
 	ChangedScene = false; 
@@ -422,10 +426,6 @@ EditorUI::EditorUI()
 	Console::RegisterCommand(Console::Command("reload", EditorUI::RebuildAssembly, {}));
 	Console::RegisterCommand(Console::Command("run", EditorUI::LaunchInEditor, {}));
 	Console::RegisterCommand(Console::Command("toggle_light", []() { EditorUI::SetUseLightMode(!EditorUI::GetUseLightMode()); }, {}));
-	Console::RegisterCommand(Console::Command("classtree", []()
-		{
-			//auto Items = dynamic_cast<ItemBrowser*>(Application::EditorInstance->UIElements[3])->GetEditorUIClasses();
-		}, {}));
 
 #endif
 }
@@ -437,27 +437,17 @@ void EditorUI::OnLeave(void(*ReturnF)())
 	QuitFunction = ReturnF;
 	if (ChangedScene)
 	{
-		/*new DialogBox("Scene", 0,
-			"Save changes to scene before quitting?",
+		new DialogBox("Scene", 0,
+			"The current scene has unsaved changes. Save changes before exiting?",
 			{
-				DialogBox::Answer("Yes", []() {
-				if (Viewport::ViewportInstance->CurrentTab)
-				{
-					Viewport::ViewportInstance->CurrentTab->Save();
-				}
-				SaveCurrentScene();
-				QuitFunction(); }),
-				DialogBox::Answer("No", ReturnF),
-				DialogBox::Answer("Cancel", nullptr)
+				EditorPopup::PopupOption("Yes", []() { SaveCurrentScene(); QuitFunction(); }),
+				EditorPopup::PopupOption("No", ReturnF),
+				EditorPopup::PopupOption("Cancel", nullptr)
 			});
-		*/
+		
 	}
 	else
 	{
-		/*if (Viewport::ViewportInstance->CurrentTab)
-		{
-			Viewport::ViewportInstance->CurrentTab->Save();
-		}*/
 		ReturnF();
 	}
 }
@@ -483,9 +473,16 @@ void EditorUI::Tick()
 	{
 		Log::Print("Finished building assembly. Hotreloading .dll file.", Log::LogColor::Yellow);
 		CSharp::ReloadCSharpAssembly();
-		//ItemBrowser* Browser = dynamic_cast<ItemBrowser*>(UIElements[3]);
-		//Browser->CPPClasses = Browser->GetEditorUIClasses();
-		//Browser->UpdateLayout();
+		for (UICanvas* c : Graphics::UIToRender)
+		{
+			auto Browser = dynamic_cast<ClassesBrowser*>(c);
+			if (Browser)
+			{
+				Browser->UpdateClasses();
+			}
+		}
+
+		UpdateAllInstancesOf<ClassesBrowser>();
 
 		Editor::CanHotreload = false;
 	}
@@ -494,7 +491,7 @@ void EditorUI::Tick()
 	if (BakedLighting::FinishedBaking)
 	{
 		BakedLighting::FinishedBaking = false;
-		Editor::IsBakingScene = false;
+		EditorUI::IsBakingScene = false;
 		Assets::ScanForAssets();
 		BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene));
 	}
@@ -759,7 +756,7 @@ void EditorUI::OnButtonClicked(int Index)
 
 void EditorUI::BakeScene()
 {
-	Editor::IsBakingScene = true;
+	EditorUI::IsBakingScene = true;
 	BakedLighting::BakeCurrentSceneToFile();
 }
 

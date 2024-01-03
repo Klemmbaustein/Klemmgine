@@ -329,9 +329,6 @@ void EditorPanel::AddTab(EditorPanel* NewTab, ChildrenType Align, size_t TabPosi
 		if (NewTab->Parent)
 		{
 			NewTab->ClearParent(true);
-			{
-				NewTab->GetAbsoluteParent()->OnPanelResized();
-			}
 		}
 		NewTab->Parent = this;
 		if (TabPosition < Children.size())

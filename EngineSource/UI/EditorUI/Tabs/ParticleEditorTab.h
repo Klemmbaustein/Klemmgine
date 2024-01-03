@@ -26,6 +26,7 @@ class ParticleEditorTab : public EditorTab
 	};
 	UIBackground* PreviewBackground = nullptr;
 	UIScrollBox* ChildBox = nullptr;
+	UIScrollBox* SideBar = nullptr;
 	std::vector<std::vector<ParticleParam>> Parameters;
 	std::vector<std::vector<UIBox*>> ParameterButtons;
 	FramebufferObject* PreviewBuffer = nullptr;

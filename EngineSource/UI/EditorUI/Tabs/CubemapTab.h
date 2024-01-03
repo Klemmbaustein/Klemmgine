@@ -1,3 +1,11 @@
+/**
+* @file
+* @brief
+* Cubemap Editor UI
+* 
+* @todo Rewrite Cubemap Editor UI.
+*/
+
 #if EDITOR && 0
 #pragma once
 #include <UI/EditorUI/Tabs/EditorTab.h>

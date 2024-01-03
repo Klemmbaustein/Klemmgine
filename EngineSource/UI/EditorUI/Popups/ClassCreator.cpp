@@ -1,4 +1,4 @@
-#if EDITOR && 0
+#if EDITOR
 #include "ClassCreator.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <filesystem>
@@ -8,7 +8,7 @@
 #include <thread>
 #include <Engine/BackgroundTask.h>
 #include <Engine/Log.h>
-#include <UI/EditorUI/ItemBrowser.h>
+#include <UI/EditorUI/ClassesBrowser.h>
 
 bool replace(std::string& str, const std::string& from, const std::string& to) {
 	size_t start_pos = str.find(from);
@@ -18,66 +18,50 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 	return true;
 }
 
-ClassCreator::ClassCreator() : EditorPanel(Application::EditorInstance->UIColors, 0.15f, 1, 0.3f, 0.3f, true, "Class creator")
+ClassCreator::ClassCreator() : EditorPopup(0, 0.3f, "Create class")
 {
-	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
-	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
-	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-	TabBackground->SetVerticalAlign(UIBox::Align::Default);
-	TabBackground->AddChild(ButtonBackground);
+	PopupBackground->SetVerticalAlign(UIBox::Align::Default);
+	PopupBackground->AddChild(PopupBackground);
 
-	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
-		->SetPadding(0.01f)
-		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Create", Application::EditorInstance->EngineUIText))
-			->SetPadding(0.005f)))
-		->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
-			->SetPadding(0.01f)
-			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Application::EditorInstance->EngineUIText))
-				->SetPadding(0.005f)));
+	SetOptions({
+		PopupOption("Create"),
+		PopupOption("Cancel")
+		});
 
-	ClassFields[0] = new UITextField(0, UIColors[1], this, 0, Application::EditorInstance->EngineUIText);
-	ClassFields[1] = new UITextField(0, UIColors[1], this, 0, Application::EditorInstance->EngineUIText);
+	ClassFields[0] = new UITextField(0, EditorUI::UIColors[1], this, 2, EditorUI::Text);
+	ClassFields[1] = new UITextField(0, EditorUI::UIColors[1], this, 2, EditorUI::Text);
 
-	PathText = new UIText(0.4f, UIColors[2], "File: ", Application::EditorInstance->EngineUIText);
+	PathText = new UIText(0.4f, EditorUI::UIColors[2], "File: ", EditorUI::Text);
 
-	TabBackground->AddChild(PathText);
+	PopupBackground->AddChild(PathText);
 
-	TabBackground->AddChild((new UIBox(true, 0))
+	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 		->SetPadding(0)
-		->AddChild((new UIText(0.4f, UIColors[2], "Path: ", Application::EditorInstance->EngineUIText))
+		->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "Path: ", EditorUI::Text))
+			->SetTextWidthOverride(0.06f)
 			->SetPadding(0.01f, 0.01f, 0.02f, 0))
 		->AddChild(ClassFields[1]
-			->SetText(ItemBrowser::GetCurrentCPPPathString().substr(std::string("Classes/").length()))
+			->SetText(ClassesBrowser::GetCurrentCPPPathString().substr(std::string("Classes/").length()))
 			->SetTextSize(0.4f)
 			->SetPadding(0.01f, 0.01f, 0, 0)
-			->SetMinSize(Vector2(0.2f, 0.01f))));
+			->SetMinSize(Vector2(0.15f, 0.01f))));
 
-	TabBackground->AddChild((new UIBox(true, 0))
+	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 		->SetPadding(0)
-		->AddChild((new UIText(0.4f, UIColors[2], "Name: ", Application::EditorInstance->EngineUIText))
+		->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "Name: ", EditorUI::Text))
+			->SetTextWidthOverride(0.06f)
 			->SetPadding(0.01f, 0.01f, 0.02f, 0))
 		->AddChild(ClassFields[0]
 			->SetText("MyClass")
 			->SetTextSize(0.4f)
 			->SetPadding(0.01f, 0.01f, 0, 0)
-			->SetMinSize(Vector2(0.2f, 0.01f))));
+			->SetMinSize(Vector2(0.15f, 0.01f))));
 
-
-	UpdateLayout();
-}
-
-void ClassCreator::UpdateLayout()
-{
-	ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075f));
 }
 
 void ClassCreator::Tick()
 {
-	UpdatePanel();
-
+	TickPopup();
 	PathString = ClassFields[1]->GetText();
 	if (!PathString.empty() && PathString[PathString.size() - 1] == '/')
 	{
@@ -97,13 +81,13 @@ void ClassCreator::OnButtonClicked(int Index)
 {
 	switch (Index)
 	{
-	case -2:
+	case 0:
 	{
 		Create(ClassFields[0]->GetText(), PathString, ClassType::CSharp);
 		delete this;
 		return;
 	}
-	case -1:
+	case 1:
 		delete this;
 		return;
 	}
@@ -152,7 +136,7 @@ void ClassCreator::Create(std::string Name, std::string Namespace, ClassType New
 		replace(TemplateString, "@", Namespace);
 		out << TemplateString;
 		out.close();
-		new BackgroundTask(EditorUI::RebuildAndHotReload);
+		new BackgroundTask(EditorUI::RebuildAssembly);
 		break;
 	}
 #endif

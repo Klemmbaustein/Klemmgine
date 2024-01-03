@@ -1,12 +1,12 @@
-#if EDITOR && 0
+#if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorPanel.h>
+#include <UI/EditorUI/Popups/EditorPopup.h>
 #include <Rendering/Utility/ShaderManager.h>
 #include <UI/UIfwd.h>
 
 class UIVectorField;
 
-class ColorPicker : public EditorPanel
+class ColorPicker : public EditorPopup
 {
 	Shader* ColorPickerShaders[2];
 	UIBackground* ColorPickerBackgrounds[3];
@@ -24,7 +24,6 @@ public:
 	ColorPicker(UIVectorField* Color);
 	void OnButtonClicked(int Index) override;
 
-	void UpdateLayout() override;
 	void Tick() override;
 	~ColorPicker();
 };

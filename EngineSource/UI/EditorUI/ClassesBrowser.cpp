@@ -111,6 +111,11 @@ std::string ClassesBrowser::GetCurrentCPPPathString()
 	return PathString;
 }
 
+void ClassesBrowser::UpdateClasses()
+{
+	CPPClasses = GetEditorUIClasses();
+}
+
 std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetContentsOfCurrentCPPFolder()
 {
 	EditorClassesItem RootNode;
@@ -137,7 +142,7 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetContentsOfCurr
 ClassesBrowser::ClassesBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Classes")
 {
 	Path = GetCurrentCPPPathString();
-	CPPClasses = GetEditorUIClasses();
+	UpdateClasses();
 	OnPathChanged();
 }
 

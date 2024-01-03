@@ -9,6 +9,7 @@
 #include <Engine/Log.h>
 #include <Engine/Application.h>
 #include <UI/EditorUI/EditorUI.h>
+#include <UI/EditorUI/Popups/ColorPicker.h>
 
 void UIVectorField::SendNotifyEvent()
 {
@@ -57,10 +58,10 @@ UIVectorField::~UIVectorField()
 {
 	for (auto i : Graphics::UIToRender)
 	{
-		//if (dynamic_cast<ColorPicker*>(i) && dynamic_cast<ColorPicker*>(i)->ColorPtr == this)
-		//{
-		//	delete i;
-		//}
+		if (dynamic_cast<ColorPicker*>(i) && dynamic_cast<ColorPicker*>(i)->ColorPtr == this)
+		{
+			delete i;
+		}
 	}
 }
 
@@ -165,11 +166,11 @@ void UIVectorField::OnChildClicked(int Index)
 {
 	try
 	{
-		//if (Index == 3)
-		//{
-		//	new ColorPicker(this);
-		//	return;
-		//}
+		if (Index == 3)
+		{
+			new ColorPicker(this);
+			return;
+		}
 		if (Value[Index] != std::stof(TextFields[Index]->GetText()))
 		{
 			Value[Index] = std::stof(TextFields[Index]->GetText());

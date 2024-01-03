@@ -111,7 +111,7 @@ Toolbar::Toolbar(EditorPanel* Parent) : EditorPanel(Parent, "Toolbar")
 				}),
 			ButtonCategory::Button("Bake", Application::EditorInstance->Textures[27], []() 
 				{
-					//new BakeMenu();
+					new BakeMenu();
 				})
 		}));
 	RegisterNewButtonCategory(ButtonCategory("Project",

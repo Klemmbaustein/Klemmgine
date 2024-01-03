@@ -1,4 +1,4 @@
-#if EDITOR && 0
+#if EDITOR
 #include "AboutWindow.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Log.h>
@@ -26,29 +26,15 @@ static std::vector<std::pair<std::string, std::vector<std::pair<std::string, std
 };
 
 AboutWindow::AboutWindow()
-	: EditorPanel(Application::EditorInstance->UIColors, 0, Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), Vector2(0.5f, 0.6f), true, "About")
+	: EditorPopup(0, Vector2(0.5f, 0.6f), "About")
 {	
-	auto* Text = Application::EditorInstance->EngineUIText;
+	SetOptions({PopupOption("OK")});
 
-	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5);
-	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
-	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-
-	ButtonBackground->AddChild(
-		(new UIButton(true, 0, UIColors[2], this, (int)-1))
-		->SetPadding(0.01f)
-		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Ok", Text))
-			->SetPadding(0.005f)));
-
-	TabBackground->SetVerticalAlign(UIBox::Align::Default);
-	TabBackground->AddChild(ButtonBackground);
-	ContentBox = new UIBox(false, 0);
+	ContentBox = new UIBox(UIBox::Orientation::Vertical, 0);
 	ContentBox
 		->SetPadding(0)
 		->SetMinSize(0.3f);
-	TabBackground->AddChild(ContentBox);
+	PopupBackground->AddChild(ContentBox);
 
 #if _WIN32
 	std::string OsString = "Windows (x64)";
@@ -56,74 +42,68 @@ AboutWindow::AboutWindow()
 	std::string OsString = "Linux (x64)";
 #endif
 
-	ContentBox->AddChild((new UIBox(true, 0))
+	ContentBox->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 		->SetPadding(0)
-		->AddChild((new UIBackground(true, 0, 1, 0.1f))
-			->SetUseTexture(true, Application::EditorInstance->Textures[15])
+		->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1, 0.1f))
+			->SetUseTexture(true, EditorUI::Textures[15])
 			->SetPadding(0.01f)
 			->SetSizeMode(UIBox::SizeMode::PixelRelative))
-		->AddChild((new UIBox(false, 0))
+		->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
 			->SetPadding(0)
-			->AddChild((new UIText(0.5f, UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING), Text))
+			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING), EditorUI::Text))
 				->SetPadding(0.005f))
-			->AddChild((new UIText(0.4f, UIColors[2], "  " + OsString, Text))
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  For " + OsString, EditorUI::Text))
 				->SetPadding(0.005f))
 #if ENGINE_CSHARP
-			->AddChild((new UIText(0.4f, UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), Text))
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), EditorUI::Text))
 				->SetPadding(0.005f))
 #else
-			->AddChild((new UIText(0.4f, UIColors[2], "  C#: No", Text))
+			->AddChild((new UIText(0.4f, UIColors[2], "  C#: No", EditorUI::Text))
 				->SetPadding(0.005f))
 #endif
 #if ENGINE_NO_SOURCE
-			->AddChild((new UIText(0.4f, UIColors[2], "  With pre-built binaries", Text))
+			->AddChild((new UIText(0.4f, UIColors[2], "  With pre-built binaries", EditorUI::Text))
 				->SetPadding(0.005f))
 			->AddChild((new UIText(0.4f, UIColors[2], "  Build date: " 
 				+ std::string(__DATE__)
 				+ " - "
-				+ std::string(__TIME__), Text))
+				+ std::string(__TIME__), EditorUI::Text))
 				->SetPadding(0.005f))
 #endif
 	));
 
-	UIScrollBox* CreditsBox = new UIScrollBox(false, 0, true);
+	UIScrollBox* CreditsBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	ContentBox->AddChild(CreditsBox
 		->SetPadding(0));
 
-	int ButtonIndex = 0;
+	int ButtonIndex = 1;
 
 	for (auto& i : Credits)
 	{
-		CreditsBox->AddChild((new UIText(0.45f, UIColors[2], i.first, Text))
+		CreditsBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], i.first, EditorUI::Text))
 			->SetPadding(i.second.empty() ? 0.02f : 0.005f, 0.005f, i.second.empty() ? 0.005f : 0.02f, 0.005f));
 
-		UIBox* ButtonsBox = new UIBox(true, 0);
+		UIBox* ButtonsBox = new UIBox(UIBox::Orientation::Horizontal, 0);
 		CreditsBox->AddChild(ButtonsBox
 			->SetPadding(0));
 
 		for (auto& entry : i.second)
 		{
-			ButtonsBox->AddChild((new UIButton(true, 0, UIColors[2], this, ButtonIndex++))
+			ButtonsBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, ButtonIndex++))
 				->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-				->AddChild((new UIText(0.4f, UIColors[1], entry.first, Text))
+				->AddChild((new UIText(0.4f, EditorUI::UIColors[1], entry.first, EditorUI::Text))
 					->SetPadding(0.005f))
 				->SetPadding(0.005f, 0.005f, i.second.empty() ? 0.005f : 0.02f, 0.005f));
 		}
 
 		if (i.second.empty())
 		{
-			ButtonsBox->AddChild((new UIBackground(true, 0, UIColors[2], Vector2(0.5f, 0.003f)))
+			ButtonsBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], Vector2(0.5f, 0.003f)))
 				->SetPadding(0));
 		}
 	}
 	CreditsBox->SetMinSize(Vector2(0.5f, 0.365f));
 	CreditsBox->SetMaxSize(Vector2(0.5f, 0.365f));
-	UpdateLayout();
-}
-
-void AboutWindow::UpdateLayout()
-{
-	ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075f));
 }
 
 AboutWindow::~AboutWindow()
@@ -132,7 +112,7 @@ AboutWindow::~AboutWindow()
 
 void AboutWindow::OnButtonClicked(int Index)
 {
-	if (Index == -1)
+	if (Index == 0)
 	{
 		delete this;
 		return;
@@ -148,6 +128,8 @@ void AboutWindow::OnButtonClicked(int Index)
 			{
 #if _WIN32
 				system(("start " + entry.second).c_str());
+#else 
+				system(("xdg-open " + entry.second).c_str());
 #endif
 			}
 		}
@@ -156,6 +138,6 @@ void AboutWindow::OnButtonClicked(int Index)
 
 void AboutWindow::Tick()
 {
-	UpdatePanel();
+	TickPopup();
 }
 #endif

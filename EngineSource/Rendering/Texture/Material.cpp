@@ -190,6 +190,7 @@ void Material::SaveMaterialFile(std::string Path, Material m)
 	Out.close();
 }
 
+#if !SERVER
 void Material::ReloadMaterial(std::string MaterialPath)
 {
 	Material NewMaterial = LoadMaterialFile(MaterialPath);
@@ -208,3 +209,4 @@ void Material::ReloadMaterial(std::string MaterialPath)
 		}
 	}
 }
+#endif

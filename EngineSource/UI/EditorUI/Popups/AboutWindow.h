@@ -1,13 +1,12 @@
-#if EDITOR && 0
+#if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorPanel.h>
+#include <UI/EditorUI/Popups/EditorPopup.h>
 
-class AboutWindow : public EditorPanel
+class AboutWindow : public EditorPopup
 {
 public:
 	UIBox* ContentBox = nullptr;
 	AboutWindow();
-	void UpdateLayout() override;
 	~AboutWindow();
 	void OnButtonClicked(int Index) override;
 	void Tick() override;

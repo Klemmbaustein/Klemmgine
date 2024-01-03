@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 		ExecPath = ExecPath.substr(0, ExecPath.find_last_of("\\/"));
 		std::filesystem::current_path(ExecPath);
 	}
-	std::cout << "Klemmgine Project Generator v1.0";
+	std::cout << "Klemmgine Project Generator v1.1";
 #if ENGINE_NO_SOURCE
 	std::cout << " - without engine source";
 #endif
@@ -160,7 +160,6 @@ int main(int argc, char** argv)
 				}
 				std::filesystem::create_directories(LaunchArgs["projectPath"] + Path);
 				std::filesystem::copy(Name, LaunchArgs["projectPath"] + Path, std::filesystem::copy_options::overwrite_existing);
-				std::cout << (LaunchArgs["projectPath"] + Path) << std::endl;;
 			}
 		}
 #endif

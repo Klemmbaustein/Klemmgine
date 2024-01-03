@@ -1,4 +1,4 @@
-#if EDITOR && 0
+#if EDITOR
 #include "BakeMenu.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <Rendering/Utility/BakedLighting.h>
@@ -7,44 +7,29 @@
 #include <UI/UIScrollBox.h>
 #include <Engine/Input.h>
 #include <Engine/Log.h>
+#include <Engine/Application.h>
 
 
 bool BakeMenu::BakeMenuActive = false;
 
 BakeMenu::BakeMenu()
-	: EditorPanel(Application::EditorInstance->UIColors, Position, Vector2(0.5f, 0.55f), Vector2(0.5f, 0.55f), 2, true, "Bake Lightmap")
+	: EditorPopup(0, Vector2(0.5f, 0.55f), "Bake scene lighting")
 {
 	if (BakeMenuActive)
 	{
 		return;
 	}
 	BakeMenuActive = true;
-	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
-	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
-	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-	TabBackground->SetVerticalAlign(UIBox::Align::Default);
-	TabBackground->AddChild(ButtonBackground);
 
-	ButtonBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -2))
-		->SetPadding(0.01f)
-		->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-		->AddChild((new UIText(0.45f, 1 - UIColors[2], "Bake", Application::EditorInstance->EngineUIText))
-			->SetPadding(0.005f)))
-		->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
-			->SetPadding(0.01f)
-			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-			->AddChild((new UIText(0.45f, 1 - UIColors[2], "Cancel", Application::EditorInstance->EngineUIText))
-				->SetPadding(0.005f)));
-
-	InputFields[0] = new UITextField(0, UIColors[1], this, 0, Application::EditorInstance->EngineUIText);
-	InputFields[1] = new UITextField(0, UIColors[1], this, 0, Application::EditorInstance->EngineUIText);
+	InputFields[0] = new UITextField(0, EditorUI::UIColors[1], this, 1, EditorUI::Text);
+	InputFields[1] = new UITextField(0, EditorUI::UIColors[1], this, 1, EditorUI::Text);
 
 
 
-	TabBackground->AddChild((new UIBox(true, 0))
+	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 		->SetPadding(0.01f, 0.3f, 0.01f, 0.01f)
-		->AddChild((new UIText(0.55f, UIColors[2], "Lightmap scale:      ", Application::EditorInstance->EngineUIText))
+		->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Lightmap scale:", EditorUI::Text))
+			->SetTextWidthOverride(0.2f)
 			->SetPadding(0.005f))
 		->AddChild(InputFields[0]
 			->SetText(EditorUI::ToShortString(BakedLighting::LightmapScaleMultiplier))
@@ -52,9 +37,10 @@ BakeMenu::BakeMenu()
 			->SetPadding(0, 0, 0, 0)
 			->SetMinSize(Vector2(0.1f, 0.01f))));
 
-	TabBackground->AddChild((new UIBox(true, 0))
+	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 		->SetPadding(0.01f)
-		->AddChild((new UIText(0.55f, UIColors[2], "Lightmap resolution: ", Application::EditorInstance->EngineUIText))
+		->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Lightmap resolution:", EditorUI::Text))
+			->SetTextWidthOverride(0.2f)
 			->SetPadding(0.005f))
 		->AddChild(InputFields[1]
 			->SetText(std::to_string(BakedLighting::LightmapResolution))
@@ -62,15 +48,10 @@ BakeMenu::BakeMenu()
 			->SetPadding(0, 0, 0, 0)
 			->SetMinSize(Vector2(0.1f, 0.01f))));
 
-	UpdateLayout();
-}
-
-void BakeMenu::UpdateLayout()
-{
-	if (ButtonBackground)
-	{
-		ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075f));
-	}
+	SetOptions({
+	PopupOption("Bake"),
+	PopupOption("Cancel")
+		});
 }
 
 BakeMenu::~BakeMenu()
@@ -80,12 +61,17 @@ BakeMenu::~BakeMenu()
 
 void BakeMenu::OnButtonClicked(int Index)
 {
-	if (Index == -1)
+	if (IsFinished)
 	{
 		delete this;
 		return;
 	}
-	if (Index == -2)
+	if (Index == 1)
+	{
+		delete this;
+		return;
+	}
+	if (Index == 0)
 	{
 		BakedLighting::LightmapScaleMultiplier = std::stof(InputFields[0]->GetText());
 		BakedLighting::LightmapResolution = std::stoull(InputFields[1]->GetText());
@@ -97,21 +83,16 @@ void BakeMenu::OnButtonClicked(int Index)
 
 void BakeMenu::Tick()
 {
-	UpdatePanel();
+	TickPopup();
 
 	if (BakeProgressText)
 	{
-
-		if (!IsFinished && !Editor::IsBakingScene)
+		if (!IsFinished && !EditorUI::IsBakingScene)
 		{
+			SetOptions({EditorPopup::PopupOption("Close")});
 			IsFinished = true;
-			TabBackground->AddChild((new UIButton(true, 0, UIColors[2], this, -1))
-				->SetPadding(0.01f)
-				->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-				->AddChild((new UIText(0.45f, 1 - UIColors[2], "Close", Application::EditorInstance->EngineUIText))
-					->SetPadding(0.005f)));
 		}
-		else if (Editor::IsBakingScene)
+		else if (EditorUI::IsBakingScene)
 		{
 			BakeProgressText->SetText("Progress: " + std::to_string((int)(BakedLighting::GetBakeProgress() * 100)) + "%");
 		}
@@ -133,31 +114,29 @@ void BakeMenu::GenerateBakeLog()
 	LogScrollBox->DeleteChildren();
 	for (auto& i : BakedLighting::GetBakeLog())
 	{
-		LogScrollBox->AddChild((new UIText(0.45f, UIColors[2], i, Application::EditorInstance->EngineUIText))
+		LogScrollBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], i, EditorUI::MonoText))
 			->SetPadding(0, 0, 0.01f, 0));
 	}
 }
 
 void BakeMenu::StartBake()
 {
-	TabBackground->DeleteChildren();
-	ButtonBackground = nullptr;
+	PopupBackground->DeleteChildren();
+	SetOptions({});
 	
-	TabBackground->SetVerticalAlign(UIBox::Align::Reverse);
-
-	TabBackground->AddChild((new UIText(0.6f, UIColors[2], "Baking lighting...", Application::EditorInstance->EngineUIText))
+	PopupBackground->AddChild((new UIText(0.6f, EditorUI::UIColors[2], "Baking lighting...", EditorUI::Text))
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.005f));
 
-	BakeProgressText = new UIText(0.5, UIColors[2], "Progress: 0%", Application::EditorInstance->EngineUIText);
-	TabBackground->AddChild(BakeProgressText
+	BakeProgressText = new UIText(0.5, EditorUI::UIColors[2], "Progress: 0%", EditorUI::Text);
+	PopupBackground->AddChild(BakeProgressText
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.005f));
 
-	LogScrollBox = new UIScrollBox(false, 0, true);
+	LogScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	LogScrollBox->SetMinSize(Vector2(0.45f, 0.35f));
 	LogScrollBox->SetMaxSize(Vector2(0.45f, 0.35f));
 	LogScrollBox->SetPadding(0);
 
-	TabBackground->AddChild((new UIBackground(true, 0, UIColors[1], 0))
+	PopupBackground->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[1], 0))
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.01f)
 		->AddChild(LogScrollBox));
 }

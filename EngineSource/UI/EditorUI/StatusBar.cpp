@@ -47,7 +47,7 @@ static std::vector<MenuBarItem> MenuBarItems =
 					EditorUI::LaunchInEditor();
 				});
 				}, true),
-			MenuBarEntry("Bake Scene Shadows", []() { /*new BakeMenu()*/; }),
+			MenuBarEntry("Bake Scene Shadows", []() { new BakeMenu(); }),
 		}),
 	MenuBarItem("View",
 		{
@@ -57,12 +57,12 @@ static std::vector<MenuBarItem> MenuBarItems =
 		{
 			MenuBarEntry("Open Solution", []() { OS::OpenFile(Build::GetProjectBuildName() + ".sln"); }),
 			MenuBarEntry("Reload C# Assembly", []() { new BackgroundTask(EditorUI::RebuildAssembly); }, true),
-			MenuBarEntry("New Class", []() { /*new ClassCreator();*/ }),
+			MenuBarEntry("New Class", []() { new ClassCreator(); }),
 		}),
 	MenuBarItem("Help",
 		{
 			MenuBarEntry("Documentation", []() { OS::OpenFile(Application::GetEditorPath() + "/Docs/html/index.html"); }),
-			MenuBarEntry("About", []() { /*new AboutWindow();*/ })
+			MenuBarEntry("About", []() { new AboutWindow(); })
 		}),
 };
 static std::vector<UIButton*> MenuBarButtons;

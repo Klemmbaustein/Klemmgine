@@ -1,4 +1,4 @@
-#if EDITOR && 0
+#if EDITOR
 #include "ColorPicker.h"
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Log.h>
@@ -100,29 +100,15 @@ HsvColor RgbToHsv(RgbColor rgb)
 
 
 ColorPicker::ColorPicker(UIVectorField* Color)
-	: EditorPanel(Application::EditorInstance->UIColors, 0, Vector2(0.5f, 0.35f), Vector2(0.5f, 0.35f), Vector2(0.45f, 0.35f), true, "Color picker")
+	: EditorPopup(0, Vector2(0.425f, 0.45f), "Color picker")
 {
-	ButtonBackground = new UIBackground(true, 0, UIColors[0] * 1.5f);
-	ButtonBackground->SetPadding(0);
-	ButtonBackground->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f);
-	ButtonBackground->SetVerticalAlign(UIBox::Align::Centered);
-	TabBackground->AddChild(ButtonBackground);
-	TabBackground->SetVerticalAlign(UIBox::Align::Default);
-	std::vector<std::string> Answers =
-	{
-		"Apply",
-		"Cancel"
-	};
 
-	for (size_t i = 0; i < Answers.size(); i++)
-	{
-		ButtonBackground->AddChild(
-			(new UIButton(true, 0, UIColors[2], this, (int)i))
-			->SetPadding(0.01f)
-			->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-			->AddChild((new UIText(0.45f, 1 - UIColors[2], Answers[i], Application::EditorInstance->EngineUIText))
-				->SetPadding(0.005f)));
-	}
+	SetOptions({
+	PopupOption("OK"),
+	PopupOption("Cancel")
+		});
+
+
 	SelectedColor = Color->GetValue();
 	ColorPtr = Color;
 
@@ -130,23 +116,23 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 	{
 		SelectedColor = SelectedColor / SelectedColor.Length();
 	}
-	UIBox* PickerBackground = new UIBox(true, 0);
+	UIBox* PickerBackground = new UIBox(UIBox::Orientation::Horizontal, 0);
 	ColorPickerShaders[0] = new Shader("Shaders/UI/uishader.vert", "Shaders/Editor/color_picker.frag");
 	ColorPickerShaders[0]->Bind();
 
 	ColorPickerShaders[1] = new Shader("Shaders/UI/uishader.vert", "Shaders/Editor/color_picker.frag");
 	ColorPickerShaders[1]->Bind();
 
-	ColorPickerBackgrounds[0] = new UIBackground(true, 0, 1, 0.3f, ColorPickerShaders[0]);
+	ColorPickerBackgrounds[0] = new UIBackground(UIBox::Orientation::Horizontal, 0, 1, 0.3f, ColorPickerShaders[0]);
 	ColorPickerBackgrounds[0]->SetSizeMode(UIBox::SizeMode::PixelRelative);
 	ColorPickerBackgrounds[0]->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
-	ColorPickerBackgrounds[1] = new UIBackground(true, 0, 1, Vector2(0.025f, 0.3f), ColorPickerShaders[1]);
+	ColorPickerBackgrounds[1] = new UIBackground(UIBox::Orientation::Horizontal, 0, 1, Vector2(0.025f, 0.3f), ColorPickerShaders[1]);
 	ColorPickerBackgrounds[1]->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
-	ColorPickerBackgrounds[2] = new UIBackground(true, 0, SelectedColor, Vector2(0.1f, 0.075f));
+	ColorPickerBackgrounds[2] = new UIBackground(UIBox::Orientation::Horizontal, 0, SelectedColor, Vector2(0.1f, 0.075f));
 
-	RGBBox = new UIBox(false, 0);
+	RGBBox = new UIBox(UIBox::Orientation::Vertical, 0);
 	RGBBox->SetPadding(0);
-	auto PreviewBox = new UIBox(false, 0);
+	auto PreviewBox = new UIBox(UIBox::Orientation::Vertical, 0);
 	PreviewBox->SetPadding(0);
 	PreviewBox->AddChild(RGBBox);
 	PreviewBox->AddChild(ColorPickerBackgrounds[2]);
@@ -154,7 +140,7 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 	PickerBackground->AddChild(ColorPickerBackgrounds[1]);
 	PickerBackground->AddChild(PreviewBox);
 
-	TabBackground->AddChild(PickerBackground);
+	PopupBackground->AddChild(PickerBackground);
 
 	auto c = RgbToHsv(RgbColor((uint8_t)(SelectedColor.X * 255), (uint8_t)(SelectedColor.Y * 255), (uint8_t)(SelectedColor.Z * 255)));
 	SelectedHue = c.h / 255.f;
@@ -178,13 +164,7 @@ void ColorPicker::UpdateColors()
 		i->SetInt("mode", (int)it++);
 	}
 	ColorPickerBackgrounds[2]->SetColor(SelectedColor);
-	UpdateLayout();
 	GenerateRGBDisplay();
-}
-
-void ColorPicker::UpdateLayout()
-{
-	ButtonBackground->SetMinSize(Vector2(TabBackground->GetMinSize().X, 0.075f));
 }
 
 void ColorPicker::Tick()
@@ -197,7 +177,7 @@ void ColorPicker::Tick()
 		delete this;
 		return;
 	}
-	UpdatePanel();
+	TickPopup();
 	if (ColorPickerBackgrounds[0]->IsHovered())
 	{
 		Vector2 RelativeMousePosition = ((Input::MouseLocation - ColorPickerBackgrounds[0]->GetPosition()) / ColorPickerBackgrounds[0]->GetUsedSize());
@@ -207,7 +187,7 @@ void ColorPicker::Tick()
 			SV = RelativeMousePosition;
 			UpdateColors();
 		}
-		Application::EditorInstance->CurrentCursor = EditorUI::CursorType::Cross;
+		EditorUI::CurrentCursor = EditorUI::CursorType::Cross;
 	}
 
 	if (ColorPickerBackgrounds[1]->IsHovered())
@@ -219,7 +199,7 @@ void ColorPicker::Tick()
 			SelectedHue = RelativeMousePosition.Y;
 			UpdateColors();
 		}
-		Application::EditorInstance->CurrentCursor = EditorUI::CursorType::Cross;
+		EditorUI::CurrentCursor = EditorUI::CursorType::Cross;
 	}
 }
 void ColorPicker::OnButtonClicked(int Index)
@@ -260,15 +240,15 @@ void ColorPicker::GenerateRGBDisplay()
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		RGBTexts[i] = new UITextField(0, UIColors[1], this, 2, Application::EditorInstance->EngineUIText);
+		RGBTexts[i] = new UITextField(0, EditorUI::UIColors[1], this, 2, EditorUI::Text);
 		RGBTexts[i]
 			->SetTextSize(0.4f)
 			->SetMinSize(Vector2(0.06f, 0.04f))
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		RGBTexts[i]->SetText(EditorUI::ToShortString(SelectedColor[(int)i]));
-		RGBBox->AddChild((new UIBox(true, 0))
+		RGBBox->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 				->SetPadding(0)
-				->AddChild((new UIText(0.4f, UIColors[2], xyz[i], Application::EditorInstance->EngineUIText))
+				->AddChild((new UIText(0.4f, EditorUI::UIColors[2], xyz[i], EditorUI::Text))
 					->SetPadding(0.015f, 0.015f, 0.01f, 0.005f))
 				->AddChild(RGBTexts[i]
 					->SetPadding(0.01f, 0.01f, 0, 0)));

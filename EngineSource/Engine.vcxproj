@@ -110,6 +110,7 @@
     <ClCompile Include="UI\EditorUI\Popups\ClassCreator.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\ColorPicker.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\DialogBox.cpp" />
+    <ClCompile Include="UI\EditorUI\Popups\EditorPopup.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\RenameBox.cpp" />
     <ClCompile Include="UI\EditorUI\StatusBar.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\CubemapTab.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="UI\EditorUI\Popups\ClassCreator.h" />
     <ClInclude Include="UI\EditorUI\Popups\ColorPicker.h" />
     <ClInclude Include="UI\EditorUI\Popups\DialogBox.h" />
+    <ClInclude Include="UI\EditorUI\Popups\EditorPopup.h" />
     <ClInclude Include="UI\EditorUI\Popups\RenameBox.h" />
     <ClInclude Include="UI\EditorUI\StatusBar.h" />
     <ClInclude Include="UI\EditorUI\Tabs\CubemapTab.h" />
@@ -520,7 +522,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);EDITOR;GLEW_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>

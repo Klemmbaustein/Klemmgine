@@ -23,7 +23,9 @@ public:
 	static std::vector<size_t> CPPPath;
 	std::vector<EditorClassesItem> GetEditorUIClasses();
 	std::vector<EditorClassesItem> GetContentsOfCurrentCPPFolder();
-	std::string GetCurrentCPPPathString();
+	static std::string GetCurrentCPPPathString();
+
+	void UpdateClasses();
 
 	ClassesBrowser(EditorPanel* Parent);
 

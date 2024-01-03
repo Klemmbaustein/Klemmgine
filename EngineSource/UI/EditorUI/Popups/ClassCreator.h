@@ -1,8 +1,9 @@
-#if EDITOR && 0
+#if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorPanel.h>
+#include <UI/EditorUI/Popups/EditorPopup.h>
+#include <UI/UITextField.h>
 
-class ClassCreator : public EditorPanel
+class ClassCreator : public EditorPopup
 {
 public:
 	ClassCreator();
@@ -14,7 +15,6 @@ public:
 
 	UITextField* ClassFields[2];
 
-	void UpdateLayout() override;
 	void Tick() override;
 	void OnButtonClicked(int Index) override;
 
