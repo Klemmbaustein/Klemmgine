@@ -1,5 +1,16 @@
 # Changes
 
+## Version 1.8.0
+
+### Changes
+
+- Large editor UI rewrite.
+- Added documentation using doxygen.
+- Moved engine functions into `KlemmgineCSharp` project.
+- Renamed some C# functions to match their C++ equivalent.
+- Added enum `Input::GamepadType` and `Input::GetGamepadType(Input::Gamepad* From)`.
+- `UIButton` and `UITextField` now inherit from `UIBackground`.
+
 ## Version 1.7.2
 
 ### Fixes

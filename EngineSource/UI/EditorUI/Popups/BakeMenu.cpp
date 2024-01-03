@@ -27,7 +27,7 @@ BakeMenu::BakeMenu()
 
 
 	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-		->SetPadding(0.01f, 0.3f, 0.01f, 0.01f)
+		->SetPadding(0.01f, 0.01f, 0.01f, 0.01f)
 		->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Lightmap scale:", EditorUI::Text))
 			->SetTextWidthOverride(0.2f)
 			->SetPadding(0.005f))
