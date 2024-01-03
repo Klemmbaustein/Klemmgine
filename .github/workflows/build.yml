@@ -52,6 +52,7 @@ jobs:
           cp -r -force ./CSharp Release/CSharp
           cp -r -force ./Tools Release/Tools
           cp -r -force ./ProjectGenerator.exe Release
+          cp -r -force ./Docs Release/Docs
     - name: upload artifact
       uses: actions/upload-artifact@v3
       env:
@@ -76,6 +77,7 @@ jobs:
           sudo apt-get install libsdl2-dev
           sudo apt-get install libglew-dev
           sudo apt-get install libopenal-dev
+          sudo apt-get install doxygen
           cd Dependencies
           git clone https://github.com/Klemmbaustein/KlemmBuild.git --recurse-submodules
           cd KlemmBuild
@@ -106,12 +108,14 @@ jobs:
           rm -rf Build
     - name: make-release
       run: |
-          ls -R
+          doxygen
+          ls
           mkdir Release
           cp -rf ./EditorContent Release/EditorContent
           cp -rf ./CSharp Release/CSharp
           cp -rf ./Tools Release/Tools
           cp -rf ./ProjectGenerator Release
+          cp -rf ./Docs Release/Docs
     - name: upload artifact
       uses: actions/upload-artifact@v3
       env:
