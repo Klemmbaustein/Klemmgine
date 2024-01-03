@@ -5,6 +5,7 @@
 #include <Engine/Log.h>
 #include <Engine/Application.h>
 #include <Engine/Input.h>
+#include <UI/EditorUI/Popups/RenameBox.h>
 
 static ItemBrowser::BrowserItem DropdownItem;
 static ItemBrowser::BrowserItem DraggedItem;
@@ -122,7 +123,7 @@ void ItemBrowser::Tick()
 		}
 		if (DropdownItem.Renameable)
 		{
-			Items.push_back(EditorUI::DropdownItem("Rename", []() { }));
+			Items.push_back(EditorUI::DropdownItem("Rename", []() { new RenameBox(DropdownItem.Path); }));
 		}
 		if (DropdownItem.Deleteable)
 		{

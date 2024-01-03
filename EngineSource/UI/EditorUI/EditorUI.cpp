@@ -260,6 +260,7 @@ void EditorUI::SaveCurrentScene()
 		Scene::SaveSceneAs(Scene::CurrentScene);
 	}
 	ChangedScene = false;
+	AssetBrowser::UpdateAll();
 }
 
 std::string EditorSceneToOpen;
