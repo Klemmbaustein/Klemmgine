@@ -13,6 +13,7 @@
 #include <thread>
 #include "Viewport.h"
 #include <Engine/BackgroundTask.h>
+#include "SettingsPanel.h"
 
 StatusBar* CurrentStatusBar = nullptr;
 
@@ -41,7 +42,7 @@ static std::vector<MenuBarItem> MenuBarItems =
 		}),
 	MenuBarItem("Edit",
 		{
-			MenuBarEntry("Settings", []() { }),
+			MenuBarEntry("Settings", []() {	SettingsPanel::NewSettingsPanel(); }),
 			MenuBarEntry("Run Project", []() {
 			new std::thread([]() {
 					EditorUI::LaunchInEditor();

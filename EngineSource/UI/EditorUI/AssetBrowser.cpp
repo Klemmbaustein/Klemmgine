@@ -13,11 +13,13 @@
 #include <UI/EditorUI/Viewport.h>
 #include <UI/EditorUI/Tabs/MeshTab.h>
 #include <UI/EditorUI/Tabs/ParticleEditorTab.h>
+#include <Engine/File/Assets.h>
 
 static std::string* CurrentPath = nullptr;
 
 std::vector<AssetBrowser::BrowserItem> AssetBrowser::GetBrowserContents()
 {
+	Assets::ScanForAssets();
 	std::vector<BrowserItem> Items;
 
 	for (const auto& File : std::filesystem::directory_iterator(Path))

@@ -118,7 +118,7 @@ Toolbar::Toolbar(EditorPanel* Parent) : EditorPanel(Parent, "Toolbar")
 		{
 			
 			ButtonCategory::Button("Settings", Application::EditorInstance->Textures[20], []() {
-					Viewport::ViewportInstance->AddTab(new SettingsPanel(nullptr));
+					SettingsPanel::NewSettingsPanel();
 				}),
 			ButtonCategory::Button("Build", Application::EditorInstance->Textures[3], []() { new std::thread(Build::TryBuildProject, "Build/"); }),
 			ButtonCategory::Button("Run", Application::EditorInstance->Textures[21], []()
