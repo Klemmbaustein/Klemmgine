@@ -63,7 +63,7 @@
         "dl",
         "libGLEW.a",
         "../../Dependencies/openal-soft/Build/openal",
-        "../../CSharpCore/lib/nethost"
+        "../../CSharp/lib/nethost"
       ],
       "optimization": "fast"
     },

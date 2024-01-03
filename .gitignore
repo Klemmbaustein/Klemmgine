@@ -17,7 +17,7 @@ Tools/BuildTool/Release/
 *.pdb
 *.a
 *.pdb
-*.lib
+lib
 # Generated engine files
 paths.txt
 cppinfo.txt
