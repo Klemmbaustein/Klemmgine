@@ -125,6 +125,11 @@ void EditorPanel::HandlePanelButtons(int Index)
 {
 	if (Index == -10000)
 	{
+		if (Tabs[0] != UI::HoveredBox)
+		{
+			delete this;
+			return;
+		}
 		Collapse();
 	}
 }
@@ -328,7 +333,7 @@ void EditorPanel::AddTab(EditorPanel* NewTab, ChildrenType Align, size_t TabPosi
 	{
 		if (NewTab->Parent)
 		{
-			NewTab->ClearParent(true);
+			NewTab->ClearParent(false);
 		}
 		NewTab->Parent = this;
 		if (TabPosition < Children.size())

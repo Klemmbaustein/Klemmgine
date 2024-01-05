@@ -287,7 +287,7 @@ void ContextMenu::OnButtonClicked(int Index)
 							break;
 						case Type::String:
 							GetVec<std::string>(Element.Variable).at(j) = ((UITextField*)ContextButtons[i])->GetText();
-							EditorUI::UpdateAllInstancesOf<ContextMenu>();
+							Log::Print(((UITextField*)ContextButtons[i])->GetText());
 							break;
 						case Type::Bool:
 							if (((UIButton*)ContextButtons[i])->GetIsHovered())
@@ -328,11 +328,7 @@ void ContextMenu::OnButtonClicked(int Index)
 						break;
 					case Type::String:
 						*(std::string*)(ContextSettings[IteratedElement].Variable) = ((UITextField*)ContextButtons[i])->GetText();
-						if (EditorUI::SelectedObjects.size()
-							&& ContextSettings[IteratedElement].Variable == &EditorUI::SelectedObjects[0]->Name)
-						{
-							//Application::EditorInstance->UIElements[5]->UpdateLayout();
-						}
+						EditorUI::UpdateAllInstancesOf<ContextMenu>();
 						break;
 					case Type::Bool:
 						if (((UIButton*)ContextButtons[i])->GetIsHovered())

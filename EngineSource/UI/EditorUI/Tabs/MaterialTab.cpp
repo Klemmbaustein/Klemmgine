@@ -18,7 +18,6 @@
 
 void MaterialTab::OnButtonClicked(int Index)
 {
-	HandlePanelButtons(Index);
 	if (!PanelMainBackground->IsVisible)
 	{
 		return;
@@ -88,6 +87,7 @@ void MaterialTab::OnButtonClicked(int Index)
 		}
 		GenerateUI();
 	}
+	HandlePanelButtons(Index);
 }
 
 MaterialTab::MaterialTab(EditorPanel* Parent, std::string File) : EditorTab(Parent, "Material", File)

@@ -118,7 +118,7 @@ void AboutWindow::OnButtonClicked(int Index)
 		return;
 	}
 
-	int it = 0;
+	int it = 1;
 
 	for (auto& i : Credits)
 	{

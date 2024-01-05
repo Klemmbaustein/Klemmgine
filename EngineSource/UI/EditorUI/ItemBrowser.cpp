@@ -215,7 +215,7 @@ void ItemBrowser::GenerateAssetList()
 				->SetSizeMode(UIBox::SizeMode::PixelRelative)
 				->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative))
 			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], Item.Name, EditorUI::Text))
-				->SetWrapEnabled(true, 0.12f, UIBox::SizeMode::ScreenRelative)
+				->SetWrapEnabled(true, 0.115f, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0, 0, 0.005f, 0.005f)
 				->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)));
 		Index++;

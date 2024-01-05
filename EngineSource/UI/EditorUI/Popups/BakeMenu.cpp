@@ -9,7 +9,6 @@
 #include <Engine/Log.h>
 #include <Engine/Application.h>
 
-
 bool BakeMenu::BakeMenuActive = false;
 
 BakeMenu::BakeMenu()
@@ -21,10 +20,8 @@ BakeMenu::BakeMenu()
 	}
 	BakeMenuActive = true;
 
-	InputFields[0] = new UITextField(0, EditorUI::UIColors[1], this, 1, EditorUI::Text);
-	InputFields[1] = new UITextField(0, EditorUI::UIColors[1], this, 1, EditorUI::Text);
-
-
+	InputFields[0] = new UITextField(0, EditorUI::UIColors[1], this, 2, EditorUI::Text);
+	InputFields[1] = new UITextField(0, EditorUI::UIColors[1], this, 2, EditorUI::Text);
 
 	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 		->SetPadding(0.01f, 0.01f, 0.01f, 0.01f)

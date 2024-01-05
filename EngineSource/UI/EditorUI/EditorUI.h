@@ -211,7 +211,7 @@ public:
 protected:
 	SDL_Cursor* Cursors[(int)CursorType::End];
 	std::vector<DropdownItem> CurrentDropdown;
-
+	bool ShouldSave = false;
 public:
 	static std::vector<WorldObject*> SelectedObjects;
 	static void OnObjectSelected();
