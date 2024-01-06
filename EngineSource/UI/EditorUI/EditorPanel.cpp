@@ -51,8 +51,10 @@ void EditorPanel::ClearParent(bool Delete)
 		{
 			delete Parent;
 		}
-
-		Parent->GetAbsoluteParent()->OnPanelResized();	
+		else
+		{
+			Parent->GetAbsoluteParent()->OnPanelResized();
+		}
 	}
 }
 
@@ -188,7 +190,7 @@ void EditorPanel::Tick()
 	TickPanel();
 }
 
-void EditorPanel::TickPanelInternal()
+bool EditorPanel::TickPanelInternal()
 {
 	if (DraggedTabPanel)
 	{
@@ -224,7 +226,7 @@ void EditorPanel::TickPanelInternal()
 
 	if (Collapsed)
 	{
-		return;
+		return true;
 	}
 	if (Math::NearlyEqual(Position.X + PanelMainBackground->GetUsedSize().X, Input::MouseLocation.X, 0.01f)
 		&& Math::IsPointIn2DBox(Vector2(-1, Position.Y), Vector2(1, Position.Y + PanelMainBackground->GetUsedSize().Y), Input::MouseLocation)
@@ -280,7 +282,7 @@ void EditorPanel::TickPanelInternal()
 		}
 		if (Size + Difference < 0)
 		{
-			return;
+			return true;
 		}
 
 		Size += Difference;
@@ -304,8 +306,12 @@ void EditorPanel::TickPanelInternal()
 
 	for (EditorPanel* c : Children)
 	{
-		c->TickPanelInternal();
+		if (!c->TickPanelInternal())
+		{
+			return false;
+		}
 	}
+	return true;
 }
 
 void EditorPanel::OnPanelResized()
@@ -317,6 +323,28 @@ void EditorPanel::OnPanelResized()
 		c->OnPanelResized();
 	}
 	OnResized();
+}
+
+void EditorPanel::SetName(std::string Name)
+{
+	if (Name == this->Name)
+	{
+		return;
+	}
+	this->Name = Name;
+	GetAbsoluteParent()->OnPanelResized();
+}
+
+void EditorPanel::AddPanelTab(EditorPanel* Panel)
+{
+	if (Parent && Parent->ChildrenAlign == ChildrenType::Tabs)
+	{
+		Parent->AddTab(Panel);
+	}
+	else
+	{
+		AddTab(Panel);
+	}
 }
 
 void EditorPanel::OnResized()
@@ -333,7 +361,7 @@ void EditorPanel::AddTab(EditorPanel* NewTab, ChildrenType Align, size_t TabPosi
 	{
 		if (NewTab->Parent)
 		{
-			NewTab->ClearParent(false);
+			NewTab->ClearParent(true);
 		}
 		NewTab->Parent = this;
 		if (TabPosition < Children.size())

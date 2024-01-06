@@ -176,7 +176,7 @@ namespace Scene
 					if (NewObject)
 					{
 						NewObject->Deserialize(Path);
-						NewObject->SetName(Name);
+						NewObject->Name = Name;
 						NewObject->LoadProperties(desc);
 						NewObject->OnPropertySet();
 						NewObject->CurrentScene = CurrentScene;
@@ -236,7 +236,7 @@ namespace Scene
 
 		for (int i = 0; i < ObjectLength; i++)
 		{
-			std::string name = SavedObjects.at(i)->GetName();
+			std::string name = SavedObjects.at(i)->Name;
 			std::string path = SavedObjects.at(i)->Serialize();
 			uint32_t ID = SavedObjects[i]->GetObjectDescription().ID; //C++ 20 or not?
 			Transform T = SavedObjects[i]->GetTransform();
@@ -289,7 +289,7 @@ namespace Scene
 					if (NewObject)
 					{
 						NewObject->Deserialize(Path);
-						NewObject->SetName(Name);
+						NewObject->Name = Name;
 						NewObject->LoadProperties(desc);
 						NewObject->OnPropertySet();
 						NewObject->CurrentScene = CurrentScene;

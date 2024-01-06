@@ -5,6 +5,7 @@
 #include <Engine/Log.h>
 #include <Engine/Application.h>
 #include <Engine/Input.h>
+#include <Engine/Utility/FileUtility.h>
 #include <UI/EditorUI/Popups/RenameBox.h>
 
 static ItemBrowser::BrowserItem DropdownItem;
@@ -64,6 +65,7 @@ void ItemBrowser::Tick()
 					DroppedItem i;
 					i.Path = DraggedItem.Path;
 					i.TypeID = DraggedItem.TypeID;
+					i.From = this;
 					Panel->OnItemDropped(i);
 				}
 			}
@@ -154,11 +156,49 @@ void ItemBrowser::OnPathChanged()
 	GenerateTopBox();
 }
 
+void ItemBrowser::OnItemDropped(DroppedItem Item)
+{
+	if (Item.From != this)
+	{
+		return;
+	}
+
+	if (UI::HoveredBox == UpButton)
+	{
+		std::string NewPath = Path;
+		if (NewPath.substr(NewPath.size() - 1) == "/")
+		{
+			NewPath.pop_back();
+		}
+		size_t LastSlash = NewPath.find_last_of("/");
+		if (LastSlash == std::string::npos)
+		{
+			return;
+		}
+		NewPath = NewPath.substr(0, LastSlash + 1);
+		BrowserItem i;
+		i.Path = NewPath;
+		OnItemDropped(Item, i);
+	}
+
+	for (size_t i = 0; i < Buttons.size(); i++)
+	{
+		if (UI::HoveredBox == Buttons[i])
+		{
+			OnItemDropped(Item, LoadedItems[i]);
+		}
+	}
+}
+
+void ItemBrowser::OnItemDropped(DroppedItem From, BrowserItem To)
+{
+}
+
 void ItemBrowser::GenerateTopBox()
 {
 	TopBox->DeleteChildren();
-
-	TopBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, -1))
+	UpButton = new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, -1);
+	TopBox->AddChild(UpButton
 		->SetUseTexture(true, EditorUI::Textures[8])
 		->SetPadding(0.01f)
 		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)

@@ -20,6 +20,34 @@ using System;
  */
 namespace Engine
 {
+	/**
+	 * @brief
+	 * Equivalent to Type::TypeEnum in C++.
+	 * Some elements are missing.
+	 */
+	enum NativeType
+	{
+		/// No type.
+		Null = -1,
+		/// Vector3.
+		Vector3 = 0,
+		/// float.
+		Float = 1,
+		/// Int32.
+		Int = 2,
+		/// string. Usually std::string.
+		String = 3,
+		/// Vector3. A UIVectorField will display 'R', 'G' 'B' instead of 'X', 'Y', 'Z' when editing a Vector3Color.
+		Vector3Color = 4,
+		/// Boolean type. Either true or false. Editor will display this as a checkbox.
+		Bool = 7,
+		/// Vector3. A UIVectorField will display 'P', 'Y' 'R' (Pitch, Yaw, Roll) instead of 'X', 'Y', 'Z' when editing a Vector3Color.
+		Vector3Rotation = 8,
+		/// List modifier. Bitwise and this with any other value in this enum to make it a list.
+		List = 0b10000000
+	};
+
+
 	public static class CameraShake
 	{
 		private delegate void CameraShakeDelegate(float i);
@@ -62,9 +90,18 @@ namespace Engine
 			public bool Hit;
 			public Vector3 ImpactPoint;
 			public float t;
-			public IntPtr HitObject;
-			public IntPtr HitComponent;
+			private IntPtr HitObject;
+			private IntPtr HitComponent;
 			public Vector3 Normal;
+
+			public readonly WorldObject GetHitObject()
+			{
+				if (!Hit)
+				{
+					return null;
+				}
+				return WorldObject.GetObjectFromNativePointer(HitObject);
+			}
 		}
 
 		public static HitResponse LineTrace(Vector3 Start, Vector3 End, WorldObject This)

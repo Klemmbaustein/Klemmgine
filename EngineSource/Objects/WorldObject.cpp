@@ -114,16 +114,6 @@ int WorldObject::Attach(Component* NewComponent)
 	return (int)Components.size() - 1;
 }
 
-void WorldObject::SetName(std::string Name)
-{
-	this->Name = Name;
-}
-
-std::string WorldObject::GetName()
-{
-	return Name;
-}
-
 ObjectDescription WorldObject::GetObjectDescription()
 {
 	return ObjectDescription(TypeName, TypeID);

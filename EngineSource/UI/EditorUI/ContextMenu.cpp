@@ -13,6 +13,7 @@
 #include <Rendering/Utility/BakedLighting.h>
 #include <Engine/Utility/StringUtility.h>
 #include <Engine/Application.h>
+#include "ObjectList.h"
 
 ContextMenu::ContextMenu(EditorPanel* Parent, bool IsScene) : EditorPanel(Parent, IsScene ? "Scene" : "Object Properties")
 {
@@ -287,7 +288,6 @@ void ContextMenu::OnButtonClicked(int Index)
 							break;
 						case Type::String:
 							GetVec<std::string>(Element.Variable).at(j) = ((UITextField*)ContextButtons[i])->GetText();
-							Log::Print(((UITextField*)ContextButtons[i])->GetText());
 							break;
 						case Type::Bool:
 							if (((UIButton*)ContextButtons[i])->GetIsHovered())
@@ -328,7 +328,7 @@ void ContextMenu::OnButtonClicked(int Index)
 						break;
 					case Type::String:
 						*(std::string*)(ContextSettings[IteratedElement].Variable) = ((UITextField*)ContextButtons[i])->GetText();
-						EditorUI::UpdateAllInstancesOf<ContextMenu>();
+						EditorUI::UpdateAllInstancesOf<ObjectList>();
 						break;
 					case Type::Bool:
 						if (((UIButton*)ContextButtons[i])->GetIsHovered())
@@ -381,7 +381,7 @@ void ContextMenu::OnResized()
 			return;
 		}
 
-		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Object: " + SelectedObject->GetName(), EditorUI::Text))
+		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Object: " + SelectedObject->Name, EditorUI::Text))
 			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
 			->SetPadding(0.01f, 0, 0.01f, 0.01f));
 		BackgroundBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], "Class: " + SelectedObject->GetObjectDescription().Name, EditorUI::Text))

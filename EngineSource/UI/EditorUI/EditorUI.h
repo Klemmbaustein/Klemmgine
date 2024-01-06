@@ -236,7 +236,7 @@ public:
 			this->ListIndex = ListIndex;
 			if (Object)
 			{
-				Name = Object->GetName(); 
+				Name = Object->Name; 
 				IsSelected = Object->IsSelected;
 			}
 		}

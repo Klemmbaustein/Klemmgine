@@ -149,14 +149,7 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 void SettingsPanel::NewSettingsPanel()
 {
 	auto NewTab = new SettingsPanel(nullptr);
-	if (Viewport::ViewportInstance->Parent->ChildrenAlign == ChildrenType::Tabs)
-	{
-		Viewport::ViewportInstance->Parent->AddTab(NewTab);
-	}
-	else
-	{
-		Viewport::ViewportInstance->AddTab(NewTab);
-	}
+	Viewport::ViewportInstance->AddPanelTab(NewTab);
 }
 
 void SettingsPanel::OpenSettingsPage(std::string Name)

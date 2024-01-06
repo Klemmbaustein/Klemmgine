@@ -36,9 +36,9 @@ void CSharpObject::Reload()
 	if (CS_Obj.ID)
 	{
 		CSharp::ExectuteFunctionOnObject(CS_Obj, "Begin");
-		if (GetName() == "CSharpObject")
+		if (Name == "CSharpObject")
 		{
-			SetName(CSharpClass);
+			Name = CSharpClass;
 		}
 	}
 	else if (!CSharpClass.empty())

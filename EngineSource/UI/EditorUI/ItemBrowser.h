@@ -22,6 +22,7 @@ class ItemBrowser : public EditorPanel
 	UIBox* TopBox = nullptr;
 protected:
 	static ItemBrowser* DropdownBrowser;
+	UIButton* UpButton = nullptr;
 public:
 	UIBackground* DraggedButton = nullptr;
 
@@ -74,6 +75,8 @@ public:
 	void OnResized() override;
 	void Tick() override;
 	virtual void DeleteItem(BrowserItem Item);
+	virtual void OnItemDropped(DroppedItem Item) override;
+	virtual void OnItemDropped(DroppedItem From, BrowserItem To);
 
 	void OnPathChanged();
 	void GenerateTopBox();

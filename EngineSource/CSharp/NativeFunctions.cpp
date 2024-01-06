@@ -24,9 +24,13 @@
 #include <Engine/Application.h>
 #include <cstring>
 
-#if _WIN32
-#define strdup(...) _strdup(__VA_ARGS__)
-#endif
+char* CopyString(const char* s)
+{
+	size_t len = 1 + strlen(s);
+	char* p = (char*)malloc(len);
+
+	return p ? (char*)memcpy(p, s, len) : nullptr;
+}
 
 #if SERVER
 class UIBox;
@@ -137,9 +141,25 @@ namespace NativeFunctions
 		return NewObject->CS_Obj;
 	}
 
+	static char* GetTypeNameOfObject(WorldObject* Object)
+	{
+		return CopyString(Object->GetObjectDescription().Name.c_str());
+	}
+
 	static void DestroyObject(WorldObject* Ptr)
 	{
 		Objects::DestroyObject(Ptr);
+	}
+
+	static void SetObjectName(WorldObject* Object, const char* NewName)
+	{
+		Object->Name = NewName;
+	}
+
+	static char* GetObjectName(WorldObject* Object)
+	{
+		// The .NET runtime (apparently) frees this.
+		return CopyString(Object->Name.c_str());
 	}
 
 	static Sound::SoundBuffer* LoadSound(const char* File)
@@ -159,7 +179,8 @@ namespace NativeFunctions
 
 	static Collision::HitResponse NativeRaycast(Vector3 Start, Vector3 End, WorldObject* ObjectsToIgnore)
 	{
-		return Collision::LineTrace(Start, End, {ObjectsToIgnore});
+		auto hit = Collision::LineTrace(Start, End, { ObjectsToIgnore });
+		return hit;
 	}
 
 	static bool CallConsoleCommand(const char* cmd)
@@ -177,6 +198,7 @@ namespace NativeFunctions
 		TargetObject->SetTransform(NewTransform);
 	}
 
+#pragma region UI
 	static UIBox* CreateUIBox(bool Horizontal, Vector2 Position)
 	{
 #if !EDITOR && !SERVER
@@ -350,6 +372,7 @@ namespace NativeFunctions
 		Input::CursorVisible = NewVisible;
 #endif
 	}
+#pragma endregion
 
 	static int32_t GetNumGamepads()
 	{
@@ -364,12 +387,37 @@ namespace NativeFunctions
 			if (Index == it++)
 			{
 				Input::Gamepad g = i.second;
-				g.DeviceName = strdup(i.second.DeviceName);
+				g.DeviceName = i.second.DeviceName;
 				return g;
 			}
 		}
 		return Input::Gamepad();
 	}
+
+	static Type::TypeEnum GetObjectPropertyType(WorldObject* Obj, const char* Property)
+	{
+		for (auto& i : Obj->Properties)
+		{
+			if (i.Name == Property)
+			{
+				return i.Type;
+			}
+		}
+		return Type::Null;
+	}
+
+	static const char* GetObjectPropertyString(WorldObject* Obj, const char* Property)
+	{
+		for (auto& i : Obj->Properties)
+		{
+			if (i.Name == Property)
+			{
+				return (*(std::string*)i.Data).c_str();
+			}
+		}
+		return "";
+	}
+
 }
 
 #define REGISTER_FUNCTION(func) CSharp::RegisterNativeFunction(# func, (void*)func)
@@ -392,6 +440,9 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(GetObjectTransform);
 	REGISTER_FUNCTION(SetObjectTransform);
 	REGISTER_FUNCTION(DestroyObject);
+	REGISTER_FUNCTION(SetObjectName);
+	REGISTER_FUNCTION(GetObjectName);
+	REGISTER_FUNCTION(GetTypeNameOfObject);
 
 	REGISTER_FUNCTION(DestroyComponent);
 	REGISTER_FUNCTION(SetComponentTransform);
@@ -444,6 +495,9 @@ void NativeFunctions::RegisterNativeFunctions()
 
 	REGISTER_FUNCTION(GetNumGamepads);
 	REGISTER_FUNCTION(GetGamepadIndex);
+
+	REGISTER_FUNCTION(GetObjectPropertyType);
+	REGISTER_FUNCTION(GetObjectPropertyString);
 }
 
 #endif

@@ -60,6 +60,19 @@ static class Engine
 		}
 		return null;
 	}
+
+	public static object? GetObjectFromPtr(IntPtr Ptr)
+	{
+		foreach (var i in WorldObjects)
+		{
+			if ((IntPtr)Get(i.Value, "NativeObject")! == Ptr)
+			{
+				return i.Value;
+			}
+		}
+		return null;
+	}
+
 	static bool LoadedEngine = false;
 
 	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path, [MarshalAs(UnmanagedType.LPUTF8Str)] string EngineDllPath, bool InEditor)
@@ -89,7 +102,11 @@ static class Engine
 			return;
 		}
 
-		WorldObjectType?.GetMethod("LoadGetObjectFunction")!.Invoke(null, new object[] { (object)GetObjectFromID });
+		WorldObjectType?.GetMethod("LoadGetObjectFunctions")!.Invoke(null, new object[] 
+		{ 
+			(object)GetObjectFromID,
+			(object)GetObjectFromPtr
+		});
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{

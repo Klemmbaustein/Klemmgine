@@ -211,8 +211,7 @@ public:
 	void SetTransform(Transform NewTransform);
 	Transform& GetTransform();
 	int Attach(Component* NewComponent);
-	void SetName(std::string Name);
-	std::string GetName();
+	std::string Name = "Object";
 
 	/**
 	 * @brief
@@ -276,7 +275,6 @@ protected:
 	std::string TypeName;
 	uint32_t TypeID = 0;
 	std::vector<Component*> Components;
-	std::string Name = "Object";
 	friend EditorUI;
 	friend class ContextMenu;
 	Transform ObjectTransform;

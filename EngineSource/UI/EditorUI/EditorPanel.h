@@ -19,7 +19,7 @@ protected:
 	std::vector<UIButton*> Tabs;
 	void AddTabButton(bool Selected, int Index, std::string Name, bool Closable);
 	static void HandleDrag();
-	void TickPanelInternal();
+	bool TickPanelInternal();
 public:
 	UIBackground* PanelMainBackground = nullptr;
 	bool CanBeClosed = false;
@@ -54,6 +54,7 @@ public:
 
 	struct DroppedItem
 	{
+		UICanvas* From = nullptr;
 		int32_t TypeID = 0;
 		std::string Path;
 	};
@@ -81,6 +82,8 @@ public:
 	virtual void Tick() override;
 	void TickPanel();
 	void OnPanelResized();
+	void SetName(std::string Name);
+	void AddPanelTab(EditorPanel* Panel);
 	
 	/**
 	* This function will be called if the editor window has been resized.

@@ -282,6 +282,7 @@ void CSharp::RunPerFrameLogic()
 	{
 		return;
 	}
+
 	CSharp::StaticCall<void, float>(SetDeltaFunction, Performance::DeltaTime);
 }
 

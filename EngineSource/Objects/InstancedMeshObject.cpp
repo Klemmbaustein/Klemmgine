@@ -28,7 +28,7 @@ void InstancedMeshObject::Update()
 						Rotation,
 						Scale * Random::GetRandomFloat(15, 25) / 20));
 				}
-				else if (ComponentName == Hit.HitObject->GetName())
+				else if (ComponentName == Hit.HitObject->Name)
 				{
 					AddInstance(Transform(Hit.ImpactPoint - GetTransform().Location,
 						Rotation,

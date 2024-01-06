@@ -27,13 +27,51 @@ public abstract class WorldObject
 {
 	public IntPtr NativeObject = new();
 
+	private delegate void SetObjNameDelegate(IntPtr ObjPtr, [MarshalAs(UnmanagedType.LPUTF8Str)] string NewName);
+
+	[return: MarshalAs(UnmanagedType.LPStr)]
+	private delegate string GetObjNameDelegate(IntPtr ObjPtr);
+
 	private delegate Int32 NewCSObjectDelegate(string TypeName, Transform t);
 	private delegate Int32 DestroyObjectDelegate(IntPtr ObjPtr);
 	private delegate void SetTransformDelegate(Transform NewTransform, IntPtr NativeObjectPtr);
 	private delegate Transform GetTransformDelegate(IntPtr NativeObjectPtr);
 
 	private static Delegate? GetCSObjectDelegate;
+	private static Delegate? GetCSObjectByPtrDelegate;
 
+	private static readonly Dictionary<IntPtr, WorldObject> Objects = [];
+
+	/**
+	 * @brief
+	 * Returns a C# object corrisponding with the given native object.
+	 * 
+	 * If no object has been found, a new Engine.NativeObject is created from the given pointer.
+	 */
+	public static WorldObject? GetObjectFromNativePointer(IntPtr Pointer)
+	{
+		WorldObject? ManagedObject = (WorldObject?)GetCSObjectByPtrDelegate?.DynamicInvoke(Pointer);
+		if (ManagedObject != null)
+		{
+			return ManagedObject;
+		}
+
+		var NewObject = new NativeObject();
+		NewObject.LoadFromPtr(Pointer);
+		return NewObject;
+	}
+
+	/**
+	 * @brief
+	 * Returns the type of this object's the native object.
+	 * 
+	 * If this is a managed object, this will always be "CSharpObject".
+	 * If this object has the type Engine.NativeObject, this will be the name of the class this object represents.
+	 */
+	public string GetNativeTypeName()
+	{
+		return (string)NativeFunction.CallNativeFunction("GetTypeNameOfObject", typeof(GetObjNameDelegate), new object[] { NativeObject })!;
+	}
 
 	/**
 	 * @brief
@@ -65,6 +103,25 @@ public abstract class WorldObject
 		}
 		return (WorldObject)objRef;
 	}
+
+	/**
+	 * @brief
+	 * Sets the name of the object.
+	 */
+	public void SetName(string NewName)
+	{
+		NativeFunction.CallNativeFunction("SetObjectName", typeof(SetObjNameDelegate), new object[] { NativeObject, NewName });
+	}
+
+	/**
+	 * @brief
+	 * Gets the name of the object.
+	 */
+	public string GetName()
+	{
+		return (string)NativeFunction.CallNativeFunction("GetObjectName", typeof(GetObjNameDelegate), new object[] { NativeObject })!;
+	}
+
 
 	/**
 	 * @brief
@@ -158,9 +215,10 @@ public abstract class WorldObject
 		return;
 	}
 
-	public static void LoadGetObjectFunction(Delegate Func)
+	public static void LoadGetObjectFunctions(Delegate GetCSObjByID, Delegate GetCSObjByPtr)
 	{
-		GetCSObjectDelegate = Func;
+		GetCSObjectDelegate = GetCSObjByID;
+		GetCSObjectByPtrDelegate = GetCSObjByPtr;
 	}
 
 	/**
