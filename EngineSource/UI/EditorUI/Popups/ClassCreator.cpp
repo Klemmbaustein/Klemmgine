@@ -21,7 +21,6 @@ bool replace(std::string& str, const std::string& from, const std::string& to) {
 ClassCreator::ClassCreator() : EditorPopup(0, 0.3f, "Create class")
 {
 	PopupBackground->SetVerticalAlign(UIBox::Align::Default);
-	PopupBackground->AddChild(PopupBackground);
 
 	SetOptions({
 		PopupOption("Create"),
@@ -74,7 +73,7 @@ void ClassCreator::Tick()
 		DisplayedPath.append("/");
 	}
 
-	PathText->SetText("File: " + DisplayedPath + ClassFields[0]->GetText() + ".cs");
+	PathText->SetText("File: Scripts/" + DisplayedPath + ClassFields[0]->GetText() + ".cs");
 }
 
 void ClassCreator::OnButtonClicked(int Index)

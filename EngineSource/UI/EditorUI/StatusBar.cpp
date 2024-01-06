@@ -57,7 +57,7 @@ static std::vector<MenuBarItem> MenuBarItems =
 	MenuBarItem("C#",
 		{
 			MenuBarEntry("Open Solution", []() { OS::OpenFile(Build::GetProjectBuildName() + ".sln"); }),
-			MenuBarEntry("Reload C# Assembly", []() { new BackgroundTask(EditorUI::RebuildAssembly); }, true),
+			MenuBarEntry("Rebuild C# Assembly", []() { new BackgroundTask(EditorUI::RebuildAssembly); }, true),
 			MenuBarEntry("New Class", []() { new ClassCreator(); }),
 		}),
 	MenuBarItem("Help",

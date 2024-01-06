@@ -153,7 +153,7 @@ std::vector<ClassesBrowser::BrowserItem> ClassesBrowser::GetBrowserContents()
 	for (auto& i : CItems)
 	{
 		BrowserItem New;
-		New.Name = i.Name;
+		New.Name = FileUtil::GetFileNameFromPath(i.Name);
 		std::string Ext = i.Object.ID == CSharpObject::GetID() ? "cs" : "cpp";
 
 		New.Color = i.IsFolder ? EditorUI::ItemColors["dir"] : EditorUI::ItemColors[Ext];

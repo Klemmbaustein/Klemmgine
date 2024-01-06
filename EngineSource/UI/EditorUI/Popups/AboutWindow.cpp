@@ -91,7 +91,7 @@ AboutWindow::AboutWindow()
 		{
 			ButtonsBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, ButtonIndex++))
 				->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-				->AddChild((new UIText(0.4f, EditorUI::UIColors[1], entry.first, EditorUI::Text))
+				->AddChild((new UIText(0.4f, 1 - EditorUI::UIColors[2], entry.first, EditorUI::Text))
 					->SetPadding(0.005f))
 				->SetPadding(0.005f, 0.005f, i.second.empty() ? 0.005f : 0.02f, 0.005f));
 		}

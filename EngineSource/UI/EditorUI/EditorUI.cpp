@@ -479,7 +479,7 @@ void EditorUI::Tick()
 			auto Browser = dynamic_cast<ClassesBrowser*>(c);
 			if (Browser)
 			{
-				Browser->UpdateClasses();
+				Browser->OnPathChanged();
 			}
 		}
 

@@ -118,6 +118,11 @@ void AssetBrowser::OnItemDropped(DroppedItem From, BrowserItem To)
 		return;
 	}
 
+	if (From.Path == To.Path)
+	{
+		return;
+	}
+
 	if (std::filesystem::is_directory(To.Path))
 	{
 		std::filesystem::copy(From.Path,

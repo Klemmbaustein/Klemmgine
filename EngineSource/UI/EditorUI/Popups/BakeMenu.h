@@ -13,7 +13,7 @@ public:
 	UITextField* InputFields[2] = { nullptr, nullptr };
 	size_t CurrentBakeProgress = 0;
 	UIText* BakeProgressText = nullptr;
-	static bool BakeMenuActive;
+	static BakeMenu* ActiveBakeMenu;
 
 	void GenerateBakeLog();
 

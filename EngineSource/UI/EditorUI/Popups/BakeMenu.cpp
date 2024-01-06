@@ -9,16 +9,18 @@
 #include <Engine/Log.h>
 #include <Engine/Application.h>
 
-bool BakeMenu::BakeMenuActive = false;
+BakeMenu* BakeMenu::ActiveBakeMenu = nullptr;
 
 BakeMenu::BakeMenu()
 	: EditorPopup(0, Vector2(0.5f, 0.55f), "Bake scene lighting")
 {
-	if (BakeMenuActive)
+	if (ActiveBakeMenu)
 	{
+		delete this;
 		return;
 	}
-	BakeMenuActive = true;
+
+	ActiveBakeMenu = this;
 
 	InputFields[0] = new UITextField(0, EditorUI::UIColors[1], this, 2, EditorUI::Text);
 	InputFields[1] = new UITextField(0, EditorUI::UIColors[1], this, 2, EditorUI::Text);
@@ -53,7 +55,10 @@ BakeMenu::BakeMenu()
 
 BakeMenu::~BakeMenu()
 {
-	BakeMenuActive = false;
+	if (ActiveBakeMenu == this)
+	{
+		ActiveBakeMenu = nullptr;
+	}
 }
 
 void BakeMenu::OnButtonClicked(int Index)
