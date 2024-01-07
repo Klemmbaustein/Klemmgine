@@ -195,7 +195,7 @@ void Networking::SendObjectInfo(WorldObject* obj, void* TargetAddr)
 				memcpy(&Properties.Data[1], &obj->NetID, sizeof(size_t));
 			}
 
-			Properties.AppendStringToData(i.Name + "=" + i.ValueToString() + ";");
+			Properties.AppendStringToData(i.Name + "=" + i.ValueToString(obj) + ";");
 		}
 	}
 	if (!Properties.Data.empty())
