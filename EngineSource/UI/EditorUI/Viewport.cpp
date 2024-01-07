@@ -22,6 +22,7 @@
 #include <Objects/CSharpObject.h>
 #include "ContextMenu.h"
 #include <Objects/ParticleObject.h>
+#include <Objects/SoundObject.h>
 
 Viewport* Viewport::ViewportInstance = nullptr;
 
@@ -123,6 +124,13 @@ void Viewport::OnItemDropped(DroppedItem Item)
 	if (Ext == "jscn")
 	{
 		EditorUI::OpenScene(Item.Path);
+	}
+
+	if (Ext == "wav")
+	{
+		auto Obj = Objects::SpawnObject<SoundObject>(Transform(Point, 0, 1));
+		Obj->LoadSound(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
+		Obj->IsSelected = true;
 	}
 }
 

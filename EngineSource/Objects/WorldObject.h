@@ -8,7 +8,7 @@ class MeshObject;
 
 /**
 * @brief
-* A simple struct describing a WorldObject Type.
+* A simple struct describing a WorldObject type.
 */
 struct ObjectDescription
 {
@@ -136,12 +136,16 @@ public:
 		}
 
 		std::string Name;
+		std::string ValueString;
 		Type::TypeEnum Type;
 		void* Data;
 		enum class PropertyType
 		{
 			EditorProperty,
-			NetProperty
+			NetProperty,
+#if ENGINE_CSHARP
+			CSharpProperty
+#endif
 		};
 		enum class NetOwner
 		{
@@ -149,7 +153,7 @@ public:
 			Server
 		};
 
-		std::string ValueToString();
+		std::string ValueToString(WorldObject* Context);
 
 		NetOwner PropertyOwner = NetOwner::Server;
 

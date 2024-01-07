@@ -3,6 +3,8 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using System.IO;
 using System.Xml.Linq;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct EngineVector
@@ -200,14 +202,165 @@ static class Engine
 		func.Invoke(obj, []);
 	}
 
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	public static string ExecuteStringFunctionOnObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string FunctionName)
+	{
+		if (!WorldObjects.TryGetValue(ID, out object? value))
+		{
+			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID));
+			return "";
+		}
+		var obj = value;
+		var func = obj.GetType().GetMethod(FunctionName);
+		if (func == null)
+		{
+			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name));
+			return "";
+		}
+		return (string)func.Invoke(obj, [])!;
+	}
+
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	public static string GetObjectPropertyString(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyName)
+	{
+		if (!WorldObjects.TryGetValue(ID, out object? value))
+		{
+			EngineLog.Print(string.Format("Tried get the field {0} on the object with ID {1} but that object doesn't exist!", PropertyName, ID));
+			return "";
+		}
+		var obj = value;
+		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
+		if (field == null)
+		{
+			EngineLog.Print(string.Format("Tried to get the field {0} on {1} but that field doesn't exist on this class!", PropertyName, obj.GetType().Name));
+			return "";
+		}
+
+		if (!field.FieldType.IsArray)
+		{
+			return field.GetValue(obj)?.ToString()!;
+		}
+		object[] arr = (object[])field.GetValue(obj)!;
+		string str = "";
+		foreach (object o in arr)
+		{
+			str += o.ToString() + "\r";
+		}
+		return str;
+	}
+
+	public static void SetObjectPropertyString(Int32 ID,
+		[MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyName,
+		[MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyValue)
+	{
+		if (!WorldObjects.TryGetValue(ID, out object? value))
+		{
+			EngineLog.Print(string.Format("Tried set the field {0} on the object with ID {1} but that object doesn't exist!", PropertyName, ID));
+			return;
+		}
+		var obj = value;
+		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
+		if (field == null)
+		{
+			EngineLog.Print(string.Format("Tried to set the field {0} on {1} but that field doesn't exist on this class!", PropertyName, obj.GetType().Name));
+			return;
+		}
+
+		if (field.FieldType.IsArray)
+		{
+			string[] entries = PropertyValue.Split(new string[] { "\r" }, StringSplitOptions.None).Select(x => x).ToArray();
+
+			if (entries.Last().Length == 0)
+			{
+				entries = entries.SkipLast(1).ToArray();
+			}
+
+
+			object[] arr = (object[])field.GetValue(obj)!;
+			Array destinationArray = Array.CreateInstance(arr[0].GetType(), arr.Length);
+			field.SetValue(obj, destinationArray);
+			for (int i = 0; i < arr.Length; i++)
+			{
+				switch (field.FieldType.ToString())
+				{
+					case "System.Int[]":
+						if (int.TryParse(PropertyValue, out int iresult))
+						{
+							destinationArray.SetValue(iresult, i);
+						}
+						break;
+					case "System.Float[]":
+						if (float.TryParse(PropertyValue, out float fresult))
+						{
+							destinationArray.SetValue(fresult, i);
+						}
+						break;
+					case "System.String[]":
+						destinationArray.SetValue(PropertyValue, i);
+						break;
+					case "Engine.Vector3[]":
+						var Culture = CultureInfo.GetCultureInfo("en-US");
+						float[] newPosCoordinates = PropertyValue.Split(new string[] { " " }, StringSplitOptions.None).Select(x => float.Parse(x, Culture)).ToArray();
+						var vec = destinationArray.GetValue(i)!;
+						Set(ref vec, "X", newPosCoordinates[0]);
+						Set(ref vec, "Y", newPosCoordinates[1]);
+						Set(ref vec, "Z", newPosCoordinates[2]);
+						destinationArray.SetValue(vec, i);
+						break;
+					default:
+						EngineLog.Print("Unknown type: " + field.FieldType.ToString());
+						break;
+				}
+			}
+			EngineLog.Print(destinationArray.Length.ToString());
+			return;
+		}
+
+		switch (field.FieldType.ToString())
+		{
+			case "System.Int":
+				if (int.TryParse(PropertyValue, out int iresult))
+				{
+					field.SetValue(obj, iresult);
+				}
+				break;
+			case "System.Float":
+				if (float.TryParse(PropertyValue, out float fresult))
+				{
+					field.SetValue(obj, fresult);
+				}
+				break;
+			case "System.String":
+				field.SetValue(obj, PropertyValue);
+				break;
+			case "Engine.Vector3":
+				var Culture = CultureInfo.GetCultureInfo("en-US");
+				float[] newPosCoordinates = PropertyValue.Split(new string[] { " " }, StringSplitOptions.None).Select(x => float.Parse(x, Culture)).ToArray();
+				var vec = field.GetValue(obj)!;
+				Set(ref vec, "X", newPosCoordinates[0]);
+				Set(ref vec, "Y", newPosCoordinates[1]);
+				Set(ref vec, "Z", newPosCoordinates[2]);
+				field.SetValue(obj, vec);
+				break;
+			default:
+				EngineLog.Print("Unknown type: " + field.FieldType.ToString());
+				break;
+		}
+	}
+
 	public static object? Get(object obj, string member)
 	{
 		var memb = obj.GetType().GetField(member);
 		return memb?.GetValue(obj);
 	}
-	public static void Set(ref object? obj, string field, object value)
+	public static void Set(ref object obj, string field, object value)
 	{
 		var memb = obj?.GetType().GetField(field);
+		if (memb == null)
+		{
+			EngineLog.Print("Object " + obj?.ToString() + " does not have member " + field);
+			return;
+		}
 		memb?.SetValueDirect(__makeref(obj), value);
 	}
 
@@ -229,9 +382,18 @@ static class Engine
 		if (!WorldObjects.ContainsKey(ID))
 		{
 			EngineLog.Print(string.Format("Tried to access {1} of object with ID {0} but that object doesn't exist!", ID, Field));
+			return;
 		}
 		var obj = WorldObjects[ID];
-		var pos = obj?.GetType()?.GetField(Field)?.GetValue(obj);
+		if (obj == null)
+		{
+			return;
+		}
+		var pos = obj?.GetType()?.GetField(Field)?.GetValue(obj)!;
+		if (pos == null)
+		{
+			return;
+		}
 		Set(ref pos, "X", NewValue.X);
 		Set(ref pos, "Y", NewValue.Y);
 		Set(ref pos, "Z", NewValue.Z);

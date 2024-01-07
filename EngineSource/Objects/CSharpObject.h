@@ -23,12 +23,16 @@ public:
 	void Update() override;
 	void Destroy() override;
 
-	void Reload();
+	void Reload(bool DeleteParameters);
+
+	std::string GetProperty(std::string PropertyName);
+	void SetProperty(std::string PropertyName, std::string Value);
 
 	Transform CSharpTransform;
 
 	/// The class name of the object.
 	std::string CSharpClass;
+
 	std::string OldCSharpClass;
 
 	void OnPropertySet() override;

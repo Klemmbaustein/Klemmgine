@@ -1,6 +1,8 @@
 ﻿using Engine;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 #nullable enable
 
@@ -13,6 +15,25 @@ namespace Engine;
  * @brief
  * Functions/classes related to objects in C#
  */
+
+/**
+ * @brief
+ * An Attribute that adds the field to the "Objects" menu.
+ * 
+ */
+[AttributeUsage(AttributeTargets.Field)]
+public class EditorProperty : Attribute
+{
+	public EditorProperty()
+	{
+		Category = "C#";
+	}
+	public EditorProperty(string Category)
+	{
+		this.Category = Category;
+	}
+	public string Category;
+}
 
 /**
  * @brief
@@ -29,7 +50,7 @@ public abstract class WorldObject
 
 	private delegate void SetObjNameDelegate(IntPtr ObjPtr, [MarshalAs(UnmanagedType.LPUTF8Str)] string NewName);
 
-	[return: MarshalAs(UnmanagedType.LPStr)]
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
 	private delegate string GetObjNameDelegate(IntPtr ObjPtr);
 
 	private delegate Int32 NewCSObjectDelegate(string TypeName, Transform t);
@@ -41,6 +62,26 @@ public abstract class WorldObject
 	private static Delegate? GetCSObjectByPtrDelegate;
 
 	private static readonly Dictionary<IntPtr, WorldObject> Objects = [];
+
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	public string GetEditorProperties()
+	{
+		var ObjectType = GetType();
+		string PropertyString = "";
+		foreach (var i in ObjectType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+		{
+			if (!i.IsDefined(typeof(EditorProperty)))
+			{
+				continue;
+			}
+
+			var attr = i.GetCustomAttribute<EditorProperty>()!;
+
+			PropertyString += i.FieldType.Name + " " + attr.Category + ":" + i.Name + ";";
+		}
+
+		return PropertyString;
+	}
 
 	/**
 	 * @brief

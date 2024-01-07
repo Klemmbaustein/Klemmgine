@@ -68,6 +68,11 @@ namespace CSharp
 	void RegisterNativeFunction(std::string Name, void* Function);
 
 	void ExectuteFunctionOnObject(CSharpWorldObject Object, std::string FunctionName);
+	std::string ExectuteStringFunctionOnObject(CSharpWorldObject Object, std::string FunctionName);
+
+	std::string GetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName);
+	void SetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName, std::string Value);
+
 	Vector3 GetObjectVectorField(CSharpWorldObject Obj, std::string Field);
 	void SetObjectVectorField(CSharpWorldObject Obj, std::string Field, Vector3 Value);
 

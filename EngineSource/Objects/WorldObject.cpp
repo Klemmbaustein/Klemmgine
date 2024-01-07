@@ -8,6 +8,7 @@
 #include <Networking/Client.h>
 #include <Networking/NetworkEvent.h>
 #include <Engine/Utility/StringUtility.h>
+#include <Objects/CSharpObject.h>
 
 namespace Objects
 {
@@ -172,7 +173,7 @@ std::string WorldObject::GetPropertiesAsString()
 	std::stringstream OutProperties;
 	for (Property p : Properties)
 	{
-		if (p.PType != Property::PropertyType::EditorProperty)
+		if (p.PType != Property::PropertyType::EditorProperty && p.PType != Property::PropertyType::CSharpProperty)
 		{
 			continue;
 		}
@@ -180,8 +181,12 @@ std::string WorldObject::GetPropertiesAsString()
 		StrUtil::ReplaceChar(p.Name, '#', "\\#");
 		StrUtil::ReplaceChar(p.Name, ';', "\\;");
 
+		if (p.PType == Property::PropertyType::CSharpProperty)
+		{
+			OutProperties << "@csharp_";
+		}
 		OutProperties << p.Name << ";" << p.Type << ";";
-		OutProperties << p.ValueToString();
+		OutProperties << p.ValueToString(this);
 		OutProperties << "#";
 	}
 	return OutProperties.str();
@@ -245,7 +250,14 @@ void WorldObject::LoadProperties(std::string in)
 				CurrentProperty.Name = current;
 				break;
 			case 1:
-				CurrentProperty.Type = (Type::TypeEnum)std::stoi(current);
+				try
+				{
+					CurrentProperty.Type = (Type::TypeEnum)std::stoi(current);
+				}
+				catch (std::exception)
+				{
+					return;
+				}
 				break;
 			case 2:
 				if (current.empty())
@@ -253,6 +265,16 @@ void WorldObject::LoadProperties(std::string in)
 					current.clear();
 					i = 0;
 					continue;
+				}
+				{
+					std::string CSharpSeperator = "@csharp";
+					if (CurrentProperty.Name.substr(0, CSharpSeperator.size()) == CSharpSeperator)
+					{
+						Property p = Property(CurrentProperty.Name, CurrentProperty.Type, nullptr);
+						p.PType = Property::PropertyType::CSharpProperty;
+						p.ValueString = current;
+						Properties.push_back(p);
+					}
 				}
 				for (Property& p : Properties)
 				{
@@ -361,8 +383,14 @@ static std::string ListToString(void* Data, std::string(*ToString)(T Data))
 	return val;
 }
 
-std::string WorldObject::Property::ValueToString()
+std::string WorldObject::Property::ValueToString(WorldObject* Context)
 {
+#if ENGINE_CSHARP
+	if (PType == PropertyType::CSharpProperty)
+	{
+		return static_cast<CSharpObject*>(Context)->GetProperty(Name.substr(Name.find_first_of(":") + 1));
+	}
+#endif
 	if (Type & Type::List)
 	{
 		Type = (Type::TypeEnum)(Type ^ Type::List);

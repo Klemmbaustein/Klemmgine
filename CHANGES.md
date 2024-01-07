@@ -11,6 +11,7 @@
 - Added enum `Input::GamepadType` and `Input::GetGamepadType(Input::Gamepad* From)`.
 - `UIButton` and `UITextField` now inherit from `UIBackground`.
 - Added `Engine.NativeObject` and a few more utility functions to C#.
+- Added C# `EditorProperty` attribute and functionality.
 
 ## Version 1.7.2
 

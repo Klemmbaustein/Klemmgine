@@ -46,5 +46,7 @@ public:
 	void Tick() override;
 	void OnButtonClicked(int Index) override;
 	void OnResized() override;
+private:
+	void GenerateCSharpProperty(const ContextMenu::ContextMenuSection& Element, WorldObject* ContextObject);
 };
 #endif

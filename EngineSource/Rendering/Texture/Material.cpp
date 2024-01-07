@@ -12,6 +12,8 @@
 #include <Rendering/Mesh/Mesh.h>
 #include <Rendering/Graphics.h>
 #include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Mesh/InstancedModel.h>
+#include <Rendering/Mesh/InstancedMesh.h>
 
 void Material::SetPredefinedMaterialValue(std::string Value, char* ptr, std::string Name)
 {
@@ -200,6 +202,17 @@ void Material::ReloadMaterial(std::string MaterialPath)
 		if (RenderableModel)
 		{
 			for (Mesh* i : RenderableModel->Meshes)
+			{
+				if (i->RenderContext.Mat.Name == MaterialPath)
+				{
+					i->RenderContext = ObjectRenderContext(NewMaterial);
+				}
+			}
+		}
+		InstancedModel* RenderableInstanced = dynamic_cast<InstancedModel*>(m);
+		if (RenderableInstanced)
+		{
+			for (InstancedMesh* i : RenderableInstanced->Meshes)
 			{
 				if (i->RenderContext.Mat.Name == MaterialPath)
 				{

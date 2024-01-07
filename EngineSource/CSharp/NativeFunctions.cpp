@@ -387,7 +387,7 @@ namespace NativeFunctions
 			if (Index == it++)
 			{
 				Input::Gamepad g = i.second;
-				g.DeviceName = i.second.DeviceName;
+				g.DeviceName = CopyString(i.second.DeviceName);
 				return g;
 			}
 		}

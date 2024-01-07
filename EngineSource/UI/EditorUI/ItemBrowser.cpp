@@ -204,6 +204,7 @@ void ItemBrowser::GenerateTopBox()
 		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
 		->SetMinSize(0.05f)
 		->SetSizeMode(UIBox::SizeMode::PixelRelative));
+
 	TopBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Path, EditorUI::Text))
 		->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
 		->SetPadding(0.005f));
