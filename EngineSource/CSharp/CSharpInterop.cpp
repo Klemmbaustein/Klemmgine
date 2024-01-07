@@ -497,16 +497,16 @@ void CSharp::LoadAssembly()
 		return;
 	}
 
-	std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCsharp.dll",
-		"bin/KlemmgineCsharp.dll",
+	std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCSharp.dll",
+		"bin/KlemmgineCSharp.dll",
 		std::filesystem::copy_options::update_existing);
 
 	StaticCall<void, const char*, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
-		AssemblyPath.c_str(), "bin/KlemmgineCsharp.dll", IsInEditor);
+		AssemblyPath.c_str(), "bin/KlemmgineCSharp.dll", IsInEditor);
 #else
 	StaticCall<void, const char*, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
 		(std::filesystem::current_path().string() + "/bin/CSharp/CSharpAssembly.dll").c_str(),
-		(std::filesystem::current_path().string() + "/bin/CSharp/Engine/KlemmgineCsharp.dll").c_str(),
+		(std::filesystem::current_path().string() + "/bin/CSharp/Engine/KlemmgineCSharp.dll").c_str(),
 		IsInEditor);
 #endif
 
