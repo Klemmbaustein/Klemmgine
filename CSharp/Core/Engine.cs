@@ -2,7 +2,6 @@
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.IO;
-using System.Xml.Linq;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
@@ -268,6 +267,7 @@ static class Engine
 
 		if (field.FieldType.IsArray)
 		{
+			return;
 			string[] entries = PropertyValue.Split(new string[] { "\r" }, StringSplitOptions.None).Select(x => x).ToArray();
 
 			if (entries.Last().Length == 0)

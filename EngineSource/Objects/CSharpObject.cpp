@@ -55,15 +55,14 @@ void CSharpObject::Reload(bool DeleteParameters)
 		{
 			for (auto& i : Properties)
 			{
-				if (i.PType == Property::PropertyType::CSharpProperty)
+				if (i.PType == Property::PropertyType::CSharpProperty && !i.ValueString.empty())
 				{
 					static_cast<CSharpObject*>(this)->SetProperty(i.Name.substr(i.Name.find_last_of(":") + 1), i.ValueString);
 				}
 			}
-			Properties.clear();
-			AddEditorProperty(Property("C#:Object class", Type::String, &CSharpClass));
 		}
 		CSharp::ExectuteFunctionOnObject(CS_Obj, "Begin");
+		size_t it = 1;
 		for (auto& i : LoadedProperties)
 		{
 			size_t FirstSpace = i.find_first_of(" ");
@@ -85,7 +84,15 @@ void CSharpObject::Reload(bool DeleteParameters)
 				p.Type = (Type::TypeEnum)(p.Type | Type::List);
 			}
 			p.PType = Property::PropertyType::CSharpProperty;
-			Properties.push_back(p);
+
+			if (DeleteParameters || Properties.size() <= it)
+			{
+				Properties.push_back(p);
+			}
+			else
+			{
+				Properties[it++] = p;
+			}
 		}
 		if (Name == "CSharpObject")
 		{

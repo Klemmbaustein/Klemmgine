@@ -44,7 +44,6 @@ namespace Assets
 		}
 	}
 
-
 	std::string GetAsset(std::string Name)
 	{
 		for (const Asset& s : Assets::Assets)

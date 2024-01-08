@@ -15,6 +15,7 @@ namespace Input
 bool Input::IsKeyDown(Key InputKey)
 {
 	int KeyID = (int)InputKey;
+	
 	if (!(KeyID < 128))
 	{
 		KeyID -= 1073741755;

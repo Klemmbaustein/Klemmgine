@@ -405,7 +405,6 @@ void Viewport::Tick()
 			-100000.0f, 100000.0f,
 			-100000.0f, 100000.0f
 		);
-
 		Vector3 BoxScale = 1;
 		int Prev = -1;
 		Vector3 Forward = Vector3::GetForwardVector(Graphics::MainCamera->Rotation);
@@ -419,8 +418,8 @@ void Viewport::Tick()
 				}
 				else
 				{
-					BoxScale.at(i) = Forward.at(Prev) > Forward.at(i) ? 0.0f : 1.0f;
-					BoxScale.at(Prev) = Forward.at(Prev) > Forward.at(i) ? 1.0f : 0.0f;
+					BoxScale.at(i) = std::abs(Forward.at(Prev)) > std::abs(Forward.at(i)) ? 1.0f : 0.0f;
+					BoxScale.at(Prev) = std::abs(Forward.at(Prev)) > std::abs(Forward.at(i)) ? 0.0f : 1.0f;
 				}
 			}
 		}

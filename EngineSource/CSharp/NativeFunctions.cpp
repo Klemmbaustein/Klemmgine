@@ -452,7 +452,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(CollisionComponentOverlap);
 	REGISTER_FUNCTION(MovementComponentAddMovementInput);
 	REGISTER_FUNCTION(MovementComponentJump);
-
+	 
 	REGISTER_FUNCTION(IsKeyDown);
 	REGISTER_FUNCTION(GetMouseMovement);
 	REGISTER_FUNCTION(PlayDefaultCameraShake);
