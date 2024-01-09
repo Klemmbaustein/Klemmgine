@@ -23,6 +23,7 @@
 #include <Engine/Gamepad.h>
 #include <Engine/Application.h>
 #include <cstring>
+#include <Engine/Utility/StringUtility.h>
 
 char* CopyString(const char* s)
 {
@@ -398,7 +399,9 @@ namespace NativeFunctions
 	{
 		for (auto& i : Obj->Properties)
 		{
-			if (i.Name == Property)
+			std::string Name = i.Name.substr(i.Name.find_last_of(":") + 1);
+			StrUtil::ReplaceChar(Name, '\n', "");
+			if (Name == Property)
 			{
 				return i.Type;
 			}
@@ -410,12 +413,95 @@ namespace NativeFunctions
 	{
 		for (auto& i : Obj->Properties)
 		{
-			if (i.Name == Property)
+			if (i.Type != Type::String)
 			{
-				return (*(std::string*)i.Data).c_str();
+				continue;
+			}
+
+			std::string Name = i.Name.substr(i.Name.find_last_of(":") + 1);
+			StrUtil::ReplaceChar(Name, '\n', "");
+			if (Name == Property)
+			{
+				return CopyString((*(std::string*)i.Data).c_str());
 			}
 		}
 		return "";
+	}
+
+	static int GetObjectPropertyInt(WorldObject* Obj, const char* Property)
+	{
+		for (auto& i : Obj->Properties)
+		{
+			if (i.Type != Type::Int)
+			{
+				continue;
+			}
+
+			std::string Name = i.Name.substr(i.Name.find_last_of(":") + 1);
+			StrUtil::ReplaceChar(Name, '\n', "");
+			if (Name == Property)
+			{
+				return (*(int*)i.Data);
+			}
+		}
+		return 0;
+	}
+
+	static bool GetObjectPropertyBool(WorldObject* Obj, const char* Property)
+	{
+		for (auto& i : Obj->Properties)
+		{
+			if (i.Type != Type::Bool)
+			{
+				continue;
+			}
+
+			std::string Name = i.Name.substr(i.Name.find_last_of(":") + 1);
+			StrUtil::ReplaceChar(Name, '\n', "");
+			if (Name == Property)
+			{
+				return (*(bool*)i.Data);
+			}
+		}
+		return false;
+	}
+
+	static Vector3 GetObjectPropertyVector3(WorldObject* Obj, const char* Property)
+	{
+		for (auto& i : Obj->Properties)
+		{
+			if (i.Type != Type::Vector3)
+			{
+				continue;
+			}
+
+			std::string Name = i.Name.substr(i.Name.find_last_of(":") + 1);
+			StrUtil::ReplaceChar(Name, '\n', "");
+			if (Name == Property)
+			{
+				return (*(Vector3*)i.Data);
+			}
+		}
+		return Vector3(0);
+	}
+
+	static float GetObjectPropertyFloat(WorldObject* Obj, const char* Property)
+	{
+		for (auto& i : Obj->Properties)
+		{
+			if (i.Type != Type::Float)
+			{
+				continue;
+			}
+
+			std::string Name = i.Name.substr(i.Name.find_last_of(":") + 1);
+			StrUtil::ReplaceChar(Name, '\n', "");
+			if (Name == Property)
+			{
+				return (*(float*)i.Data);
+			}
+		}
+		return 0;
 	}
 
 }
@@ -498,6 +584,10 @@ void NativeFunctions::RegisterNativeFunctions()
 
 	REGISTER_FUNCTION(GetObjectPropertyType);
 	REGISTER_FUNCTION(GetObjectPropertyString);
+	REGISTER_FUNCTION(GetObjectPropertyInt);
+	REGISTER_FUNCTION(GetObjectPropertyVector3);
+	REGISTER_FUNCTION(GetObjectPropertyBool);
+	REGISTER_FUNCTION(GetObjectPropertyFloat);
 }
 
 #endif

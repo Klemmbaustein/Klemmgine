@@ -106,7 +106,7 @@ namespace Engine
 
 		public static HitResponse LineTrace(Vector3 Start, Vector3 End, WorldObject This)
 		{
-			return (HitResponse)NativeFunction.CallNativeFunction("NativeRaycast", typeof(LineTraceDelegate), new object[] { Start, End, This.NativeObject });
+			return (HitResponse)NativeFunction.CallNativeFunction("NativeRaycast", typeof(LineTraceDelegate), new object[] { Start, End, This.NativePtr });
 		}
 	}
 

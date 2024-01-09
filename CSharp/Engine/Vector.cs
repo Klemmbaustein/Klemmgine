@@ -36,7 +36,7 @@ public struct Vector3
 		Z = xyz;
 	}
 
-	/***
+	/**
 	 */
 	public readonly float Length()
 	{

@@ -8,7 +8,8 @@ static std::map<std::string, Type::TypeEnum> ManagedTypes =
 {
 	{"String", Type::String},
 	{"Float", Type::Float},
-	{"Vector3", Type::Vector3}
+	{"Vector3", Type::Vector3},
+	{"Boolean", Type::Bool}
 };
 
 void CSharpObject::Begin()
@@ -112,6 +113,13 @@ std::string CSharpObject::GetProperty(std::string PropertyName)
 
 void CSharpObject::SetProperty(std::string PropertyName, std::string Value)
 {
+	for (auto& i : Properties)
+	{
+		if (i.Name.substr(i.Name.find_last_of(":") + 1) == PropertyName)
+		{
+			i.ValueString = Value;
+		}
+	}
 	return CSharp::SetPropertyOfObject(CS_Obj, PropertyName, Value);
 }
 

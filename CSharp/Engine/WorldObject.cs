@@ -46,7 +46,7 @@ public class EditorProperty : Attribute
  */
 public abstract class WorldObject
 {
-	public IntPtr NativeObject = new();
+	public IntPtr NativePtr = new();
 
 	private delegate void SetObjNameDelegate(IntPtr ObjPtr, [MarshalAs(UnmanagedType.LPUTF8Str)] string NewName);
 
@@ -87,7 +87,7 @@ public abstract class WorldObject
 	 * @brief
 	 * Returns a C# object corrisponding with the given native object.
 	 * 
-	 * If no object has been found, a new Engine.NativeObject is created from the given pointer.
+	 * If no object has been found, a new Engine.NativePtr is created from the given pointer.
 	 */
 	public static WorldObject? GetObjectFromNativePointer(IntPtr Pointer)
 	{
@@ -107,11 +107,11 @@ public abstract class WorldObject
 	 * Returns the type of this object's the native object.
 	 * 
 	 * If this is a managed object, this will always be "CSharpObject".
-	 * If this object has the type Engine.NativeObject, this will be the name of the class this object represents.
+	 * If this object has the type Engine.NativePtr, this will be the name of the class this object represents.
 	 */
 	public string GetNativeTypeName()
 	{
-		return (string)NativeFunction.CallNativeFunction("GetTypeNameOfObject", typeof(GetObjNameDelegate), new object[] { NativeObject })!;
+		return (string)NativeFunction.CallNativeFunction("GetTypeNameOfObject", typeof(GetObjNameDelegate), new object[] { NativePtr })!;
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class WorldObject
 	 */
 	public void SetName(string NewName)
 	{
-		NativeFunction.CallNativeFunction("SetObjectName", typeof(SetObjNameDelegate), new object[] { NativeObject, NewName });
+		NativeFunction.CallNativeFunction("SetObjectName", typeof(SetObjNameDelegate), new object[] { NativePtr, NewName });
 	}
 
 	/**
@@ -160,7 +160,7 @@ public abstract class WorldObject
 	 */
 	public string GetName()
 	{
-		return (string)NativeFunction.CallNativeFunction("GetObjectName", typeof(GetObjNameDelegate), new object[] { NativeObject })!;
+		return (string)NativeFunction.CallNativeFunction("GetObjectName", typeof(GetObjNameDelegate), new object[] { NativePtr })!;
 	}
 
 
@@ -230,7 +230,7 @@ public abstract class WorldObject
 	 */
 	public Transform GetTransform()
 	{
-		return (Transform)NativeFunction.CallNativeFunction("GetObjectTransform", typeof(GetTransformDelegate), new object[] { NativeObject })!;
+		return (Transform)NativeFunction.CallNativeFunction("GetObjectTransform", typeof(GetTransformDelegate), new object[] { NativePtr })!;
 	}
 	/**
 	 * @brief
@@ -238,7 +238,7 @@ public abstract class WorldObject
 	 */
 	public void SetTransform(Transform NewTransform)
 	{
-		NativeFunction.CallNativeFunction("SetObjectTransform", typeof(SetTransformDelegate), new object[] { NewTransform, NativeObject });
+		NativeFunction.CallNativeFunction("SetObjectTransform", typeof(SetTransformDelegate), new object[] { NewTransform, NativePtr });
 	}
 
 	readonly List<ObjectComponent> AttachedComponents = [];
@@ -252,7 +252,7 @@ public abstract class WorldObject
 	 */
 	public static void DestroyObject(WorldObject o)
 	{
-		NativeFunction.CallNativeFunction("DestroyObject", typeof(DestroyObjectDelegate), new object[] { o.NativeObject });
+		NativeFunction.CallNativeFunction("DestroyObject", typeof(DestroyObjectDelegate), new object[] { o.NativePtr });
 		return;
 	}
 

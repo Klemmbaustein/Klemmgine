@@ -30,10 +30,10 @@ public class CameraComponent : ObjectComponent
 
 		if (!NativePtr.Equals(new IntPtr()))
 		{
-			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativeObject });
+			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
 		}
 
-		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewCameraComponent", typeof(NewCamera), new object[] { 60, Parent.NativeObject });
+		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewCameraComponent", typeof(NewCamera), new object[] { 60, Parent.NativePtr });
 	}
 
 	public override void Tick()
@@ -42,7 +42,7 @@ public class CameraComponent : ObjectComponent
 
 	public override void Destroy()
 	{
-		NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativeObject });
+		NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
 		NativePtr = new IntPtr();
 	}
 }

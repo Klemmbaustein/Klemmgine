@@ -332,7 +332,7 @@ bool CSharp::IsAssemblyLoaded()
 
 void CSharp::CSharpLog(std::string Msg, CSharpLogType Type, CSharpLogSev Severity)
 {
-	Log::Print("[C#]: [" + CSharpLogTypes[Type] + "]: " + Msg, CSharpLogColors[Severity]);
+	Log::PrintMultiLine(Msg, CSharpLogColors[Severity], "[C#]: [" + CSharpLogTypes[Type] + "]: ");
 }
 
 void CSharp::RegisterNativeFunction(std::string Name, void* Function)

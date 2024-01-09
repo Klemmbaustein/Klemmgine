@@ -113,6 +113,18 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 		case Type::Int:
 			NewElement = GenerateTextField(Value, -1);
 			break;
+		case Type::Bool:
+			NewElement = new UIButton(UIBox::Orientation::Horizontal, 0, 0.75f, this, -1);
+			NewElement->SetSizeMode(UIBox::SizeMode::PixelRelative);
+			NewElement->SetMinSize(0.04f);
+			NewElement->SetBorder(UIBox::BorderType::Rounded, 0.3f);
+			NewElement->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
+			if (Value == "True")
+			{
+				((UIButton*)NewElement)->SetUseTexture(true, Application::EditorInstance->Textures[16]);
+			}
+
+			break;
 		default:
 			break;
 		}
@@ -353,6 +365,12 @@ void ContextMenu::OnButtonClicked(int Index)
 					case Type::Vector3Color:
 					case Type::Vector3Rotation:
 						obj->SetProperty(Element.Name, ((UIVectorField*)ContextButtons[i])->GetValue().ToString());
+						break;
+					case Type::Bool:
+						if (((UIButton*)ContextButtons[i])->GetIsHovered())
+						{
+							obj->SetProperty(Element.Name, obj->GetProperty(Element.Name) == "True" ? "False" : "True");
+						}
 						break;
 					default:
 						break;

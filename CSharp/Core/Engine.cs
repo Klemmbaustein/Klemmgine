@@ -66,7 +66,7 @@ static class Engine
 	{
 		foreach (var i in WorldObjects)
 		{
-			if ((IntPtr)Get(i.Value, "NativeObject")! == Ptr)
+			if ((IntPtr)Get(i.Value, "NativePtr")! == Ptr)
 			{
 				return i.Value;
 			}
@@ -140,7 +140,7 @@ static class Engine
 				{
 					HashCode = -1;
 				}
-				Set(ref NewObject!, "NativeObject", NativeObject);
+				Set(ref NewObject!, "NativePtr", NativeObject);
 
 				WorldObjects.Add(HashCode, NewObject);
 				SetVectorFieldOfObject(HashCode, "Position", t.Position);
@@ -183,6 +183,18 @@ static class Engine
 		return null;
 	}
 
+	public static object? SafeInvokeMethod(MethodInfo Method, object? TargetObject, object?[]? args)
+	{
+		try
+		{
+			return Method.Invoke(TargetObject, args);
+		}
+		catch (Exception e)
+		{
+			EngineLog.Print(e.InnerException!.ToString(), 2);
+			return null;
+		}
+	}
 
 	public static void ExecuteFunctionOnObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string FunctionName)
 	{
@@ -198,7 +210,7 @@ static class Engine
 			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name));
 			return;
 		}
-		func.Invoke(obj, []);
+		SafeInvokeMethod(func, obj, null);
 	}
 
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
@@ -216,7 +228,7 @@ static class Engine
 			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name));
 			return "";
 		}
-		return (string)func.Invoke(obj, [])!;
+		return (string)SafeInvokeMethod(func, obj, [])!;
 	}
 
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
@@ -254,21 +266,21 @@ static class Engine
 	{
 		if (!WorldObjects.TryGetValue(ID, out object? value))
 		{
-			EngineLog.Print(string.Format("Tried set the field {0} on the object with ID {1} but that object doesn't exist!", PropertyName, ID));
+			EngineLog.Print(string.Format("Tried set the field {0} on the object with ID {1} but that object doesn't exist!", PropertyName, ID), 1);
 			return;
 		}
 		var obj = value;
 		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
 		if (field == null)
 		{
-			EngineLog.Print(string.Format("Tried to set the field {0} on {1} but that field doesn't exist on this class!", PropertyName, obj.GetType().Name));
+			EngineLog.Print(string.Format("Tried to set the field {0} on {1} but that field doesn't exist on this class!", PropertyName, obj.GetType().Name), 1);
 			return;
 		}
 
 		if (field.FieldType.IsArray)
 		{
 			return;
-			string[] entries = PropertyValue.Split(new string[] { "\r" }, StringSplitOptions.None).Select(x => x).ToArray();
+			/*string[] entries = PropertyValue.Split(new string[] { "\r" }, StringSplitOptions.None).Select(x => x).ToArray();
 
 			if (entries.Last().Length == 0)
 			{
@@ -313,7 +325,7 @@ static class Engine
 				}
 			}
 			EngineLog.Print(destinationArray.Length.ToString());
-			return;
+			return;*/
 		}
 
 		switch (field.FieldType.ToString())
@@ -342,8 +354,11 @@ static class Engine
 				Set(ref vec, "Z", newPosCoordinates[2]);
 				field.SetValue(obj, vec);
 				break;
+			case "System.Boolean":
+				field.SetValue(obj, PropertyValue == "True");
+				break;
 			default:
-				EngineLog.Print("Unknown type: " + field.FieldType.ToString());
+				EngineLog.Print("Unknown type: " + field.FieldType.ToString(), 2);
 				break;
 		}
 	}
@@ -403,7 +418,7 @@ static class Engine
 	public static void SetDelta(float NewDelta)
 	{
 		StatsObject!.GetField("DeltaTime")?.SetValue(null, NewDelta);
-		InputObject!.GetMethod("UpdateGamepadList")?.Invoke(null, null);
+		SafeInvokeMethod(InputObject!.GetMethod("UpdateGamepadList")!, null, null);
 	}
 
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
@@ -440,7 +455,7 @@ static class Engine
 			EngineLog.Print("Failed to load Project.GetStartupScene()", 2);
 			return "";
 		}
-		return (string)StartupScene.Invoke(null, null)!;
+		return (string)SafeInvokeMethod(StartupScene, null, null)!;
 	}
 
 	public static void OnLaunchInternally()
@@ -457,7 +472,7 @@ static class Engine
 			EngineLog.Print("Failed to load Project.OnLaunch()", 2);
 			return;
 		}
-		OnLaunch.Invoke(null, null);
+		SafeInvokeMethod(OnLaunch, null, null);
 		return;
 	}
 
@@ -475,7 +490,7 @@ static class Engine
 			EngineLog.Print("Failed to load Project.GetProjectName()", 2);
 			return "";
 		}
-		return (string)GetProjectName.Invoke(null, null)!;
+		return (string)SafeInvokeMethod(GetProjectName, null, null)!;
 	}
 
 }
