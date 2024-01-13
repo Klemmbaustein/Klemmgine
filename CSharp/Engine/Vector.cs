@@ -201,10 +201,10 @@ public struct Transform
 		Rotation = new Vector3();
 		Scale = new Vector3(1);
 	}
-	public Transform(Vector3 x, Vector3 y, Vector3 z)
+	public Transform(Vector3 position, Vector3 rotation, Vector3 scale)
 	{
-		Position = x;
-		Rotation = y;
-		Scale = z;
+		Position = position;
+		Rotation = rotation;
+		Scale = scale;
 	}
 }

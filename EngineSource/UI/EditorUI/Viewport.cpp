@@ -111,6 +111,7 @@ void Viewport::OnItemDropped(DroppedItem Item)
 	{
 		auto Obj = Objects::SpawnObject<MeshObject>(Transform(Point, 0, 1));
 		Obj->LoadFromFile(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
+		Obj->Name = FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path);
 		Obj->IsSelected = true;
 	}
 

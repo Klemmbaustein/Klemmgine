@@ -2,6 +2,7 @@
 #include "ClassesBrowser.h"
 #include <CSharp/CSharpInterop.h>
 #include <Objects/CSharpObject.h>
+#include <UI/EditorUI/Popups/ClassCreator.h>
 #include <UI/EditorUI/EditorUI.h>
 
 std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::CPPClasses;
@@ -111,9 +112,23 @@ std::string ClassesBrowser::GetCurrentCPPPathString()
 	return PathString;
 }
 
+
 void ClassesBrowser::UpdateClasses()
 {
 	CPPClasses = GetEditorUIClasses();
+
+	std::vector<EditorClassesItem> CurrentItems = CPPClasses;
+	for (size_t i : CPPPath)
+	{
+		std::cout << CurrentItems.size() << " : " << i << std::endl;
+		if (CurrentItems.size() <= i)
+		{
+			CPPPath.clear();
+			break;
+		}
+		CurrentItems = CurrentItems[i].SubItems;
+	}
+	OnPathChanged();
 }
 
 std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetContentsOfCurrentCPPFolder()
@@ -141,6 +156,13 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetContentsOfCurr
 
 ClassesBrowser::ClassesBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Classes")
 {
+	DefaultDropdown =
+	{
+		EditorUI::DropdownItem("New C# class", []()
+			{
+				new ClassCreator();
+			}, true)
+	};
 	Path = GetCurrentCPPPathString();
 	UpdateClasses();
 	OnPathChanged();
