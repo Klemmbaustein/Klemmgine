@@ -74,9 +74,14 @@ void Packet::EvaluatePacket()
 
 		for (auto& i : Values)
 		{
+			size_t Equals = i.find_first_of("=");
+			if (Equals == std::string::npos)
+			{
+				break;
+			}
 			Client::HandleValueUpdate(ObjID,
-				i.substr(0, i.find_first_of("=")),
-				i.substr(i.find_first_of("=") + 1), true);
+				i.substr(0, Equals),
+				i.substr(Equals + 1), true);
 		}
 		break;
 	}

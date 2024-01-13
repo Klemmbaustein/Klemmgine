@@ -200,14 +200,14 @@ static class Engine
 	{
 		if (!WorldObjects.TryGetValue(ID, out object? value))
 		{
-			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID));
+			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID), 1);
 			return;
 		}
 		var obj = value;
-		var func = obj.GetType().GetMethod(FunctionName);
+		var func = obj.GetType().GetMethod(FunctionName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 		if (func == null)
 		{
-			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name));
+			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name), 1);
 			return;
 		}
 		SafeInvokeMethod(func, obj, null);
@@ -218,14 +218,14 @@ static class Engine
 	{
 		if (!WorldObjects.TryGetValue(ID, out object? value))
 		{
-			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID));
+			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID), 1);
 			return "";
 		}
 		var obj = value;
-		var func = obj.GetType().GetMethod(FunctionName);
+		var func = obj.GetType().GetMethod(FunctionName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 		if (func == null)
 		{
-			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name));
+			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name), 1);
 			return "";
 		}
 		return (string)SafeInvokeMethod(func, obj, [])!;

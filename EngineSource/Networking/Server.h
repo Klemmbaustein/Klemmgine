@@ -17,9 +17,13 @@ namespace Server
 		void SendServerTravelRequest(std::string SceneName) const;
 	};
 
-	// Function called when a 'ConnectionRequest' packet has been received.
-	// params: 
-	//   p - The packet that caused the ConnectionRequest
+	/**
+	* @brief
+	* Function called when a 'ConnectionRequest' packet has been received.
+	* 
+	* @param p 
+	* The packet that caused the ConnectionRequest
+	*/
 	void OnConnectRequestReceived(Packet p);
 	void DisconnectPlayer(void* IP);
 	void DisconnectPlayer(uint64_t UID);

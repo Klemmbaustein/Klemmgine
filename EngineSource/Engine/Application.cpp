@@ -861,7 +861,6 @@ static void ApplicationLoop()
 	Performance::DeltaTime *= Performance::TimeMultiplier;
 	Performance::FPS = 1 / Performance::DeltaTime;
 	Performance::DeltaTime = std::min(Performance::DeltaTime, 0.1f);
-	Stats::Time += Performance::DeltaTime;
 	Performance::DrawCalls = 0u;
 
 #if EDITOR
@@ -871,10 +870,15 @@ static void ApplicationLoop()
 	}
 #endif
 #if SERVER
-	SDL_Delay((Uint32)(1000.0f
-		* std::max(1.0f / (float)Networking::GetTickRate() - Performance::DeltaTime,
-			0.0f)));
+	if (Networking::GetTickRate() > Performance::DeltaTime)
+	{
+		SDL_Delay((Uint32)(1000.0f
+			* 1.0f / (float)Networking::GetTickRate() - Performance::DeltaTime));
+	}
+
+	Performance::DeltaTime = std::max(Performance::DeltaTime, 1.0f / (float)Networking::GetTickRate());
 #endif
+	Stats::Time += Performance::DeltaTime;
 }
 
 int Application::Initialize(int argc, char** argv)

@@ -1,6 +1,7 @@
 ﻿using Engine;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -18,25 +19,6 @@ namespace Engine;
 
 /**
  * @brief
- * An Attribute that adds the field to the "Objects" menu.
- * 
- */
-[AttributeUsage(AttributeTargets.Field)]
-public class EditorProperty : Attribute
-{
-	public EditorProperty()
-	{
-		Category = "C#";
-	}
-	public EditorProperty(string Category)
-	{
-		this.Category = Category;
-	}
-	public string Category;
-}
-
-/**
- * @brief
  * C# class representing an object.
  * 
  * C++ equivalent: WorldObject class.
@@ -46,6 +28,27 @@ public class EditorProperty : Attribute
  */
 public abstract class WorldObject
 {
+	/**
+	 * @brief
+	 * An Attribute that adds the field to the "Objects" menu.
+	 * 
+	 * @ingroup CSharp-Objects
+	 */
+	[AttributeUsage(AttributeTargets.Field)]
+	public class EditorProperty : Attribute
+	{
+		public EditorProperty()
+		{
+			Category = "";
+		}
+		public EditorProperty(string Category)
+		{
+			this.Category = Category;
+		}
+		public string Category;
+	}
+
+
 	public IntPtr NativePtr = new();
 
 	private delegate void SetObjNameDelegate(IntPtr ObjPtr, [MarshalAs(UnmanagedType.LPUTF8Str)] string NewName);
@@ -77,7 +80,14 @@ public abstract class WorldObject
 
 			var attr = i.GetCustomAttribute<EditorProperty>()!;
 
-			PropertyString += i.FieldType.Name + " " + attr.Category + ":" + i.Name + ";";
+			if (attr.Category.Length > 0)
+			{
+				PropertyString += i.FieldType.Name + " " + attr.Category + ":" + i.Name + ";";
+			}
+			else
+			{
+				PropertyString += i.FieldType.Name + " " + GetType().Name + ":" + i.Name + ";";
+			}
 		}
 
 		return PropertyString;
@@ -85,7 +95,7 @@ public abstract class WorldObject
 
 	/**
 	 * @brief
-	 * Returns a C# object corrisponding with the given native object.
+	 * Returns a C# object corrisponding to the given native object.
 	 * 
 	 * If no object has been found, a new Engine.NativePtr is created from the given pointer.
 	 */

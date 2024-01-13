@@ -52,6 +52,11 @@ std::vector<std::string> StrUtil::SeperateString(std::string Value, char Sep)
 		size_t PrevLast = Last == 0 ? Last : Last + 1;
 		Last = Value.find_first_of(Sep, PrevLast);
 		Values.push_back(Value.substr(PrevLast, Last - PrevLast));
+
+		if (Last == PrevLast && Last == 0)
+		{
+			break;
+		}
 	} while (Last != std::string::npos);
 
 	if (!Values.empty() && Values[Values.size() - 1].empty())
