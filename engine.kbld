@@ -14,21 +14,25 @@
 #endif
 
 #if Generator
-  "defaultProject": "ProjectGenerator",
+  "defaultTarget": "ProjectGenerator",
 #else
-  "defaultProject": NAME,
+  "defaultTarget": NAME,
 #endif
-
-  "projects": [
+  "targets": [
     {
-      "dependencies": "BuildTool",
+      "name": "RunBuildTool",
+      "type": "command",
+#if MSVC_WINDOWS
+      "command": "Tools\\bin\\BuildTool.exe in=EngineSource/Objects out=Tools/BuildTool/Output",
+#else
+      "command": "Tools/bin/BuildTool in=EngineSource/Objects out=Tools/BuildTool/Output",
+#endif
+      "dependencies": [ "BuildTool" ]
+    },
+    {
+      "dependencies": [ "RunBuildTool" ],
       "name": NAME,
       "outputPath": "lib/",
-#if MSVC_WINDOWS
-      "preBuildCommand": "Tools\\bin\\BuildTool.exe in=EngineSource/Objects out=Tools/BuildTool/Output",
-#else
-      "preBuildCommand": "Tools/bin/BuildTool in=EngineSource/Objects out=Tools/BuildTool/Output",
-#endif
       "sources": [
         "EngineSource/*.cpp"
       ],
@@ -59,8 +63,8 @@
         "ENGINE_CSHARP",
         "GLEW_STATIC"
       ],
-      "type": "staticLib",
-      "optimization": "fast"
+      "configuration": "staticLibrary",
+      "optimization": "fastest"
     },
     {
       "name": "BuildTool",

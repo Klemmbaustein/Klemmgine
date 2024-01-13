@@ -77,7 +77,6 @@ jobs:
           sudo apt-get install libsdl2-dev
           sudo apt-get install libglew-dev
           sudo apt-get install libopenal-dev
-          sudo apt-get install doxygen
           cd Dependencies
           git clone https://github.com/Klemmbaustein/KlemmBuild.git --recurse-submodules
           cd KlemmBuild
@@ -90,6 +89,12 @@ jobs:
           cd ../../assimp/
           cmake CMakeLists.txt
           make
+    - name: install doxygen
+      run: |
+        wget https://www.doxygen.nl/files/doxygen-1.10.0.linux.bin.tar.gz
+        tar -xf doxygen-1.10.0.linux.bin.tar.gz
+        cd doxygen-1.10.0
+        sudo make
     - name: build
       run: |
           KlemmBuild engine.kbld -DGenerator -DCiBuild
