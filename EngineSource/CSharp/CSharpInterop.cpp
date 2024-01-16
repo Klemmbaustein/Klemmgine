@@ -74,6 +74,9 @@ namespace CSharp
 		Log::LogColor::Red
 	};
 	void* ExecuteOnObjectFunction = nullptr;
+	void* ExecuteStringOnObjectFunction = nullptr;
+	void* GetPropertyFunction = nullptr;
+	void* SetPropertyFunction = nullptr;
 	void* InstantiateFunction = nullptr;
 	void* DestroyFunction = nullptr;
 	void* GetPosFunction = nullptr;
@@ -258,19 +261,22 @@ void CSharp::Init()
 		Console::ExecuteConsoleCommand("makecsproj");
 	}
 #endif
-	CSharp::LoadRuntime();
-	void* LogRegister = CSharp::LoadCSharpFunction("LoadLogFunction", "EngineLog", "LoadFunctionDelegate");
+	LoadRuntime();
+	void* LogRegister = LoadCSharpFunction("LoadLogFunction", "EngineLog", "LoadFunctionDelegate");
 
-	CSharp::StaticCall<void, void*>(LogRegister, (void*)CSharpInternalPrint);
+	StaticCall<void, void*>(LogRegister, (void*)CSharpInternalPrint);
 
-	ExecuteOnObjectFunction = CSharp::LoadCSharpFunction("ExecuteFunctionOnObject", "Engine", "ExecuteOnDelegate");
-	InstantiateFunction = CSharp::LoadCSharpFunction("Instantiate", "Engine", "InstantiateDelegate");
-	GetPosFunction = CSharp::LoadCSharpFunction("GetVectorFieldOfObject", "Engine", "GetVectorDelegate");
-	SetPosFunction = CSharp::LoadCSharpFunction("SetVectorFieldOfObject", "Engine", "SetVectorDelegate");
-	DestroyFunction = CSharp::LoadCSharpFunction("Destroy", "Engine", "VoidInt32InDelegate");
-	SetDeltaFunction = CSharp::LoadCSharpFunction("SetDelta", "Engine", "VoidFloatInDelegate");
-	RegisterNativeFunctionPtr = CSharp::LoadCSharpFunction("RegisterNativeFunction", "CoreNativeFunction", "LoadNativeFunctionDelegate");
-	GetAllClassesPtr = CSharp::LoadCSharpFunction("GetAllObjectTypes", "Engine", "StringDelegate");
+	GetPropertyFunction = LoadCSharpFunction("GetObjectPropertyString", "Engine", "ExecuteOnStringDelegate");
+	SetPropertyFunction = LoadCSharpFunction("SetObjectPropertyString", "Engine", "SetPropertyDelegate");
+	ExecuteOnObjectFunction = LoadCSharpFunction("ExecuteFunctionOnObject", "Engine", "ExecuteOnDelegate");
+	ExecuteStringOnObjectFunction = LoadCSharpFunction("ExecuteStringFunctionOnObject", "Engine", "ExecuteOnStringDelegate");
+	InstantiateFunction = LoadCSharpFunction("Instantiate", "Engine", "InstantiateDelegate");
+	GetPosFunction = LoadCSharpFunction("GetVectorFieldOfObject", "Engine", "GetVectorDelegate");
+	SetPosFunction = LoadCSharpFunction("SetVectorFieldOfObject", "Engine", "SetVectorDelegate");
+	DestroyFunction = LoadCSharpFunction("Destroy", "Engine", "VoidInt32InDelegate");
+	SetDeltaFunction = LoadCSharpFunction("SetDelta", "Engine", "VoidFloatInDelegate");
+	RegisterNativeFunctionPtr = LoadCSharpFunction("RegisterNativeFunction", "CoreNativeFunction", "LoadNativeFunctionDelegate");
+	GetAllClassesPtr = LoadCSharpFunction("GetAllObjectTypes", "Engine", "StringDelegate");
 
 	LoadAssembly();
 	NativeFunctions::RegisterNativeFunctions();
@@ -282,6 +288,7 @@ void CSharp::RunPerFrameLogic()
 	{
 		return;
 	}
+
 	CSharp::StaticCall<void, float>(SetDeltaFunction, Performance::DeltaTime);
 }
 
@@ -325,27 +332,42 @@ bool CSharp::IsAssemblyLoaded()
 
 void CSharp::CSharpLog(std::string Msg, CSharpLogType Type, CSharpLogSev Severity)
 {
-	Log::Print("[C#]: [" + CSharpLogTypes[Type] + "]: " + Msg, CSharpLogColors[Severity]);
+	Log::PrintMultiLine(Msg, CSharpLogColors[Severity], "[C#]: [" + CSharpLogTypes[Type] + "]: ");
 }
 
 void CSharp::RegisterNativeFunction(std::string Name, void* Function)
 {
-	CSharp::StaticCall<void, const char*, void*>(RegisterNativeFunctionPtr, Name.c_str(), Function);
+	StaticCall<void, const char*, void*>(RegisterNativeFunctionPtr, Name.c_str(), Function);
 }
 
 void CSharp::ExectuteFunctionOnObject(CSharpWorldObject Object, std::string FunctionName)
 {
-	CSharp::StaticCall<void, int32_t, const char*>(ExecuteOnObjectFunction, Object.ID, FunctionName.c_str());
+	StaticCall<void, int32_t, const char*>(ExecuteOnObjectFunction, Object.ID, FunctionName.c_str());
+}
+
+std::string CSharp::ExectuteStringFunctionOnObject(CSharpWorldObject Object, std::string FunctionName)
+{
+	return StaticCall<const char*, int32_t, const char*>(ExecuteStringOnObjectFunction, Object.ID, FunctionName.c_str());
+}
+
+std::string CSharp::GetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName)
+{
+	return StaticCall<const char*, int32_t, const char*>(GetPropertyFunction, Object.ID,  FunctionName.c_str());
+}
+
+void CSharp::SetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName, std::string Value)
+{
+	return StaticCall<void, int32_t, const char*, const char*>(SetPropertyFunction, Object.ID, FunctionName.c_str(), Value.c_str());
 }
 
 Vector3 CSharp::GetObjectVectorField(CSharpWorldObject Obj, std::string Field)
 {
-	return CSharp::StaticCall<Vector3, int32_t, const char*>(GetPosFunction, Obj.ID, Field.c_str());
+	return StaticCall<Vector3, int32_t, const char*>(GetPosFunction, Obj.ID, Field.c_str());
 }
 
 void CSharp::SetObjectVectorField(CSharpWorldObject Obj, std::string Field, Vector3 Value)
 {
-	return CSharp::StaticCall<void, int32_t, const char*, Vector3>(SetPosFunction, Obj.ID, Field.c_str(), Value);
+	return StaticCall<void, int32_t, const char*, Vector3>(SetPosFunction, Obj.ID, Field.c_str(), Value);
 }
 
 std::string CSharp::GetNetVersion()
@@ -363,7 +385,7 @@ void CSharp::ReloadCSharpAssembly()
 	NativeFunctions::RegisterNativeFunctions();
 	for (auto i : Objects::GetAllObjectsWithID(CSharpObject::GetID()))
 	{
-		dynamic_cast<CSharpObject*>(i)->Reload();
+		dynamic_cast<CSharpObject*>(i)->Reload(false);
 	}
 }
 
@@ -475,16 +497,16 @@ void CSharp::LoadAssembly()
 		return;
 	}
 
-	std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCsharp.dll",
-		"bin/KlemmgineCsharp.dll",
+	std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCSharp.dll",
+		"bin/KlemmgineCSharp.dll",
 		std::filesystem::copy_options::update_existing);
 
 	StaticCall<void, const char*, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
-		AssemblyPath.c_str(), "bin/KlemmgineCsharp.dll", IsInEditor);
+		AssemblyPath.c_str(), "bin/KlemmgineCSharp.dll", IsInEditor);
 #else
 	StaticCall<void, const char*, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
 		(std::filesystem::current_path().string() + "/bin/CSharp/CSharpAssembly.dll").c_str(),
-		(std::filesystem::current_path().string() + "/bin/CSharp/Engine/KlemmgineCsharp.dll").c_str(),
+		(std::filesystem::current_path().string() + "/bin/CSharp/Engine/KlemmgineCSharp.dll").c_str(),
 		IsInEditor);
 #endif
 

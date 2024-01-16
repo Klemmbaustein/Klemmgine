@@ -21,6 +21,8 @@
 #include <Objects/MeshObject.h>
 #include <Objects/CSharpObject.h>
 #include "ContextMenu.h"
+#include <Objects/ParticleObject.h>
+#include <Objects/SoundObject.h>
 
 Viewport* Viewport::ViewportInstance = nullptr;
 
@@ -109,12 +111,27 @@ void Viewport::OnItemDropped(DroppedItem Item)
 	{
 		auto Obj = Objects::SpawnObject<MeshObject>(Transform(Point, 0, 1));
 		Obj->LoadFromFile(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
+		Obj->Name = FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path);
+		Obj->IsSelected = true;
+	}
+
+	if (Ext == "jspart")
+	{
+		auto Obj = Objects::SpawnObject<ParticleObject>(Transform(Point, 0, 1));
+		Obj->LoadParticle(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
 		Obj->IsSelected = true;
 	}
 
 	if (Ext == "jscn")
 	{
 		EditorUI::OpenScene(Item.Path);
+	}
+
+	if (Ext == "wav")
+	{
+		auto Obj = Objects::SpawnObject<SoundObject>(Transform(Point, 0, 1));
+		Obj->LoadSound(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
+		Obj->IsSelected = true;
 	}
 }
 
@@ -202,6 +219,8 @@ void Viewport::Tick()
 		}
 	}
 
+	SetName(ChangedScene ? "Viewport*" : "Viewport");
+
 	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Position + (Scale * 0.5));
 	Vector3 Rotation = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
@@ -230,7 +249,7 @@ void Viewport::Tick()
 			for (WorldObject* i : EditorUI::SelectedObjects)
 			{
 				WorldObject* o = Objects::SpawnObjectFromID(i->GetObjectDescription().ID, i->GetTransform());
-				o->SetName(i->GetName());
+				o->Name = i->Name;
 				o->Deserialize(i->Serialize());
 				o->LoadProperties(i->GetPropertiesAsString());
 				o->OnPropertySet();
@@ -387,7 +406,6 @@ void Viewport::Tick()
 			-100000.0f, 100000.0f,
 			-100000.0f, 100000.0f
 		);
-
 		Vector3 BoxScale = 1;
 		int Prev = -1;
 		Vector3 Forward = Vector3::GetForwardVector(Graphics::MainCamera->Rotation);
@@ -401,8 +419,8 @@ void Viewport::Tick()
 				}
 				else
 				{
-					BoxScale.at(i) = Forward.at(Prev) > Forward.at(i) ? 0.0f : 1.0f;
-					BoxScale.at(Prev) = Forward.at(Prev) > Forward.at(i) ? 1.0f : 0.0f;
+					BoxScale.at(i) = std::abs(Forward.at(Prev)) > std::abs(Forward.at(i)) ? 1.0f : 0.0f;
+					BoxScale.at(Prev) = std::abs(Forward.at(Prev)) > std::abs(Forward.at(i)) ? 0.0f : 1.0f;
 				}
 			}
 		}

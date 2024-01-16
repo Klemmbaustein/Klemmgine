@@ -8,7 +8,7 @@ class MeshObject;
 
 /**
 * @brief
-* A simple struct describing a WorldObject Type.
+* A simple struct describing a WorldObject type.
 */
 struct ObjectDescription
 {
@@ -136,12 +136,16 @@ public:
 		}
 
 		std::string Name;
+		std::string ValueString;
 		Type::TypeEnum Type;
 		void* Data;
 		enum class PropertyType
 		{
 			EditorProperty,
-			NetProperty
+			NetProperty,
+#if ENGINE_CSHARP
+			CSharpProperty
+#endif
 		};
 		enum class NetOwner
 		{
@@ -149,7 +153,7 @@ public:
 			Server
 		};
 
-		std::string ValueToString();
+		std::string ValueToString(WorldObject* Context);
 
 		NetOwner PropertyOwner = NetOwner::Server;
 
@@ -211,8 +215,7 @@ public:
 	void SetTransform(Transform NewTransform);
 	Transform& GetTransform();
 	int Attach(Component* NewComponent);
-	void SetName(std::string Name);
-	std::string GetName();
+	std::string Name = "Object";
 
 	/**
 	 * @brief
@@ -276,7 +279,6 @@ protected:
 	std::string TypeName;
 	uint32_t TypeID = 0;
 	std::vector<Component*> Components;
-	std::string Name = "Object";
 	friend EditorUI;
 	friend class ContextMenu;
 	Transform ObjectTransform;

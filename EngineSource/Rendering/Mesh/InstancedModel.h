@@ -19,10 +19,10 @@ public:
 	void ConfigureVAO();
 	void LoadMaterials(std::vector<std::string> Materials);
 	std::vector<Transform> Instances;
+	std::vector<InstancedMesh*> Meshes;
 protected:
 	ModelGenerator::ModelData ModelData;
 	unsigned int MatBuffer = -1;
-	std::vector<InstancedMesh*> Meshes;
 	glm::mat4 ModelViewProjection = glm::mat4();
 	Collision::Box NonScaledSize;
 };

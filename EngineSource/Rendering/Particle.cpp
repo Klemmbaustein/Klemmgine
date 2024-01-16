@@ -283,6 +283,7 @@ void Particles::ParticleEmitter::Update(Camera* MainCamera)
 				if (i == j)
 				{
 					ParticleInstances[elem].erase(ParticleInstances[elem].begin() + it);
+					break;
 				}
 				it++;
 			}

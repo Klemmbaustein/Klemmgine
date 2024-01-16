@@ -10,7 +10,7 @@ public class MoveComponent : ObjectComponent
 	public override void OnAttached()
 	{
 		base.OnAttached();
-		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewMoveComponent", typeof(NewMovement), new object[] { Parent.NativeObject });
+		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewMoveComponent", typeof(NewMovement), new object[] { Parent.NativePtr });
 	}
 
 	public override void Tick()
@@ -38,7 +38,7 @@ public class MoveComponent : ObjectComponent
 	{
 		if (NativePtr != new IntPtr())
 		{
-			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativeObject });
+			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
 		}
 		NativePtr = new IntPtr();
 	}

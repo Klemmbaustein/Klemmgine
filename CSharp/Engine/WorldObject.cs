@@ -1,6 +1,9 @@
 ﻿using Engine;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 #nullable enable
 
@@ -25,7 +28,33 @@ namespace Engine;
  */
 public abstract class WorldObject
 {
-	public IntPtr NativeObject = new();
+	/**
+	 * @brief
+	 * An Attribute that adds the field to the "Objects" menu.
+	 * 
+	 * @ingroup CSharp-Objects
+	 */
+	[AttributeUsage(AttributeTargets.Field)]
+	public class EditorProperty : Attribute
+	{
+		public EditorProperty()
+		{
+			Category = "";
+		}
+		public EditorProperty(string Category)
+		{
+			this.Category = Category;
+		}
+		public string Category;
+	}
+
+
+	public IntPtr NativePtr = new();
+
+	private delegate void SetObjNameDelegate(IntPtr ObjPtr, [MarshalAs(UnmanagedType.LPUTF8Str)] string NewName);
+
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	private delegate string GetObjNameDelegate(IntPtr ObjPtr);
 
 	private delegate Int32 NewCSObjectDelegate(string TypeName, Transform t);
 	private delegate Int32 DestroyObjectDelegate(IntPtr ObjPtr);
@@ -33,7 +62,67 @@ public abstract class WorldObject
 	private delegate Transform GetTransformDelegate(IntPtr NativeObjectPtr);
 
 	private static Delegate? GetCSObjectDelegate;
+	private static Delegate? GetCSObjectByPtrDelegate;
 
+	private static readonly Dictionary<IntPtr, WorldObject> Objects = [];
+
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	public string GetEditorProperties()
+	{
+		var ObjectType = GetType();
+		string PropertyString = "";
+		foreach (var i in ObjectType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+		{
+			if (!i.IsDefined(typeof(EditorProperty)))
+			{
+				continue;
+			}
+
+			var attr = i.GetCustomAttribute<EditorProperty>()!;
+
+			if (attr.Category.Length > 0)
+			{
+				PropertyString += i.FieldType.Name + " " + attr.Category + ":" + i.Name + ";";
+			}
+			else
+			{
+				PropertyString += i.FieldType.Name + " " + GetType().Name + ":" + i.Name + ";";
+			}
+		}
+
+		return PropertyString;
+	}
+
+	/**
+	 * @brief
+	 * Returns a C# object corrisponding to the given native object.
+	 * 
+	 * If no object has been found, a new Engine.NativePtr is created from the given pointer.
+	 */
+	public static WorldObject? GetObjectFromNativePointer(IntPtr Pointer)
+	{
+		WorldObject? ManagedObject = (WorldObject?)GetCSObjectByPtrDelegate?.DynamicInvoke(Pointer);
+		if (ManagedObject != null)
+		{
+			return ManagedObject;
+		}
+
+		var NewObject = new NativeObject();
+		NewObject.LoadFromPtr(Pointer);
+		return NewObject;
+	}
+
+	/**
+	 * @brief
+	 * Returns the type of this object's the native object.
+	 * 
+	 * If this is a managed object, this will always be "CSharpObject".
+	 * If this object has the type Engine.NativePtr, this will be the name of the class this object represents.
+	 */
+	public string GetNativeTypeName()
+	{
+		return (string)NativeFunction.CallNativeFunction("GetTypeNameOfObject", typeof(GetObjNameDelegate), new object[] { NativePtr })!;
+	}
 
 	/**
 	 * @brief
@@ -65,6 +154,25 @@ public abstract class WorldObject
 		}
 		return (WorldObject)objRef;
 	}
+
+	/**
+	 * @brief
+	 * Sets the name of the object.
+	 */
+	public void SetName(string NewName)
+	{
+		NativeFunction.CallNativeFunction("SetObjectName", typeof(SetObjNameDelegate), new object[] { NativePtr, NewName });
+	}
+
+	/**
+	 * @brief
+	 * Gets the name of the object.
+	 */
+	public string GetName()
+	{
+		return (string)NativeFunction.CallNativeFunction("GetObjectName", typeof(GetObjNameDelegate), new object[] { NativePtr })!;
+	}
+
 
 	/**
 	 * @brief
@@ -132,7 +240,7 @@ public abstract class WorldObject
 	 */
 	public Transform GetTransform()
 	{
-		return (Transform)NativeFunction.CallNativeFunction("GetObjectTransform", typeof(GetTransformDelegate), new object[] { NativeObject })!;
+		return (Transform)NativeFunction.CallNativeFunction("GetObjectTransform", typeof(GetTransformDelegate), new object[] { NativePtr })!;
 	}
 	/**
 	 * @brief
@@ -140,7 +248,7 @@ public abstract class WorldObject
 	 */
 	public void SetTransform(Transform NewTransform)
 	{
-		NativeFunction.CallNativeFunction("SetObjectTransform", typeof(SetTransformDelegate), new object[] { NewTransform, NativeObject });
+		NativeFunction.CallNativeFunction("SetObjectTransform", typeof(SetTransformDelegate), new object[] { NewTransform, NativePtr });
 	}
 
 	readonly List<ObjectComponent> AttachedComponents = [];
@@ -154,13 +262,14 @@ public abstract class WorldObject
 	 */
 	public static void DestroyObject(WorldObject o)
 	{
-		NativeFunction.CallNativeFunction("DestroyObject", typeof(DestroyObjectDelegate), new object[] { o.NativeObject });
+		NativeFunction.CallNativeFunction("DestroyObject", typeof(DestroyObjectDelegate), new object[] { o.NativePtr });
 		return;
 	}
 
-	public static void LoadGetObjectFunction(Delegate Func)
+	public static void LoadGetObjectFunctions(Delegate GetCSObjByID, Delegate GetCSObjByPtr)
 	{
-		GetCSObjectDelegate = Func;
+		GetCSObjectDelegate = GetCSObjByID;
+		GetCSObjectByPtrDelegate = GetCSObjByPtr;
 	}
 
 	/**

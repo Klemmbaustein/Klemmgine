@@ -58,13 +58,13 @@ AboutWindow::AboutWindow()
 			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), EditorUI::Text))
 				->SetPadding(0.005f))
 #else
-			->AddChild((new UIText(0.4f, UIColors[2], "  C#: No", EditorUI::Text))
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  C#: No", EditorUI::Text))
 				->SetPadding(0.005f))
 #endif
 #if ENGINE_NO_SOURCE
-			->AddChild((new UIText(0.4f, UIColors[2], "  With pre-built binaries", EditorUI::Text))
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  With pre-built binaries", EditorUI::Text))
 				->SetPadding(0.005f))
-			->AddChild((new UIText(0.4f, UIColors[2], "  Build date: " 
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  Build date: "
 				+ std::string(__DATE__)
 				+ " - "
 				+ std::string(__TIME__), EditorUI::Text))
@@ -91,7 +91,7 @@ AboutWindow::AboutWindow()
 		{
 			ButtonsBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, ButtonIndex++))
 				->SetBorder(UIBox::BorderType::Rounded, 0.2f)
-				->AddChild((new UIText(0.4f, EditorUI::UIColors[1], entry.first, EditorUI::Text))
+				->AddChild((new UIText(0.4f, 1 - EditorUI::UIColors[2], entry.first, EditorUI::Text))
 					->SetPadding(0.005f))
 				->SetPadding(0.005f, 0.005f, i.second.empty() ? 0.005f : 0.02f, 0.005f));
 		}
@@ -118,7 +118,7 @@ void AboutWindow::OnButtonClicked(int Index)
 		return;
 	}
 
-	int it = 0;
+	int it = 1;
 
 	for (auto& i : Credits)
 	{

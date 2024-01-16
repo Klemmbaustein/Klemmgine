@@ -2,7 +2,8 @@
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.IO;
-using System.Xml.Linq;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 [StructLayout(LayoutKind.Sequential)]
 public struct EngineVector
@@ -60,6 +61,19 @@ static class Engine
 		}
 		return null;
 	}
+
+	public static object? GetObjectFromPtr(IntPtr Ptr)
+	{
+		foreach (var i in WorldObjects)
+		{
+			if ((IntPtr)Get(i.Value, "NativePtr")! == Ptr)
+			{
+				return i.Value;
+			}
+		}
+		return null;
+	}
+
 	static bool LoadedEngine = false;
 
 	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path, [MarshalAs(UnmanagedType.LPUTF8Str)] string EngineDllPath, bool InEditor)
@@ -89,7 +103,11 @@ static class Engine
 			return;
 		}
 
-		WorldObjectType?.GetMethod("LoadGetObjectFunction")!.Invoke(null, new object[] { (object)GetObjectFromID });
+		WorldObjectType?.GetMethod("LoadGetObjectFunctions")!.Invoke(null, new object[] 
+		{ 
+			(object)GetObjectFromID,
+			(object)GetObjectFromPtr
+		});
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{
@@ -122,7 +140,7 @@ static class Engine
 				{
 					HashCode = -1;
 				}
-				Set(ref NewObject!, "NativeObject", NativeObject);
+				Set(ref NewObject!, "NativePtr", NativeObject);
 
 				WorldObjects.Add(HashCode, NewObject);
 				SetVectorFieldOfObject(HashCode, "Position", t.Position);
@@ -165,22 +183,184 @@ static class Engine
 		return null;
 	}
 
+	public static object? SafeInvokeMethod(MethodInfo Method, object? TargetObject, object?[]? args)
+	{
+		try
+		{
+			return Method.Invoke(TargetObject, args);
+		}
+		catch (Exception e)
+		{
+			EngineLog.Print(e.InnerException!.ToString(), 2);
+			return null;
+		}
+	}
 
 	public static void ExecuteFunctionOnObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string FunctionName)
 	{
 		if (!WorldObjects.TryGetValue(ID, out object? value))
 		{
-			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID));
+			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID), 1);
 			return;
 		}
 		var obj = value;
-		var func = obj.GetType().GetMethod(FunctionName);
+		var func = obj.GetType().GetMethod(FunctionName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
 		if (func == null)
 		{
-			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name));
+			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name), 1);
 			return;
 		}
-		func.Invoke(obj, []);
+		SafeInvokeMethod(func, obj, null);
+	}
+
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	public static string ExecuteStringFunctionOnObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string FunctionName)
+	{
+		if (!WorldObjects.TryGetValue(ID, out object? value))
+		{
+			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID), 1);
+			return "";
+		}
+		var obj = value;
+		var func = obj.GetType().GetMethod(FunctionName, BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public);
+		if (func == null)
+		{
+			EngineLog.Print(string.Format("Tried to call {0} on {1} but that function doesn't exist on this class!", FunctionName, obj.GetType().Name), 1);
+			return "";
+		}
+		return (string)SafeInvokeMethod(func, obj, [])!;
+	}
+
+	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+	public static string GetObjectPropertyString(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyName)
+	{
+		if (!WorldObjects.TryGetValue(ID, out object? value))
+		{
+			EngineLog.Print(string.Format("Tried get the field {0} on the object with ID {1} but that object doesn't exist!", PropertyName, ID));
+			return "";
+		}
+		var obj = value;
+		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
+		if (field == null)
+		{
+			EngineLog.Print(string.Format("Tried to get the field {0} on {1} but that field doesn't exist on this class!", PropertyName, obj.GetType().Name));
+			return "";
+		}
+
+		if (!field.FieldType.IsArray)
+		{
+			return field.GetValue(obj)?.ToString()!;
+		}
+		object[] arr = (object[])field.GetValue(obj)!;
+		string str = "";
+		foreach (object o in arr)
+		{
+			str += o.ToString() + "\r";
+		}
+		return str;
+	}
+
+	public static void SetObjectPropertyString(Int32 ID,
+		[MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyName,
+		[MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyValue)
+	{
+		if (!WorldObjects.TryGetValue(ID, out object? value))
+		{
+			EngineLog.Print(string.Format("Tried set the field {0} on the object with ID {1} but that object doesn't exist!", PropertyName, ID), 1);
+			return;
+		}
+		var obj = value;
+		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
+		if (field == null)
+		{
+			EngineLog.Print(string.Format("Tried to set the field {0} on {1} but that field doesn't exist on this class!", PropertyName, obj.GetType().Name), 1);
+			return;
+		}
+
+		if (field.FieldType.IsArray)
+		{
+			return;
+			/*string[] entries = PropertyValue.Split(new string[] { "\r" }, StringSplitOptions.None).Select(x => x).ToArray();
+
+			if (entries.Last().Length == 0)
+			{
+				entries = entries.SkipLast(1).ToArray();
+			}
+
+
+			object[] arr = (object[])field.GetValue(obj)!;
+			Array destinationArray = Array.CreateInstance(arr[0].GetType(), arr.Length);
+			field.SetValue(obj, destinationArray);
+			for (int i = 0; i < arr.Length; i++)
+			{
+				switch (field.FieldType.ToString())
+				{
+					case "System.Int[]":
+						if (int.TryParse(PropertyValue, out int iresult))
+						{
+							destinationArray.SetValue(iresult, i);
+						}
+						break;
+					case "System.Float[]":
+						if (float.TryParse(PropertyValue, out float fresult))
+						{
+							destinationArray.SetValue(fresult, i);
+						}
+						break;
+					case "System.String[]":
+						destinationArray.SetValue(PropertyValue, i);
+						break;
+					case "Engine.Vector3[]":
+						var Culture = CultureInfo.GetCultureInfo("en-US");
+						float[] newPosCoordinates = PropertyValue.Split(new string[] { " " }, StringSplitOptions.None).Select(x => float.Parse(x, Culture)).ToArray();
+						var vec = destinationArray.GetValue(i)!;
+						Set(ref vec, "X", newPosCoordinates[0]);
+						Set(ref vec, "Y", newPosCoordinates[1]);
+						Set(ref vec, "Z", newPosCoordinates[2]);
+						destinationArray.SetValue(vec, i);
+						break;
+					default:
+						EngineLog.Print("Unknown type: " + field.FieldType.ToString());
+						break;
+				}
+			}
+			EngineLog.Print(destinationArray.Length.ToString());
+			return;*/
+		}
+
+		switch (field.FieldType.ToString())
+		{
+			case "System.Int":
+				if (int.TryParse(PropertyValue, out int iresult))
+				{
+					field.SetValue(obj, iresult);
+				}
+				break;
+			case "System.Float":
+				if (float.TryParse(PropertyValue, out float fresult))
+				{
+					field.SetValue(obj, fresult);
+				}
+				break;
+			case "System.String":
+				field.SetValue(obj, PropertyValue);
+				break;
+			case "Engine.Vector3":
+				var Culture = CultureInfo.GetCultureInfo("en-US");
+				float[] newPosCoordinates = PropertyValue.Split(new string[] { " " }, StringSplitOptions.None).Select(x => float.Parse(x, Culture)).ToArray();
+				var vec = field.GetValue(obj)!;
+				Set(ref vec, "X", newPosCoordinates[0]);
+				Set(ref vec, "Y", newPosCoordinates[1]);
+				Set(ref vec, "Z", newPosCoordinates[2]);
+				field.SetValue(obj, vec);
+				break;
+			case "System.Boolean":
+				field.SetValue(obj, PropertyValue == "True");
+				break;
+			default:
+				EngineLog.Print("Unknown type: " + field.FieldType.ToString(), 2);
+				break;
+		}
 	}
 
 	public static object? Get(object obj, string member)
@@ -188,9 +368,14 @@ static class Engine
 		var memb = obj.GetType().GetField(member);
 		return memb?.GetValue(obj);
 	}
-	public static void Set(ref object? obj, string field, object value)
+	public static void Set(ref object obj, string field, object value)
 	{
 		var memb = obj?.GetType().GetField(field);
+		if (memb == null)
+		{
+			EngineLog.Print("Object " + obj?.ToString() + " does not have member " + field);
+			return;
+		}
 		memb?.SetValueDirect(__makeref(obj), value);
 	}
 
@@ -212,9 +397,18 @@ static class Engine
 		if (!WorldObjects.ContainsKey(ID))
 		{
 			EngineLog.Print(string.Format("Tried to access {1} of object with ID {0} but that object doesn't exist!", ID, Field));
+			return;
 		}
 		var obj = WorldObjects[ID];
-		var pos = obj?.GetType()?.GetField(Field)?.GetValue(obj);
+		if (obj == null)
+		{
+			return;
+		}
+		var pos = obj?.GetType()?.GetField(Field)?.GetValue(obj)!;
+		if (pos == null)
+		{
+			return;
+		}
 		Set(ref pos, "X", NewValue.X);
 		Set(ref pos, "Y", NewValue.Y);
 		Set(ref pos, "Z", NewValue.Z);
@@ -224,7 +418,7 @@ static class Engine
 	public static void SetDelta(float NewDelta)
 	{
 		StatsObject!.GetField("DeltaTime")?.SetValue(null, NewDelta);
-		InputObject!.GetMethod("UpdateGamepadList")?.Invoke(null, null);
+		SafeInvokeMethod(InputObject!.GetMethod("UpdateGamepadList")!, null, null);
 	}
 
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
@@ -261,7 +455,7 @@ static class Engine
 			EngineLog.Print("Failed to load Project.GetStartupScene()", 2);
 			return "";
 		}
-		return (string)StartupScene.Invoke(null, null)!;
+		return (string)SafeInvokeMethod(StartupScene, null, null)!;
 	}
 
 	public static void OnLaunchInternally()
@@ -278,7 +472,7 @@ static class Engine
 			EngineLog.Print("Failed to load Project.OnLaunch()", 2);
 			return;
 		}
-		OnLaunch.Invoke(null, null);
+		SafeInvokeMethod(OnLaunch, null, null);
 		return;
 	}
 
@@ -296,7 +490,7 @@ static class Engine
 			EngineLog.Print("Failed to load Project.GetProjectName()", 2);
 			return "";
 		}
-		return (string)GetProjectName.Invoke(null, null)!;
+		return (string)SafeInvokeMethod(GetProjectName, null, null)!;
 	}
 
 }

@@ -5,6 +5,8 @@
 #include <Engine/Log.h>
 #include <Engine/Application.h>
 #include <Engine/Input.h>
+#include <Engine/Utility/FileUtility.h>
+#include <UI/EditorUI/Popups/RenameBox.h>
 
 static ItemBrowser::BrowserItem DropdownItem;
 static ItemBrowser::BrowserItem DraggedItem;
@@ -63,6 +65,7 @@ void ItemBrowser::Tick()
 					DroppedItem i;
 					i.Path = DraggedItem.Path;
 					i.TypeID = DraggedItem.TypeID;
+					i.From = this;
 					Panel->OnItemDropped(i);
 				}
 			}
@@ -122,7 +125,7 @@ void ItemBrowser::Tick()
 		}
 		if (DropdownItem.Renameable)
 		{
-			Items.push_back(EditorUI::DropdownItem("Rename", []() { }));
+			Items.push_back(EditorUI::DropdownItem("Rename", []() { new RenameBox(DropdownItem.Path); }));
 		}
 		if (DropdownItem.Deleteable)
 		{
@@ -153,16 +156,55 @@ void ItemBrowser::OnPathChanged()
 	GenerateTopBox();
 }
 
+void ItemBrowser::OnItemDropped(DroppedItem Item)
+{
+	if (Item.From != this)
+	{
+		return;
+	}
+
+	if (UI::HoveredBox == UpButton)
+	{
+		std::string NewPath = Path;
+		if (NewPath.substr(NewPath.size() - 1) == "/")
+		{
+			NewPath.pop_back();
+		}
+		size_t LastSlash = NewPath.find_last_of("/");
+		if (LastSlash == std::string::npos)
+		{
+			return;
+		}
+		NewPath = NewPath.substr(0, LastSlash + 1);
+		BrowserItem i;
+		i.Path = NewPath;
+		OnItemDropped(Item, i);
+	}
+
+	for (size_t i = 0; i < Buttons.size(); i++)
+	{
+		if (UI::HoveredBox == Buttons[i])
+		{
+			OnItemDropped(Item, LoadedItems[i]);
+		}
+	}
+}
+
+void ItemBrowser::OnItemDropped(DroppedItem From, BrowserItem To)
+{
+}
+
 void ItemBrowser::GenerateTopBox()
 {
 	TopBox->DeleteChildren();
-
-	TopBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, -1))
+	UpButton = new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, -1);
+	TopBox->AddChild(UpButton
 		->SetUseTexture(true, EditorUI::Textures[8])
 		->SetPadding(0.01f)
 		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
 		->SetMinSize(0.05f)
 		->SetSizeMode(UIBox::SizeMode::PixelRelative));
+
 	TopBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Path, EditorUI::Text))
 		->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
 		->SetPadding(0.005f));
@@ -214,7 +256,7 @@ void ItemBrowser::GenerateAssetList()
 				->SetSizeMode(UIBox::SizeMode::PixelRelative)
 				->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative))
 			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], Item.Name, EditorUI::Text))
-				->SetWrapEnabled(true, 0.12f, UIBox::SizeMode::ScreenRelative)
+				->SetWrapEnabled(true, 0.115f, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0, 0, 0.005f, 0.005f)
 				->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)));
 		Index++;

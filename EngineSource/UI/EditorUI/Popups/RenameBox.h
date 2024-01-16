@@ -1,12 +1,12 @@
-#if EDITOR && 0
+#if EDITOR
 #pragma once
-#include <UI/EditorUI/EditorPanel.h>
+#include <UI/EditorUI/Popups/EditorPopup.h>
+#include <UI/UIfwd.h>
 
-class RenameBox : public EditorPanel
+class RenameBox : public EditorPopup
 {
 public:
-	RenameBox(std::string FileToRename, Vector2 Position);
-	void UpdateLayout() override;
+	RenameBox(std::string FileToRename);
 	~RenameBox();
 	void OnButtonClicked(int Index) override;
 	void Tick() override;

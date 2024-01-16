@@ -69,21 +69,19 @@ void Packet::EvaluatePacket()
 			}
 			Value.append({ (char)Data[i] });
 		}
-		std::vector<std::string> Values;
-		size_t Last = 0;
 
-		do
-		{
-			size_t PrevLast = Last == 0 ? Last : Last + 1;
-			Last = Value.find_first_of(";", PrevLast);
-			Values.push_back(Value.substr(PrevLast, Last - PrevLast));
-		} while (Last != std::string::npos);
+		auto Values = StrUtil::SeperateString(Value, ';');
 
 		for (auto& i : Values)
 		{
+			size_t Equals = i.find_first_of("=");
+			if (Equals == std::string::npos)
+			{
+				break;
+			}
 			Client::HandleValueUpdate(ObjID,
-				i.substr(0, i.find_first_of("=")),
-				i.substr(i.find_first_of("=") + 1), true);
+				i.substr(0, Equals),
+				i.substr(Equals + 1), true);
 		}
 		break;
 	}

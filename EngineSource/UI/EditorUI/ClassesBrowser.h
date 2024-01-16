@@ -25,6 +25,7 @@ public:
 	std::vector<EditorClassesItem> GetContentsOfCurrentCPPFolder();
 	static std::string GetCurrentCPPPathString();
 
+	void OnItemDragged();
 	void UpdateClasses();
 
 	ClassesBrowser(EditorPanel* Parent);

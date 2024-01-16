@@ -48,7 +48,11 @@ namespace CSM
 		case 36053:
 			return "The framebuffer is complete\n";
 		case 36054:
-			return "Not all framebuffer attachment points are framebuffer attachment complete.\nThis means that at least one attachment point with a renderbuffer or texture attached has its attached object no longer in existence \nor has an attached image with a width or height of zero, or the color attachment point has a non-color-renderable image attached, \nor the depth attachment point has a non-depth-renderable image attached, or the stencil attachment point \nhas a non-stencil-renderable image attached.\n";
+			return "Not all framebuffer attachment points are framebuffer attachment complete.\n\
+This means that at least one attachment point with a renderbuffer or texture attached has its attached object no longer in existence \n\
+or has an attached image with a width or height of zero, or the color attachment point has a non-color-renderable image attached, \n\
+or the depth attachment point has a non-depth-renderable image attached, or the stencil attachment point \n\
+has a non-stencil-renderable image attached.\n";
 		case 36057:
 			return "Not all attached images have the same width and height.";
 		case 36055:
@@ -206,7 +210,7 @@ namespace CSM
 			center += glm::vec3(v);
 		}
 		center /= corners.size();
-		float SnapSize = farPlane / 10;
+		float SnapSize = farPlane / 5;
 
 		center = Vector3::SnapToGrid(center, SnapSize);
 		auto lightView = glm::lookAt(center + (glm::vec3)Vector3::GetForwardVector(Graphics::WorldSun.Rotation), center, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -254,7 +258,7 @@ namespace CSM
 			maxZ *= zMult;
 		}
 
-		float zoom = 1.75;
+		float zoom = 2.0f;
 
 		const glm::mat4 lightProjection = glm::ortho(minX / zoom, maxX / zoom, minY / zoom, maxY / zoom, minZ / zoom, maxZ / zoom);
 

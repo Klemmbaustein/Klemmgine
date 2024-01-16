@@ -231,13 +231,22 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 		}
 		TotalLightIntensity += glm::clamp(NewIntensity, 0.0f, 4.0f);
 	}
+	float LightInt = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		r = Bake::BakeLine(StartPos, StartPos
+			+ (Bake::SunDirection
+				+ glm::vec3(
+					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f,
+					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f,
+					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f)
+				* 0.035f)
+			* TraceDistance, false);
+		LightInt += r.Hit ? 1 - std::min(r.t * TraceDistance / 12.0f, 1.0f) : 1;
+	}
+	LightInt /= 3.0f;
 
-	r = Bake::BakeLine(StartPos, StartPos + Bake::SunDirection * TraceDistance, false);
-
-
-	float LightInt = r.Hit ? 1 - std::min(r.t * TraceDistance / 12.0f, 1.0f) : 1;
-
-	return std::min((LightInt / 2 + TotalLightIntensity / 4.0f), 1.0f);
+	return std::min((LightInt / 2.0f + TotalLightIntensity / 4.0f), 1.0f);
 }
 
 static std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
@@ -246,7 +255,7 @@ static std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
 		|| y < 0 || y >= (int64_t)BakedLighting::LightmapResolution
 		|| z < 0 || z >= (int64_t)BakedLighting::LightmapResolution)
 	{
-		return std::byte(255);
+		return std::byte(128);
 	}
 
 	return Bake::Texture[x * BakedLighting::LightmapResolution * BakedLighting::LightmapResolution + y * BakedLighting::LightmapResolution + z];
@@ -363,8 +372,31 @@ void BakedLighting::BakeCurrentSceneToFile()
 			BakeLog("Thread " + std::to_string(++i) + "/" + std::to_string(BakeThreads.size()) + " is done.");
 		}
 
+
+
 		BakeLog("Finished baking lightmap.");
 		BakeLog("Bake took " + std::to_string((int)BakeTimer.Get()) + " seconds.");
+
+		for (int64_t x = 0; x < (int64_t)BakedLighting::LightmapResolution; x++)
+		{
+			for (int64_t y = 0; y < (int64_t)BakedLighting::LightmapResolution; y++)
+			{
+				for (int64_t z = 0; z < (int64_t)BakedLighting::LightmapResolution; z++)
+				{
+					uint16_t val = 0;
+					for (int64_t bx = -1; bx <= 1; bx++)
+					{
+						for (int64_t bz = -1; bz <= 1; bz++)
+						{
+							val += (uint16_t)Sample3DArray(Bake::Texture, x + bx, y, z + bz);
+						}
+					}
+					Bake::Texture[x * BakedLighting::LightmapResolution * BakedLighting::LightmapResolution
+						+ y * BakedLighting::LightmapResolution
+						+ z] = (std::byte)(val / 9);
+				}
+			}
+		}
 
 		// Simple RLE for lightmap compression.
 		std::byte* TexPtr = Bake::Texture;
@@ -375,12 +407,10 @@ void BakedLighting::BakeCurrentSceneToFile()
 			BakFile = FileUtil::GetFilePathWithoutExtension(Scene::CurrentScene) + ".bkdat";
 		}
 
+
 		std::ofstream OutFile = std::ofstream(BakFile);
 
 		OutFile << (int)BKDAT_FILE_VERSION;
-
-
-
 		struct RLEelem
 		{
 			std::byte Value = std::byte(1);

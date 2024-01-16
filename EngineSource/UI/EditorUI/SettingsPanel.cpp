@@ -6,6 +6,7 @@
 #include <CSharp/CSharpInterop.h>
 #include <filesystem>
 #include <UI/UIScrollBox.h>
+#include "Viewport.h"
 
 void SettingsPanel::GenerateUI()
 {
@@ -143,6 +144,12 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 		break;
 	}
 	LoadedSettingElements.push_back(Element);
+}
+
+void SettingsPanel::NewSettingsPanel()
+{
+	auto NewTab = new SettingsPanel(nullptr);
+	Viewport::ViewportInstance->AddPanelTab(NewTab);
 }
 
 void SettingsPanel::OpenSettingsPage(std::string Name)

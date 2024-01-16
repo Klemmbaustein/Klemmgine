@@ -7,6 +7,10 @@
 #include <Engine/EngineProperties.h>
 #include <Engine/Application.h>
 
+/**
+* @brief
+* EditorPanel responsible for loading, saving and editing project settings.
+*/
 class SettingsPanel : public EditorPanel
 {
 	UIBox* HorizontalBox = nullptr;
@@ -67,7 +71,7 @@ class SettingsPanel : public EditorPanel
 				Toolbar::ToolbarInstance->SetButtonVisibility("Reload C#", std::stoi(NewValue));
 			}),
 #endif
-			SettingsCategory::Setting("Editor:Start in fullscreen", Type::Bool, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Editor:Start in fullscreen", Type::Bool, "0", [](std::string NewValue)
 			{
 				if (Stats::Time == 0)
 				{
@@ -113,6 +117,7 @@ class SettingsPanel : public EditorPanel
 	void GenerateUI();
 	void GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value);
 public:
+	static void NewSettingsPanel();
 	void OpenSettingsPage(std::string Name);
 	void Load();
 	void Save();

@@ -15,7 +15,6 @@ namespace Assets
 		std::string Name;
 	};
 	extern std::vector<Asset> Assets;
-
 	void ScanForAssets(std::string Path = "Content/", bool Recursive = false);
 	std::string GetAsset(std::string Name);
 }

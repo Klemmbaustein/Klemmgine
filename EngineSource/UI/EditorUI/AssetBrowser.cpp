@@ -13,11 +13,13 @@
 #include <UI/EditorUI/Viewport.h>
 #include <UI/EditorUI/Tabs/MeshTab.h>
 #include <UI/EditorUI/Tabs/ParticleEditorTab.h>
+#include <Engine/File/Assets.h>
 
 static std::string* CurrentPath = nullptr;
 
 std::vector<AssetBrowser::BrowserItem> AssetBrowser::GetBrowserContents()
 {
+	Assets::ScanForAssets();
 	std::vector<BrowserItem> Items;
 
 	for (const auto& File : std::filesystem::directory_iterator(Path))
@@ -70,42 +72,21 @@ void AssetBrowser::OnItemClicked(BrowserItem Item)
 	if (Extension == "jsmat")
 	{
 		auto NewTab = new MaterialTab(nullptr, Item.Path);
-		if (Viewport::ViewportInstance->Parent->ChildrenAlign == ChildrenType::Tabs)
-		{
-			Viewport::ViewportInstance->Parent->AddTab(NewTab);
-		}
-		else
-		{
-			Viewport::ViewportInstance->AddTab(NewTab);
-		}
+		Viewport::ViewportInstance->AddPanelTab(NewTab);
 		NewTab->Load(Item.Path);
 	}
 
 	if (Extension == "jsm")
 	{
 		auto NewTab = new MeshTab(nullptr, Item.Path);
-		if (Viewport::ViewportInstance->Parent->ChildrenAlign == ChildrenType::Tabs)
-		{
-			Viewport::ViewportInstance->Parent->AddTab(NewTab);
-		}
-		else
-		{
-			Viewport::ViewportInstance->AddTab(NewTab);
-		}
+		Viewport::ViewportInstance->AddPanelTab(NewTab);
 		NewTab->Load(Item.Path);
 	}
 
 	if (Extension == "jspart")
 	{
 		auto NewTab = new ParticleEditorTab(nullptr, Item.Path);
-		if (Viewport::ViewportInstance->Parent->ChildrenAlign == ChildrenType::Tabs)
-		{
-			Viewport::ViewportInstance->Parent->AddTab(NewTab);
-		}
-		else
-		{
-			Viewport::ViewportInstance->AddTab(NewTab);
-		}
+		Viewport::ViewportInstance->AddPanelTab(NewTab);
 	}
 
 	if (Extension == "jscn")
@@ -128,6 +109,28 @@ void AssetBrowser::GoBack()
 	Path = Path.substr(0, Path.find_last_of("/"));
 	Path.append("/");
 	CurrentPath = &Path;
+}
+
+void AssetBrowser::OnItemDropped(DroppedItem From, BrowserItem To)
+{
+	if (!std::filesystem::exists(From.Path))
+	{
+		return;
+	}
+
+	if (From.Path == To.Path)
+	{
+		return;
+	}
+
+	if (std::filesystem::is_directory(To.Path))
+	{
+		std::filesystem::copy(From.Path,
+			To.Path + "/" + FileUtil::GetFileNameFromPath(From.Path),
+			std::filesystem::copy_options::recursive | std::filesystem::copy_options::overwrite_existing);
+		std::filesystem::remove_all(From.Path);
+		OnPathChanged();
+	}
 }
 
 void AssetBrowser::DeleteItem(BrowserItem Item)

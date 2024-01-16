@@ -37,12 +37,33 @@ void Server::ClearOnPlayerdisconnectedCallbacks()
 #include <Engine/Utility/FileUtility.h>
 #include <Engine/EngineError.h>
 #include "NetworkEvent.h"
+#include <Engine/Stats.h>
 
 namespace Server
 {
 	static bool ShouldQuitOnPlayerDisconnect = false;
 	static std::vector<ClientInfo> Clients;
 	static uint64_t UIDCounter = 0;
+	namespace TPS
+	{
+		static bool PrintTPS = false;
+		static uint16_t NewTicksPerSecond = 0;
+		static uint16_t TicksPerSecond = 0;
+		static Application::Timer PerSecondTimer;
+
+		static void PrintTickStats()
+		{
+			Log::Print("[Net]: Time: "
+				+ std::to_string((int)Stats::Time)
+				+ "s. Ticks per second: "
+				+ std::to_string(TPS::TicksPerSecond)
+				+ ". Target: "
+				+ std::to_string(Networking::GetTickRate())
+				+ ". Delta time: "
+				+ std::to_string(100.0f * Performance::DeltaTime)
+				+ "ms", Log::LogColor::Gray);
+		}
+	}
 	static ClientInfo* ServerClient = new ClientInfo();
 	void ClientInfo::SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform) const
 	{
@@ -232,6 +253,17 @@ void Server::Init()
 		ShouldQuitOnPlayerDisconnect = true;
 		}, {}));
 
+	Console::RegisterCommand(Console::Command("tickrate", []() {
+		TPS::PrintTickStats();
+		}, { }));
+
+	Console::RegisterCommand(Console::Command("serverperf", []() {
+		TPS::PrintTPS = !TPS::PrintTPS;
+		if (TPS::PrintTPS)
+		{
+			Log::Print("[Net]: Printing performance stats... 'serverperf' to disable.");
+		}
+		}, { }));
 }
 
 bool Server::IsServer()
@@ -245,6 +277,18 @@ bool Server::IsServer()
 
 void Server::Update()
 {
+	TPS::NewTicksPerSecond++;
+	if (TPS::PerSecondTimer.Get() > 1.0f + Performance::DeltaTime)
+	{
+		TPS::PerSecondTimer.Reset();
+		TPS::TicksPerSecond = TPS::NewTicksPerSecond;
+		TPS::NewTicksPerSecond = 0;
+		if (TPS::PrintTPS)
+		{
+			TPS::PrintTickStats();
+		}
+	}
+
 	for (size_t i = 0; i < Clients.size(); i++)
 	{
 		SendClientInfo(&Clients[i]);

@@ -7,7 +7,7 @@ name: Build binaries
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "main" ]
     paths:
     - CHANGES.md
     - .github/workflows/**'
@@ -52,6 +52,7 @@ jobs:
           cp -r -force ./CSharp Release/CSharp
           cp -r -force ./Tools Release/Tools
           cp -r -force ./ProjectGenerator.exe Release
+          cp -r -force ./Docs Release/Docs
     - name: upload artifact
       uses: actions/upload-artifact@v3
       env:
@@ -88,6 +89,12 @@ jobs:
           cd ../../assimp/
           cmake CMakeLists.txt
           make
+    - name: install doxygen
+      run: |
+        wget https://www.doxygen.nl/files/doxygen-1.10.0.linux.bin.tar.gz
+        tar -xf doxygen-1.10.0.linux.bin.tar.gz
+        cd doxygen-1.10.0
+        sudo make
     - name: build
       run: |
           KlemmBuild engine.kbld -DGenerator -DCiBuild
@@ -106,12 +113,14 @@ jobs:
           rm -rf Build
     - name: make-release
       run: |
-          ls -R
+          doxygen
+          ls
           mkdir Release
           cp -rf ./EditorContent Release/EditorContent
           cp -rf ./CSharp Release/CSharp
           cp -rf ./Tools Release/Tools
           cp -rf ./ProjectGenerator Release
+          cp -rf ./Docs Release/Docs
     - name: upload artifact
       uses: actions/upload-artifact@v3
       env:

@@ -41,3 +41,28 @@ std::string StrUtil::VectorToString(std::vector<char> In)
 	}
 	return Out;
 }
+
+std::vector<std::string> StrUtil::SeperateString(std::string Value, char Sep)
+{
+	std::vector<std::string> Values;
+	size_t Last = 0;
+
+	do
+	{
+		size_t PrevLast = Last == 0 ? Last : Last + 1;
+		Last = Value.find_first_of(Sep, PrevLast);
+		Values.push_back(Value.substr(PrevLast, Last - PrevLast));
+
+		if (Last == PrevLast && Last == 0)
+		{
+			break;
+		}
+	} while (Last != std::string::npos);
+
+	if (!Values.empty() && Values[Values.size() - 1].empty())
+	{
+		Values.pop_back();
+	}
+
+	return Values;
+}

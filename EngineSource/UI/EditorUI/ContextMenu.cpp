@@ -13,6 +13,8 @@
 #include <Rendering/Utility/BakedLighting.h>
 #include <Engine/Utility/StringUtility.h>
 #include <Engine/Application.h>
+#include "ObjectList.h"
+#include <Objects/CSharpObject.h>
 
 ContextMenu::ContextMenu(EditorPanel* Parent, bool IsScene) : EditorPanel(Parent, IsScene ? "Scene" : "Object Properties")
 {
@@ -81,6 +83,96 @@ std::vector<T>& GetVec(void* vec)
 	return *(std::vector<T>*)vec;
 }
 
+void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& Element, WorldObject* ContextObject)
+{
+	UIBox* NewElement = nullptr;
+	CSharpObject* obj = static_cast<CSharpObject*>(ContextObject);
+	std::string Value = obj->GetProperty(Element.Name);
+	UIVectorField::VecType VectorType = UIVectorField::VecType::xyz;
+
+	if (Value.find("\r") == std::string::npos)
+	{
+		switch (Element.Type)
+		{
+		case Type::Vector3Color:
+			VectorType = UIVectorField::VecType::rgb;
+			[[fallthrough]];
+		case Type::Vector3Rotation:
+			if (VectorType == UIVectorField::VecType::xyz)
+			{
+				VectorType = UIVectorField::VecType::PitchYawRoll;
+			}
+			[[fallthrough]];
+		case Type::Vector3:
+			NewElement = new UIVectorField(Scale.X - 0.04f, Vector3::FromString(Value), this, -1, EditorUI::Text);
+			NewElement->SetPadding(0.005f, 0, 0.02f, 0);
+			((UIVectorField*)NewElement)->SetValueType(VectorType);
+			break;
+		case Type::String:
+		case Type::Float:
+		case Type::Int:
+			NewElement = GenerateTextField(Value, -1);
+			break;
+		case Type::Bool:
+			NewElement = new UIButton(UIBox::Orientation::Horizontal, 0, 0.75f, this, -1);
+			NewElement->SetSizeMode(UIBox::SizeMode::PixelRelative);
+			NewElement->SetMinSize(0.04f);
+			NewElement->SetBorder(UIBox::BorderType::Rounded, 0.3f);
+			NewElement->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
+			if (Value == "True")
+			{
+				((UIButton*)NewElement)->SetUseTexture(true, Application::EditorInstance->Textures[16]);
+			}
+
+			break;
+		default:
+			break;
+		}
+		if (NewElement)
+		{
+			BackgroundBox->AddChild(NewElement);
+			ContextButtons.push_back(NewElement);
+			ContextSettings.push_back(Element);
+		}
+		return;
+	}
+	return;
+	auto Elements = StrUtil::SeperateString(Value, '\r');
+	for (auto& i : Elements)
+	{
+		switch (Element.Type & ~Type::List)
+		{
+		case Type::Vector3Color:
+			VectorType = UIVectorField::VecType::rgb;
+			[[fallthrough]];
+		case Type::Vector3Rotation:
+			if (VectorType == UIVectorField::VecType::xyz)
+			{
+				VectorType = UIVectorField::VecType::PitchYawRoll;
+			}
+			[[fallthrough]];
+		case Type::Vector3:
+			NewElement = new UIVectorField(Scale.X - 0.04f, Vector3::FromString(i), this, -1, EditorUI::Text);
+			NewElement->SetPadding(0.005f, 0, 0.02f, 0);
+			((UIVectorField*)NewElement)->SetValueType(VectorType);
+			break;
+		case Type::String:
+		case Type::Float:
+		case Type::Int:
+			NewElement = GenerateTextField(i, -1);
+			break;
+		default:
+			break;
+		}
+		if (NewElement)
+		{
+			BackgroundBox->AddChild(NewElement);
+			ContextButtons.push_back(NewElement);
+		}
+	}
+	ContextSettings.push_back(Element);
+}
+
 void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject* ContextObject, std::string Name)
 {
 	UIBox* NewElement = nullptr;
@@ -94,7 +186,7 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 
 	size_t NumElements = 1;
 
-	if (IsList)
+	if (IsList && Element.Variable)
 	{
 		switch (Element.Type & ~Type::List)
 		{
@@ -124,6 +216,11 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 	{
 		void* val = Element.Variable;
 
+		if (val == nullptr)
+		{
+			GenerateCSharpProperty(Element, ContextObject);
+			continue;
+		}
 		if (IsList)
 		{
 			switch (Element.Type & ~Type::List)
@@ -236,6 +333,53 @@ void ContextMenu::OnButtonClicked(int Index)
 
 		for (size_t i = 0; i < ContextButtons.size(); i++)
 		{
+			if (!ContextSettings[IteratedElement].Variable)
+			{
+				auto& Element = ContextSettings[IteratedElement];
+				CSharpObject* obj = static_cast<CSharpObject*>(EditorUI::SelectedObjects[0]);
+
+				if (ContextSettings[IteratedElement].Type & Type::List)
+				{
+					auto arr = StrUtil::SeperateString(obj->GetProperty(Element.Name), '\r');
+					std::string Value;
+					for (auto& arrElem : arr)
+					{
+						ENGINE_ASSERT(arrElem.find("\r") == std::string::npos, "");
+						Value.append(((UITextField*)ContextButtons[i])->GetText());
+						i++;
+					}
+					Value.pop_back();
+					i--;
+					obj->SetProperty(Element.Name, Value);
+				}
+				else
+				{
+					switch (Element.Type)
+					{
+					case Type::Int:
+					case Type::Float:
+					case Type::String:
+						obj->SetProperty(Element.Name, ((UITextField*)ContextButtons[i])->GetText());
+						break;
+					case Type::Vector3:
+					case Type::Vector3Color:
+					case Type::Vector3Rotation:
+						obj->SetProperty(Element.Name, ((UIVectorField*)ContextButtons[i])->GetValue().ToString());
+						break;
+					case Type::Bool:
+						if (((UIButton*)ContextButtons[i])->GetIsHovered())
+						{
+							obj->SetProperty(Element.Name, obj->GetProperty(Element.Name) == "True" ? "False" : "True");
+						}
+						break;
+					default:
+						break;
+					}
+				}
+
+				IteratedElement++;
+				continue;
+			}
 			if (ContextSettings[IteratedElement].Type & Type::List)
 			{
 				size_t NumElements = 1;
@@ -287,7 +431,6 @@ void ContextMenu::OnButtonClicked(int Index)
 							break;
 						case Type::String:
 							GetVec<std::string>(Element.Variable).at(j) = ((UITextField*)ContextButtons[i])->GetText();
-							EditorUI::UpdateAllInstancesOf<ContextMenu>();
 							break;
 						case Type::Bool:
 							if (((UIButton*)ContextButtons[i])->GetIsHovered())
@@ -305,6 +448,7 @@ void ContextMenu::OnButtonClicked(int Index)
 					}
 					i++;
 				}
+				i--;
 			}
 			else
 			{
@@ -328,11 +472,7 @@ void ContextMenu::OnButtonClicked(int Index)
 						break;
 					case Type::String:
 						*(std::string*)(ContextSettings[IteratedElement].Variable) = ((UITextField*)ContextButtons[i])->GetText();
-						if (EditorUI::SelectedObjects.size()
-							&& ContextSettings[IteratedElement].Variable == &EditorUI::SelectedObjects[0]->Name)
-						{
-							//Application::EditorInstance->UIElements[5]->UpdateLayout();
-						}
+						EditorUI::UpdateAllInstancesOf<ObjectList>();
 						break;
 					case Type::Bool:
 						if (((UIButton*)ContextButtons[i])->GetIsHovered())
@@ -385,7 +525,7 @@ void ContextMenu::OnResized()
 			return;
 		}
 
-		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Object: " + SelectedObject->GetName(), EditorUI::Text))
+		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Object: " + SelectedObject->Name, EditorUI::Text))
 			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
 			->SetPadding(0.01f, 0, 0.01f, 0.01f));
 		BackgroundBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], "Class: " + SelectedObject->GetObjectDescription().Name, EditorUI::Text))
@@ -410,7 +550,8 @@ void ContextMenu::OnResized()
 
 		for (WorldObject::Property i : SelectedObject->Properties)
 		{
-			if (i.PType != WorldObject::Property::PropertyType::EditorProperty)
+
+			if (i.PType != WorldObject::Property::PropertyType::EditorProperty && i.PType != WorldObject::Property::PropertyType::CSharpProperty)
 			{
 				continue;
 			}
@@ -434,6 +575,9 @@ void ContextMenu::OnResized()
 				Categories[CategoryName].push_back(ContextMenuSection(i.Data, i.Type, i.Name));
 			}
 		}
+
+		CSharpObject* CSharp = dynamic_cast<CSharpObject*>(SelectedObject);
+
 		char Iterator = 1;
 		for (auto& i : Categories)
 		{

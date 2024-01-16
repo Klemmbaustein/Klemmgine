@@ -197,23 +197,26 @@ void MeshTab::OnButtonClicked(int Index)
 			ModelData.Elements[i].ElemMaterial = MaterialTextFields[i]->GetText();
 		}
 		Generate();
+		UpdatePreviewModel();
 		break;
 	case -1:
 		CastShadow = !CastShadow;
 		Generate();
+		UpdatePreviewModel();
 		break;
 	case -2:
 		HasCollision = !HasCollision;
 		Generate();
+		UpdatePreviewModel();
 		break;
 	case -3:
 		TwoSided = !TwoSided;
 		Generate();
+		UpdatePreviewModel();
 		break;
 	default:
 		break;
 	}
-	UpdatePreviewModel();
 }
 
 MeshTab::~MeshTab()

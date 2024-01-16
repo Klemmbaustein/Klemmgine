@@ -160,7 +160,7 @@ void EditorUI::LaunchInEditor()
 
 	if (Editor::SaveSceneOnLaunch)
 	{
-		SaveCurrentScene();
+		Application::EditorInstance->ShouldSave = true;
 	}
 
 	std::string Args = LaunchInEditorArgs;
@@ -260,6 +260,7 @@ void EditorUI::SaveCurrentScene()
 		Scene::SaveSceneAs(Scene::CurrentScene);
 	}
 	ChangedScene = false;
+	AssetBrowser::UpdateAll();
 }
 
 std::string EditorSceneToOpen;
@@ -530,11 +531,12 @@ void EditorUI::Tick()
 		}
 	}
 
-	if (Input::IsKeyDown(Input::Key::LCTRL) && Input::IsKeyDown(Input::Key::s))
+	if ((Input::IsKeyDown(Input::Key::LCTRL) && Input::IsKeyDown(Input::Key::s)) || ShouldSave)
 	{
 		if (!Input::IsRMBDown && ChangedScene && !Editor::IsSavingScene)
 		{
 			SaveCurrentScene();
+			ShouldSave = false;
 		}
 		Editor::IsSavingScene = true;
 	}

@@ -78,6 +78,18 @@ if ($args[0] -eq "CI_BUILD")
 	cp Games/Klemmgine/bin/* Tools/ProjectGenerator/ProjectFilesNoSource/bin/
 	cp Games/Klemmgine/*.dll Tools/ProjectGenerator/ProjectFilesNoSource/
 
+	# Download/Install doxygen.
+	Invoke-WebRequest https://www.doxygen.nl/files/doxygen-1.10.0.windows.x64.bin.zip -OutFile doxygen.zip
+
+	Expand-Archive doxygen.zip
+
+	# Run doxygen on the engine, output will be in ./Docs/html
+	./doxygen/doxygen
+
+	# Remove doxygen
+	rm doxygen -r -force
+	rm doxygen.zip
+
 	# Remove uneccesary files
 	rm x64/ -r -force
 	rm lib/ -r -force
@@ -89,19 +101,6 @@ if ($args[0] -eq "CI_BUILD")
 	rm Tools/ProjectGenerator/ProjectFiles/Code -r -force
 	rm Tools/ProjectGenerator/ProjectFilesNoSource/Code -r -force
 	rm Games/ -r -force
-
-	# Download/Install doxygen.
-	Invoke-WebRequest https://www.doxygen.nl/files/doxygen-1.10.0.windows.x64.bin.zip -OutFile doxygen.zip
-
-	Expand-Archive doxygen.zip
-
-	# Run doxygen on the engine, output will be in ./Docs/html
-	./doxygen/doxygen
-
-	# Remove doxygen again
-	rm doxygen -r -force
-	rm doxygen.zip
-
 }
 else
 {

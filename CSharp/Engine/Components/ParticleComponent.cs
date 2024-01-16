@@ -15,14 +15,14 @@ public class ParticleComponent : ObjectComponent
 		}
 		if (!NativePtr.Equals(new IntPtr()))
 		{
-			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativeObject });
+			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
 		}
-		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewParticleComponent", typeof(NewParticle), new object[] { FileName, Parent.NativeObject });
+		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewParticleComponent", typeof(NewParticle), new object[] { FileName, Parent.NativePtr });
 	}
 
 	public override void Destroy()
 	{
-		NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativeObject });
+		NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
 		NativePtr = new IntPtr();
 	}
 

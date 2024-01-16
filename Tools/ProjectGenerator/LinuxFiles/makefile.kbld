@@ -15,20 +15,14 @@
 #error "Neither Debug, Editor nor Release have been defined"
 #endif  
 
-  "defaultProject": NAME,
-  "projects": [
+  "defaultTarget": NAME,
+  "targets": [
     {
-      "dependencies": "Engine",
+      "dependencies": [ "Engine", "RunBuildTool" ],
       "name": NAME,
       "sources": [
         "Code/*.cpp"
       ],
-
-#if MSVC_WINDOWS
-      "preBuildCommand": "..\\..\\Tools\\bin\\BuildTool.exe in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes",
-#else
-      "preBuildCommand": "../../Tools/bin/BuildTool in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes",
-#endif
 #if !CiBuild
       "debug": true,
 #endif
@@ -63,12 +57,23 @@
         "dl",
         "libGLEW.a",
         "../../Dependencies/openal-soft/Build/openal",
-        "../../CSharpCore/lib/nethost"
+        "../../CSharp/lib/nethost"
       ],
-      "optimization": "fast"
+      "optimization": "fastest"
+    },
+    {
+      "name": "RunBuildTool",
+      "type": "command",
+#if MSVC_WINDOWS
+      "command": "..\\..\\Tools\\bin\\BuildTool.exe in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes"
+#else
+      "command": "../../Tools/bin/BuildTool in=../../EngineSource/Objects in=./Code/Objects out=GeneratedIncludes"
+#endif
+
     },
     {
       "name": "Engine",
+      "type": "makefile",
       "makefile": "../../engine.kbld"
     }
   ]
