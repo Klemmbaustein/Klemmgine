@@ -28,6 +28,7 @@
 #include <Rendering/Camera/CameraShake.h>
 #include <Rendering/Utility/Framebuffer.h>
 #include <Rendering/Utility/CSM.h>
+#include <Rendering/Mesh/Mesh.h>
 #include <Rendering/Utility/SSAO.h>
 #include <Rendering/Utility/Bloom.h>
 #include <Rendering/Utility/BakedLighting.h>
@@ -56,11 +57,7 @@
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
-
-#if _WIN32
-#define NOMINMAX
-#include <Windows.h>
-#endif
+#include <stack>
 
 static Vector2 GetMousePosition()
 {
@@ -220,6 +217,17 @@ namespace Application
 	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
 	std::thread ConsoleThread;
+	Model* OcclusionCullMesh = nullptr;
+	Shader* CullShader = nullptr;
+	size_t FrameCount = 0;
+	uint8_t NumOcclusionQueries = 0;
+	GLuint OcclusionQueries[256];
+	bool QueriesActive[256];
+	std::stack<Model*> CulledModels;
+}
+void Application::FreeOcclusionQuery(uint8_t Index)
+{
+	QueriesActive[Index] = false;
 }
 
 namespace Input
@@ -247,9 +255,106 @@ static void GLAPIENTRY MessageCallback(
 		|| type == GL_DEBUG_TYPE_PORTABILITY)
 	{
 		Log::Print(std::string(message)  + " - " + Debugging::EngineStatus, Log::LogColor::Red);
-		SDL_Delay(15);
+		SDL_Delay(5);
 	}
 }
+
+static bool RenderOccluded(Model* m, size_t i, FramebufferObject* Buffer)
+{
+	GLuint sampleCount = 0;
+	if (!m || !m->Visible)
+	{
+		return false;
+	}
+
+	if ((m->Size.extents * m->ModelTransform.Scale).Length() > 500.0f
+		|| (!m->IsOcclusionCulled && i != Application::FrameCount % Buffer->Renderables.size())
+		|| !m->ShouldCull)
+	{
+		m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
+		m->IsOcclusionCulled = false;
+		return true;
+	}
+
+	if (m->RunningQuery)
+	{
+		if (!m->IsOcclusionCulled)
+		{
+			m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
+		}
+		return !m->IsOcclusionCulled;
+	}
+	if (m->IsOcclusionCulled)
+	{
+		Application::CulledModels.push(m);
+		return false;
+	}
+
+	GLuint Query = 0;
+	for (uint8_t i = 0; i < 255; i++)
+	{
+		if (!Application::QueriesActive[i])
+		{
+			Application::QueriesActive[i] = true;
+			m->OcclusionQueryIndex = i;
+			Query = Application::OcclusionQueries[i];
+			break;
+		}
+	}
+
+	if (Query == 0)
+	{
+		if (!m->IsOcclusionCulled)
+		{
+			m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
+		}
+		return !m->IsOcclusionCulled;
+	}
+
+	glBeginQuery(GL_ANY_SAMPLES_PASSED, Query);
+	m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
+	glEndQuery(GL_ANY_SAMPLES_PASSED);
+	m->RunningQuery = true;
+	return true;
+}
+
+static void OcclusionCheck(Model* m, size_t i, FramebufferObject* Buffer)
+{
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	glDepthMask(GL_FALSE);
+	GLuint Query = 0;
+	for (uint8_t i = 0; i < 255; i++)
+	{
+		if (!Application::QueriesActive[i])
+		{
+			Application::QueriesActive[i] = true;
+			m->OcclusionQueryIndex = i;
+			Query = Application::OcclusionQueries[i];
+			break;
+		}
+	}
+
+	if (Query == 0)
+	{
+		if (!m->IsOcclusionCulled)
+		{
+			m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
+		}
+		return;
+	}
+
+	glBeginQuery(GL_ANY_SAMPLES_PASSED, Query);
+	Transform t = Transform(m->ModelTransform.Location + m->Size.extents, m->ModelTransform.Rotation, m->Size.extents * m->ModelTransform.Scale);
+	Application::OcclusionCullMesh->ModelTransform = t;
+	Application::OcclusionCullMesh->UpdateTransform();
+	Application::OcclusionCullMesh->SimpleRender(Application::CullShader);
+	
+	glEndQuery(GL_ANY_SAMPLES_PASSED);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+	glDepthMask(GL_TRUE);
+	m->RunningQuery = true;
+}
+
 
 static void TickObjects()
 {
@@ -333,15 +438,13 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 		Graphics::IsRenderingShadows = false;
 	}
 
-	FrustumCulling::Active = true;
+	FrustumCulling::Active = false;
 	FrustumCulling::CurrentCameraFrustum = FrustumCulling::createFrustumFromCamera(*Buffer->FramebufferCamera);
 	Buffer->GetBuffer()->Bind();
 	Debugging::EngineStatus = "Rendering (Framebuffer: Main pass)";
 
 	Vector2 BufferResolution = Buffer->UseMainWindowResolution ? Graphics::WindowResolution : Buffer->CustomFramebufferResolution;
 	glViewport(0, 0, (int)BufferResolution.X, (int)BufferResolution.Y);
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	auto Matrices = CSM::getLightSpaceMatrices();
 	for (auto& s : Shaders)
 	{
@@ -365,9 +468,11 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 			}
 		}
 	}
-	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
+	glEnable(GL_CULL_FACE);
+	glClearColor(0, 0, 0, 1);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	if (Graphics::IsWireframe)
 	{
 		glLineWidth(3);
@@ -377,11 +482,55 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 	glActiveTexture(GL_TEXTURE2);
 	glBindTexture(GL_TEXTURE_CUBE_MAP, Buffer->ReflectionCubemap);
 	// Main pass
+
 	BakedLighting::BindToTexture();
+	Application::CullShader->Bind();
+	Application::CullShader->SetMat4("u_viewpro", Buffer->FramebufferCamera->getViewProj());
+	size_t i = 0;
+	Buffer->GetBuffer()->Bind();
 	for (auto o : Buffer->Renderables)
 	{
-		o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
+		Model* m = dynamic_cast<Model*>(o);
+		if (Buffer == Graphics::MainFramebuffer && m && !Graphics::IsWireframe)
+		{
+			RenderOccluded(m, i, Buffer);
+		}
+		else
+		{
+			o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
+		}
+		i++;
 	}
+	for (size_t i = 0; i < Buffer->Renderables.size(); i++)
+	{
+		Model* m = dynamic_cast<Model*>(Buffer->Renderables[i]);
+		if (!m)
+		{
+			continue;
+		}
+		if (!m->RunningQuery)
+		{
+			continue;
+		}
+		GLuint Query = Application::OcclusionQueries[m->OcclusionQueryIndex];
+		GLuint QueryVal = 0;
+		glGetQueryObjectuiv(Query, GL_QUERY_RESULT_AVAILABLE, &QueryVal);
+		if (!QueryVal)
+		{
+			continue;
+		}
+		glGetQueryObjectuiv(Query, GL_QUERY_RESULT, &QueryVal);
+		m->IsOcclusionCulled = QueryVal == 0 || Graphics::IsWireframe;
+		m->RunningQuery = false;
+		Application::QueriesActive[m->OcclusionQueryIndex] = false;
+	}
+
+	while (!Application::CulledModels.empty())
+	{
+		OcclusionCheck(Application::CulledModels.top(), 0, Buffer);
+		Application::CulledModels.pop();
+	}
+
 	Buffer->GetBuffer()->Bind();
 	// Transparency pass
 	for (auto p : Buffer->ParticleEmitters)
@@ -393,7 +542,6 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 	{
 		o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, true);
 	}
-
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -856,6 +1004,7 @@ static void ApplicationLoop()
 #endif
 	Application::LogicTime = LogicTime;
 	Application::SyncTime = SwapTimer.Get();
+	Application::FrameCount++;
 
 	Performance::DeltaTime = FrameTimer.Get();
 	Performance::DeltaTime *= Performance::TimeMultiplier;
@@ -909,9 +1058,6 @@ int Application::Initialize(int argc, char** argv)
 	SDL_GL_SetAttribute(SDL_GL_BUFFER_SIZE, 32);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	int flags = SDL_WINDOW_OPENGL;
-#if _WIN32
-	SetProcessDPIAware();
-#endif
 	// Set Window resolution to the screens resolution * 0.75
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
@@ -1003,6 +1149,16 @@ int Application::Initialize(int argc, char** argv)
 
 	ConsoleInput::ReadConsoleThread = new std::thread(ConsoleInput::ReadConsole);
 
+	{
+		ModelGenerator::ModelData CullMeshData;
+		CullMeshData.AddElement().MakeCube(2, 0);
+		Application::OcclusionCullMesh = new Model(CullMeshData);
+		Application::OcclusionCullMesh->TwoSided = true;
+		Application::CullShader = ReferenceShader("Shaders/Internal/cull.vert", "Shaders/Internal/cull.frag");
+
+		memset(QueriesActive, 0, sizeof(QueriesActive));
+		glGenQueries(256, Application::OcclusionQueries);
+	}
 
 	std::string Startup = Project::GetStartupScene();
 	if (!Application::StartupSceneOverride.empty())

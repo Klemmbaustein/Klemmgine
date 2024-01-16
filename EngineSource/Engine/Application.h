@@ -117,6 +117,8 @@ namespace Application
 
 	extern std::set<ButtonEvent> ButtonEvents;
 
+	void FreeOcclusionQuery(uint8_t Index);
+
 	/**
 	* @brief
 	* A timer class that accurately measures time since it's creation.

@@ -62,6 +62,11 @@ namespace FrustumCulling
 			extents = glm::vec3(max.x - center.x, max.y - center.y, max.z - center.z);
 		}
 
+		AABB()
+		{
+
+		}
+
 		bool isOnOrForwardPlan(const Plan& plan) const
 		{
 			// Compute the projection interval radius of b onto L(t) = b.c + t * p.n

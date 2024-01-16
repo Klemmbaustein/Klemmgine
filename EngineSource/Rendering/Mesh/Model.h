@@ -32,7 +32,6 @@ public:
 		MatModel = glm::mat4(1.f);
 
 		Vector3 Scale = NonScaledSize * ModelTransform.Scale;
-		Size = FrustumCulling::AABB(ModelTransform.Location, Scale.X, Scale.Y, Scale.Z);
 		
 		ModelTransform.Scale = ModelTransform.Scale * 0.025f;
 		MatModel = ModelTransform.ToMatrix();
@@ -67,9 +66,13 @@ public:
 	Vector3 ModelCenter;
 	Transform ModelTransform;
 	bool TwoSided = false, HasCollision = true;
-	FrustumCulling::AABB Size = FrustumCulling::AABB(Vector3(), NonScaledSize, NonScaledSize, NonScaledSize);
+	FrustumCulling::AABB Size;
 	void SetUniform(Material::Param NewUniform, uint8_t MeshIndex);
 
+	bool ShouldCull = false;
+	bool RunningQuery = false;
+	uint8_t OcclusionQueryIndex = 255;
+	bool IsOcclusionCulled = false;
 	bool Visible = true;
 
 	unsigned int MatBuffer = -1;

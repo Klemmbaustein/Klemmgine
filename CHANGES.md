@@ -10,12 +10,15 @@
 - Renamed some C# functions to match their C++ equivalent.
 - Added enum `Input::GamepadType` and `Input::GetGamepadType(Input::Gamepad* From)`.
 - `UIButton` and `UITextField` now inherit from `UIBackground`.
+- Added `Engine.NativeObject` and a few more utility functions to C#.
+- Added C# `EditorProperty` attribute and functionality.
+- Upgrade to new KlemmBuild version.
 
 ## Version 1.7.2
 
 ### Fixes
 
-- Fixed a crash with the server
+- Fixed a crash with the server.
 
 ## Version 1.7.1
 

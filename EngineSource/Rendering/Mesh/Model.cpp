@@ -14,6 +14,7 @@
 #include <GL/glew.h>
 #include <Rendering/Texture/Material.h>
 #include <Rendering/Mesh/Mesh.h>
+#include <Engine/Application.h>
 
 const extern bool IsInEditor;
 const extern bool EngineDebug;
@@ -26,14 +27,18 @@ Model::Model(std::string Filename)
 		ModelMeshData.LoadModelFromFile(Filename);
 		CastShadow = ModelMeshData.CastShadow;
 		TwoSided = ModelMeshData.TwoSided;
+		size_t NumVerts = 0;
 		for (size_t i = 0; i < ModelMeshData.Elements.size(); i++)
 		{
 			Mesh* NewMesh = new Mesh(ModelMeshData.Elements[i].Vertices, ModelMeshData.Elements[i].Indices, 
 				Material::LoadMaterialFile(ModelMeshData.Elements[i].ElemMaterial));
 			Meshes.push_back(NewMesh);
 		}
+		ShouldCull = NumVerts > 100;
 		HasCollision = ModelMeshData.HasCollision;
 		NonScaledSize = ModelMeshData.CollisionBox.GetLength();
+		Vector3 Extent = ModelMeshData.CollisionBox.GetExtent();
+		Size = FrustumCulling::AABB(ModelMeshData.CollisionBox.GetCenter() * 0.025f, Extent.X, Extent.Y, Extent.Z);
 		ConfigureVAO();
 	}
 	else
@@ -47,14 +52,19 @@ Model::Model(ModelGenerator::ModelData Data)
 	ModelMeshData = Data;
 	CastShadow = Data.CastShadow;
 	TwoSided = Data.TwoSided;
+	size_t NumVerts = 0;
 	for (auto& i : Data.Elements)
 	{
 		Material mat = Material::LoadMaterialFile(i.ElemMaterial);
 		Mesh* NewMesh = new Mesh(i.Vertices, i.Indices, mat);
+		NumVerts += i.Vertices.size();
 		Meshes.push_back(NewMesh);
 	}
+	ShouldCull = NumVerts > 100;
 	HasCollision = Data.HasCollision;
 	NonScaledSize = Data.CollisionBox.GetLength();
+	Vector3 Extent = Data.CollisionBox.GetExtent() * 0.025f;
+	Size = FrustumCulling::AABB(Data.CollisionBox.GetCenter() * 0.025f, Extent.X, Extent.Y, Extent.Z);
 	ConfigureVAO();
 }
 
@@ -66,6 +76,10 @@ Model::~Model()
 		delete m;
 	}
 	glDeleteBuffers(1, &MatBuffer);
+	if (RunningQuery)
+	{
+		Application::FreeOcclusionQuery(OcclusionQueryIndex);
+	}
 }
 namespace CSM
 {

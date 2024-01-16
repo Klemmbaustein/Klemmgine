@@ -56,6 +56,8 @@ void OS::SetConsoleWindowVisible(bool Visible)
 	// Enable buffering to prevent VS from chopping up UTF-8 byte sequences
 	setvbuf(stdout, nullptr, _IOFBF, 1000);
 
+	SetProcessDPIAware();
+
 	if (ConsoleCanBeHidden)
 	{
 		::ShowWindow(::GetConsoleWindow(), Visible ? SW_SHOW : SW_HIDE);
