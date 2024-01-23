@@ -164,11 +164,8 @@ void Console::InitializeConsole()
 			},
 			[]() {
 #if !SERVER
-				ConsoleLog("OpenGL version: " + std::string((const char*)glGetString(GL_VERSION)));
-				ConsoleLog("GLSL: " + std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
+				ConsoleLog("OpenGL version: " + std::string((const char*)glGetString(GL_VERSION)) + ", GLSL: " + std::string((const char*)glGetString(GL_SHADING_LANGUAGE_VERSION)));
 				ConsoleLog("Window resolution: x=" + std::to_string((int)Graphics::WindowResolution.X) + " y=" + std::to_string((int)Graphics::WindowResolution.Y));
-				ConsoleLog("Shadow resolution: " + std::to_string(Graphics::ShadowResolution) + "x" + std::to_string(Graphics::ShadowResolution) + "px");
-				ConsoleLog("Shaders: " + std::to_string(GetNumShaders()));
 #else
 				ConsoleLog("Build config is server - no graphics");
 #endif

@@ -160,7 +160,7 @@ TextRenderer::TextRenderer(std::string filename)
 	size_t ret = fread(ttfBuffer, 1, 1 << 20, fopen(Filename.c_str(), "rb"));
 	if (!ret)
 	{
-		Log::Print("Failed to loat font: " + filename);
+		Log::Print("Failed to load font: " + filename);
 		return;
 	}
 	stbtt_fontinfo finf;
@@ -335,7 +335,6 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 
 Vector2 TextRenderer::GetLetterPosition(ColoredText Text, size_t Index, float Scale, bool Wrapped, float LengthBeforeWrap)
 {
-	float originalScale = Scale;
 	Scale *= 2.5f;
 	float x = 0.f, y = CharacterSize;
 	size_t Wraps = 0;
@@ -416,7 +415,6 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(FontVertex), (const void*)offsetof(FontVertex, color));
 	glBindVertexArray(0);
 
-	float originalScale = Scale;
 	Scale *= 2.5f;
 	Pos.X = Pos.X * 450 * Graphics::AspectRatio;
 	Pos.Y = Pos.Y * -450;
@@ -506,9 +504,8 @@ TextRenderer::~TextRenderer()
 	glDeleteBuffers(1, &fontVao);
 	if (fontVertexBufferData)
 	{
-		delete[]fontVertexBufferData;
+		delete[] fontVertexBufferData;
 	}
-	//delete[] cdatapointer;
 }
 
 DrawableText::DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumVerts, unsigned int Texture,

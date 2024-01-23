@@ -31,7 +31,7 @@ public:
 	* @brief
 	* Loads a mesh from the given model data struct.
 	*
-	* @param File
+	* @param Data
 	* The model data struct.
 	*/
 	void Load(const ModelGenerator::ModelData& Data);

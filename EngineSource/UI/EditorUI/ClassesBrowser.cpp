@@ -4,6 +4,7 @@
 #include <Objects/CSharpObject.h>
 #include <UI/EditorUI/Popups/ClassCreator.h>
 #include <UI/EditorUI/EditorUI.h>
+#include <Engine/OS.h>
 
 std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::CPPClasses;
 std::vector<size_t> ClassesBrowser::CPPPath;
@@ -161,7 +162,12 @@ ClassesBrowser::ClassesBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Class
 		EditorUI::DropdownItem("New C# class", []()
 			{
 				new ClassCreator();
+			}),
+		EditorUI::DropdownItem("Open Solution", []()
+			{
+				OS::OpenFile(Build::GetProjectBuildName() + ".sln");
 			}, true)
+
 	};
 	Path = GetCurrentCPPPathString();
 	UpdateClasses();

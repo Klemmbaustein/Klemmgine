@@ -217,17 +217,21 @@ namespace Application
 	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
 	std::thread ConsoleThread;
+	size_t FrameCount = 0;
+#if !SERVER
 	Model* OcclusionCullMesh = nullptr;
 	Shader* CullShader = nullptr;
-	size_t FrameCount = 0;
 	uint8_t NumOcclusionQueries = 0;
 	GLuint OcclusionQueries[256];
 	bool QueriesActive[256];
 	std::stack<Model*> CulledModels;
+#endif
 }
 void Application::FreeOcclusionQuery(uint8_t Index)
 {
+#if !SERVER
 	QueriesActive[Index] = false;
+#endif
 }
 
 namespace Input
@@ -259,6 +263,7 @@ static void GLAPIENTRY MessageCallback(
 	}
 }
 
+#if !SERVER
 static bool RenderOccluded(Model* m, size_t i, FramebufferObject* Buffer)
 {
 	GLuint sampleCount = 0;
@@ -354,7 +359,7 @@ static void OcclusionCheck(Model* m, size_t i, FramebufferObject* Buffer)
 	glDepthMask(GL_TRUE);
 	m->RunningQuery = true;
 }
-
+#endif
 
 static void TickObjects()
 {
@@ -1149,9 +1154,6 @@ int Application::Initialize(int argc, char** argv)
 	CSM::Init();
 	Bloom::Init();
 	SSAO::Init();
-#endif
-
-	ConsoleInput::ReadConsoleThread = new std::thread(ConsoleInput::ReadConsole);
 
 	{
 		ModelGenerator::ModelData CullMeshData;
@@ -1163,6 +1165,9 @@ int Application::Initialize(int argc, char** argv)
 		memset(QueriesActive, 0, sizeof(QueriesActive));
 		glGenQueries(256, Application::OcclusionQueries);
 	}
+#endif
+
+	ConsoleInput::ReadConsoleThread = new std::thread(ConsoleInput::ReadConsole);
 
 	std::string Startup = Project::GetStartupScene();
 	if (!Application::StartupSceneOverride.empty())

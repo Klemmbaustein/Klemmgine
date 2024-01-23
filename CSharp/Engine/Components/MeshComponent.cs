@@ -25,8 +25,8 @@ public class MeshComponent : ObjectComponent
 	* @brief
 	* Loads a mesh file (.jsm) from the given file name. (without path or extension)
 	* 
-	* @param Filename
-	* 
+	* @param File
+	* The file to load.
 	*/
 	public void Load(string File)
 	{
