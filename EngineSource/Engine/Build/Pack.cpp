@@ -112,7 +112,7 @@ void Pack::SaveFolderToPack(std::string Folder, std::string Outf)
 	}
 	else
 	{
-		throw "Pack dir invalid";
+		Log::Print("Error: Pack dir invalid", Log::LogColor::Yellow);
 	}
 	SaveToPack(PackedFiles, Outf);
 }
@@ -134,5 +134,6 @@ std::string Pack::GetFile(std::string File)
 			}
 		}
 	}
-	throw ("Pack File: Could not find file: " + File).c_str();
+	Log::Print("Could not load file: " + File, Log::LogColor::Red);
+	return "";
 }

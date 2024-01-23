@@ -1,8 +1,10 @@
 #include "EngineError.h"
 #include <Engine/Log.h>
 #include <iostream>
+#include <Engine/Application.h>
 #include <csignal>
 #include <Engine/OS.h>
+#include <SDL.h>
 #include <Engine/Stats.h>
 
 #if __cpp_lib_stacktrace >= 202011L
@@ -21,6 +23,7 @@ void Error::Init()
 void Error::AssertFailure(std::string Name, std::string Location)
 {
 	OS::SetConsoleWindowVisible(true);
+	SDL_DestroyWindow(Application::Window);
 	Log::Print("[Error]: ------------------------------------[Error]------------------------------------", Log::LogColor::Red);
 	Log::PrintMultiLine(Name, Log::LogColor::Red, "[Error]: ");
 	Log::Print("[Error]: " + Location, Log::LogColor::Red);

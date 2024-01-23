@@ -4,6 +4,7 @@
 
 #include <SDL.h>
 #include <iostream>
+#include "Application.h"
 std::unordered_map<int32_t, Input::Gamepad> Input::Gamepads;
 Vector2 GetHatState(Uint8 hat);
 
@@ -37,6 +38,10 @@ void Input::GamepadUpdate()
 
 void Input::HandleGamepadEvent(void* EventPtr)
 {
+	if (!Application::WindowHasFocus())
+	{
+		return;
+	}
 	SDL_Event* e = (SDL_Event*)EventPtr;
 
 	if (!Gamepads.contains(e->jdevice.which))
