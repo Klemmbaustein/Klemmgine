@@ -7,6 +7,7 @@
 #include <filesystem>
 #include "SLN.h"
 #include <iostream>
+#include <algorithm>
 
 int Run(std::string Command)
 {
