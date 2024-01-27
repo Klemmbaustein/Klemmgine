@@ -39,7 +39,7 @@ namespace Log
 	* @param Prefix
 	* A prefix string that should be printed before each line.
 	*/
-	void PrintMultiLine(std::string Text, Vector3 Color = Vector3(1, 1, 1), std::string Prefix = "");
+	void PrintMultiLine(std::string Text, Vector3 Color = LogColor::White, std::string Prefix = "");
 
 	struct Message
 	{
