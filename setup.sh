@@ -26,6 +26,12 @@ cd ../..
 
 KlemmBuild engine.kbld -DGenerator -DCiBuild || fail
 
+declare -a cs_projects=("CSharp/Engine/KlemmgineCSharp.csproj" "CSharp/Core/CSharpCore.csproj")
+
+for i in "${cs_projects[@]}"; do
+	dotnet build $i || fail
+done
+
 if [ "$is_ci" != 1 ]; then
 	echo "Built dependencies and project generator."
 	exit 0
@@ -34,12 +40,6 @@ fi
 echo "Building for CI"
 
 ./ProjectGenerator -projectName Klemmgine -includeEngine false -ciBuild true || fail
-
-declare -a cs_projects=("CSharp/Engine/KlemmgineCSharp.csproj" "CSharp/Core/CSharpCore.csproj")
-
-for i in "${cs_projects[@]}"; do
-	dotnet build $i || fail
-done
 
 cd Games/Klemmgine
 declare -a configs=("-DEditor" "-DDebug" "-DRelease" "-DServer")

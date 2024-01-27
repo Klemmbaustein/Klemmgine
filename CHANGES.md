@@ -13,6 +13,7 @@
 - Added `Engine.NativeObject` and a few more utility functions to C#.
 - Added C# `EditorProperty` attribute and functionality.
 - Upgrade to new KlemmBuild version.
+- Added `setup.sh` for Linux builds.
 
 ## Version 1.7.2
 
