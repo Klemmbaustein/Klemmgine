@@ -82,7 +82,9 @@ jobs:
           cd KlemmBuild
           sudo make install
     - name: build
-      run: ./setup.sh
+      run: |
+          chmod +x setup.sh
+          ./setup.sh
     - name: install doxygen
       run: |
         wget https://www.doxygen.nl/files/doxygen-1.10.0.linux.bin.tar.gz
