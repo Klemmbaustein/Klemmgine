@@ -85,16 +85,16 @@ namespace LaunchArgs
 	}
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
 	{
-		std::pair("neverhideconsole", NeverHideConsole),
-		std::pair("scene", LoadScene),
-		std::pair("novsync", NoVSync),
-		std::pair("wireframe", Wireframe),
-		std::pair("version", GetVersion),
-		std::pair("fullscreen", FullScreen),
-		std::pair("nostartupinfo", NoStartupInfo),
-		std::pair("connect", Connect),
+		std::pair("neverhideconsole", &NeverHideConsole),
+		std::pair("scene", &LoadScene),
+		std::pair("novsync", &NoVSync),
+		std::pair("wireframe", &Wireframe),
+		std::pair("version", &GetVersion),
+		std::pair("fullscreen", &FullScreen),
+		std::pair("nostartupinfo", &NoStartupInfo),
+		std::pair("connect", &Connect),
 #if !RELEASE
-		std::pair("editorPath", EditorPath),
+		std::pair("editorPath", &EditorPath),
 #endif
 #if SERVER
 		std::pair("quitondisconnect", [](std::vector<std::string> arg) {

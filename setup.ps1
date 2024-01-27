@@ -46,34 +46,44 @@ dotnet restore
 #if the argument CI_BUILD has been passed through the command line, build the engine for a continuous integration build.
 if ($args[0] -eq "CI_BUILD")
 {
+	function Build-KlemmgineProject 
+	{
+		Param($config, $name)
+		msbuild $name /p:Configuration=$Configuration /p:Platform=x64 /p:CI_BUILD=1
+	}
+
+	$engine_configs = 
+	@(
+		"Release",
+		"Editor",
+		"Debug",
+		"Server"
+	)
+
 	Write-Host "--- Building for CI ---"
 	# Build the engine
 	$Env:ExternalCompilerOptions = "ENGINE_NO_SOURCE=1"
-	msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
-	msbuild Klemmgine.sln /p:Configuration=Editor /p:Platform=x64 /p:CI_BUILD=1
-	msbuild Klemmgine.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
-	msbuild Klemmgine.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
+
+	foreach ($config in $engine_configs)
+	{
+		Build-KlemmgineProject -name Klemmgine.sln -config $config
+	}
 
 	./ProjectGenerator.exe -projectName Klemmgine -includeEngine false -ciBuild true
-
 	cd Games/Klemmgine
-
 	dotnet restore
 
-	ls
-
-	# Build a simple project
-	msbuild Klemmgine.sln /p:Configuration=Release /p:Platform=x64 /p:CI_BUILD=1
-	msbuild Klemmgine.sln /p:Configuration=Editor /p:Platform=x64 /p:CI_BUILD=1
-	msbuild Klemmgine.sln /p:Configuration=Debug /p:Platform=x64 /p:CI_BUILD=1
-	msbuild Klemmgine.sln /p:Configuration=Server /p:Platform=x64 /p:CI_BUILD=1
+	foreach ($config in $engine_configs)
+	{
+		Build-KlemmgineProject -name Klemmgine.sln -config $config
+	}
 	rm x64 -r -force
 	rm GeneratedIncludes -r -force
 	rm Code -r -force
 	rm bin\*.pdb
 	cd ../..
 
-	# Create Project files without source directory
+	# Create the directory for project files for "Without Source" builds (CI Builds)
 	mkdir Tools/ProjectGenerator/ProjectFilesNoSource/bin/
 	cp Games/Klemmgine/bin/* Tools/ProjectGenerator/ProjectFilesNoSource/bin/
 	cp Games/Klemmgine/*.dll Tools/ProjectGenerator/ProjectFilesNoSource/
@@ -86,21 +96,27 @@ if ($args[0] -eq "CI_BUILD")
 	# Run doxygen on the engine, output will be in ./Docs/html
 	./doxygen/doxygen
 
-	# Remove doxygen
-	rm doxygen -r -force
-	rm doxygen.zip
+	# Remove unused files
+	$unused_files = 
+	@(
+		"doxygen.zip",
+		"doxygen/",
+		"x64/",
+		"Dependencies/",
+		"lib/",
+		"EngineSource/",
+		"Tools/ProjectGenerator/x64/",
+		"Tools/BuildTool/",
+		"Tools/bin/",
+		"Tools/ProjectGenerator/ProjectFiles/Code/",
+		"Tools/ProjectGenerator/ProjectFilesNoSource/Code/",
+		"Games/"
+	)
 
-	# Remove uneccesary files
-	rm x64/ -r -force
-	rm lib/ -r -force
-	rm Dependencies/ -r -force
-	rm EngineSource/ -r -force
-	rm Tools/ProjectGenerator/x64 -r -force
-	rm Tools/BuildTool -r -force
-	rm Tools/bin -r -force
-	rm Tools/ProjectGenerator/ProjectFiles/Code -r -force
-	rm Tools/ProjectGenerator/ProjectFilesNoSource/Code -r -force
-	rm Games/ -r -force
+	foreach ($file in $unused_files) 
+	{
+	#	rm -r -fo $file
+	}
 }
 else
 {
