@@ -81,36 +81,14 @@ jobs:
           git clone https://github.com/Klemmbaustein/KlemmBuild.git --recurse-submodules
           cd KlemmBuild
           sudo make install
-          cd ../SDL_net
-          cmake -S . -B Build/
-          cd Build
-          make
-          ls
-          cd ../../assimp/
-          cmake CMakeLists.txt
-          make
+    - name: build
+      run: ./setup.sh
     - name: install doxygen
       run: |
         wget https://www.doxygen.nl/files/doxygen-1.10.0.linux.bin.tar.gz
         tar -xf doxygen-1.10.0.linux.bin.tar.gz
         cd doxygen-1.10.0
         sudo make
-    - name: build
-      run: |
-          KlemmBuild engine.kbld -DGenerator -DCiBuild
-          ./ProjectGenerator -projectName Klemmgine -includeEngine false -ciBuild true
-          cd CSharp/Core
-          dotnet build
-          cd ../Engine
-          dotnet build
-          cd ../../Games/Klemmgine
-          KlemmBuild makefile.kbld -DEditor -DCiBuild
-          KlemmBuild makefile.kbld -DDebug -DCiBuild
-          KlemmBuild makefile.kbld -DRelease -DCiBuild
-          KlemmBuild makefile.kbld -DServer -DCiBuild
-          mkdir ../../Tools/ProjectGenerator/ProjectFilesNoSource/bin
-          cp ./bin/* ../../Tools/ProjectGenerator/ProjectFilesNoSource/bin
-          rm -rf Build
     - name: make-release
       run: |
           doxygen

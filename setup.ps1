@@ -115,7 +115,7 @@ if ($args[0] -eq "CI_BUILD")
 
 	foreach ($file in $unused_files) 
 	{
-	#	rm -r -fo $file
+		rm -r -fo $file
 	}
 }
 else
