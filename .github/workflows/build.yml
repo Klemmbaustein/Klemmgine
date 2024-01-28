@@ -122,10 +122,13 @@ jobs:
         cd ${{ github.workspace }}/Release/Klemmgine-Windows-${{ github.run_number }}.zip
         zip -r ${{ github.workspace }}/klemmgine-win.zip ./*
 
-        cd ${{ github.workspace }}/Release/Klemmgine-Linux-${{ github.run_number }}
+        export LINUX_ARTIFACT_NAME=${{ github.workspace }}/Release/Klemmgine-Linux-${{ github.run_number }}
+
+        cd LINUX_ARTIFACT_NAME
         chmod +x ProjectGenerator
         chmod +x Tools/ProjectGenerator/LinuxFiles/Editor.sh
-        tar -czvf ${{ github.workspace }}/klemmgine-linux.tar.gz ./*
+        cd ..
+        tar -czvf ${{ github.workspace }}/klemmgine-linux.tar.gz LINUX_ARTIFACT_NAME
 
     - name: list-directory
       run: ls -R
