@@ -36,6 +36,7 @@
       "sources": [
         "EngineSource/*.cpp"
       ],
+      "u8char": false,
 #if !CiBuild
       "debug": true,
 #endif
@@ -71,7 +72,8 @@
       "sources": [
         "Tools/BuildTool/Code/*.cpp"
       ],
-      "outputPath": "Tools/bin"
+      "outputPath": "Tools/bin",
+      "u8char": false
     },
     {
       "name": "ProjectGenerator",
@@ -81,7 +83,8 @@
 
       "sources": [
         "Tools/ProjectGenerator/Code/*.cpp"
-      ]
+      ],
+      "u8char": false
     }
   ]
 }
