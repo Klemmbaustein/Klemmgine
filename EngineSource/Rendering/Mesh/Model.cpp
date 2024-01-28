@@ -55,7 +55,11 @@ Model::Model(ModelGenerator::ModelData Data)
 	size_t NumVerts = 0;
 	for (auto& i : Data.Elements)
 	{
-		Material mat = Material::LoadMaterialFile(i.ElemMaterial);
+		Material mat;
+		if (!i.ElemMaterial.empty())
+		{
+			mat = Material::LoadMaterialFile(i.ElemMaterial);
+		}
 		Mesh* NewMesh = new Mesh(i.Vertices, i.Indices, mat);
 		NumVerts += i.Vertices.size();
 		Meshes.push_back(NewMesh);

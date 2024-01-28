@@ -123,12 +123,14 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				return "";
 			}
 #endif
+#else
 #if !ENGINE_NO_SOURCE
+			Log::Print("[Build]: Running KlemmBuild...");
 			system("KlemmBuild -DRelease");
 #endif
 			std::filesystem::copy("bin/Klemmgine-Release", TargetFolder + Project::ProjectName);
 #endif
-#if ENGINE_CSHARP && _WIN32
+#if ENGINE_CSHARP
 			if (CSharp::GetUseCSharp())
 			{
 				Log::Print("[Build]: Building C# core...");
