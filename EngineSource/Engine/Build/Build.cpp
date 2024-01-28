@@ -13,7 +13,6 @@
 #include <CSharp/CSharpInterop.h>
 #include <Engine/Build/Pack.h>
 
-#if _WIN32
 namespace Build
 {
 	std::string GetSystemCommandReturnValue(const std::string& command)
@@ -33,13 +32,17 @@ namespace Build
 		}
 		return ret;
 	}
+#if _WIN32
 	static std::string GetVSLocation()
 	{
 		auto test = GetSystemCommandReturnValue("cmd /C \"%ProgramFiles(x86)%\\Microsoft Visual Studio\\Installer\\vswhere.exe\"\
  -latest -property installationPath");
 		return test;
 	}
+#endif
 }
+
+#if _WIN32
 
 #define NOMINMAX
 #include <Windows.h>

@@ -28,12 +28,10 @@ public:
 	std::string GetProperty(std::string PropertyName);
 	void SetProperty(std::string PropertyName, std::string Value);
 
-	Transform CSharpTransform;
 
 	/// The class name of the object.
 	std::string CSharpClass;
 
-	std::string OldCSharpClass;
 
 	void OnPropertySet() override;
 	
@@ -45,5 +43,9 @@ public:
 	* The name of the class that should be instantiated.
 	*/
 	void LoadClass(std::string ClassName);
+
+private:
+	Transform CSharpTransform;
+	std::string OldCSharpClass;
 };
 #endif

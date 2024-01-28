@@ -14,7 +14,7 @@ RenameBox::RenameBox(std::string FileToRename)
 
 	SetOptions({ PopupOption("Confirm"), PopupOption("Cancel") });
 
-	InputField = new UITextField(0, EditorUI::UIColors[1], this, 0, EditorUI::Text);
+	InputField = new UITextField(0, EditorUI::UIColors[1], this, -1, EditorUI::Text);
 
 	std::string Ext = FileUtil::GetExtension(FileToRename);
 	PopupBackground->AddChild(new UIText(0.4f, EditorUI::UIColors[2], "From:  " + FileUtil::GetFileNameFromPath(FileToRename), EditorUI::Text));
@@ -57,6 +57,8 @@ void RenameBox::OnButtonClicked(int Index)
 
 void RenameBox::Tick()
 {
+	TickPopup();
+
 	if (Input::IsKeyDown(Input::Key::RETURN))
 	{
 		OnButtonClicked(0);

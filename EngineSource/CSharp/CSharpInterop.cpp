@@ -226,7 +226,6 @@ static void WriteCSProj(std::string Name)
 		<EnableDynamicLoading>true</EnableDynamicLoading>\n\
 	</PropertyGroup>\n\
 	<PropertyGroup>\n\
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>\n\
 		<OutputPath>" + std::filesystem::current_path().string() + "/CSharp/Build</OutputPath>\n\
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>\n\
 	</PropertyGroup>\n\

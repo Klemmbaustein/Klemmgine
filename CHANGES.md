@@ -1,5 +1,14 @@
 # Changes
 
+## Version 1.8.1
+
+### Changes
+
+- .tar.gz files for linux builds.
+- Multiple small fixes to the editor.
+
+### Fixes
+
 ## Version 1.8.0
 
 ### Changes

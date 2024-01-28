@@ -121,7 +121,6 @@ void ClassesBrowser::UpdateClasses()
 	std::vector<EditorClassesItem> CurrentItems = CPPClasses;
 	for (size_t i : CPPPath)
 	{
-		std::cout << CurrentItems.size() << " : " << i << std::endl;
 		if (CurrentItems.size() <= i)
 		{
 			CPPPath.clear();
@@ -182,14 +181,14 @@ std::vector<ClassesBrowser::BrowserItem> ClassesBrowser::GetBrowserContents()
 	{
 		BrowserItem New;
 		New.Name = FileUtil::GetFileNameFromPath(i.Name);
-		std::string Ext = i.Object.ID == CSharpObject::GetID() ? "cs" : "cpp";
+		std::string Ext = (i.Object.ID == CSharpObject::GetID() && i.Object.Name != "CSharpObject") ? "cs" : "cpp";
 
 		New.Color = i.IsFolder ? EditorUI::ItemColors["dir"] : EditorUI::ItemColors[Ext];
 		New.Texture = i.IsFolder ? EditorUI::Textures[5] : EditorUI::Textures[EditorUI::ItemTextures[Ext]];
 		New.Renameable = false;
 		New.Openable = i.IsFolder;
 		New.TypeID = i.Object.ID;
-		New.Path = i.Name;
+		New.Path = New.Name;
 		New.Deleteable = false;
 		Items.push_back(New);
 	}

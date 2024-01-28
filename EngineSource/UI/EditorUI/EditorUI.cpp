@@ -253,6 +253,7 @@ void EditorUI::SaveCurrentScene()
 	{
 		Log::Print("Saving scene \"Untitled\"", Vector3(0.3f, 0.4f, 1));
 		Scene::SaveSceneAs("Content/Untitled");
+		Scene::CurrentScene = "Content/Untitled";
 	}
 	else
 	{
@@ -261,6 +262,7 @@ void EditorUI::SaveCurrentScene()
 	}
 	ChangedScene = false;
 	AssetBrowser::UpdateAll();
+	UpdateAllInstancesOf<ObjectList>();
 }
 
 std::string EditorSceneToOpen;

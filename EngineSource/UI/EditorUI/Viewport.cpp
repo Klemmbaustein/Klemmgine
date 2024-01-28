@@ -94,7 +94,10 @@ void Viewport::OnItemDropped(DroppedItem Item)
 	if (Item.TypeID == CSharpObject::GetID())
 	{
 		auto Obj = Objects::SpawnObject<CSharpObject>(Transform(Point, 0, 1));
-		Obj->LoadClass(Item.Path);
+		if (Item.Path != "CSharpObject")
+		{
+			Obj->LoadClass(Item.Path);
+		}
 		Obj->IsSelected = true;
 		return;
 	}
