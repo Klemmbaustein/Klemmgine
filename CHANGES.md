@@ -5,9 +5,11 @@
 ### Changes
 
 - .tar.gz files for linux builds.
-- Multiple small fixes to the editor.
 
 ### Fixes
+
+- Multiple small fixes to the editor.
+- Linux builds can now properly create releases.
 
 ## Version 1.8.0
 
