@@ -123,8 +123,10 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				return "";
 			}
 #endif
-#else
-			Log::Print("Build: Compiling is currently not supported on Linux.", Vector3(1, 0, 0));
+#if !ENGINE_NO_SOURCE
+			system("KlemmBuild -DRelease");
+#endif
+			std::filesystem::copy("bin/Klemmgine-Release", TargetFolder + Project::ProjectName);
 #endif
 #if ENGINE_CSHARP && _WIN32
 			if (CSharp::GetUseCSharp())
