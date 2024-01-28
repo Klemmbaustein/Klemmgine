@@ -117,12 +117,15 @@ jobs:
       with:
         path: Release
 
-    - name: "zip artifacts"
+    - name: compress artifacts
       run: |
         cd ${{ github.workspace }}/Release/Klemmgine-Windows-${{ github.run_number }}.zip
         zip -r ${{ github.workspace }}/klemmgine-win.zip ./*
+
         cd ${{ github.workspace }}/Release/Klemmgine-Linux-${{ github.run_number }}
-        tar -czvf ${{ github.workspace }}/klemmgine-linux.tar.gz ./
+        chmod +x ProjectGenerator
+        chmod +x Tools/ProjectGenerator/LinuxFiles/Editor.sh
+        tar -czvf ${{ github.workspace }}/klemmgine-linux.tar.gz ./*
 
     - name: list-directory
       run: ls -R
