@@ -59,7 +59,8 @@
         "../../Dependencies/openal-soft/Build/openal",
         "../../CSharp/lib/nethost"
       ],
-      "optimization": "fastest"
+      "optimization": "fastest",
+      "u8char": false 
     },
     {
       "name": "RunBuildTool",

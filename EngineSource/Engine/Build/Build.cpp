@@ -76,11 +76,18 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			std::filesystem::create_directories(TargetFolder + "bin");
 			Debugging::EngineStatus = "Build: Copying .dll files";
 			Log::Print("[Build]: Copying .dll files");
+#if _WIN32
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
 			std::filesystem::copy("SDL2_net.dll", TargetFolder + "SDL2_net.dll");
 			std::filesystem::copy("bin/OpenAL32.dll", TargetFolder + "bin/OpenAL32.dll");
 #ifdef ENGINE_CSHARP
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
+#endif
+#else
+			std::filesystem::copy("bin/libSDL2_net.so", TargetFolder + "/libSDL2_net.so");
+#ifdef ENGINE_CSHARP
+			std::filesystem::copy("bin/libnethost.so", TargetFolder + "/libnethost.so");
+#endif
 #endif
 			Debugging::EngineStatus = "Build: Creating folders";
 			Log::Print("[Build]: Creating folders");

@@ -107,7 +107,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         path: Release
-        name: Klemmgine-Linux-${{ github.run_number }}.zip
+        name: Klemmgine-Linux-${{ github.run_number }}
   Release:
     runs-on: ubuntu-latest
     needs: [ build-windows, build-linux ]
@@ -121,11 +121,11 @@ jobs:
       run: |
         cd ${{ github.workspace }}/Release/Klemmgine-Windows-${{ github.run_number }}.zip
         zip -r ${{ github.workspace }}/klemmgine-win.zip ./*
-        cd ${{ github.workspace }}/Release/Klemmgine-Linux-${{ github.run_number }}.zip
-        zip -r ${{ github.workspace }}/klemmgine-linux.zip ./
+        cd ${{ github.workspace }}/Release/Klemmgine-Linux-${{ github.run_number }}
+        tar -czvf ${{ github.workspace }}/klemmgine-linux.tar.gz ./
 
     - name: list-directory
-      run: "ls -R"
+      run: ls -R
 
     - name: Create release
       uses: actions/create-release@v1
@@ -143,8 +143,8 @@ jobs:
         GITHUB_TOKEN: ${{ github.token }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: klemmgine-linux.zip
-        asset_name: Klemmgine-Linux-${{ github.run_number }}.zip
+        asset_path: klemmgine-linux.tar.gz
+        asset_name: Klemmgine-Linux-${{ github.run_number }}.tar.gz
         asset_content_type: application/zip
 
     - name: upload windows artifact
