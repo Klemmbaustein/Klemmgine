@@ -124,11 +124,11 @@ jobs:
 
         export LINUX_ARTIFACT_NAME=${{ github.workspace }}/Release/Klemmgine-Linux-${{ github.run_number }}
 
-        cd LINUX_ARTIFACT_NAME
+        cd $LINUX_ARTIFACT_NAME
         chmod +x ProjectGenerator
         chmod +x Tools/ProjectGenerator/LinuxFiles/Editor.sh
         cd ..
-        tar -czvf ${{ github.workspace }}/klemmgine-linux.tar.gz LINUX_ARTIFACT_NAME
+        tar -czvf ${{ github.workspace }}/klemmgine-linux.tar.gz $LINUX_ARTIFACT_NAME
 
     - name: list-directory
       run: ls -R
