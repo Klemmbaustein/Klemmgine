@@ -90,7 +90,6 @@ namespace CSharp
 
 using string_t = std::basic_string<char_t>;
 
-
 namespace CSharp
 {	
 	// Globals to hold hostfxr exports
@@ -165,6 +164,11 @@ namespace CSharp
 			Log::Print("Could not get hostfxr path - Error code: " + std::to_string(rc) + " : " + std::to_string(buffer_size), Log::LogColor::Red);
 			return false;
 		}
+#if _WIN32
+		CSharpLog("Using .net runtime .dll: '" + FileUtil::wstrtostr(buffer) + "'", CS_Log_Runtime);
+#else
+		CSharpLog("Using .net runtime .so: '" + std::string(buffer) + "'", CS_Log_Runtime);
+#endif
 		// Load hostfxr and get desired exports
 		hostfxr_lib = load_library(buffer);
 		init_fptr = (hostfxr_initialize_for_runtime_config_fn)get_export(hostfxr_lib, "hostfxr_initialize_for_runtime_config");
@@ -438,8 +442,6 @@ void* CSharp::LoadCSharpFunction(std::string Function, std::string Namespace, st
 	auto pos = root_path.find_last_of(DIR_SEPARATOR);
 	ENGINE_ASSERT(pos != string_t::npos, "Root path isn't valid");
 
-	ENGINE_ASSERT(load_hostfxr(), "Failure: load_hostfxr() failed.");
-
 	if (Application::GetEditorPath() != std::filesystem::current_path().string())
 	{
 #if !RELEASE
@@ -480,6 +482,19 @@ void CSharp::LoadAssembly()
 	{
 		return;
 	}
+
+	// Engine.Stats.EngineConfig enum for more information.
+	int Config = 0;
+#if EDITOR
+	Config = 0;
+#elif RELEASE
+	Config = 2;
+#elif SERVER
+	Config = 3;
+#else
+	Config = 1;
+#endif
+
 #if !RELEASE
 
 	std::string AssemblyPath = std::filesystem::current_path().string() + "/CSharp/Build/CSharpAssembly.dll";
@@ -500,13 +515,13 @@ void CSharp::LoadAssembly()
 		"bin/KlemmgineCSharp.dll",
 		std::filesystem::copy_options::update_existing);
 
-	StaticCall<void, const char*, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
-		AssemblyPath.c_str(), "bin/KlemmgineCSharp.dll", IsInEditor);
+	StaticCall<void, const char*, const char*, int>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
+		AssemblyPath.c_str(), "bin/KlemmgineCSharp.dll", Config);
 #else
-	StaticCall<void, const char*, const char*, bool>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
+	StaticCall<void, const char*, const char*, int>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
 		(std::filesystem::current_path().string() + "/bin/CSharp/CSharpAssembly.dll").c_str(),
 		(std::filesystem::current_path().string() + "/bin/CSharp/Engine/KlemmgineCSharp.dll").c_str(),
-		IsInEditor);
+		Config);
 #endif
 
 	AllClasses.clear();

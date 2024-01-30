@@ -17,13 +17,15 @@
 #include <Sound/Sound.h>
 #include <Math/Collision/Collision.h>
 #include <Engine/Console.h>
-#include <UI/UIBox.h>
+#include <UI/UIButton.h>
+#include <UI/Default/UICanvas.h>
 #include <UI/UIBackground.h>
 #include <UI/UIText.h>
 #include <Engine/Gamepad.h>
 #include <Engine/Application.h>
 #include <cstring>
 #include <Engine/Utility/StringUtility.h>
+#include "CSharpUICanvas.h"
 
 char* CopyString(const char* s)
 {
@@ -337,6 +339,30 @@ namespace NativeFunctions
 		return;
 	}
 
+	static UIButton* CreateUIButton(bool Horizontal, Vector2 Position, Vector3 Color, UICanvas* Parent, int Index)
+	{
+#if !EDITOR && !SERVER
+		return new UIButton(Horizontal ? UIBox::Orientation::Horizontal : UIBox::Orientation::Vertical, Position, Color, Parent, Index);
+#endif
+		return nullptr;
+	}
+
+	static bool GetIsUIButtonHovered(UIButton* Button)
+	{
+#if !EDITOR && !SERVER
+		return Button->GetIsHovered();
+#endif
+		return false;
+	}
+
+	static bool GetIsUIButtonPressed(UIButton* Button)
+	{
+#if !EDITOR && !SERVER
+		return Button->GetIsPressed();
+#endif
+		return false;
+	}
+
 	static TextRenderer* CreateTextRenderer(const char* Font)
 	{
 #if !EDITOR && !SERVER
@@ -372,6 +398,24 @@ namespace NativeFunctions
 #if !EDITOR && !SERVER
 		Input::CursorVisible = NewVisible;
 #endif
+	}
+
+	static UICanvas* NewUICanvas(void* OnClickedFunction, void* UpdateFunction, void* OnDestroyedFunction)
+	{
+		auto c = UICanvas::CreateNewCanvas<CSharpUICanvas>();
+		if (c)
+		{
+			c->LoadCSharpFunctions(OnClickedFunction, UpdateFunction, OnDestroyedFunction);
+		}
+		return c;
+	}
+
+	static void DestroyUICanvas(UICanvas* Canvas)
+	{
+		if (Canvas)
+		{
+			delete Canvas;
+		}
 	}
 #pragma endregion
 
@@ -574,10 +618,17 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(GetUIBackgroundColor);
 	REGISTER_FUNCTION(SetUIBackgroundTexture);
 
+	REGISTER_FUNCTION(CreateUIButton);
+	REGISTER_FUNCTION(GetIsUIButtonHovered);
+	REGISTER_FUNCTION(GetIsUIButtonPressed);
+
 	REGISTER_FUNCTION(CreateUIText);
 	REGISTER_FUNCTION(CreateTextRenderer);
 	REGISTER_FUNCTION(SetUITextColor);
 	REGISTER_FUNCTION(SetUITextText);
+
+	REGISTER_FUNCTION(NewUICanvas);
+	REGISTER_FUNCTION(DestroyUICanvas);
 
 	REGISTER_FUNCTION(GetNumGamepads);
 	REGISTER_FUNCTION(GetGamepadIndex);

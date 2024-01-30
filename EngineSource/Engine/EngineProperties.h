@@ -107,6 +107,8 @@ namespace Project
 /**
 * @mainpage Klemmgine documentation
 *
+* A simple 3D game engine written in C++ using OpenGL and SDL2 for Windows. It has basic support for scripting in C#.
+* 
 * ## Links
 * - Getting started: @ref Getting-Started
 * - C# documentation: @ref CSharp

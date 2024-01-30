@@ -443,15 +443,17 @@ namespace Engine.UI
 		public UIBackground(Orientation BoxOrientation, Vector2 Position, Vector3 Color, Vector2 MinScale) 
 			: base(BoxOrientation, Position)
 		{
-			NativePtr = (IntPtr)NativeFunction.CallNativeFunction("CreateUIBackground",
-				typeof(CreateBackground),
-				new object[]
-				{
-					BoxOrientation == Orientation.Horizontal,
-					Position,
-					Color,
-					MinScale
-				});
+			if (GetType() == typeof(UIBackground))
+			{ 
+				NativePtr = (IntPtr)NativeFunction.CallNativeFunction("CreateUIBackground",
+					typeof(CreateBackground),
+					[
+						BoxOrientation == Orientation.Horizontal,
+						Position,
+						Color,
+						MinScale
+					]);
+			}
 		}
 
 		/**
@@ -471,7 +473,7 @@ namespace Engine.UI
 		{
 			NativeFunction.CallNativeFunction("SetUIBackgroundColor",
 				typeof(SetBackgroundColor),
-				new object[] { NativePtr, NewColor });
+				[ NativePtr, NewColor ]);
 			return this;
 		}
 
@@ -486,7 +488,7 @@ namespace Engine.UI
 		{
 			return (Vector3)NativeFunction.CallNativeFunction("GetUIBackgroundColor",
 				typeof(GetBackgroundColor),
-				new object[] { NativePtr });
+				[ NativePtr ]);
 		}
 
 		/**
@@ -504,10 +506,68 @@ namespace Engine.UI
 		{
 			NativeFunction.CallNativeFunction("SetUIBackgroundTexture",
 				typeof(SetTextureDelegate),
-				new object[] { NativePtr, TextureName });
+				[ NativePtr, TextureName ]);
 			return this;
 		}
 
+	}
+
+	/**
+	 * @brief
+	 * A button.
+	 * 
+	 * C++ equivalent: UIButton
+	 * If the Parent UICanvas has been specified, the UIButton will call the OnClicked(int Index)
+	 * function with the given ButtonIndex.
+	 * 
+	 * Buttons function like a UIBackground and can have color, opacity and texture.
+	 * 
+	 * @ingroup CSharp-UI
+	 */
+	public class UIButton : UIBackground
+	{
+		protected delegate IntPtr CreateButton(bool Horizontal, Vector2 Position, Vector3 Color, IntPtr Parent, int Index);
+
+		[return: MarshalAs(UnmanagedType.U1)]
+		protected delegate bool GetButtonBoolPtr(IntPtr Button);
+		
+		public UIButton(Orientation BoxOrientation, Vector2 Position, Vector3 Color, UICanvas Parent, int ButtonIndex) : base(BoxOrientation, Position, Color, 0)
+		{
+			NativePtr = (IntPtr)NativeFunction.CallNativeFunction("CreateUIButton",
+				typeof(CreateButton),
+				[
+					BoxOrientation == Orientation.Horizontal,
+					Position,
+					Color,
+					Parent.NativePtr,
+					ButtonIndex
+				]);
+		}
+
+		/**
+		 * @brief
+		 * Checks if the button is hovered by the mouse cursor.
+		 * 
+		 * @return
+		 * true if the button is hovered, false if not.
+		 */
+		public bool GetIsHovered()
+		{
+			return (bool)NativeFunction.CallNativeFunction("GetIsUIButtonHovered", typeof(GetButtonBoolPtr), [ NativePtr ]);
+		}
+
+
+		/**
+		 * @brief
+		 * Checks if the button is pressed.
+		 * 
+		 * @return
+		 * true if the button is pressed, false if not.
+		 */
+		public bool GetIsPressed()
+		{
+			return (bool)NativeFunction.CallNativeFunction("GetIsUIButtonPressed", typeof(GetButtonBoolPtr), [ NativePtr ]);
+		}
 	}
 
 	/**

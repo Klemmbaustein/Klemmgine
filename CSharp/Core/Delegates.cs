@@ -11,7 +11,7 @@ public static class Delegates
 
 	public delegate void SetPropertyDelegate(Int32 Object, string Name, string Value);
 
-	public delegate void LoadAssemblyDelegate(string AsmPath, string EngineAsmPath, bool InEditor);
+	public delegate void LoadAssemblyDelegate(string AsmPath, string EngineAsmPath, int Config);
 	public delegate void LoadFunctionDelegate(IntPtr LoadedFunction);
 	public delegate void LoadNativeFunctionDelegate(string Name, IntPtr FunctionPtr);
 	public delegate Int32 InstantiateDelegate(string obj, EngineTransform t, IntPtr NativeObject);

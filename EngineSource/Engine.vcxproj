@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CSharp\CSharpUICanvas.cpp" />
     <ClCompile Include="Engine\BackgroundTask.cpp" />
     <ClCompile Include="Engine\Gamepad.cpp" />
     <ClCompile Include="UI\EditorUI\AssetBrowser.cpp" />
@@ -131,6 +132,7 @@
     <ClCompile Include="UI\UITextField.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CSharp\CSharpUICanvas.h" />
     <ClInclude Include="Engine\BackgroundTask.h" />
     <ClInclude Include="Engine\Gamepad.h" />
     <ClInclude Include="UI\EditorUI\AssetBrowser.h" />

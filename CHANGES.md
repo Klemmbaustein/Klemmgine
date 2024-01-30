@@ -5,6 +5,10 @@
 ### Changes
 
 - .tar.gz files for linux builds.
+- Added UIButton C# bindings.
+- Added UICanvas C# function.
+- Added C# `Engine.Stats.EngineConfig`.
+- Added more documentation and updated README.md to mention the linux version.
 
 ### Fixes
 

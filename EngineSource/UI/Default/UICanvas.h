@@ -8,7 +8,7 @@ class UIBox;
 
 /**
 * @brief
-* A class for managing multiple UIBoxes.
+* A class for managing multiple UI elements.
 * 
 * This class responds to button events with the OnButtonClicked() function.
 * 

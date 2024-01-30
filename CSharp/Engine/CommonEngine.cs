@@ -25,7 +25,7 @@ namespace Engine
 	 * Equivalent to Type::TypeEnum in C++.
 	 * Some elements are missing.
 	 */
-	enum NativeType
+	public enum NativeType
 	{
 		/// No type.
 		Null = -1,
@@ -114,8 +114,21 @@ namespace Engine
 	{
 		/// DeltaTime. Time between the last frame and the one before.
 		public static float DeltaTime = 0.0f;
-		/// True if in editor, false if not.
-		public static bool InEditor = false;
+
+		public enum EngineConfig
+		{
+			/// Editor configuration. No UI or networking functions are active.
+			Editor = 0,
+			/// Debug configuration. Like release builds, but with a console and performance display.
+			Debug = 1,
+			/// Release configuration. Release build of the game.
+			Release = 2,
+			/// Server configuration. For game servers. No graphics or UI code is active.
+			Server = 3
+		}
+
+		/// The configuration of the game engine.
+		public static EngineConfig Config = EngineConfig.Editor;
 	}
 
 

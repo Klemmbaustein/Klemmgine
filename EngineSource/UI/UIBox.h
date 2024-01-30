@@ -28,16 +28,34 @@ class UIBox
 {
 public:
 	bool IsVisible = true;
+
+	/**
+	* @brief
+	* Children align for UIBox.
+	*/
+
 	enum class Align
 	{
+		/// Align from lowest to highest. if Orientation = Horizontal, this means from left to right.
 		Default,
+		/// Centered align. will act like Align.Default, but children will be put in the center of the box.
 		Centered,
+		/// Align from highest to lowest. if Orientation = Horizontal, this means from right to left.
 		Reverse
 	};
+
+	/**
+	* @brief
+	* Describes the border of an Engine.UI.UIBox.
+	*/
+
 	enum class BorderType
 	{
+		/// No border.
 		None = 0,
+		/// Rounded border.
 		Rounded = 1,
+		/// Darkened edge around the box.
 		DarkenedEdge = 2
 	};
 	/**
@@ -119,7 +137,51 @@ public:
 	void InvalidateLayout();
 	UIBox* AddChild(UIBox* NewChild);
 	UIBox* GetAbsoluteParent();
+
+	/**
+	 * @brief
+	 * Sets the horizontal align for all children.
+	 * 
+	 * ```
+	 * Example
+	 *  ____________________________________    ____________________________________
+	 * | _______   _______                  |  |         _______   _______          |
+	 * ||Child 1| |Child 2|                 |  |        |Child 1| |Child 2|         |
+	 * ||_______| |_______|                 |  |        |_______| |_______|         |
+	 * |                                    |  |                                    |
+	 * | Parent box                         |  | Parent box                         |
+	 * | Horizontal Align: Default          |  | Horizontal Align: Centered         |
+	 * |____________________________________|  |____________________________________|
+	 * 
+	 * @return
+	 * A reference to this %UIBox.
+	 * ```
+	 */
 	UIBox* SetHorizontalAlign(Align NewAlign);
+	/**
+	 * @brief
+	 * Sets the horizontal align for all children.
+	 * 
+	 * Notes:
+	 * - The default vertical align is Align.Reverse, not Align.Default.
+	 * - **Align::Reverse aligns boxes from the top down (from 1 to -1)** while Align.Default aligns boxes from the bottom up (from -1 to 1)
+	 *   The reason for this is that this corresponds to the way horizotal align works.
+	 *   (Default is from -1 to 1 - left to right, Reverse 1 to -1, right to left)
+	 * 
+	 * ```
+	 * Example
+	 *  ____________________________________    ____________________________________
+	 * | _______   _______                  |  | Vertical Align: Default            |
+	 * ||Child 1| |Child 2|                 |  | Parent box                         |
+	 * ||_______| |_______|                 |  |                                    |
+	 * |                                    |  | _______   _______                  |
+	 * | Parent box                         |  ||Child 1| |Child 2|                 |
+	 * | Vertical Align: Reverse            |  ||_______| |_______|                 |
+	 * |____________________________________|  |____________________________________|
+	 * ```
+	 * @return
+	 * A reference to this %UIBox.
+	 */
 	UIBox* SetVerticalAlign(Align NewAlign);
 	static void DrawAllUIElements();
 	void DeleteChildren();
@@ -151,7 +213,23 @@ public:
 	 */
 	UIBox* SetMinSize(Vector2 NewMinSize);
 	Vector2 GetMinSize();
+
+	/**
+	 * @brief
+	 * Sets the position of the UIBox.
+	 * 
+	 * @param NewPosition
+	 * The new position of the box, where -1, -1 is the bottom left corner of the screen and 1, 1 is the top right corner.
+	 */
 	UIBox* SetPosition(Vector2 NewPosition);
+
+	/**
+	 * @brief
+	 * Gets the position of the UIBox.
+	 *
+	 * @return
+	 * The position of the box, where -1, -1 is the bottom left corner of the screen and 1, 1 is the top right corner.
+	 */
 	Vector2 GetPosition();
 
 	/**
@@ -182,6 +260,22 @@ public:
 	bool GetTryFill();
 	friend UIScrollBox;
 	virtual void OnChildClicked(int Index);
+	/**
+	 * @brief
+	 * Sets the border type of the UIBox.
+	 * 
+	 * This only has an effect on the classes UIButton, UIBackground and UITextField.
+	 * 
+	 * @param NewBorderType
+	 * The type of the border. See UIBox::BorderType for more info.
+	 * 
+	 * @param Size
+	 * The size of the border.
+	 * 
+	 * @return
+	 * A pointer to this %UIBox.
+	 */
+
 	UIBox* SetBorder(UIBox::BorderType Type, float Size);
 	static void ForceUpdateUI();
 	static void InitUI();

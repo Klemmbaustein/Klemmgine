@@ -76,7 +76,7 @@ static class Engine
 
 	static bool LoadedEngine = false;
 
-	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path, [MarshalAs(UnmanagedType.LPUTF8Str)] string EngineDllPath, bool InEditor)
+	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path, [MarshalAs(UnmanagedType.LPUTF8Str)] string EngineDllPath, int EngineConfig)
 	{
 		WorldObjectTypes.Clear();
 		CoreNativeFunction.UnloadNativeFunctions();
@@ -118,7 +118,7 @@ static class Engine
 		}
 
 		StatsObject = LoadTypeFromAssembly("Engine.Stats");
-		StatsObject!.GetField("InEditor")!.SetValue(null, InEditor);
+		StatsObject!.GetField("Config")!.SetValue(null, EngineConfig);
 		InputObject = LoadTypeFromAssembly("Engine.Input");
 	}
 
