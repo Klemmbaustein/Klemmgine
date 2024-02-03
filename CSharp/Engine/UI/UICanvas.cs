@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Engine.UI;
@@ -16,18 +17,27 @@ namespace Engine.UI;
  */
 public abstract class UICanvas
 {
+	// Keep all UICanvases alive so the GC won't try to free them while they're
+	// still being used by the unmanaged C++ code.
+	public static readonly HashSet<UICanvas> LoadedCanvases = [];
+
 	public readonly IntPtr NativePtr;
 
 	private delegate IntPtr NewUICanvas(IntPtr OnButtonClickedPtr, IntPtr UpdatePtr, IntPtr DestroyPtr);
 	private delegate void OnButtonClickedDelegate(Int32 Index);
 	private delegate void VoidDelegate();
-	private delegate void DestroyDelegate(IntPtr Canvas);
+	private delegate void DestroyDelegateType(IntPtr Canvas);
+
+	VoidDelegate UpdateDelegate;
+	VoidDelegate DestroyDelegate;
+	OnButtonClickedDelegate OnClicked;
 
 	public UICanvas()
 	{
-		OnButtonClickedDelegate OnClicked = OnButtonClicked;
-		VoidDelegate UpdateDelegate = Update;
-		VoidDelegate DestroyDelegate = OnDestroyed;
+		UpdateDelegate = Update;
+		DestroyDelegate = OnDestroyed;
+		OnClicked = OnButtonClicked;
+
 		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewUICanvas",
 			typeof(NewUICanvas),
 			[
@@ -35,6 +45,7 @@ public abstract class UICanvas
 				Marshal.GetFunctionPointerForDelegate(UpdateDelegate),
 				Marshal.GetFunctionPointerForDelegate(DestroyDelegate),
 			]);
+		LoadedCanvases.Add(this);
 	}
 
 	/**
@@ -68,10 +79,15 @@ public abstract class UICanvas
 	public void Destroy()
 	{
 		NativeFunction.CallNativeFunction("DestroyUICanvas",
-			typeof(DestroyDelegate),
+			typeof(DestroyDelegateType),
 			[
 				NativePtr
 			]);
+		LoadedCanvases.Remove(this);
 	}
 
+	~UICanvas()
+	{
+		Log.Print("hi");
+	}
 }

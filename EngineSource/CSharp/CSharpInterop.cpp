@@ -511,9 +511,17 @@ void CSharp::LoadAssembly()
 		return;
 	}
 
-	std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCSharp.dll",
-		"bin/KlemmgineCSharp.dll",
-		std::filesystem::copy_options::update_existing);
+	try
+	{
+		std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCSharp.dll",
+			"bin/KlemmgineCSharp.dll",
+			std::filesystem::copy_options::update_existing);
+	}
+	catch (std::exception& e)
+	{
+		Log::Print(e.what(), Log::LogColor::Red);
+	}
+
 
 	StaticCall<void, const char*, const char*, int>(LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
 		AssemblyPath.c_str(), "bin/KlemmgineCSharp.dll", Config);

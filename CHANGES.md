@@ -1,14 +1,23 @@
 # Changes
 
+## Version 1.8.2
+
+### Fixes
+
+- Fixed a crash with rebuilding C# in the editor.
+- Fixed an issue with public EditorProperties.
+- Fixed an issue where C# UICanvases would be garbage collected.
+- Fixed some incomplete/incorrect documentation.
+
 ## Version 1.8.1
 
 ### Changes
 
-- .tar.gz files for linux builds.
+- .tar.gz files for Linux builds.
 - Added UIButton C# bindings.
 - Added UICanvas C# function.
 - Added C# `Engine.Stats.EngineConfig`.
-- Added more documentation and updated README.md to mention the linux version.
+- Added more documentation and updated README.md to mention the Linux version.
 
 ### Fixes
 
@@ -56,5 +65,5 @@
 
 ### Fixes
 - Fixed some issues with point lights.
-- Fixed isues with shadows.
+- Fixed issues with shadows.
 - Fixed an issue with the default movement.

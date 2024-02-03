@@ -9,8 +9,6 @@ namespace Engine
 	 * 
 	 * Equivalent to the Log:: namespace in <Engine/Log.h>.
 	 * 
-	 * Note: Log::PrintMultiLine() is not supported in C#.
-	 * 
 	 * @ingroup CSharp
 	 */
 	public class Log
@@ -31,7 +29,7 @@ namespace Engine
 			Error = 2
 		}
 
-		static System.Action<string, int>? PrintFunction = null;
+		static Action<string, int>? PrintFunction = null;
 
 		public static void LoadLogFunction(System.Action<string, int> Target)
 		{
@@ -40,15 +38,15 @@ namespace Engine
 
 		/**
 		 * @brief
-		 * Mostly equivalent to Log::Print() in <Engine/Log.h>. Prints the string Message to standard output and log if avaliable.
+		 * Mostly equivalent to Log::PrintMultiLine() in <Engine/Log.h>. Prints the string Message to standard output and log if avaliable.
 		 * 
-		 * There are a few differences between this function and Log::Print() in <Engine/Log.h>.
+		 * There are a few differences between this function and Log::PrintMultiLine() in <Engine/Log.h>.
 		 * 1. The string `[C#]: [Script]: ` gets printed before `Message`.
 		 * 2. You cannot specify the color of the message. Instead, you can define the severity with the Log.Severity enum. Color
 		 *    is determined by the severity.
 		 * 
 		 * This function calls the native function `CSharpInternalPrint()` in `CSharp/CSharpInterop.cpp`, which calls `CSharp::CSharpLog()`.
-		 * `CSharp::CSharpLog()` calls Log::Print().
+		 * `CSharp::CSharpLog()` calls Log::PrintMultiLine().
 		 */
 		public static void Print(string Message, Severity MessageSeverity = Severity.Info)
 		{

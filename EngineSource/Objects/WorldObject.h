@@ -134,11 +134,15 @@ public:
 			this->Type = (Type::TypeEnum)Type;
 			this->Data = Data;
 		}
+		Property()
+		{
+
+		}
 
 		std::string Name;
 		std::string ValueString;
-		Type::TypeEnum Type;
-		void* Data;
+		Type::TypeEnum Type = Type::Null;
+		void* Data = nullptr;
 		enum class PropertyType
 		{
 			EditorProperty,

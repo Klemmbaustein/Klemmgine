@@ -787,7 +787,7 @@ static void PollInput()
 			}
 		}
 	}
-	if (Input::CursorVisible)
+	if (Input::CursorVisible || !Application::WindowHasFocus())
 	{
 		Input::MouseLocation = GetMousePosition();
 		SDL_SetRelativeMouseMode(SDL_FALSE);

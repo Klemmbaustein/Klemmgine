@@ -71,7 +71,7 @@ public abstract class WorldObject
 	{
 		var ObjectType = GetType();
 		string PropertyString = "";
-		foreach (var i in ObjectType.GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
+		foreach (var i in ObjectType.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
 		{
 			if (!i.IsDefined(typeof(EditorProperty)))
 			{

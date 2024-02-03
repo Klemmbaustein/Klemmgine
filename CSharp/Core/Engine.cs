@@ -240,7 +240,7 @@ static class Engine
 			return "";
 		}
 		var obj = value;
-		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
+		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
 		if (field == null)
 		{
 			EngineLog.Print(string.Format("Tried to get the field {0} on {1} but that field doesn't exist on this class!", PropertyName, obj.GetType().Name));
@@ -270,7 +270,7 @@ static class Engine
 			return;
 		}
 		var obj = value;
-		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Instance);
+		var field = obj.GetType().GetField(PropertyName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
 		if (field == null)
 		{
 			EngineLog.Print(string.Format("Tried to set the field {0} on {1} but that field doesn't exist on this class!", PropertyName, obj.GetType().Name), 1);
@@ -280,6 +280,7 @@ static class Engine
 		if (field.FieldType.IsArray)
 		{
 			return;
+			// TODO: Implement property arrays
 			/*string[] entries = PropertyValue.Split(new string[] { "\r" }, StringSplitOptions.None).Select(x => x).ToArray();
 
 			if (entries.Last().Length == 0)
@@ -336,6 +337,7 @@ static class Engine
 					field.SetValue(obj, iresult);
 				}
 				break;
+			case "System.Single":
 			case "System.Float":
 				if (float.TryParse(PropertyValue, out float fresult))
 				{

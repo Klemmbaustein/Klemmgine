@@ -8,8 +8,9 @@ static std::map<std::string, Type::TypeEnum> ManagedTypes =
 {
 	{"String", Type::String},
 	{"Float", Type::Float},
+	{"Single", Type::Float},
 	{"Vector3", Type::Vector3},
-	{"Boolean", Type::Bool}
+	{"Boolean", Type::Bool},
 };
 
 void CSharpObject::Begin()
@@ -54,7 +55,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 
 		if (!DeleteParameters)
 		{
-			for (auto& i : Properties)
+			for (const Property& i : Properties)
 			{
 				if (i.PType == Property::PropertyType::CSharpProperty && !i.ValueString.empty())
 				{
@@ -64,7 +65,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 		}
 		CSharp::ExectuteFunctionOnObject(CS_Obj, "Begin");
 		size_t it = 1;
-		for (auto& i : LoadedProperties)
+		for (const std::string& i : LoadedProperties)
 		{
 			size_t FirstSpace = i.find_first_of(" ");
 			std::vector<std::string> values = {i.substr(0, FirstSpace), i.substr(FirstSpace + 1)};
@@ -76,7 +77,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 
 			if (!ManagedTypes.contains(values[0]))
 			{
-				Log::Print("Unknown managed type: " + values[0], Log::LogColor::Red);
+				Log::Print("Unknown managed type: " + values[0] + " of variable " + values[1], Log::LogColor::Red);
 				continue;
 			}
 			Property p = Property(values[1], ManagedTypes[values[0]], nullptr);
@@ -89,12 +90,14 @@ void CSharpObject::Reload(bool DeleteParameters)
 			if (DeleteParameters || Properties.size() <= it)
 			{
 				Properties.push_back(p);
+				it++;
 			}
 			else
 			{
 				Properties[it++] = p;
 			}
 		}
+		Properties.resize(it);
 		if (Name == "CSharpObject")
 		{
 			Name = CSharpClass;
@@ -120,7 +123,7 @@ void CSharpObject::SetProperty(std::string PropertyName, std::string Value)
 			i.ValueString = Value;
 		}
 	}
-	return CSharp::SetPropertyOfObject(CS_Obj, PropertyName, Value);
+	CSharp::SetPropertyOfObject(CS_Obj, PropertyName, Value);
 }
 
 void CSharpObject::OnPropertySet()

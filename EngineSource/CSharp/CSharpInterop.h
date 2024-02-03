@@ -62,7 +62,7 @@ namespace CSharp
 	bool IsAssemblyLoaded();
 	/**
 	* @brief
-	* Function used by 
+	* Function used by C# code to print messages to the log.
 	*/
 	void CSharpLog(std::string Msg, CSharpLogType Type, CSharpLogSev Severity = CS_Log_Info);
 	void RegisterNativeFunction(std::string Name, void* Function);

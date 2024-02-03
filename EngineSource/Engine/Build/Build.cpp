@@ -196,8 +196,9 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				std::filesystem::create_directories(ToDir);
 				std::filesystem::copy(LatestRuntimePath, ToDir, DirectoryCopyOptions);
 
-				std::filesystem::create_directories(TargetFolder + "/bin/NetRuntime/host");
-				std::filesystem::copy(LatestRuntimePath + "/../../../host", TargetFolder + "/bin/NetRuntime/host", DirectoryCopyOptions);
+				std::string HostPath = TargetFolder + "/bin/NetRuntime/host/fxr/" + LatestRuntimeVersion;
+				std::filesystem::create_directories(HostPath);
+				std::filesystem::copy(LatestRuntimePath + "/../../../host/fxr/" + LatestRuntimeVersion, HostPath, DirectoryCopyOptions);
 			}
 #endif
 			Log::Print("[Build]: Complete", Log::LogColor::Green);
