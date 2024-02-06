@@ -25,8 +25,7 @@ static std::vector<std::pair<std::string, std::vector<std::pair<std::string, std
 	}}
 };
 
-AboutWindow::AboutWindow()
-	: EditorPopup(0, Vector2(0.5f, 0.6f), "About")
+AboutWindow::AboutWindow() : EditorPopup(0, Vector2(0.5f, 0.6f), "About")
 {	
 	SetOptions({PopupOption("OK")});
 

@@ -562,6 +562,16 @@ namespace Input
 		ENDCALL = TO_KEYCODE(Key_Scancode::SCANCODE_ENDCALL)
 	};
 
+	/**
+	* @brief
+	* Checks if a given key is pressed.
+	* 
+	* @param InputKey
+	* The Key to check.
+	* 
+	* @return
+	* True if the given key is pressed, false if not.
+	*/
 	bool IsKeyDown(Key InputKey);
 }
 

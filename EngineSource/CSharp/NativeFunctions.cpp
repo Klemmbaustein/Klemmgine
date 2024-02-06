@@ -60,7 +60,7 @@ namespace NativeFunctions
 		Parent->Attach(NewCollider);
 		ModelGenerator::ModelData m;
 		m.LoadModelFromFile(ModelFile);
-		NewCollider->Load(m.GetMergedVertices(), m.GetMergedIndices());
+		NewCollider->Load(m);
 		return NewCollider;
 	}
 

@@ -18,8 +18,8 @@ void InstancedMeshObject::Update()
 			Collision::HitResponse Hit = Collision::LineTrace(GetTransform().Location + Loc, GetTransform().Location + Loc - Vector3(0, 100, 0));
 			Vector3 AxisA = Vector3(Hit.Normal.Y, Hit.Normal.Z, Hit.Normal.X);
 			Vector3 AxisB = Vector3::Cross(Hit.Normal, AxisA);
-			Vector3 Rotation = Vector3(sin(AxisB.Y), atan2(AxisB.X, AxisB.Z) + 3.14f, 0).RadiantsToDegrees();
-			Rotation = Vector3(Rotation.X, 0, Rotation.Y).DegreesToRadiants();
+			Vector3 Rotation = Vector3(sin(AxisB.Y), atan2(AxisB.X, AxisB.Z) + 3.14f, 0).RadiansToDegrees();
+			Rotation = Vector3(Rotation.X, 0, Rotation.Y).DegreesToRadians();
 			if (Hit.Hit)
 			{
 				if (ComponentName == "")

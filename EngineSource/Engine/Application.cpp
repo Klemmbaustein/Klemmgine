@@ -58,6 +58,7 @@
 #include <chrono>
 #include <condition_variable>
 #include <stack>
+#include <Math/Physics/Physics.h>
 
 static Vector2 GetMousePosition()
 {
@@ -924,6 +925,7 @@ static void ApplicationLoop()
 	PollInput();
 	CameraShake::Tick();
 	Sound::Update();
+	Physics::Update();
 #endif
 #if !EDITOR
 	if (Project::UseNetworkFunctions)
@@ -1166,6 +1168,7 @@ int Application::Initialize(int argc, char** argv)
 		glGenQueries(256, Application::OcclusionQueries);
 	}
 #endif
+	Physics::Init();
 
 	ConsoleInput::ReadConsoleThread = new std::thread(ConsoleInput::ReadConsole);
 

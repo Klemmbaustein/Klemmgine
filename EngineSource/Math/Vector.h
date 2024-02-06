@@ -136,8 +136,8 @@ struct Vector3
 	
 	Vector3 operator-();
 
-	Vector3 RadiantsToDegrees() const;
-	Vector3 DegreesToRadiants() const;
+	Vector3 RadiansToDegrees() const;
+	Vector3 DegreesToRadians() const;
 
 	/**
 	* @brief 

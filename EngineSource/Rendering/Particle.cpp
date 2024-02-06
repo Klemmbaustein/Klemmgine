@@ -121,8 +121,8 @@ void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 		for (const auto& T : ParticleInstances[i])
 		{
 			glm::mat4 Inst = glm::mat4(1.f);
-			Inst = glm::translate(Inst, (glm::vec3)(Vector3::TranslateVector(T.Position, Transform(0, Rotation.DegreesToRadiants(), 1)) + Position));
-			Vector3 Rotation = Vector3() - MainCamera->Rotation.DegreesToRadiants();
+			Inst = glm::translate(Inst, (glm::vec3)(Vector3::TranslateVector(T.Position, Transform(0, Rotation.DegreesToRadians(), 1)) + Position));
+			Vector3 Rotation = Vector3() - MainCamera->Rotation.DegreesToRadians();
 			Inst = glm::rotate(Inst, Rotation.Y, glm::vec3(0, 1, 0));
 			Inst = glm::rotate(Inst, (float)Math::PI, glm::vec3(0, 1, 0));
 			Inst = glm::rotate(Inst, Rotation.X + -(float)Math::PI / 2.f, glm::vec3(0, 0, 1));

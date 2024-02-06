@@ -35,7 +35,7 @@ namespace Collision
 		/// The object that was hit.
 		WorldObject* HitObject = nullptr;
 		/// The component that was hit.
-		CollisionComponent* HitComponent = nullptr;
+		Component* HitComponent = nullptr;
 		/// The normal vector of the collision.
 		Vector3 Normal;
 		HitResponse()

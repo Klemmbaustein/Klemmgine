@@ -521,8 +521,13 @@ void ContextMenu::OnResized()
 
 		if (!SelectedObject)
 		{
+			BackgroundBox->HorizontalBoxAlign = UIBox::Align::Centered;
 			BackgroundBox->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "No object selected", EditorUI::Text)));
 			return;
+		}
+		else
+		{
+			BackgroundBox->HorizontalBoxAlign = UIBox::Align::Default;
 		}
 
 		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Object: " + SelectedObject->Name, EditorUI::Text))

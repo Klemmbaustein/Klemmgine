@@ -22,7 +22,7 @@ void SoundObject::Begin()
 
 	auto EditorCollision = new CollisionComponent();
 	Attach(EditorCollision);
-	EditorCollision->Load(m.GetMergedVertices(), m.GetMergedIndices());
+	EditorCollision->Load(m);
 	EditorCollision->RelativeTransform.Scale = 0.25;
 #endif
 }

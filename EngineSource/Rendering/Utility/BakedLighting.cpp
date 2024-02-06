@@ -97,7 +97,7 @@ namespace Bake
 
 	std::byte* Texture = nullptr;
 
-	constexpr int NUM_CHUNK_SPLITS = 2;
+	constexpr int NUM_CHUNK_SPLITS = 4;
 	std::atomic<float> ThreadProgress[NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS];
 
 	static void BakeSection(int64_t x, int64_t y, int64_t z, size_t ThreadID)
@@ -283,7 +283,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 				Vector3 InvertedRotation = (i->GetTransform().Rotation + c->RelativeTransform.Rotation);
 				InvertedRotation = Vector3(-InvertedRotation.Z, InvertedRotation.Y, -InvertedRotation.X);
 				Transform ModelTransform = (Transform(Vector3::TranslateVector(c->RelativeTransform.Location, i->GetTransform()),
-					Vector3() - InvertedRotation.DegreesToRadiants(),
+					Vector3() - InvertedRotation.DegreesToRadians(),
 					c->RelativeTransform.Scale * 0.025f * i->GetTransform().Scale));
 
 				Bake::Meshes.push_back(Collision::CollisionMesh(m.GetMergedVertices(), m.GetMergedIndices(), ModelTransform));

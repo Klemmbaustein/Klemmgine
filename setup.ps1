@@ -1,30 +1,43 @@
 Write-Host "Building dependencies..."
 
+function Build-MsBuild
+{
+	Param($config, $name)
+	msbuild $name /p:Configuration=$config /p:Platform=x64 /p:CI_BUILD=1 /v:Minimal /property:MultiProcessorCompilation=true
+}
+
 # Build engine dependencies
 cd Dependencies\SDL\VisualC\SDL
-msbuild -nologo /p:Configuration=Release /p:Platform=x64 /property:MultiProcessorCompilation=true
+Build-MsBuild -config Release
 cd ..\..\..\..
 
 cd Dependencies\SDL_net
 cmake -S . -B Build -DSDL2_LIBRARY="..\SDL\VisualC\SDL\x64\Release\SDL2.lib" -DSDL2_INCLUDE_DIR="..\SDL\include"
 cd Build\
-msbuild SDL2_net.vcxproj /p:Configuration=Release /p:Platform=x64 /property:MultiProcessorCompilation=true
+Build-MsBuild -name SDL2_net.vcxproj -config Release
 cd ..\..\..
 
 cd Dependencies\glew-cmake
 cmake CMakeLists.txt
-msbuild libglew_static.vcxproj -nologo /p:Configuration=Release /p:Platform=x64 /property:MultiProcessorCompilation=true
+Build-MsBuild -name libglew_static.vcxproj -config Release
 cd ..\..
 
 cd Dependencies\assimp
 cmake CMakeLists.txt
-msbuild code\assimp.vcxproj -nologo /p:Configuration=Release /p:Platform=x64 /property:MultiProcessorCompilation=true
+Build-MsBuild -name code\assimp.vcxproj -config Release
 cd ..\..
 
 cd Dependencies\openal-soft
 cmake CMakeLists.txt
-msbuild OpenAL.vcxproj -nologo /p:Configuration=Release /p:Platform=x64 /property:MultiProcessorCompilation=true
+Build-MsBuild -name OpenAL.vcxproj -config Release
 cd ..\..
+
+cd Dependencies\JoltPhysics\Build
+.\cmake_vs2022_cl.bat
+cd VS2022_CL
+Build-MsBuild -name Jolt.vcxproj -config Distribution
+cd ..\..\..\..
+
 Write-Host "--- Finished setting up dependencies ---"
 
 Write-Host "--- Building Engine ---"

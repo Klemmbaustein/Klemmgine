@@ -17,8 +17,8 @@ public:
 	CollisionComponent() {}
 	virtual void Destroy() override;
 	void Update() override;
-	void Load(std::vector<Vertex> Vertices, std::vector<unsigned int> Indices, Transform RelativeTransform = Transform());
-	Collision::CollisionMesh* CollMesh = nullptr;
+	void Load(const ModelGenerator::ModelData& Model, Transform RelativeTransform = Transform());
+	void* Collider = nullptr;
 protected:
 	Transform LastParentTransform;
 	Transform LastRelativeTransform;

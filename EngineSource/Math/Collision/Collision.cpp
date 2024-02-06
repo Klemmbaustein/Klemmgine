@@ -5,6 +5,7 @@
 #include <Engine/Log.h>
 #include <cmath>
 #include <Math/Math.h>
+#include <Math/Physics/Physics.h>
 
 namespace Collision
 {
@@ -132,26 +133,18 @@ Collision::HitResponse IntersectRaySphere(Vector3 Start, Vector3 Dir, Vector3 sp
 
 Collision::HitResponse Collision::LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<WorldObject*> ObjectsToIgnore, std::set<CollisionComponent*> MeshesToIgnore)
 {
-	float CollTMin = INFINITY;
-	HitResponse Collision;
+	HitResponse Result;
 
-	for (int i = 0; i < Collision::CollisionBoxes.size(); i++)
+	auto Hit = Physics::RayCast(RayStart, RayEnd);
+
+	Result.Hit = Hit.Hit;
+	Result.HitComponent = Hit.HitComponent;
+	Result.ImpactPoint = Hit.ImpactPoint;
+	if (Hit.HitComponent)
 	{
-		if (MeshesToIgnore.find(Collision::CollisionBoxes[i]) == MeshesToIgnore.end()
-			&& ObjectsToIgnore.find(Collision::CollisionBoxes[i]->GetParent()) == ObjectsToIgnore.end())
-		{
-			HitResponse NewCollision = Collision::CollisionBoxes.at(i)->CollMesh->CheckAgainstLine(RayStart, RayEnd);
-			if (NewCollision.t < CollTMin && NewCollision.Hit)
-			{
-				CollTMin = NewCollision.t;
-				Collision = NewCollision;
-				Collision.Normal = NewCollision.Normal;
-				Collision.HitComponent = Collision::CollisionBoxes.at(i);
-				Collision.HitObject = Collision::CollisionBoxes.at(i)->GetParent();
-			}
-		}
+		Result.HitObject = Hit.HitComponent->GetParent();
 	}
-	return Collision;
+	return Result;
 }
 
 //send help
@@ -378,13 +371,14 @@ Collision::HitResponse Collision::CollisionMesh::CheckAgainstAABB(const Box& b)
 }
 Collision::HitResponse Collision::CollisionMesh::OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore)
 {
+	/*
 	for (CollisionComponent* c : CollisionBoxes)
 	{
 		if (MeshesToIgnore.find(c) == MeshesToIgnore.end())
 		{
-			if (c->CollMesh != this)
+			if (c->Collider != this)
 			{
-				HitResponse newR = CheckAgainstMesh(c->CollMesh);
+				HitResponse newR = CheckAgainstMesh(c->Collider);
 				if (newR.Hit)
 				{
 					newR.HitObject = c->GetParent();
@@ -394,5 +388,6 @@ Collision::HitResponse Collision::CollisionMesh::OverlapCheck(std::set<Collision
 			}
 		}
 	}
+	*/
 	return HitResponse();
 }

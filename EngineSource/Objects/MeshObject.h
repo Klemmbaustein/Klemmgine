@@ -39,7 +39,7 @@ public:
 	*/
 	bool MeshCastShadow = true;
 protected:
-	std::vector<CollisionComponent*> MeshCollision;
+	CollisionComponent* MeshCollision = nullptr;
 
 	void GenerateDefaultCategories();
 	MeshComponent* Mesh = nullptr;

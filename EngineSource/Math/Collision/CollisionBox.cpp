@@ -60,7 +60,7 @@ Collision::Box Collision::Box::TransformBy(Transform Transform)
 {
 	Collision::Box OldBox = Box(minX, maxX, minY, maxY, minZ, maxZ) * Transform.Scale;
 	Collision::Box RotatedBox = OldBox;
-	float rot = std::abs(Vector3::Dot(Vector3::GetForwardVector(Transform.Rotation.RadiantsToDegrees()), Vector3(0, 0, 1)));
+	float rot = std::abs(Vector3::Dot(Vector3::GetForwardVector(Transform.Rotation.RadiansToDegrees()), Vector3(0, 0, 1)));
 	RotatedBox.maxX = std::lerp(OldBox.maxX, OldBox.maxZ, rot);
 	RotatedBox.minX = std::lerp(OldBox.minX, OldBox.minZ, rot);
 	RotatedBox.maxZ = std::lerp(OldBox.maxZ, OldBox.maxX, rot);

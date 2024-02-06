@@ -59,7 +59,7 @@ void BillboardSprite::Render(Camera* WorldCamera, bool MainFrameBuffer, bool Tra
 
 	rot.Y = -rot.Y - 90;
 	
-	auto Mat = Transform(Position, rot.DegreesToRadiants(), ScaleWithDistance ? 1 : Vector3::Distance(WorldCamera->Position, Position)).ToMatrix();
+	auto Mat = Transform(Position, rot.DegreesToRadians(), ScaleWithDistance ? 1 : Vector3::Distance(WorldCamera->Position, Position)).ToMatrix();
 
 	Mat = glm::rotate(Mat, glm::radians(Rotation), glm::vec3(0, 0, 1));
 

@@ -152,7 +152,7 @@ Vector3& Vector3::operator-=(Vector3 a)
 	return *this;
 }
 
-Vector3 Vector3::RadiantsToDegrees() const
+Vector3 Vector3::RadiansToDegrees() const
 {
 	return Vector3(glm::degrees(X), glm::degrees(Y), glm::degrees(Z));
 }
@@ -161,7 +161,7 @@ Vector3 Vector3::operator-()
 	return Vector3() - *this;
 }
 
-Vector3 Vector3::DegreesToRadiants() const
+Vector3 Vector3::DegreesToRadians() const
 {
 	return Vector3(glm::radians(X), glm::radians(Y), glm::radians(Z));
 }
@@ -195,12 +195,12 @@ Vector3 Vector3::Abs()
 
 Vector3 Vector3::GetForwardVector(Vector3 In)
 {
-	return Vector3::GetScaledAxis(In.DegreesToRadiants(), 2);
+	return Vector3::GetScaledAxis(In.DegreesToRadians(), 2);
 }
 
 Vector3 Vector3::GetRightVector(Vector3 In)
 {
-	return GetScaledAxis(In.DegreesToRadiants(), 0);
+	return GetScaledAxis(In.DegreesToRadians(), 0);
 }
 
 Vector3 Vector3::SnapToGrid(Vector3 In, float GridSize)
@@ -231,7 +231,7 @@ Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 	if (Radiants)
 		return Vector3(atan2f(1 - Dir.Y, Dir.Y), atan2f(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0);
 	else
-		return Vector3(atan2f(1 - Dir.Y, Dir.Y), atan2f(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0).RadiantsToDegrees();
+		return Vector3(atan2f(1 - Dir.Y, Dir.Y), atan2f(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0).RadiansToDegrees();
 }
 
 Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)
@@ -240,7 +240,7 @@ Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)
 	if (Radiants)
 		return Vector3(sinf(Dir.Y), atan2f(Dir.Z, Dir.X), 0);
 	else
-		return Vector3(sinf(Dir.Y), atan2f(Dir.Z, Dir.X), 0).RadiantsToDegrees();
+		return Vector3(sinf(Dir.Y), atan2f(Dir.Z, Dir.X), 0).RadiansToDegrees();
 }
 
 Vector3 Vector3::QuatToEuler(glm::quat quat)
@@ -257,7 +257,7 @@ float Vector3::Distance(Vector3 a, Vector3 b)
 
 Vector3 Vector3::GetUpVector(Vector3 In)
 {
-	return Vector3::GetScaledAxis(In.DegreesToRadiants(), 1);
+	return Vector3::GetScaledAxis(In.DegreesToRadians(), 1);
 }
 typedef float Float;
 typedef Float Axis[3];
@@ -326,9 +326,9 @@ Vector3 Vector3::RotateVector(Vector3 Vec, Vector3 Rot)
 {
 	auto Matrix = glm::mat4(1.f);
 
+	Matrix = glm::rotate(Matrix, Rot.X, glm::vec3(1, 0, 0));
 	Matrix = glm::rotate(Matrix, Rot.Y, glm::vec3(0, 1, 0));
 	Matrix = glm::rotate(Matrix, Rot.Z, glm::vec3(0, 0, 1));
-	Matrix = glm::rotate(Matrix, Rot.X, glm::vec3(1, 0, 0));
 	return glm::vec3(Matrix * glm::vec4((glm::vec3)Vec, 1));
 }
 
@@ -337,9 +337,9 @@ Vector3 Vector3::TranslateVector(Vector3 Vec, Transform Transform)
 	auto Matrix = glm::mat4(1.f);
 
 	Matrix = glm::translate(Matrix, (glm::vec3)Transform.Location);
-	Matrix = glm::rotate(Matrix, -Transform.Rotation.Y, glm::vec3(0, 1, 0));
-	Matrix = glm::rotate(Matrix, -Transform.Rotation.Z, glm::vec3(0, 0, 1));
-	Matrix = glm::rotate(Matrix, -Transform.Rotation.X, glm::vec3(1, 0, 0));
+	Matrix = glm::rotate(Matrix, Transform.Rotation.Z, glm::vec3(1, 0, 0));
+	Matrix = glm::rotate(Matrix, Transform.Rotation.Y, glm::vec3(0, 1, 0));
+	Matrix = glm::rotate(Matrix, Transform.Rotation.X, glm::vec3(0, 0, 1));
 	Matrix = glm::scale(Matrix, (glm::vec3)Transform.Scale);
 	return glm::vec3(Matrix * glm::vec4((glm::vec3)Vec, 1));
 }
@@ -391,9 +391,9 @@ glm::mat4 Transform::ToMatrix()
 	glm::mat4 Matrix = glm::mat4(1);
 
 	Matrix = glm::translate(Matrix, (glm::vec3)Location);
+	Matrix = glm::rotate(Matrix, Rotation.X, glm::vec3(1, 0, 0));
 	Matrix = glm::rotate(Matrix, Rotation.Y, glm::vec3(0, 1, 0));
 	Matrix = glm::rotate(Matrix, Rotation.Z, glm::vec3(0, 0, 1));
-	Matrix = glm::rotate(Matrix, Rotation.X, glm::vec3(1, 0, 0));
 	Matrix = glm::scale(Matrix, (glm::vec3)Scale);
 
 	return Matrix;

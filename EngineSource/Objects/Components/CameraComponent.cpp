@@ -13,7 +13,7 @@ void CameraComponent::Update()
 	Vector3 ParentRotation = GetParent()->GetTransform().Rotation;
 	ParentRotation = Vector3(ParentRotation.X, ParentRotation.Y, 0);
 	Transform ParentTransform = Transform(GetParent()->GetTransform().Location,
-		Vector3(0, ParentRotation.Y, -ParentRotation.X).DegreesToRadiants(), GetParent()->GetTransform().Scale * RelativeTransform.Scale);
+		Vector3(0, ParentRotation.Y, -ParentRotation.X).DegreesToRadians(), GetParent()->GetTransform().Scale * RelativeTransform.Scale);
 	auto Location = Vector3::TranslateVector(RelativeTransform.Location, ParentTransform);
 	ComponentCamera.Position = Location;
 	ParentRotation = GetParent()->GetTransform().Rotation + RelativeTransform.Rotation;

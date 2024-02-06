@@ -2,7 +2,9 @@
 #include <string>
 #include <Engine/Utility/FileUtility.h>
 
-#define __FILENAME__ FileUtil::GetFileNameFromPath(__FILE__)
+#define FILENAME FileUtil::GetFileNameFromPath(__FILE__)
+
+#define FILEPOS (FILENAME + ", " + std::string(__FUNCTION__) + ", Line " + std::to_string(__LINE__))
 
 /**
 * @brief
@@ -41,4 +43,11 @@ namespace Error
 * @param Description
 * A description of the condition/crash that will be displayed if the condition fails.
 */
-#define ENGINE_ASSERT(Condition, Description) Error::Assert(Condition, Description + std::string("\nCondition: ") + #Condition + std::string(""), std::string(__FILENAME__) + ", " + std::string(__FUNCTION__) + ", Line " + std::to_string(__LINE__))
+#define ENGINE_ASSERT(Condition, Description) Error::Assert(Condition, Description + std::string("\nCondition: ") + #Condition + std::string(""), FILEPOS)
+
+/**
+* @def ENGINE_UNREACHABLE()
+* @brief
+* Marks this code as unreachable. The engine will crash if the code is reached.
+*/
+#define ENGINE_UNREACHABLE() Error::AssertFailure("Unreachable code reached. This should never happen.", FILEPOS)

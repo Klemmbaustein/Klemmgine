@@ -22,6 +22,8 @@
     <ClCompile Include="CSharp\CSharpUICanvas.cpp" />
     <ClCompile Include="Engine\BackgroundTask.cpp" />
     <ClCompile Include="Engine\Gamepad.cpp" />
+    <ClCompile Include="Math\Physics\JoltPhysics.cpp" />
+    <ClCompile Include="Math\Physics\Physics.cpp" />
     <ClCompile Include="UI\EditorUI\AssetBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\ClassesBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\AboutWindow.cpp" />
@@ -135,6 +137,8 @@
     <ClInclude Include="CSharp\CSharpUICanvas.h" />
     <ClInclude Include="Engine\BackgroundTask.h" />
     <ClInclude Include="Engine\Gamepad.h" />
+    <ClInclude Include="Math\Physics\JoltPhysics.h" />
+    <ClInclude Include="Math\Physics\Physics.h" />
     <ClInclude Include="UI\EditorUI\AssetBrowser.h" />
     <ClInclude Include="UI\EditorUI\ClassesBrowser.h" />
     <ClInclude Include="UI\EditorUI\Popups\AboutWindow.h" />
@@ -353,22 +357,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Dependencies\JoltPhysics;$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\lib\</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Server|x64'">
-    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Dependencies\JoltPhysics;$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\lib\</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Editor|x64'">
-    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Dependencies\JoltPhysics;$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\lib\</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)..\Dependencies\JoltPhysics;$(ProjectDir)..\Dependencies\assimp\include;$(ProjectDir)..\Dependencies\glew-cmake\include;$(ProjectDir)..\Dependencies\openal-soft\include;$(ProjectDir)..\Dependencies\glm;$(ProjectDir)..\Dependencies\SDL_net\include;$(ProjectDir)..\Dependencies\SDL\include;$(ProjectDir);$(ProjectDir)..\Tools\BuildTool\Output;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\lib\</OutDir>
     <TargetName>$(ProjectName)-$(Configuration)</TargetName>
   </PropertyGroup>
