@@ -20,13 +20,13 @@ void Error::Init()
 	signal(SIGSEGV, HandleSigSegV);
 }
 
-void Error::AssertFailure(std::string Name, std::string Location)
+void Error::AssertFailure(std::string Name, std::string Position)
 {
 	OS::SetConsoleWindowVisible(true);
 	SDL_DestroyWindow(Application::Window);
 	Log::Print("[Error]: ------------------------------------[Error]------------------------------------", Log::LogColor::Red);
 	Log::PrintMultiLine(Name, Log::LogColor::Red, "[Error]: ");
-	Log::Print("[Error]: " + Location, Log::LogColor::Red);
+	Log::Print("[Error]: " + Position, Log::LogColor::Red);
 
 	PrintStackTrace();
 

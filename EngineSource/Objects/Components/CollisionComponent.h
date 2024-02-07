@@ -20,6 +20,8 @@ public:
 	void Load(const ModelGenerator::ModelData& Model, Transform RelativeTransform = Transform());
 	void* Collider = nullptr;
 protected:
+	Vector3 LastScale = 0;
+	Transform CalculateMeshTransform();
 	Transform LastParentTransform;
 	Transform LastRelativeTransform;
 };

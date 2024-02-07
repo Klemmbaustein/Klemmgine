@@ -66,7 +66,7 @@ void DebugUI::Tick()
 
 		DebugTexts[2]->SetText(DeltaString);
 		DebugTexts[3]->SetText("DrawCalls: " + std::to_string(Performance::DrawCalls));
-		DebugTexts[4]->SetText("CollisonMeshes: " + std::to_string(Collision::CollisionBoxes.size()));
+		//DebugTexts[4]->SetText("CollisonMeshes: " + std::to_string(Collision::CollisionBoxes.size()));
 		StatsRedrawTimer = 0;
 		FPS = 0;
 	}

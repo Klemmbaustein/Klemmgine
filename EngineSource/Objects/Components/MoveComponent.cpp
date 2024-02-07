@@ -8,13 +8,13 @@
 
 Collision::HitResponse MoveComponent::TryMove(Vector3 Direction, float Distance, bool TryAdjust)
 {
-	Vector3 PreviousLocation = GetParent()->GetTransform().Location;
+	Vector3 PreviousLocation = GetParent()->GetTransform().Position;
 	Direction = Direction.Normalize();
 	Distance = Distance * Performance::DeltaTime;
 	uint8_t Index = TryAdjust;
 	for (float Time = 0; Distance > 0 ? (Time < Distance) : (Time > Distance); Time = std::min(Distance, Time + (Distance > 0 ? 0.5f : -0.5f)))
 	{
-		CollisionMeshes[Index]->RelativeTransform.Location = Direction * Time;
+		CollisionMeshes[Index]->RelativeTransform.Position = Direction * Time;
 		auto MoveHit = CollisionMeshes[Index]->OverlapCheck(std::set({ CollisionMeshes[0], CollisionMeshes[1] }));
 		if (MoveHit.Hit)
 		{
@@ -24,7 +24,7 @@ Collision::HitResponse MoveComponent::TryMove(Vector3 Direction, float Distance,
 				Vector3 Dir = MoveHit.Normal * abs(Distance) * 0.3f + Vector3(Vector3::Dot(MoveHit.Normal, Vector3(0, 1, 0)) * abs(Distance) * 0.1f);
 				if (TryMove(Dir, Dir.Length(), false).Hit)
 				{
-					GetParent()->GetTransform().Location += Dir;
+					GetParent()->GetTransform().Position += Dir;
 					MoveHit.Normal = Vector3(0, 1, 0);
 				}
 			}
@@ -32,11 +32,11 @@ Collision::HitResponse MoveComponent::TryMove(Vector3 Direction, float Distance,
 		}
 		else
 		{
-			GetParent()->GetTransform().Location = PreviousLocation + Direction * Time;
+			GetParent()->GetTransform().Position = PreviousLocation + Direction * Time;
 		}
 	}
-	CollisionMeshes[Index]->RelativeTransform.Location = 0;
-	GetParent()->GetTransform().Location = PreviousLocation + Direction * Distance;
+	CollisionMeshes[Index]->RelativeTransform.Position = 0;
+	GetParent()->GetTransform().Position = PreviousLocation + Direction * Distance;
 	return Collision::HitResponse();
 }
 
@@ -109,7 +109,7 @@ void MoveComponent::Update()
 	}
 	else if (MoveHit.Hit)
 	{
-		GetParent()->GetTransform().Location += MoveHit.Normal * 0.2f + Vector3(0, Performance::DeltaTime, 0);
+		GetParent()->GetTransform().Position += MoveHit.Normal * 0.2f + Vector3(0, Performance::DeltaTime, 0);
 		if (!HasBounced)
 		{
 			auto ReflectedDirection = glm::reflect((glm::vec3)Vector3(MovementVelocity.X, VerticalVelocity, MovementVelocity.Y), (glm::vec3)MoveHit.Normal);

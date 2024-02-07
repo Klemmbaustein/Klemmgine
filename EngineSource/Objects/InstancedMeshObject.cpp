@@ -15,22 +15,21 @@ void InstancedMeshObject::Update()
 			Vector3 Loc = Vector3(Random::GetRandomFloat(-(float)Range, (float)Range),
 				0, Random::GetRandomFloat(-(float)Range, (float)Range));
 
-			Collision::HitResponse Hit = Collision::LineTrace(GetTransform().Location + Loc, GetTransform().Location + Loc - Vector3(0, 100, 0));
-			Vector3 AxisA = Vector3(Hit.Normal.Y, Hit.Normal.Z, Hit.Normal.X);
-			Vector3 AxisB = Vector3::Cross(Hit.Normal, AxisA);
-			Vector3 Rotation = Vector3(sin(AxisB.Y), atan2(AxisB.X, AxisB.Z) + 3.14f, 0).RadiansToDegrees();
-			Rotation = Vector3(Rotation.X, 0, Rotation.Y).DegreesToRadians();
+			Collision::HitResponse Hit = Collision::LineTrace(GetTransform().Position + Loc, GetTransform().Position + Loc - Vector3(0, 100, 0));
+
+
+			Vector3 Rotation = Vector3::LookAtFunctionY(0, Hit.Normal);
 			if (Hit.Hit)
 			{
 				if (ComponentName == "")
 				{
-					AddInstance(Transform(Hit.ImpactPoint - GetTransform().Location,
+					AddInstance(Transform(Hit.ImpactPoint - GetTransform().Position,
 						Rotation,
 						Scale * Random::GetRandomFloat(15, 25) / 20));
 				}
 				else if (ComponentName == Hit.HitObject->Name)
 				{
-					AddInstance(Transform(Hit.ImpactPoint - GetTransform().Location,
+					AddInstance(Transform(Hit.ImpactPoint - GetTransform().Position,
 						Rotation,
 						Scale * Random::GetRandomFloat(15, 25) / 20));
 				}

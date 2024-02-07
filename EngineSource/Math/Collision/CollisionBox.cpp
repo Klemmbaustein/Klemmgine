@@ -65,7 +65,7 @@ Collision::Box Collision::Box::TransformBy(Transform Transform)
 	RotatedBox.minX = std::lerp(OldBox.minX, OldBox.minZ, rot);
 	RotatedBox.maxZ = std::lerp(OldBox.maxZ, OldBox.maxX, rot);
 	RotatedBox.minZ = std::lerp(OldBox.minZ, OldBox.minX, rot);
-	RotatedBox = RotatedBox + Transform.Location;
+	RotatedBox = RotatedBox + Transform.Position;
 	return RotatedBox;
 }
 

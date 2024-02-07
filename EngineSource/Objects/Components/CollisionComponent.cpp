@@ -5,7 +5,7 @@
 
 Collision::HitResponse CollisionComponent::OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore)
 {
-	//CollMesh->SetTransform(Transform(Vector3::TranslateVector(RelativeTransform.Location, GetParent()->GetTransform()),
+	//CollMesh->SetTransform(Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform()),
 	//	RelativeTransform.Rotation + GetParent()->GetTransform().Rotation,
 	//	RelativeTransform.Scale * 0.025f * GetParent()->GetTransform().Scale));
 	//return CollMesh->OverlapCheck(MeshesToIgnore);
@@ -14,14 +14,6 @@ Collision::HitResponse CollisionComponent::OverlapCheck(std::set<CollisionCompon
 
 void CollisionComponent::Destroy()
 {
-	for (int i = 0; i < Collision::CollisionBoxes.size(); i++)
-	{
-		if (Collision::CollisionBoxes.at(i) == this)
-		{
-			Collision::CollisionBoxes.erase(Collision::CollisionBoxes.begin() + i);
-		}
-	}
-
 	Physics::MeshBody* m = static_cast<Physics::MeshBody*>(Collider);
 
 	Physics::RemoveBody(m);
@@ -31,19 +23,27 @@ void CollisionComponent::Destroy()
 
 void CollisionComponent::Update()
 {
-	return;
-	/*
 	if (LastParentTransform != GetParent()->GetTransform() || LastRelativeTransform != RelativeTransform)
 	{
-		Vector3 InvertedRotation = (GetParent()->GetTransform().Rotation + RelativeTransform.Rotation);
-		InvertedRotation = Vector3(-InvertedRotation.Z, InvertedRotation.Y, -InvertedRotation.X);
-		CollMesh->SetTransform(Transform(Vector3::TranslateVector(RelativeTransform.Location, GetParent()->GetTransform()),
-			Vector3() - InvertedRotation.DegreesToRadians(),
-			RelativeTransform.Scale * 0.025f * GetParent()->GetTransform().Scale));
+		Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(Collider);
+
+		Transform MeshTransform = CalculateMeshTransform();
+
+		Body->SetPosition(MeshTransform.Position);
+		Body->SetRotation(MeshTransform.Rotation);
+
+		Vector3 ScaleDifference = MeshTransform.Scale / LastScale;
+		LastScale = MeshTransform.Scale;
+
+		if (ScaleDifference != Vector3(1))
+		{
+			Body->Scale(ScaleDifference);
+		}
+
 		LastParentTransform = GetParent()->GetTransform();
 		LastRelativeTransform = RelativeTransform;
 		
-	}*/
+	}
 }
 
 void CollisionComponent::Load(const ModelGenerator::ModelData& Data, Transform RelativeTransform)
@@ -51,14 +51,18 @@ void CollisionComponent::Load(const ModelGenerator::ModelData& Data, Transform R
 	
 	this->RelativeTransform = RelativeTransform;
 	this->RelativeTransform.Scale = this->RelativeTransform.Scale;
-	//CollMesh = new Collision::CollisionMesh(Vertices, Indices, GetParent()->GetTransform() + this->RelativeTransform);
-	//Collision::CollisionBoxes.push_back(this);
-	auto t = (Transform(Vector3::TranslateVector(RelativeTransform.Location, GetParent()->GetTransform()),
-		RelativeTransform.Rotation + GetParent()->GetTransform().Rotation,
-		RelativeTransform.Scale * GetParent()->GetTransform().Scale));
+	Transform MeshTransform = CalculateMeshTransform();
 
-	Physics::MeshBody* m = new Physics::MeshBody(Data, t, Physics::MotionType::Static, Physics::Layer::Static, this);
+	Physics::MeshBody* m = new Physics::MeshBody(Data, CalculateMeshTransform(), Physics::MotionType::Static, Physics::Layer::Static, this);
 	Physics::AddBody(m);
+	LastScale = MeshTransform.Scale;
 
 	Collider = m;
+}
+
+Transform CollisionComponent::CalculateMeshTransform()
+{
+	return Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform()),
+		RelativeTransform.Rotation + GetParent()->GetTransform().Rotation,
+		RelativeTransform.Scale * GetParent()->GetTransform().Scale);
 }

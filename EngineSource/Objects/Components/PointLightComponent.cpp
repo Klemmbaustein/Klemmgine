@@ -14,7 +14,7 @@ void PointLightComponent::Update()
 #if !SERVER
 	if (CurrentLight != PreviousLight || PreviousTransform != GetParent()->GetTransform())
 	{
-		CurrentLight.Position = Vector3::TranslateVector(RelativeTransform.Location, GetParent()->GetTransform());
+		CurrentLight.Position = Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform());
 		UpdateLight();
 		PreviousTransform = GetParent()->GetTransform();
 	}

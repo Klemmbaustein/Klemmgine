@@ -46,7 +46,7 @@ void BillboardComponent::Update()
 #if !SERVER
 	if (!Sprite) return;
 	if (!GetParent()) return;
-	Sprite->Position = GetParent()->GetTransform().Location + RelativeTransform.Location;
+	Sprite->Position = GetParent()->GetTransform().Position + RelativeTransform.Position;
 	Sprite->Rotation = Rotation;
 	Sprite->Color = Color;
 #endif

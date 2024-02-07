@@ -55,9 +55,9 @@ public:
 
 	void AddOffset(Vector3 Offset)
 	{
-		ModelTransform.Location.X += Offset.X;
-		ModelTransform.Location.Y += Offset.Y;
-		ModelTransform.Location.Z += Offset.Z;
+		ModelTransform.Position.X += Offset.X;
+		ModelTransform.Position.Y += Offset.Y;
+		ModelTransform.Position.Z += Offset.Z;
 	}
 	void ConfigureVAO();
 

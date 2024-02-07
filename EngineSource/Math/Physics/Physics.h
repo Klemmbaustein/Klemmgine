@@ -43,12 +43,22 @@ namespace Physics
 		return static_cast<Layer>(static_cast<uint16_t>(a) & static_cast<uint16_t>(b));
 	}
 
+	struct HitResult
+	{
+		bool Hit = false;
+		float Depth = 0.0f;
+		Component* HitComponent = nullptr;
+		Vector3 ImpactPoint;
+		Vector3 Normal;
+	};
+
 	struct PhysicsBody
 	{
 		enum class BodyType
 		{
 			Box,
 			Sphere,
+			Capsule,
 			Mesh,
 		};
 
@@ -65,6 +75,12 @@ namespace Physics
 		Vector3 GetPosition();
 		Vector3 GetRotation();
 
+		void SetPosition(Vector3 NewPosition);
+		void SetRotation(Vector3 NewRotation);
+		void Scale(Vector3 ScaleMultiplier);
+
+		std::vector<HitResult> CollisionTest();
+
 		void* PhysicsSystemBody = nullptr;
 	protected:
 		Transform BodyTransform;
@@ -80,19 +96,20 @@ namespace Physics
 		virtual void SetTransform(Transform T) override;
 	};
 
+	struct BoxBody : public PhysicsBody
+	{
+		BoxBody(Vector3 Position, Vector3 Rotation, Vector3 Extents, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
+
+		Vector3 Extents;
+		virtual void SetTransform(Transform T) override;
+	};
+
 	struct MeshBody : public PhysicsBody
 	{
 		MeshBody(const ModelGenerator::ModelData& Mesh, Transform MeshTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
 		virtual void SetTransform(Transform T) override;
 
 		ModelGenerator::ModelData MeshData;
-	};
-
-	struct HitResult
-	{
-		bool Hit = false;
-		Component* HitComponent = nullptr;
-		Vector3 ImpactPoint;
 	};
 
 	void AddBody(PhysicsBody* Body);

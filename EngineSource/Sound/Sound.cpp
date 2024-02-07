@@ -18,14 +18,14 @@
 
 struct Source
 {
-	Source(ALuint AudioSource, float Pitch, float Volume, bool Looping, bool Is3D, Vector3 Location, float Distance, std::string Name)
+	Source(ALuint AudioSource, float Pitch, float Volume, bool Looping, bool Is3D, Vector3 Position, float Distance, std::string Name)
 	{
 		this->AudioSource = AudioSource;
 		this->Pitch = Pitch;
 		this->Volume = Volume;
 		this->Looping = Looping;
 		this->Is3D = Is3D;
-		this->Location = Location;
+		this->Position = Position;
 		this->Distance = Distance;
 		this->name = Name;
 	}
@@ -33,7 +33,7 @@ struct Source
 	float Volume = 1.f;
 	bool Looping = false;
 	bool Is3D = false;
-	Vector3 Location;
+	Vector3 Position;
 	float Distance;
 	ALuint AudioSource;
 	std::string name;
@@ -138,7 +138,7 @@ namespace Sound
 #if !SERVER
 	void Update3DVolumeOfSound(const Source& CurrentSource, const Vector3& Position)
 	{
-		float Distance = (CurrentSource.Location - Position).Length();
+		float Distance = (CurrentSource.Position - Position).Length();
 		Distance = Distance * Distance * (CurrentSource.Distance / 100.0f) / 100.f;
 		alSourcef(CurrentSource.AudioSource, AL_GAIN, std::max(CurrentSource.Volume - Distance, 0.0f));
 	}

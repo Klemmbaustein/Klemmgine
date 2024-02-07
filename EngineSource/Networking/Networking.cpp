@@ -160,7 +160,7 @@ void Networking::SendObjectInfo(WorldObject* obj, void* TargetAddr)
 		};
 
 		p.Write(obj->NetID);
-		p.AppendStringToData("_pos=" + obj->GetTransform().Location.ToString());
+		p.AppendStringToData("_pos=" + obj->GetTransform().Position.ToString());
 		p.AppendStringToData(";_rot=" + obj->GetTransform().Rotation.ToString());
 		p.AppendStringToData(";_scl=" + obj->GetTransform().Scale.ToString());
 		p.AppendStringToData(";_owner=" + std::to_string(obj->NetOwner));
@@ -280,11 +280,11 @@ void Networking::Update()
 #endif
 }
 
-WorldObject* Networking::SpawnReplicatedObjectFromID(uint32_t ID, Transform Location)
+WorldObject* Networking::SpawnReplicatedObjectFromID(uint32_t ID, Transform Position)
 {
-	WorldObject* obj = Objects::SpawnObjectFromID(ID, Location, NetIDCounter);
+	WorldObject* obj = Objects::SpawnObjectFromID(ID, Position, NetIDCounter);
 	obj->NetOwner = UINT64_MAX;
-	Server::SpawnObject(ID, NetIDCounter, Location);
+	Server::SpawnObject(ID, NetIDCounter, Position);
 	NetIDCounter++;
 	return obj;
 }

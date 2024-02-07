@@ -544,7 +544,7 @@ void ContextMenu::OnResized()
 
 		GenerateSection(
 			{
-				ContextMenuSection(&SelectedObject->GetTransform().Location, Type::Vector3, "Location"),
+				ContextMenuSection(&SelectedObject->GetTransform().Position, Type::Vector3, "Position"),
 				ContextMenuSection(&SelectedObject->GetTransform().Rotation, Type::Vector3Rotation, "Rotation"),
 				ContextMenuSection(&SelectedObject->GetTransform().Scale, Type::Vector3, "Scale"),
 				ContextMenuSection(&SelectedObject->Name, Type::String, "Name"),

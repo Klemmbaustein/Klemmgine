@@ -301,12 +301,12 @@ inline bool operator!=(Vector2 a, Vector2 b)
 
 /**
 * @brief
-* A struct containing Location, Rotation and Scale in a 3d space.
+* A struct containing Position, Rotation and Scale in a 3d space.
 */
 struct Transform
 {
-	/// Location of the Transform.
-	Vector3 Location = Vector3(0.f);
+	/// Position of the Transform.
+	Vector3 Position = Vector3(0.f);
 	/// Rotation of the Transform.
 	Vector3 Rotation = Vector3(0.f);
 	/// Scale of the Transform.
@@ -314,7 +314,7 @@ struct Transform
 
 	Transform(Vector3 Loc, Vector3 Rot, Vector3 Scl)
 	{
-		Location = Loc;
+		Position = Loc;
 		Rotation = Rot;
 		Scale = Scl;
 	}
@@ -323,7 +323,7 @@ struct Transform
 
 	}
 
-	glm::mat4 ToMatrix();
+	glm::mat4 ToMatrix() const;
 };
 
 bool operator==(Transform a, Transform b);

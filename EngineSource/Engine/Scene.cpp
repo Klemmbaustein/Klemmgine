@@ -113,7 +113,7 @@ namespace Scene
 			}
 			CameraShake::StopAllCameraShake();
 #endif
-			Collision::CollisionBoxes.clear();
+			//Collision::CollisionBoxes.clear();
 			std::ifstream Input(FilePath, std::ios::in | std::ios::binary);
 			Input.exceptions(std::ios::failbit | std::ios::badbit);
 			std::vector<WorldObject> WorldObjects;

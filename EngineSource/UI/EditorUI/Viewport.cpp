@@ -159,8 +159,8 @@ void Viewport::Tick()
 	ArrowsModel->Visible = EditorUI::SelectedObjects.size();
 	if (EditorUI::SelectedObjects.size())
 	{
-		ArrowsModel->ModelTransform.Location = EditorUI::SelectedObjects[0]->GetTransform().Location;
-		ArrowsModel->ModelTransform.Scale = Vector3(1, 1, -1) * Vector3::Distance(Graphics::MainCamera->Position, ArrowsModel->ModelTransform.Location) * 0.03f;
+		ArrowsModel->ModelTransform.Position = EditorUI::SelectedObjects[0]->GetTransform().Position;
+		ArrowsModel->ModelTransform.Scale = Vector3(1, 1, -1) * Vector3::Distance(Graphics::MainCamera->Position, ArrowsModel->ModelTransform.Position) * 0.03f;
 		ArrowsModel->UpdateTransform();
 	}
 
@@ -280,7 +280,7 @@ void Viewport::Tick()
 		{
 			Vector3 DistanceScaleMultiplier;
 			if (EditorUI::SelectedObjects.size() > 0)
-				DistanceScaleMultiplier = Vector3((EditorUI::SelectedObjects.at(0)->GetTransform().Location 
+				DistanceScaleMultiplier = Vector3((EditorUI::SelectedObjects.at(0)->GetTransform().Position 
 					- Vector3(Graphics::MainCamera->Position)).Length() * 0.15f);
 
 			bool Hit = false;
@@ -288,33 +288,33 @@ void Viewport::Tick()
 			{
 				float t = INFINITY;
 				Collision::HitResponse CollisionTest 
-					= Collision::LineCheckForAABB((ArrowBoxZ * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Location,
+					= Collision::LineCheckForAABB((ArrowBoxZ * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
 						Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 				if (CollisionTest.Hit)
 				{
-					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Location;
+					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
 					Hit = true;
 					Dragging = true;
 					Axis = Vector3(0, 0, 1.0f);
 					BoxAxis = 2;
 					t = CollisionTest.t;
 				}
-				CollisionTest = Collision::LineCheckForAABB((ArrowBoxY * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Location,
+				CollisionTest = Collision::LineCheckForAABB((ArrowBoxY * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
 					Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 				if (CollisionTest.Hit && CollisionTest.t < t)
 				{
-					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Location;
+					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
 					Hit = true;
 					Dragging = true;
 					BoxAxis = 1;
 					Axis = Vector3(0, 1.0f, 0);
 					t = CollisionTest.t;
 				}
-				CollisionTest = Collision::LineCheckForAABB((ArrowBoxX * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Location,
+				CollisionTest = Collision::LineCheckForAABB((ArrowBoxX * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
 					Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 				if (CollisionTest.Hit && CollisionTest.t < t)
 				{
-					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Location;
+					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
 					Hit = true;
 					Dragging = true;
 					Axis = Vector3(1.0f, 0, 0);
@@ -400,7 +400,7 @@ void Viewport::Tick()
 	{
 		Vector3 DistanceScaleMultiplier;
 		if (EditorUI::SelectedObjects.size() > 0)
-			DistanceScaleMultiplier = Vector3((EditorUI::SelectedObjects.at(0)->GetTransform().Location 
+			DistanceScaleMultiplier = Vector3((EditorUI::SelectedObjects.at(0)->GetTransform().Position 
 				- Vector3(Graphics::MainCamera->Position)).Length() * 0.15f);
 
 		Collision::Box TransformBox
@@ -428,11 +428,11 @@ void Viewport::Tick()
 			}
 		}
 
-		TransformBox = TransformBox.TransformBy(Transform(EditorUI::SelectedObjects[0]->GetTransform().Location, 0, BoxScale));
+		TransformBox = TransformBox.TransformBy(Transform(EditorUI::SelectedObjects[0]->GetTransform().Position, 0, BoxScale));
 
 		auto h = Collision::LineCheckForAABB(TransformBox, Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
 
-		Vector3 TransformToAdd = (h.ImpactPoint - EditorUI::SelectedObjects[0]->GetTransform().Location) * Axis - DragOffset;
+		Vector3 TransformToAdd = (h.ImpactPoint - EditorUI::SelectedObjects[0]->GetTransform().Position) * Axis - DragOffset;
 
 		if (FirstDragFrame)
 		{

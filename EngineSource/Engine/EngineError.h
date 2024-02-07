@@ -14,13 +14,13 @@ namespace Error
 {
 	void Init();
 	
-	void AssertFailure(std::string Name, std::string Location);
+	void AssertFailure(std::string Name, std::string Position);
 	
-	inline void Assert(bool Value, std::string Name, std::string Location)
+	inline void Assert(bool Value, std::string Name, std::string Position)
 	{
 		if (!Value)
 		{
-			AssertFailure(Name, Location);
+			AssertFailure(Name, Position);
 		}
 	}
 

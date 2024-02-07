@@ -103,7 +103,7 @@ void InstancedModel::ConfigureVAO()
 		glm::mat4 Inst = glm::mat4(1.f);
 
 		Size = (NonScaledSize * T.Scale * 0.025f);
-		Inst = glm::translate(Inst, (glm::vec3)T.Location);
+		Inst = glm::translate(Inst, (glm::vec3)T.Position);
 		Inst = glm::rotate(Inst, T.Rotation.Y, glm::vec3(0, 1, 0));
 		Inst = glm::rotate(Inst, T.Rotation.Z, glm::vec3(0, 0, 1));
 		Inst = glm::rotate(Inst, T.Rotation.X, glm::vec3(1, 0, 0));

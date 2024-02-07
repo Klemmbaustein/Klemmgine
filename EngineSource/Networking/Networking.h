@@ -12,7 +12,7 @@ namespace Networking
 	void HandleTick();
 	void ReceivePackets();
 	void Update();
-	WorldObject* SpawnReplicatedObjectFromID(uint32_t ID, Transform Location);
+	WorldObject* SpawnReplicatedObjectFromID(uint32_t ID, Transform Position);
 	std::string IPtoStr(void* addr);
 	void DisconnectPlayer(void* IP);
 	void Exit();

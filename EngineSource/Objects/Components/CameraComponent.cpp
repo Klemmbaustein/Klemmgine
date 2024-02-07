@@ -12,10 +12,10 @@ void CameraComponent::Update()
 #if !SERVER
 	Vector3 ParentRotation = GetParent()->GetTransform().Rotation;
 	ParentRotation = Vector3(ParentRotation.X, ParentRotation.Y, 0);
-	Transform ParentTransform = Transform(GetParent()->GetTransform().Location,
+	Transform ParentTransform = Transform(GetParent()->GetTransform().Position,
 		Vector3(0, ParentRotation.Y, -ParentRotation.X).DegreesToRadians(), GetParent()->GetTransform().Scale * RelativeTransform.Scale);
-	auto Location = Vector3::TranslateVector(RelativeTransform.Location, ParentTransform);
-	ComponentCamera.Position = Location;
+	auto Position = Vector3::TranslateVector(RelativeTransform.Position, ParentTransform);
+	ComponentCamera.Position = Position;
 	ParentRotation = GetParent()->GetTransform().Rotation + RelativeTransform.Rotation;
 	ParentRotation = Vector3(ParentRotation.X, ParentRotation.Y, 0);
 	ComponentCamera.SetRotation(ParentRotation);

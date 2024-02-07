@@ -37,7 +37,7 @@ public:
 	UIText* SetTextWidthOverride(float NewTextWidthOverride);
 	UIText* SetWrapEnabled(bool WrapEnabled, float WrapDistance, SizeMode WrapSizeMode);
 
-	size_t GetNearestLetterAtLocation(Vector2 Location);
+	size_t GetNearestLetterAtLocation(Vector2 Position);
 	Vector2 GetLetterLocation(size_t Index);
 
 	virtual std::string GetAsString() override;

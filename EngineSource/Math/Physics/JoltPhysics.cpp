@@ -16,6 +16,7 @@
 #include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
 #include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Collision/ShapeCast.h>
 
 JPH_SUPPRESS_WARNINGS
 
@@ -29,6 +30,7 @@ using namespace JPH::literals;
 #include <Engine/Stats.h>
 #include <Math/Math.h>
 #include <glm/gtx/quaternion.hpp>
+#include <Objects/Components/Component.h>
 #include <glm/mat4x4.hpp>
 #include <Engine/Input.h>
 
@@ -37,15 +39,21 @@ inline static Vec3 ToJPHVec3(const Vector3& Vec)
 	return Vec3(Vec.X, Vec.Y, Vec.Z);
 }
 
+inline static Vec4 ToJPHVec4(const glm::vec4& Vec)
+{
+	return Vec4(Vec.x, Vec.y, Vec.z, Vec.w);
+}
+
 inline static Quat ToJPHQuat(Vector3 Rot)
 {
-	glm::quat rotation = glm::quat((glm::vec3)Rot.DegreesToRadians());
-	return Quat(rotation.x, rotation.y, rotation.z, rotation.w);
+	Rot = Rot.DegreesToRadians();
+	return Quat::sEulerAngles(Vec3(Rot.Z, -Rot.Y, Rot.X));
 }
 
 struct PhysicsBodyInfo
 {
 	BodyID ID;
+	Shape* Shape = nullptr;
 	Physics::PhysicsBody* Body = nullptr;
 };
 namespace JoltPhysics
@@ -223,12 +231,23 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 	case PhysicsBody::BodyType::Sphere:
 	{
 		SphereBody* SpherePtr = static_cast<SphereBody*>(Body);
-		BodyCreationSettings SphereSettigns = BodyCreationSettings(new SphereShape(SpherePtr->GetTransform().Scale.X),
-			ToJPHVec3(Body->GetTransform().Location),
+		BodyCreationSettings SphereSettings = BodyCreationSettings(new SphereShape(SpherePtr->GetTransform().Scale.X),
+			ToJPHVec3(Body->GetTransform().Position),
 			ToJPHQuat(SpherePtr->GetTransform().Rotation),
 			EMotionType::Dynamic,
 			(ObjectLayer)Body->CollisionLayers);
-		BodyID = JoltBodyInterface->CreateAndAddBody(SphereSettigns, EActivation::Activate);
+		BodyID = JoltBodyInterface->CreateAndAddBody(SphereSettings, EActivation::Activate);
+		break;
+	}
+	case PhysicsBody::BodyType::Box:
+	{
+		BoxBody* BoxPtr = static_cast<BoxBody*>(Body);
+		BodyCreationSettings BoxSettings = BodyCreationSettings(new BoxShape(ToJPHVec3(BoxPtr->GetTransform().Scale)),
+			ToJPHVec3(Body->GetTransform().Position),
+			ToJPHQuat(BoxPtr->GetTransform().Rotation),
+			EMotionType::Dynamic,
+			(ObjectLayer)Body->CollisionLayers);
+		BodyID = JoltBodyInterface->CreateAndAddBody(BoxSettings, EActivation::Activate);
 		break;
 	}
 	case PhysicsBody::BodyType::Mesh:
@@ -244,8 +263,9 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 		Vertices.reserve(MergedVertices.size());
 		Indices.reserve(MergedIndices.size() / 3);
 		Transform OffsetTransform = MeshPtr->GetTransform();
-		OffsetTransform.Location = 0;
-		OffsetTransform.Rotation = Vector3(OffsetTransform.Rotation.Z, -OffsetTransform.Rotation.Y, OffsetTransform.Rotation.X).DegreesToRadians();
+		OffsetTransform.Position = 0;
+		OffsetTransform.Rotation = 0;
+		//OffsetTransform.Rotation = Vector3(OffsetTransform.Rotation.Z, -OffsetTransform.Rotation.Y, OffsetTransform.Rotation.X).DegreesToRadians();
 		OffsetTransform.Scale = OffsetTransform.Scale * Vector3(0.025f);
 		glm::mat4 ModelMatrix = OffsetTransform.ToMatrix();
 		for (auto& i : MergedVertices)
@@ -272,8 +292,8 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 		}
 
 		BodyCreationSettings MeshSettings = BodyCreationSettings(Shape,
-			ToJPHVec3(MeshPtr->GetTransform().Location),
-			Quat::sIdentity(),
+			ToJPHVec3(MeshPtr->GetTransform().Position),
+			ToJPHQuat(MeshPtr->GetTransform().Rotation),
 			EMotionType::Static,
 			(ObjectLayer)MeshPtr->CollisionLayers);
 
@@ -284,7 +304,6 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 		ENGINE_UNREACHABLE();
 		break;
 	}
-
 	PhysicsBodyInfo info;
 	info.Body = Body;
 	info.ID = BodyID;
@@ -315,12 +334,88 @@ Vector3 JoltPhysics::GetBodyRotation(Physics::PhysicsBody* Body)
 	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
 }
 
+void JoltPhysics::SetBodyPosition(Physics::PhysicsBody* Body, Vector3 NewPosition)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	JoltBodyInterface->SetPosition(Info->ID, ToJPHVec3(NewPosition), EActivation::Activate);
+}
+
+void JoltPhysics::SetBodyRotation(Physics::PhysicsBody* Body, Vector3 NewRotation)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	JoltBodyInterface->SetRotation(Info->ID, ToJPHQuat(NewRotation), EActivation::Activate);
+}
+
+void JoltPhysics::MultiplyBodyScale(Physics::PhysicsBody* Body, Vector3 Scale)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	auto ShapeInfo = JoltBodyInterface->GetShape(Info->ID).GetPtr()->ScaleShape(ToJPHVec3(Scale));
+	JoltBodyInterface->SetShape(Info->ID, ShapeInfo.Get(), true, EActivation::Activate);
+}
+
 void JoltPhysics::Update()
 {
 	if (Performance::DeltaTime > 0 && (Input::IsKeyDown(Input::Key::f) || !IsInEditor))
 	{
 		System->Update(Performance::DeltaTime, 1, TempAllocator, JobSystem);
 	}
+}
+
+class CollisionShapeCollectorImpl : public CollideShapeCollector
+{
+public:
+
+	CollisionShapeCollectorImpl()
+	{
+
+	}
+
+	std::vector<Physics::HitResult> Hits;
+
+	virtual void AddHit(const ResultType& inResult) override
+	{
+		using namespace JoltPhysics;
+
+		Physics::HitResult r;
+		r.Hit = true;
+		r.Depth = inResult.mPenetrationDepth;
+		r.Normal = 0 - Vector3(inResult.mPenetrationAxis.GetX(), inResult.mPenetrationAxis.GetY(), inResult.mPenetrationAxis.GetZ()).Normalize();
+		r.ImpactPoint = Vector3(inResult.mContactPointOn2.GetX(), inResult.mContactPointOn2.GetY(), inResult.mContactPointOn2.GetZ());
+
+		auto val = Bodies.find(inResult.mBodyID2);
+		PhysicsBodyInfo BodyInfo = (*val).second;
+		r.HitComponent = BodyInfo.Body->Parent;
+
+		Hits.push_back(r);
+	};
+};
+
+std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody* Body)
+{
+	using namespace Physics;
+
+	CollisionShapeCollectorImpl cl;
+	switch (Body->Type)
+	{
+	case PhysicsBody::BodyType::Sphere:
+	{
+		BodyCreationSettings SphereSettings = BodyCreationSettings(new SphereShape(Body->GetTransform().Scale.X),
+			ToJPHVec3(Body->GetTransform().Position),
+			ToJPHQuat(Body->GetTransform().Rotation),
+			EMotionType::Static,
+			(ObjectLayer)Body->CollisionLayers);
+
+		glm::mat4 mat = Body->GetTransform().ToMatrix();
+
+		Mat44 ResultMat = Mat44(ToJPHVec4(mat[0]), ToJPHVec4(mat[1]), ToJPHVec4(mat[2]), ToJPHVec4(mat[3]));
+
+		CollideShapeSettings Settings = CollideShapeSettings();
+		System->GetNarrowPhaseQuery().CollideShape(SphereSettings.GetShape(), ToJPHVec3(Body->GetTransform().Scale), ResultMat, Settings, Vec3(), cl);
+
+	}
+	}
+
+	return cl.Hits;
 }
 
 Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End)
@@ -340,7 +435,10 @@ Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End)
 			r.HitComponent = BodyInfo.Body->Parent;
 			Vec3 ImpactPos = Cast.GetPointOnRay(HitInfo.mFraction);
 			r.ImpactPoint = Vector3(ImpactPos.GetX(), ImpactPos.GetY(), ImpactPos.GetZ());
-			Vec3 Rot = JoltBodyInterface->GetRotation(HitInfo.mBodyID).GetEulerAngles();
+
+			Vec3 Normal = JoltBodyInterface->GetTransformedShape(BodyInfo.ID).GetWorldSpaceSurfaceNormal(HitInfo.mSubShapeID2, ImpactPos);
+			r.Depth = HitInfo.mFraction;
+			r.Normal = Vector3(Normal.GetX(), Normal.GetY(), Normal.GetZ());
 		}
 	}
 	return r;

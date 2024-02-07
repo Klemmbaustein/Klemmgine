@@ -19,7 +19,7 @@ void ParticleComponent::Begin()
 void ParticleComponent::Update()
 {
 #if !SERVER
-	Emitter->Position = RelativeTransform.Location + GetParent()->GetTransform().Location;
+	Emitter->Position = RelativeTransform.Position + GetParent()->GetTransform().Position;
 	Emitter->Rotation = RelativeTransform.Rotation + GetParent()->GetTransform().Rotation;
 #endif
 }

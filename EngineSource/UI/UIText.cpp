@@ -108,9 +108,9 @@ void UIText::SetText(ColoredText NewText)
 	}
 }
 
-size_t UIText::GetNearestLetterAtLocation(Vector2 Location)
+size_t UIText::GetNearestLetterAtLocation(Vector2 Position)
 {
-	size_t Depth = Renderer->GetCharacterIndexADistance(RenderedText, Location.X - OffsetPosition.X, TextSize * 2);
+	size_t Depth = Renderer->GetCharacterIndexADistance(RenderedText, Position.X - OffsetPosition.X, TextSize * 2);
 	return Depth;
 }
 

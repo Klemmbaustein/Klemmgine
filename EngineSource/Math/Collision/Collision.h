@@ -51,35 +51,7 @@ namespace Collision
 			this->HitObject = HitObject;
 		}
 	};
-	struct CollisionMesh
-	{
-		CollisionMesh(std::vector<Vertex> Verts, std::vector<unsigned int> Indices, Transform T);
-		CollisionMesh() { ModelMatrix = glm::mat4(1); }
-		~CollisionMesh();
-		glm::mat4 GetMatrix();
-		void SetTransform(Transform T);
-		Collision::HitResponse CheckAgainstMesh(CollisionMesh* b);
-		Collision::HitResponse CheckAgainstLine(Vector3 RayStart, Vector3 RayEnd);
-		Collision::HitResponse CheckAgainstAABB(const Box& b);
-		bool CanOverlap = true;
-		float SphereCollisionSize = 0.0f;
-		Vector3 WorldPosition;
-		Vector3 Scale = 1;
-		Vector3 SpherePosition;
-		HitResponse OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore = {});
-		std::vector<Vertex> Vertices;
-		std::vector<Vertex>	RawVertices; std::vector<unsigned int> Indices;
-	protected:
-		float WorldScale = 1.0f;
-		void ApplyMatrix();
-		glm::mat4 ModelMatrix;
 
-	};
-	bool CollisionAABB(Box a, Box b);
-
-	Collision::HitResponse TriangleLine(const Vector3& TriA, const Vector3& TriB, const Vector3& TriC, const Vector3& RayStart, const Vector3& RayEnd);
-
-	HitResponse BoxOverlapCheck(Box a, Vector3 Offset);
 	bool IsPointIn3DBox(Box a, Vector3 p);
 	/**
 	* @brief
@@ -100,5 +72,4 @@ namespace Collision
 	HitResponse LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<WorldObject*> ObjectsToIgnore = {}, std::set<CollisionComponent*> MeshesToIgnore = {});
 
 	HitResponse LineCheckForAABB(Box b, Vector3 RayStart, Vector3 RayEnd);
-	extern std::vector<CollisionComponent*> CollisionBoxes;
 }

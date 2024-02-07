@@ -59,6 +59,7 @@ size_t InstancedMeshComponent::AddInstance(Transform T)
 	{
 		return false;
 	}
+	T.Rotation = T.Rotation.DegreesToRadians();
 	return Mesh->AddInstance(T + GetParent()->GetTransform());
 #endif
 	return 0;
@@ -76,7 +77,7 @@ bool InstancedMeshComponent::RemoveInstance(size_t Index)
 	return false;
 }
 
-std::vector<size_t> InstancedMeshComponent::GetInstancesNearLocation(Vector3 Location, float Distance)
+std::vector<size_t> InstancedMeshComponent::GetInstancesNearLocation(Vector3 Position, float Distance)
 {
 	if (!Mesh)
 	{
@@ -86,7 +87,7 @@ std::vector<size_t> InstancedMeshComponent::GetInstancesNearLocation(Vector3 Loc
 #if !SERVER
 	for (size_t i = 0; i < Mesh->Instances.size(); i++)
 	{
-		if (Vector3::Distance(Mesh->Instances[i].Location, Location) <= Distance)
+		if (Vector3::Distance(Mesh->Instances[i].Position, Position) <= Distance)
 		{
 			Instances.push_back(i);
 		}

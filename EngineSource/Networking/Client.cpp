@@ -164,7 +164,7 @@ bool Client::GetIsConnecting()
 
 bool Client::GetIsConnected()
 {
-#if CLIENT
+#if !SERVER
 	return IsConnected;
 #else
 	return true;
@@ -198,7 +198,7 @@ bool Client::HandleValueUpdate(uint64_t ObjNetID, std::string Name, std::string 
 
 	if (Name == "_pos")
 	{
-		obj->GetTransform().Location = Vector3::FromString(Value);
+		obj->GetTransform().Position = Vector3::FromString(Value);
 		return true;
 	}
 

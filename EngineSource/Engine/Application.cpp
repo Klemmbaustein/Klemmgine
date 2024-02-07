@@ -350,7 +350,7 @@ static void OcclusionCheck(Model* m, size_t i, FramebufferObject* Buffer)
 	}
 
 	glBeginQuery(GL_ANY_SAMPLES_PASSED, Query);
-	Transform t = Transform(m->ModelTransform.Location + m->Size.extents, m->ModelTransform.Rotation, m->Size.extents * m->ModelTransform.Scale);
+	Transform t = Transform(m->ModelTransform.Position + m->Size.extents, m->ModelTransform.Rotation, m->Size.extents * m->ModelTransform.Scale);
 	Application::OcclusionCullMesh->ModelTransform = t;
 	Application::OcclusionCullMesh->UpdateTransform();
 	Application::OcclusionCullMesh->SimpleRender(Application::CullShader);

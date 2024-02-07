@@ -81,8 +81,8 @@ constexpr uint8_t BKDAT_FILE_VERSION = 1;
 
 namespace Bake
 {
-	std::vector<Collision::CollisionMesh> Meshes;
-	std::vector<Graphics::Light> Lights;
+	//std::vector<Collision::CollisionMesh> Meshes;
+	//std::vector<Graphics::Light> Lights;
 	Vector3 BakeScale;
 
 	static Vector3 BakeMapToPos(uint64_t TextureElement)
@@ -97,7 +97,7 @@ namespace Bake
 
 	std::byte* Texture = nullptr;
 
-	constexpr int NUM_CHUNK_SPLITS = 4;
+	constexpr int NUM_CHUNK_SPLITS = 3;
 	std::atomic<float> ThreadProgress[NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS];
 
 	static void BakeSection(int64_t x, int64_t y, int64_t z, size_t ThreadID)
@@ -166,7 +166,7 @@ namespace Bake
 		{
 			r.t = 0;
 		}
-
+		/*
 		for (auto& mesh : Bake::Meshes)
 		{
 			Collision::Box BroadPhaseBox = Collision::Box(
@@ -201,7 +201,7 @@ namespace Bake
 					}
 				}
 			}
-		}
+		}*/
 		return r;
 	}
 }
@@ -215,7 +215,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	r.t = 0;
 	
 	float TotalLightIntensity = 0;
-
+	/*
 	for (auto& i : Bake::Lights)
 	{
 		glm::vec3 pointLightDir = (i.Position - StartPos);
@@ -247,6 +247,8 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	LightInt /= 3.0f;
 
 	return std::min((LightInt / 2.0f + TotalLightIntensity / 4.0f), 1.0f);
+	*/
+	return 0;
 }
 
 static std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
@@ -265,7 +267,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 {
 	const int Number = 25;
 	const bool IsEven = !(Number & 1);
-	Bake::Meshes.clear();
+	//Bake::Meshes.clear();
 
 	for (WorldObject* i : Objects::AllObjects)
 	{
@@ -282,16 +284,16 @@ void BakedLighting::BakeCurrentSceneToFile()
 					continue;
 				Vector3 InvertedRotation = (i->GetTransform().Rotation + c->RelativeTransform.Rotation);
 				InvertedRotation = Vector3(-InvertedRotation.Z, InvertedRotation.Y, -InvertedRotation.X);
-				Transform ModelTransform = (Transform(Vector3::TranslateVector(c->RelativeTransform.Location, i->GetTransform()),
+				Transform ModelTransform = (Transform(Vector3::TranslateVector(c->RelativeTransform.Position, i->GetTransform()),
 					Vector3() - InvertedRotation.DegreesToRadians(),
 					c->RelativeTransform.Scale * 0.025f * i->GetTransform().Scale));
 
-				Bake::Meshes.push_back(Collision::CollisionMesh(m.GetMergedVertices(), m.GetMergedIndices(), ModelTransform));
+				//Bake::Meshes.push_back(Collision::CollisionMesh(m.GetMergedVertices(), m.GetMergedIndices(), ModelTransform));
 			}
 		}
 	}
 
-	Bake::Lights = Graphics::MainFramebuffer->Lights;
+	//Bake::Lights = Graphics::MainFramebuffer->Lights;
 
 	new std::thread([]() {
 
@@ -308,7 +310,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 
 		Collision::Box sbox;
 
-		for (auto& i : Bake::Meshes)
+		/*for (auto& i : Bake::Meshes)
 		{
 			if (!i.CanOverlap)
 			{
@@ -372,8 +374,6 @@ void BakedLighting::BakeCurrentSceneToFile()
 			BakeLog("Thread " + std::to_string(++i) + "/" + std::to_string(BakeThreads.size()) + " is done.");
 		}
 
-
-
 		BakeLog("Finished baking lightmap.");
 		BakeLog("Bake took " + std::to_string((int)BakeTimer.Get()) + " seconds.");
 
@@ -397,7 +397,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 				}
 			}
 		}
-
+		*/
 		// Simple RLE for lightmap compression.
 		std::byte* TexPtr = Bake::Texture;
 
@@ -455,7 +455,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 		BakeLog("Encoded voxels: " + std::to_string(TotalLength));
 
 		delete[] Bake::Texture;
-		Bake::Meshes.clear();
+		//Bake::Meshes.clear();
 		BakedLighting::FinishedBaking = true;
 		});
 }

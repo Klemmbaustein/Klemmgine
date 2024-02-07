@@ -41,7 +41,7 @@ void MeshComponent::Update()
 	{
 		Vector3 InvertedRotation = (GetParent()->GetTransform().Rotation + RelativeTransform.Rotation);
 		InvertedRotation = Vector3(-InvertedRotation.Z, InvertedRotation.Y, -InvertedRotation.X);
-		MeshModel->ModelTransform = Transform(Vector3::TranslateVector(RelativeTransform.Location, GetParent()->GetTransform()),
+		MeshModel->ModelTransform = Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform()),
 			Vector3() - InvertedRotation.DegreesToRadians(),
 			RelativeTransform.Scale * GetParent()->GetTransform().Scale);
 		MeshModel->UpdateTransform();
@@ -114,7 +114,7 @@ void MeshComponent::UpdateTransform()
 	{
 		Vector3 InvertedRotation = (GetParent()->GetTransform().Rotation + RelativeTransform.Rotation);
 		InvertedRotation = Vector3(InvertedRotation.Z, InvertedRotation.Y, InvertedRotation.X);
-		MeshModel->ModelTransform = Transform(Vector3::TranslateVector(RelativeTransform.Location, GetParent()->GetTransform()),
+		MeshModel->ModelTransform = Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform()),
 			Vector3() - InvertedRotation,
 			RelativeTransform.Scale * GetParent()->GetTransform().Scale);
 		MeshModel->UpdateTransform();

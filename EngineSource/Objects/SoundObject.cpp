@@ -57,7 +57,7 @@ void SoundObject::LoadSound(std::string SoundName)
 	Buffer = Sound::LoadSound(Filename);
 	if (IsSpatialSound && Buffer)
 	{
-		Source = Sound::PlaySound3D(Buffer, GetTransform().Location, FalloffRange, Pitch, Volume, IsLooping);
+		Source = Sound::PlaySound3D(Buffer, GetTransform().Position, FalloffRange, Pitch, Volume, IsLooping);
 	}
 	else if (Buffer)
 	{

@@ -96,7 +96,7 @@ namespace CSM
 void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass)
 {
 	if (Visible
-		&& (Size.isOnFrustum(FrustumCulling::CurrentCameraFrustum, ModelTransform.Location, ModelTransform.Scale * NonScaledSize * 0.02f)
+		&& (Size.isOnFrustum(FrustumCulling::CurrentCameraFrustum, ModelTransform.Position, ModelTransform.Scale * NonScaledSize * 0.02f)
 			|| !MainFrameBuffer))
 	{
 		if (TwoSided)
@@ -165,7 +165,7 @@ void Model::ConfigureVAO()
 void Model::SimpleRender(Shader* UsedShader)
 {
 	if (!Visible) return;
-	if (Size.isOnFrustum(FrustumCulling::CurrentCameraFrustum, ModelTransform.Location, ModelTransform.Scale * NonScaledSize * 0.025f))
+	if (Size.isOnFrustum(FrustumCulling::CurrentCameraFrustum, ModelTransform.Position, ModelTransform.Scale * NonScaledSize * 0.025f))
 	{
 		UsedShader->Bind();
 		if (TwoSided)

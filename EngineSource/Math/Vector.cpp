@@ -100,12 +100,12 @@ bool operator==(Vector3 a, Vector3 b)
 
 bool operator==(Transform a, Transform b)
 {
-	return a.Location == b.Location && a.Rotation == b.Rotation && a.Scale == b.Scale;
+	return a.Position == b.Position && a.Rotation == b.Rotation && a.Scale == b.Scale;
 }
 
 Transform operator+(Transform a, Transform b)
 {
-	return Transform(a.Location + b.Location, a.Rotation + b.Rotation, a.Scale * b.Scale);
+	return Transform(a.Position + b.Position, a.Rotation + b.Rotation, a.Scale * b.Scale);
 }
 
 
@@ -228,19 +228,23 @@ float Vector3::Dot(Vector3 a, Vector3 b)
 Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
+	Vector3 Rotation = Vector3(-atan2f(Dir.Y, Dir.X) + Math::PI_F / 2, atan2f(Dir.Z, Dir.X), 0);
 	if (Radiants)
-		return Vector3(atan2f(1 - Dir.Y, Dir.Y), atan2f(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0);
+		return Rotation;
 	else
-		return Vector3(atan2f(1 - Dir.Y, Dir.Y), atan2f(Dir.Z, Dir.X) + Math::PI_F / 2.f, 0).RadiansToDegrees();
+		return Rotation.RadiansToDegrees();
 }
 
 Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
+	glm::quat quat = glm::quatLookAt((glm::vec3)Dir, glm::vec3(0, 1, 0));
+	glm::vec3 Euler = glm::eulerAngles(quat);
+
 	if (Radiants)
-		return Vector3(sinf(Dir.Y), atan2f(Dir.Z, Dir.X), 0);
+		return Vector3(Euler);
 	else
-		return Vector3(sinf(Dir.Y), atan2f(Dir.Z, Dir.X), 0).RadiansToDegrees();
+		return Vector3(Euler).RadiansToDegrees();
 }
 
 Vector3 Vector3::QuatToEuler(glm::quat quat)
@@ -374,14 +378,14 @@ Vector2 Vector2::operator*(Vector2 b)
 }
 
 
-glm::mat4 Transform::ToMatrix()
+glm::mat4 Transform::ToMatrix() const
 {
 	glm::mat4 Matrix = glm::mat4(1);
 
-	Matrix = glm::translate(Matrix, (glm::vec3)Location);
-	Matrix = glm::rotate(Matrix, Rotation.X, glm::vec3(1, 0, 0));
-	Matrix = glm::rotate(Matrix, Rotation.Y, glm::vec3(0, 1, 0));
+	Matrix = glm::translate(Matrix, (glm::vec3)Position);
 	Matrix = glm::rotate(Matrix, Rotation.Z, glm::vec3(0, 0, 1));
+	Matrix = glm::rotate(Matrix, Rotation.Y, glm::vec3(0, 1, 0));
+	Matrix = glm::rotate(Matrix, Rotation.X, glm::vec3(1, 0, 0));
 	Matrix = glm::scale(Matrix, (glm::vec3)Scale);
 
 	return Matrix;
