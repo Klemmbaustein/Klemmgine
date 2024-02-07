@@ -63,6 +63,7 @@ namespace Physics
 		const Transform& GetTransform() const;
 
 		Vector3 GetPosition();
+		Vector3 GetRotation();
 
 		void* PhysicsSystemBody = nullptr;
 	protected:

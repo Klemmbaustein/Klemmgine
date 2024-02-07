@@ -28,7 +28,8 @@ using namespace JPH::literals;
 #include <Engine/Log.h>
 #include <Engine/Stats.h>
 #include <Math/Math.h>
-#include <glm/trigonometric.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/mat4x4.hpp>
 #include <Engine/Input.h>
 
 inline static Vec3 ToJPHVec3(const Vector3& Vec)
@@ -38,8 +39,8 @@ inline static Vec3 ToJPHVec3(const Vector3& Vec)
 
 inline static Quat ToJPHQuat(Vector3 Rot)
 {
-	Rot = Vector3(Rot.X, Rot.Y, Rot.Z);
-	return Quat::sEulerAngles(Vec3(0, glm::radians(15.0f), 0));
+	glm::quat rotation = glm::quat((glm::vec3)Rot.DegreesToRadians());
+	return Quat(rotation.x, rotation.y, rotation.z, rotation.w);
 }
 
 struct PhysicsBodyInfo
@@ -77,11 +78,27 @@ static bool AssertFailedImpl(const char* inExpression, const char* inMessage, co
 
 #endif
 
+static bool LayerMask(Physics::Layer Bit, Physics::Layer Mask)
+{
+	return (bool)(Bit & Mask);
+}
+
 class ObjectLayerPairFilterImpl : public ObjectLayerPairFilter
 {
 public:
+	bool CheckForStaticDynamic(Physics::Layer inObject1, Physics::Layer inObject2) const
+	{
+		if (LayerMask(inObject1, Physics::Layer::Static) && LayerMask(inObject2, Physics::Layer::Dynamic))
+		{
+			return true;
+		}
+
+		return LayerMask(inObject1, inObject2);
+	}
 	virtual bool ShouldCollide(ObjectLayer inObject1, ObjectLayer inObject2) const override
 	{
+		if (CheckForStaticDynamic((Physics::Layer)inObject1, (Physics::Layer)inObject2)) return true;
+		if (CheckForStaticDynamic((Physics::Layer)inObject2, (Physics::Layer)inObject1)) return true;
 		return inObject1 & inObject2;
 	}
 };
@@ -108,15 +125,16 @@ public:
 
 	virtual BroadPhaseLayer GetBroadPhaseLayer(ObjectLayer inLayer) const override
 	{
-		switch ((Physics::Layer)inLayer)
+		Physics::Layer Layer = (Physics::Layer)inLayer;
+		if ((bool)(Layer & Physics::Layer::Dynamic))
 		{
-		case Physics::Layer::Static:
-			return BroadPhaseLayers::STATIC;
-		case Physics::Layer::Dynamic:
 			return BroadPhaseLayers::DYNAMIC;
-		default:
-			return BroadPhaseLayers::CUSTOM;
 		}
+		if ((bool)(Layer & Physics::Layer::Static))
+		{
+			return BroadPhaseLayers::STATIC;
+		}
+		return BroadPhaseLayers::CUSTOM;
 	}
 
 #if defined(JPH_EXTERNAL_PROFILE) || defined(JPH_PROFILE_ENABLED)
@@ -132,7 +150,16 @@ class ObjectVsBroadPhaseLayerFilterImpl : public ObjectVsBroadPhaseLayerFilter
 public:
 	virtual bool ShouldCollide(ObjectLayer inLayer1, BroadPhaseLayer inLayer2) const override
 	{
-		return true;
+		Physics::Layer Layer = (Physics::Layer)inLayer1;
+		if ((bool)(Layer & Physics::Layer::Dynamic))
+		{
+			return inLayer2 == BroadPhaseLayers::STATIC;
+		}
+		if ((bool)(Layer & Physics::Layer::Static))
+		{
+			return inLayer2 == BroadPhaseLayers::STATIC || inLayer2 == BroadPhaseLayers::DYNAMIC;
+		}
+		return inLayer2 == BroadPhaseLayers::CUSTOM;
 	}
 };
 
@@ -218,11 +245,13 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 		Indices.reserve(MergedIndices.size() / 3);
 		Transform OffsetTransform = MeshPtr->GetTransform();
 		OffsetTransform.Location = 0;
-		OffsetTransform.Rotation = OffsetTransform.Rotation.DegreesToRadians();
+		OffsetTransform.Rotation = Vector3(OffsetTransform.Rotation.Z, -OffsetTransform.Rotation.Y, OffsetTransform.Rotation.X).DegreesToRadians();
 		OffsetTransform.Scale = OffsetTransform.Scale * Vector3(0.025f);
+		glm::mat4 ModelMatrix = OffsetTransform.ToMatrix();
 		for (auto& i : MergedVertices)
 		{
-			i.Position = Vector3::TranslateVector(i.Position, OffsetTransform);
+			i.Position = ModelMatrix * glm::vec4(i.Position, 1);
+
 			Vertices.push_back(Float3(i.Position.x, i.Position.y, i.Position.z));
 		}
 
@@ -236,7 +265,6 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 		MeshShapeSettings Settings = MeshShapeSettings(Vertices, Indices);
 		ShapeSettings::ShapeResult MeshResult;
 		MeshShape* Shape = new MeshShape(Settings, MeshResult);
-
 		if (!MeshResult.IsValid())
 		{
 			Log::PrintMultiLine("Error creating collision shape: " + std::string(MeshResult.GetError()), Log::LogColor::Red);
@@ -248,10 +276,6 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 			Quat::sIdentity(),
 			EMotionType::Static,
 			(ObjectLayer)MeshPtr->CollisionLayers);
-
-		Vec3 Val = ToJPHQuat(MeshPtr->GetTransform().Rotation).GetEulerAngles();
-
-		Log::Print(Vector3(Val.GetX(), Val.GetY(), Val.GetZ()).RadiansToDegrees().ToString());
 
 		BodyID = JoltBodyInterface->CreateAndAddBody(MeshSettings, EActivation::Activate);
 		break;
@@ -284,9 +308,16 @@ Vector3 JoltPhysics::GetBodyPosition(Physics::PhysicsBody* Body)
 	return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
 
+Vector3 JoltPhysics::GetBodyRotation(Physics::PhysicsBody* Body)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	Vec3 vec = JoltBodyInterface->GetRotation(Info->ID).GetEulerAngles();
+	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
+}
+
 void JoltPhysics::Update()
 {
-	if (Performance::DeltaTime > 0 && Input::IsKeyDown(Input::Key::f))
+	if (Performance::DeltaTime > 0 && (Input::IsKeyDown(Input::Key::f) || !IsInEditor))
 	{
 		System->Update(Performance::DeltaTime, 1, TempAllocator, JobSystem);
 	}

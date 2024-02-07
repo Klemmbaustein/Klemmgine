@@ -13,6 +13,7 @@ namespace JoltPhysics
 	void RemoveBody(Physics::PhysicsBody* Body);
 
 	Vector3 GetBodyPosition(Physics::PhysicsBody* Body);
+	Vector3 GetBodyRotation(Physics::PhysicsBody* Body);
 
 	void Update();
 

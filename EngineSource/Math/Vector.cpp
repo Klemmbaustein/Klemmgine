@@ -324,24 +324,12 @@ Vector3 Vector3::GetScaledAxis(Vector3 Rot, unsigned int Dir)
 
 Vector3 Vector3::RotateVector(Vector3 Vec, Vector3 Rot)
 {
-	auto Matrix = glm::mat4(1.f);
-
-	Matrix = glm::rotate(Matrix, Rot.X, glm::vec3(1, 0, 0));
-	Matrix = glm::rotate(Matrix, Rot.Y, glm::vec3(0, 1, 0));
-	Matrix = glm::rotate(Matrix, Rot.Z, glm::vec3(0, 0, 1));
-	return glm::vec3(Matrix * glm::vec4((glm::vec3)Vec, 1));
+	return glm::vec3(Transform(0, Rot, 1).ToMatrix() * glm::vec4((glm::vec3)Vec, 1));
 }
 
 Vector3 Vector3::TranslateVector(Vector3 Vec, Transform Transform)
 {
-	auto Matrix = glm::mat4(1.f);
-
-	Matrix = glm::translate(Matrix, (glm::vec3)Transform.Location);
-	Matrix = glm::rotate(Matrix, Transform.Rotation.Z, glm::vec3(1, 0, 0));
-	Matrix = glm::rotate(Matrix, Transform.Rotation.Y, glm::vec3(0, 1, 0));
-	Matrix = glm::rotate(Matrix, Transform.Rotation.X, glm::vec3(0, 0, 1));
-	Matrix = glm::scale(Matrix, (glm::vec3)Transform.Scale);
-	return glm::vec3(Matrix * glm::vec4((glm::vec3)Vec, 1));
+	return glm::vec3(Transform.ToMatrix() * glm::vec4((glm::vec3)Vec, 1));
 }
 
 Vector3 Vector3::FromString(std::string In)

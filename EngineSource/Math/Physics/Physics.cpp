@@ -46,6 +46,11 @@ Vector3 Physics::PhysicsBody::GetPosition()
 	return JoltPhysics::GetBodyPosition(this);
 }
 
+Vector3 Physics::PhysicsBody::GetRotation()
+{
+	return JoltPhysics::GetBodyRotation(this);
+}
+
 Physics::SphereBody::SphereBody(Vector3 Position, Vector3 Rotation, float Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
 	: PhysicsBody(BodyType::Sphere, Transform(Position, Rotation, Scale), ColliderMovability, CollisionLayers, Parent)
 {
