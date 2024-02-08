@@ -82,6 +82,7 @@ namespace Physics
 		std::vector<HitResult> CollisionTest();
 
 		void* PhysicsSystemBody = nullptr;
+		void* ShapeInfo = nullptr;
 	protected:
 		Transform BodyTransform;
 	private:

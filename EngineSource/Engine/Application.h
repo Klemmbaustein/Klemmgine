@@ -27,7 +27,8 @@ namespace Application
 	/**
 	* @brief
 	* A function that returns true if the application window has mouse focus.
-	* @returns
+	* 
+	* @return
 	* true if the window has mouse focus, false if not.
 	*/
 	bool WindowHasFocus();
@@ -67,7 +68,8 @@ namespace Application
 	/**
 	* @brief
 	* A function that returns true if full screen is enabled.
-	* @returns
+	* @return
+	* 
 	* true if full screen is enabled, false if not.
 	*/
 	bool GetFullScreen();
@@ -101,7 +103,8 @@ namespace Application
 	Vector2 GetWindowSize();
 #if EDITOR
 	/**
-	* @brief Editor only. A pointer to the current EditorUI instance.
+	* @brief
+	Editor only. A pointer to the current EditorUI instance.
 	*/
 	extern EditorUI* EditorInstance;
 #endif

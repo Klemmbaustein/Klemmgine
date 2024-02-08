@@ -182,6 +182,82 @@ namespace JoltPhysics
 	ObjectLayerPairFilterImpl object_vs_object_layer_filter;
 }
 
+BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
+{
+	using namespace Physics;
+
+	switch (Body->Type)
+	{
+	case PhysicsBody::BodyType::Sphere:
+	{
+		SphereBody* SpherePtr = static_cast<SphereBody*>(Body);
+		return BodyCreationSettings(new SphereShape(SpherePtr->GetTransform().Scale.X),
+			ToJPHVec3(Body->GetTransform().Position),
+			ToJPHQuat(SpherePtr->GetTransform().Rotation),
+			EMotionType::Dynamic,
+			(ObjectLayer)Body->CollisionLayers);
+	}
+	case PhysicsBody::BodyType::Box:
+	{
+		BoxBody* BoxPtr = static_cast<BoxBody*>(Body);
+		return BodyCreationSettings(new BoxShape(ToJPHVec3(BoxPtr->GetTransform().Scale)),
+			ToJPHVec3(Body->GetTransform().Position),
+			ToJPHQuat(BoxPtr->GetTransform().Rotation),
+			EMotionType::Dynamic,
+			(ObjectLayer)Body->CollisionLayers);
+	}
+	case PhysicsBody::BodyType::Mesh:
+	{
+		MeshBody* MeshPtr = static_cast<MeshBody*>(Body);
+
+		VertexList Vertices;
+		IndexedTriangleList Indices;
+
+		auto MergedVertices = MeshPtr->MeshData.GetMergedVertices();
+		auto MergedIndices = MeshPtr->MeshData.GetMergedIndices();
+
+		Vertices.reserve(MergedVertices.size());
+		Indices.reserve(MergedIndices.size() / 3);
+		Transform OffsetTransform = MeshPtr->GetTransform();
+		OffsetTransform.Position = 0;
+		OffsetTransform.Rotation = 0;
+		//OffsetTransform.Rotation = Vector3(OffsetTransform.Rotation.Z, -OffsetTransform.Rotation.Y, OffsetTransform.Rotation.X).DegreesToRadians();
+		OffsetTransform.Scale = OffsetTransform.Scale * Vector3(0.025f);
+		glm::mat4 ModelMatrix = OffsetTransform.ToMatrix();
+		for (auto& i : MergedVertices)
+		{
+			i.Position = ModelMatrix * glm::vec4(i.Position, 1);
+
+			Vertices.push_back(Float3(i.Position.x, i.Position.y, i.Position.z));
+		}
+
+		for (size_t i = 0; i < MergedIndices.size(); i += 3)
+		{
+			IndexedTriangle Tri = IndexedTriangle((uint32)MergedIndices[i], (uint32)MergedIndices[i + 1], (uint32)MergedIndices[i + 2]);
+			Indices.push_back(Tri);
+		}
+
+
+		MeshShapeSettings Settings = MeshShapeSettings(Vertices, Indices);
+		ShapeSettings::ShapeResult MeshResult;
+		MeshShape* Shape = new MeshShape(Settings, MeshResult);
+		if (!MeshResult.IsValid())
+		{
+			Log::PrintMultiLine("Error creating collision shape: " + std::string(MeshResult.GetError()), Log::LogColor::Red);
+			return BodyCreationSettings();
+		}
+
+		return BodyCreationSettings(Shape,
+			ToJPHVec3(MeshPtr->GetTransform().Position),
+			ToJPHQuat(MeshPtr->GetTransform().Rotation),
+			EMotionType::Static,
+			(ObjectLayer)MeshPtr->CollisionLayers);
+	}
+	}
+	ENGINE_UNREACHABLE();
+	return BodyCreationSettings();
+}
+
 void JoltPhysics::Init()
 {
 	RegisterDefaultAllocator();
@@ -224,86 +300,14 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 {
 	using namespace Physics;
 
-	BodyID BodyID;
-
-	switch (Body->Type)
+	if (!Body->ShapeInfo)
 	{
-	case PhysicsBody::BodyType::Sphere:
-	{
-		SphereBody* SpherePtr = static_cast<SphereBody*>(Body);
-		BodyCreationSettings SphereSettings = BodyCreationSettings(new SphereShape(SpherePtr->GetTransform().Scale.X),
-			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(SpherePtr->GetTransform().Rotation),
-			EMotionType::Dynamic,
-			(ObjectLayer)Body->CollisionLayers);
-		BodyID = JoltBodyInterface->CreateAndAddBody(SphereSettings, EActivation::Activate);
-		break;
+		CreateShape(Body);
 	}
-	case PhysicsBody::BodyType::Box:
-	{
-		BoxBody* BoxPtr = static_cast<BoxBody*>(Body);
-		BodyCreationSettings BoxSettings = BodyCreationSettings(new BoxShape(ToJPHVec3(BoxPtr->GetTransform().Scale)),
-			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(BoxPtr->GetTransform().Rotation),
-			EMotionType::Dynamic,
-			(ObjectLayer)Body->CollisionLayers);
-		BodyID = JoltBodyInterface->CreateAndAddBody(BoxSettings, EActivation::Activate);
-		break;
-	}
-	case PhysicsBody::BodyType::Mesh:
-	{
-		MeshBody* MeshPtr = static_cast<MeshBody*>(Body);
+	auto JoltShape = static_cast<BodyCreationSettings*>(Body->ShapeInfo);
 
-		VertexList Vertices;
-		IndexedTriangleList Indices;
+	BodyID BodyID = JoltBodyInterface->CreateAndAddBody(*JoltShape, EActivation::Activate);
 
-		auto MergedVertices = MeshPtr->MeshData.GetMergedVertices();
-		auto MergedIndices = MeshPtr->MeshData.GetMergedIndices();
-
-		Vertices.reserve(MergedVertices.size());
-		Indices.reserve(MergedIndices.size() / 3);
-		Transform OffsetTransform = MeshPtr->GetTransform();
-		OffsetTransform.Position = 0;
-		OffsetTransform.Rotation = 0;
-		//OffsetTransform.Rotation = Vector3(OffsetTransform.Rotation.Z, -OffsetTransform.Rotation.Y, OffsetTransform.Rotation.X).DegreesToRadians();
-		OffsetTransform.Scale = OffsetTransform.Scale * Vector3(0.025f);
-		glm::mat4 ModelMatrix = OffsetTransform.ToMatrix();
-		for (auto& i : MergedVertices)
-		{
-			i.Position = ModelMatrix * glm::vec4(i.Position, 1);
-
-			Vertices.push_back(Float3(i.Position.x, i.Position.y, i.Position.z));
-		}
-
-		for (size_t i = 0; i < MergedIndices.size(); i += 3)
-		{
-			IndexedTriangle Tri = IndexedTriangle((uint32)MergedIndices[i], (uint32)MergedIndices[i + 1], (uint32)MergedIndices[i + 2]);
-			Indices.push_back(Tri);
-		}
-
-
-		MeshShapeSettings Settings = MeshShapeSettings(Vertices, Indices);
-		ShapeSettings::ShapeResult MeshResult;
-		MeshShape* Shape = new MeshShape(Settings, MeshResult);
-		if (!MeshResult.IsValid())
-		{
-			Log::PrintMultiLine("Error creating collision shape: " + std::string(MeshResult.GetError()), Log::LogColor::Red);
-			return;
-		}
-
-		BodyCreationSettings MeshSettings = BodyCreationSettings(Shape,
-			ToJPHVec3(MeshPtr->GetTransform().Position),
-			ToJPHQuat(MeshPtr->GetTransform().Rotation),
-			EMotionType::Static,
-			(ObjectLayer)MeshPtr->CollisionLayers);
-
-		BodyID = JoltBodyInterface->CreateAndAddBody(MeshSettings, EActivation::Activate);
-		break;
-	}
-	default:
-		ENGINE_UNREACHABLE();
-		break;
-	}
 	PhysicsBodyInfo info;
 	info.Body = Body;
 	info.ID = BodyID;
@@ -318,6 +322,12 @@ void JoltPhysics::RemoveBody(Physics::PhysicsBody* Body)
 	JoltBodyInterface->RemoveBody(Info->ID);
 	JoltBodyInterface->DestroyBody(Info->ID);
 	Bodies.erase(Info->ID);
+}
+
+void JoltPhysics::CreateShape(Physics::PhysicsBody* Body)
+{
+	auto Shape = new BodyCreationSettings(CreateJoltShapeFromBody(Body));
+	Body->ShapeInfo = Shape;
 }
 
 Vector3 JoltPhysics::GetBodyPosition(Physics::PhysicsBody* Body)
@@ -394,27 +404,20 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 {
 	using namespace Physics;
 
+	if (!Body->ShapeInfo)
+	{
+		CreateShape(Body);
+	}
+	auto JoltShape = static_cast<BodyCreationSettings*>(Body->ShapeInfo);
+
+	glm::mat4 mat = Body->GetTransform().ToMatrix();
+
+	Mat44 ResultMat = Mat44(ToJPHVec4(mat[0]), ToJPHVec4(mat[1]), ToJPHVec4(mat[2]), ToJPHVec4(mat[3]));
+
 	CollisionShapeCollectorImpl cl;
-	switch (Body->Type)
-	{
-	case PhysicsBody::BodyType::Sphere:
-	{
-		BodyCreationSettings SphereSettings = BodyCreationSettings(new SphereShape(Body->GetTransform().Scale.X),
-			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(Body->GetTransform().Rotation),
-			EMotionType::Static,
-			(ObjectLayer)Body->CollisionLayers);
-
-		glm::mat4 mat = Body->GetTransform().ToMatrix();
-
-		Mat44 ResultMat = Mat44(ToJPHVec4(mat[0]), ToJPHVec4(mat[1]), ToJPHVec4(mat[2]), ToJPHVec4(mat[3]));
-
-		CollideShapeSettings Settings = CollideShapeSettings();
-		System->GetNarrowPhaseQuery().CollideShape(SphereSettings.GetShape(), ToJPHVec3(Body->GetTransform().Scale), ResultMat, Settings, Vec3(), cl);
-
-	}
-	}
-
+	CollideShapeSettings Settings = CollideShapeSettings();
+	System->GetNarrowPhaseQuery().CollideShape(JoltShape->GetShape(), ToJPHVec3(Body->GetTransform().Scale), ResultMat, Settings, Vec3(), cl);
+	
 	return cl.Hits;
 }
 
