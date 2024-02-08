@@ -465,7 +465,7 @@ void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
 		else
 		{
 			Log::PrintMultiLine("Attempted to invoke NetEvent '" + Name + "' on " + Networking::ClientIDToString(Client::GetClientID()) + "\n"
-				"but the event can only be called from the owning client (client " + Networking::ClientIDToString(Parent->NetOwner) + ")",
+				"but the event can only be called from the owning client (" + Networking::ClientIDToString(Parent->NetOwner) + ")",
 				Log::LogColor::Yellow,
 				"[Net]: ");
 		}

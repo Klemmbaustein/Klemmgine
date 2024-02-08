@@ -71,6 +71,11 @@ std::vector<Physics::HitResult> Physics::PhysicsBody::CollisionTest()
 	return JoltPhysics::CollisionTest(this);
 }
 
+std::vector<Physics::HitResult> Physics::PhysicsBody::ShapeCast(Transform StartTransform, Vector3 EndPos)
+{
+	return JoltPhysics::ShapeCastBody(this, StartTransform, EndPos);
+}
+
 Physics::SphereBody::SphereBody(Vector3 Position, Vector3 Rotation, float Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
 	: PhysicsBody(BodyType::Sphere, Transform(Position, Rotation, Scale), ColliderMovability, CollisionLayers, Parent)
 {

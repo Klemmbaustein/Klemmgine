@@ -24,6 +24,7 @@
     <ClCompile Include="Engine\Gamepad.cpp" />
     <ClCompile Include="Math\Physics\JoltPhysics.cpp" />
     <ClCompile Include="Math\Physics\Physics.cpp" />
+    <ClCompile Include="Objects\Components\PhysicsComponent.cpp" />
     <ClCompile Include="UI\EditorUI\AssetBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\ClassesBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\AboutWindow.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="Engine\Gamepad.h" />
     <ClInclude Include="Math\Physics\JoltPhysics.h" />
     <ClInclude Include="Math\Physics\Physics.h" />
+    <ClInclude Include="Objects\Components\PhysicsComponent.h" />
     <ClInclude Include="UI\EditorUI\AssetBrowser.h" />
     <ClInclude Include="UI\EditorUI\ClassesBrowser.h" />
     <ClInclude Include="UI\EditorUI\Popups\AboutWindow.h" />

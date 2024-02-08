@@ -39,6 +39,8 @@ public:
 	*/
 	Transform RelativeTransform;
 
+	virtual Transform GetWorldTransform();
+
 private:
 	WorldObject* Parent = nullptr;
 };

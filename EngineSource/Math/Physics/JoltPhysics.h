@@ -23,5 +23,6 @@ namespace JoltPhysics
 	void Update();
 
 	std::vector<Physics::HitResult> CollisionTest(Physics::PhysicsBody* Body);
+	std::vector<Physics::HitResult> ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos);
 	Physics::HitResult LineCast(Vector3 Start, Vector3 End);
 }

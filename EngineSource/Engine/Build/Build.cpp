@@ -240,7 +240,7 @@ int Build::BuildCurrentSolution(std::string Configuration)
 
 	std::filesystem::create_directories("Build\\");
 
-	std::string Command = (MSBuildPath + " " + SolutionName + ".sln /p:Platform=x64 /p:Configuration=" + Configuration);
+	std::string Command = (MSBuildPath + " " + SolutionName + ".sln /p:Configuration=" + Configuration);
 
 	std::cout << Command << std::endl;
 
@@ -250,6 +250,7 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	{
 		Log::Print("[Build]: Built project for configuration: " + Configuration, Log::LogColor::Green);
 	}
+
 	return ret;
 }
 #endif

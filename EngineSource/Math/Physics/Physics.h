@@ -28,9 +28,9 @@ namespace Physics
 
 	enum class MotionType
 	{
-		Static,
-		Kinematic,
-		Dynamic,
+		Static = 0,
+		Kinematic = 1,
+		Dynamic = 2,
 	};
 
 	inline Layer operator|(Layer a, Layer b)
@@ -80,6 +80,7 @@ namespace Physics
 		void Scale(Vector3 ScaleMultiplier);
 
 		std::vector<HitResult> CollisionTest();
+		std::vector<HitResult> ShapeCast(Transform StartTransform, Vector3 EndPos);
 
 		void* PhysicsSystemBody = nullptr;
 		void* ShapeInfo = nullptr;

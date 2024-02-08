@@ -797,6 +797,10 @@ static void PollInput()
 	{
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
+	if (!Application::WindowHasFocus())
+	{
+		Input::MouseMovement = 0;
+	}
 #endif
 }
 

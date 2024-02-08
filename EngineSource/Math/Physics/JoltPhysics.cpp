@@ -134,13 +134,13 @@ public:
 	virtual BroadPhaseLayer GetBroadPhaseLayer(ObjectLayer inLayer) const override
 	{
 		Physics::Layer Layer = (Physics::Layer)inLayer;
-		if ((bool)(Layer & Physics::Layer::Dynamic))
-		{
-			return BroadPhaseLayers::DYNAMIC;
-		}
 		if ((bool)(Layer & Physics::Layer::Static))
 		{
 			return BroadPhaseLayers::STATIC;
+		}
+		if ((bool)(Layer & Physics::Layer::Dynamic))
+		{
+			return BroadPhaseLayers::DYNAMIC;
 		}
 		return BroadPhaseLayers::CUSTOM;
 	}
@@ -182,6 +182,11 @@ namespace JoltPhysics
 	ObjectLayerPairFilterImpl object_vs_object_layer_filter;
 }
 
+static EMotionType ConvertMovability(Physics::MotionType Movability)
+{
+	return (EMotionType)Movability;
+}
+
 BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 {
 	using namespace Physics;
@@ -194,7 +199,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		return BodyCreationSettings(new SphereShape(SpherePtr->GetTransform().Scale.X),
 			ToJPHVec3(Body->GetTransform().Position),
 			ToJPHQuat(SpherePtr->GetTransform().Rotation),
-			EMotionType::Dynamic,
+			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
 	case PhysicsBody::BodyType::Box:
@@ -203,7 +208,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		return BodyCreationSettings(new BoxShape(ToJPHVec3(BoxPtr->GetTransform().Scale)),
 			ToJPHVec3(Body->GetTransform().Position),
 			ToJPHQuat(BoxPtr->GetTransform().Rotation),
-			EMotionType::Dynamic,
+			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
 	case PhysicsBody::BodyType::Mesh:
@@ -221,7 +226,6 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		Transform OffsetTransform = MeshPtr->GetTransform();
 		OffsetTransform.Position = 0;
 		OffsetTransform.Rotation = 0;
-		//OffsetTransform.Rotation = Vector3(OffsetTransform.Rotation.Z, -OffsetTransform.Rotation.Y, OffsetTransform.Rotation.X).DegreesToRadians();
 		OffsetTransform.Scale = OffsetTransform.Scale * Vector3(0.025f);
 		glm::mat4 ModelMatrix = OffsetTransform.ToMatrix();
 		for (auto& i : MergedVertices)
@@ -395,9 +399,35 @@ public:
 		auto val = Bodies.find(inResult.mBodyID2);
 		PhysicsBodyInfo BodyInfo = (*val).second;
 		r.HitComponent = BodyInfo.Body->Parent;
-
 		Hits.push_back(r);
 	};
+};
+
+class CastShapeCollectorImpl : public CastShapeCollector
+{
+public:
+	CastShapeCollectorImpl()
+	{
+
+	}
+
+	std::vector<Physics::HitResult> Hits;
+
+	virtual void AddHit(const ResultType& inResult) override
+	{
+		using namespace JoltPhysics;
+
+		Physics::HitResult r;
+		r.Hit = true;
+		r.Depth = inResult.mPenetrationDepth;
+		r.Normal = 0 - Vector3(inResult.mPenetrationAxis.GetX(), inResult.mPenetrationAxis.GetY(), inResult.mPenetrationAxis.GetZ()).Normalize();
+		r.ImpactPoint = Vector3(inResult.mContactPointOn2.GetX(), inResult.mContactPointOn2.GetY(), inResult.mContactPointOn2.GetZ());
+
+		auto val = Bodies.find(inResult.mBodyID2);
+		PhysicsBodyInfo BodyInfo = (*val).second;
+		r.HitComponent = BodyInfo.Body->Parent;
+		Hits.push_back(r);
+	}
 };
 
 std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody* Body)
@@ -416,9 +446,36 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 
 	CollisionShapeCollectorImpl cl;
 	CollideShapeSettings Settings = CollideShapeSettings();
+	Settings.mPenetrationTolerance = 0;
+	Settings.mCollisionTolerance = 0;
 	System->GetNarrowPhaseQuery().CollideShape(JoltShape->GetShape(), ToJPHVec3(Body->GetTransform().Scale), ResultMat, Settings, Vec3(), cl);
 	
 	return cl.Hits;
+}
+
+std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos)
+{
+	using namespace Physics;
+
+	if (!Body->ShapeInfo)
+	{
+		CreateShape(Body);
+	}
+
+	auto JoltShape = static_cast<BodyCreationSettings*>(Body->ShapeInfo);
+
+	glm::mat4 mat = StartPos.ToMatrix();
+
+	Vector3 Direction = EndPos - StartPos.Position;
+	
+	Mat44 ResultMat = Mat44(ToJPHVec4(mat[0]), ToJPHVec4(mat[1]), ToJPHVec4(mat[2]), ToJPHVec4(mat[3]));
+
+	CastShapeCollectorImpl cl;
+	ShapeCastSettings s;
+	RShapeCast c = RShapeCast(JoltShape->GetShape(), ToJPHVec3(Body->GetTransform().Scale), ResultMat, ToJPHVec3(Direction));
+	System->GetNarrowPhaseQuery().CastShape(c, s, Vec3(0, 0, 0), cl);
+	return cl.Hits;
+
 }
 
 Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End)

@@ -190,13 +190,13 @@ public:
 	 *     {
 	 *         // Call the event registered in MyObject::Begin() on the client.
 	 *         CallEvent(&MyObject::HelloWorld);
-	 *         Log::Print("Called event on server");
+	 *         Log::Print("Called event on client");
 	 *     }
 	 * #endif
 	 * }
 	 * 
 	 * // Output:
-	 * // - Client: Called event on server
+	 * // - Client: Called event on client
 	 * // - Server: Hello World
 	 * @endcode
 	 * 
