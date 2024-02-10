@@ -61,6 +61,29 @@ void PhysicsComponent::CreateSphere(Transform RelativeTransform, Physics::Motion
 	Physics::AddBody(Body);
 }
 
+void PhysicsComponent::CreateCapsule(Transform RelativeTransform, Physics::MotionType CapsuleMovability, Physics::Layer CollisionLayers)
+{
+	if (PhysicsBodyPtr)
+	{
+		Destroy();
+	}
+
+	this->RelativeTransform = RelativeTransform;
+
+	Transform ComponentTransform = Component::GetWorldTransform();
+
+	Physics::PhysicsBody* Body = new Physics::CapsuleBody(ComponentTransform.Position,
+		ComponentTransform.Rotation,
+		Vector2(ComponentTransform.Scale.X + ComponentTransform.Scale.Y),
+		CapsuleMovability,
+		CollisionLayers,
+		this);
+
+
+	PhysicsBodyPtr = Body;
+	Physics::AddBody(Body);
+
+}
 
 Transform PhysicsComponent::GetWorldTransform()
 {
@@ -71,4 +94,44 @@ Transform PhysicsComponent::GetWorldTransform()
 	
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 	return Transform(Body->GetPosition(), Body->GetRotation(), 1);
+}
+
+void PhysicsComponent::SetPosition(Vector3 NewPosition)
+{
+	if (!PhysicsBodyPtr)
+	{
+		return;
+	}
+
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	Body->SetPosition(NewPosition);
+}
+
+void PhysicsComponent::SetRotation(Vector3 NewRotation)
+{
+	if (!PhysicsBodyPtr)
+	{
+		return;
+	}
+
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	Body->SetRotation(NewRotation);
+}
+
+void PhysicsComponent::SetScale(Vector3 NewScale)
+{
+	if (!PhysicsBodyPtr)
+	{
+		return;
+	}
+
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+
+	Vector3 ScaleDifference = NewScale / Body->GetTransform().Scale;
+	Log::Print(ScaleDifference);
+	if (ScaleDifference != Vector3(1))
+	{
+		Body->Scale(ScaleDifference);
+	}
+
 }

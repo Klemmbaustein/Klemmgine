@@ -30,8 +30,10 @@ namespace Collision
 		bool Hit = false;
 		/// The point where the collision check hit something.
 		Vector3 ImpactPoint;
-		/// t variable for LineTrace() function. ImpactPoint = Start + Direction * t.
-		float t = INFINITY;
+		/// The depth of the collision.
+		float Depth = 0;
+		/// The distance the collision ray has traveled, from 0 - 1. If the collision is not a RayCast or ShapeCast, this can be ignored.
+		float Distance = INFINITY;
 		/// The object that was hit.
 		WorldObject* HitObject = nullptr;
 		/// The component that was hit.
@@ -42,11 +44,11 @@ namespace Collision
 		{
 			Hit = false;
 		}
-		HitResponse(bool Hit, Vector3 ImpactPoint, Vector3 Normal, float t = INFINITY, WorldObject* HitObject = nullptr)
+		HitResponse(bool Hit, Vector3 ImpactPoint, Vector3 Normal, float Distance = INFINITY, WorldObject* HitObject = nullptr)
 		{
 			this->Hit = Hit;
 			this->ImpactPoint = ImpactPoint;
-			this->t = t;
+			this->Distance = Distance;
 			this->Normal = Normal;
 			this->HitObject = HitObject;
 		}

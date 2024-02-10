@@ -193,6 +193,13 @@ Vector3 Vector3::Abs()
 	return Vector3(abs(X), abs(Y), abs(Z));
 }
 
+Vector3 Vector3::ProjectToPlane(Vector3 PlaneOrigin, Vector3 PlaneNormal)
+{
+	Vector3 normalizedPlaneNormal = PlaneNormal.Normalize();
+	Vector3 pointProjection = *this - Vector3::Dot(*this - PlaneOrigin, normalizedPlaneNormal) * normalizedPlaneNormal;
+	return pointProjection;
+}
+
 Vector3 Vector3::GetForwardVector(Vector3 In)
 {
 	return Vector3::GetScaledAxis(In.DegreesToRadians(), 2);

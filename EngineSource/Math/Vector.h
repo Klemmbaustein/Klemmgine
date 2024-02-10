@@ -165,6 +165,8 @@ struct Vector3
 	*/
 	Vector3 Abs();
 
+	Vector3 ProjectToPlane(Vector3 PlaneOrigin, Vector3 PlaneNormal);
+
 	static Vector3 GetForwardVector(Vector3 In);
 	static Vector3 GetRightVector(Vector3 In);
 	static Vector3 GetUpVector(Vector3 In);

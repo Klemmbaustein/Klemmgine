@@ -23,7 +23,8 @@ Collision::HitResponse Collision::LineTrace(Vector3 RayStart, Vector3 RayEnd, st
 	Result.HitComponent = Hit.HitComponent;
 	Result.ImpactPoint = Hit.ImpactPoint;
 	Result.Normal = Hit.Normal;
-	Result.t = Hit.Depth;
+	Result.Distance = Hit.Distance;
+	Result.Depth = Hit.Depth;
 	if (Hit.HitComponent)
 	{
 		Result.HitObject = Hit.HitComponent->GetParent();

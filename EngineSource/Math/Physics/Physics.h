@@ -47,6 +47,7 @@ namespace Physics
 	{
 		bool Hit = false;
 		float Depth = 0.0f;
+		float Distance = INFINITY;
 		Component* HitComponent = nullptr;
 		Vector3 ImpactPoint;
 		Vector3 Normal;
@@ -95,6 +96,13 @@ namespace Physics
 		SphereBody(Vector3 Position, Vector3 Rotation, float Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
 		void SetSphereTransform(Vector3 Position, Vector3 Rotation, float Scale);
 	private:
+		virtual void SetTransform(Transform T) override;
+	};
+
+	struct CapsuleBody : public PhysicsBody
+	{
+		CapsuleBody(Vector3 Position, Vector3 Rotation, Vector2 Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
+
 		virtual void SetTransform(Transform T) override;
 	};
 

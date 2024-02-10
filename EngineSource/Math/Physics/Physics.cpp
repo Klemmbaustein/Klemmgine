@@ -111,3 +111,13 @@ void Physics::BoxBody::SetTransform(Transform T)
 {
 	this->BodyTransform = T;
 }
+
+Physics::CapsuleBody::CapsuleBody(Vector3 Position, Vector3 Rotation, Vector2 Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
+	: PhysicsBody(BodyType::Capsule, Transform(Position, Rotation, Vector3(Scale.X, Scale.Y, Scale.X)), ColliderMovability, CollisionLayers, Parent)
+{
+}
+
+void Physics::CapsuleBody::SetTransform(Transform T)
+{
+	this->BodyTransform = T;
+}

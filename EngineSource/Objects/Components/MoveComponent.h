@@ -1,23 +1,27 @@
 #pragma once
 #include <Objects/Components/Component.h>
-#include <Objects/Components/CollisionComponent.h>
 
 class MoveComponent : public Component
 {
-	// Tries to move the object in the given direction, over the given distance.
+	// Tries to move the object in the given direction.
 	// If "TryAdjust" is "true", it will try to adjust the object's position to one that is more valid.
-	Collision::HitResponse TryMove(Vector3 Direction, float Distance, bool TryAdjust = true);
+	Vector3 TryMove(Vector3 Direction, Vector3 InitialDireciton, Vector3 Pos, bool GravityPass, int Depth = 0);
+
+	const int MoveMaxDepth = 5;
 
 	Vector2 MovementVelocity;
 	bool CanJump = true;
 	float VerticalVelocity = 0;
 	Vector3 InputDirection;
-	int IsOnGround = 5;
+	Vector3 GroundNormal = Vector3(0, 1, 0);
+	int GroundedTimer = 0;
 	bool HasBounced = false;
+	bool Jumping = false;
+	void* CollisionBodyPtr = nullptr;
 public:
-	CollisionComponent* CollisionMeshes[2] = { nullptr, nullptr };
+	Vector2 ColliderSize = Vector2(1.0f, 1.0f);
 	// Returns true if the object is touching the ground, false if not.
-	bool GetIsOnGround();
+	bool GetIsOnGround() const;
 	Vector3 GetVelocity();
 	void Begin() override;
 	void Update() override;
@@ -29,7 +33,7 @@ public:
 
 	// Parameters for the movement
 	float Velocity = 1000;
-	float JumpHeight = 35;
-	float Gravity = 125;
+	float JumpHeight = 15;
+	float Gravity = 25;
 	bool Active = true;
 };

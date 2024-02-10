@@ -10,6 +10,7 @@
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Body/BodyActivationListener.h>
@@ -208,6 +209,17 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		return BodyCreationSettings(new BoxShape(ToJPHVec3(BoxPtr->GetTransform().Scale)),
 			ToJPHVec3(Body->GetTransform().Position),
 			ToJPHQuat(BoxPtr->GetTransform().Rotation),
+			ConvertMovability(Body->ColliderMovability),
+			(ObjectLayer)Body->CollisionLayers);
+	}
+	case PhysicsBody::BodyType::Capsule:
+	{
+		CapsuleBody* CapsulePtr = static_cast<CapsuleBody*>(Body);
+		CapsuleShapeSettings Settings = CapsuleShapeSettings(CapsulePtr->GetTransform().Scale.Y, CapsulePtr->GetTransform().Scale.X);
+		Shape::ShapeResult r;
+		return BodyCreationSettings(new CapsuleShape(Settings, r),
+			ToJPHVec3(Body->GetTransform().Position),
+			ToJPHQuat(CapsulePtr->GetTransform().Rotation),
 			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
@@ -422,6 +434,7 @@ public:
 		r.Depth = inResult.mPenetrationDepth;
 		r.Normal = 0 - Vector3(inResult.mPenetrationAxis.GetX(), inResult.mPenetrationAxis.GetY(), inResult.mPenetrationAxis.GetZ()).Normalize();
 		r.ImpactPoint = Vector3(inResult.mContactPointOn2.GetX(), inResult.mContactPointOn2.GetY(), inResult.mContactPointOn2.GetZ());
+		r.Distance = inResult.mFraction;
 
 		auto val = Bodies.find(inResult.mBodyID2);
 		PhysicsBodyInfo BodyInfo = (*val).second;
@@ -497,7 +510,7 @@ Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End)
 			r.ImpactPoint = Vector3(ImpactPos.GetX(), ImpactPos.GetY(), ImpactPos.GetZ());
 
 			Vec3 Normal = JoltBodyInterface->GetTransformedShape(BodyInfo.ID).GetWorldSpaceSurfaceNormal(HitInfo.mSubShapeID2, ImpactPos);
-			r.Depth = HitInfo.mFraction;
+			r.Distance = HitInfo.mFraction;
 			r.Normal = Vector3(Normal.GetX(), Normal.GetY(), Normal.GetZ());
 		}
 	}
