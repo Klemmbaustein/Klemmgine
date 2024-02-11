@@ -215,7 +215,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 	case PhysicsBody::BodyType::Capsule:
 	{
 		CapsuleBody* CapsulePtr = static_cast<CapsuleBody*>(Body);
-		CapsuleShapeSettings Settings = CapsuleShapeSettings(CapsulePtr->GetTransform().Scale.Y, CapsulePtr->GetTransform().Scale.X);
+		CapsuleShapeSettings Settings = CapsuleShapeSettings(1, 1);
 		Shape::ShapeResult r;
 		return BodyCreationSettings(new CapsuleShape(Settings, r),
 			ToJPHVec3(Body->GetTransform().Position),
@@ -453,7 +453,9 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 	}
 	auto JoltShape = static_cast<BodyCreationSettings*>(Body->ShapeInfo);
 
-	glm::mat4 mat = Body->GetTransform().ToMatrix();
+	Transform t = Body->GetTransform();
+	t.Scale = 1;
+	glm::mat4 mat = t.ToMatrix();
 
 	Mat44 ResultMat = Mat44(ToJPHVec4(mat[0]), ToJPHVec4(mat[1]), ToJPHVec4(mat[2]), ToJPHVec4(mat[3]));
 
@@ -461,7 +463,7 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 	CollideShapeSettings Settings = CollideShapeSettings();
 	Settings.mPenetrationTolerance = 0;
 	Settings.mCollisionTolerance = 0;
-	System->GetNarrowPhaseQuery().CollideShape(JoltShape->GetShape(), ToJPHVec3(Body->GetTransform().Scale), ResultMat, Settings, Vec3(), cl);
+	System->GetNarrowPhaseQuery().CollideShape(JoltShape->GetShape(), ToJPHVec3(1), ResultMat, Settings, Vec3(), cl);
 	
 	return cl.Hits;
 }

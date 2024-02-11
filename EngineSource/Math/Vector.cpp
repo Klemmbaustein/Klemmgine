@@ -124,6 +124,16 @@ float Vector2::Length() const
 	return sqrt(X * X + Y * Y);
 }
 
+Vector2 Vector2::Normalize() const
+{
+	float Len = Length();
+	if (Len > 0)
+	{
+		return Vector2(X, Y) / Len;
+	}
+	return Vector2(0);
+}
+
 Vector2 Vector2::Clamp(Vector2 Min, Vector2 Max) const
 {
 	float NewX = std::min(Max.X, std::max(Min.X, X));
