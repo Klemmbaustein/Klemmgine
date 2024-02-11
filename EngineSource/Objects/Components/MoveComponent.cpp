@@ -161,6 +161,7 @@ void MoveComponent::Update()
 
 	Vector3 MoveDir = Vector3(MovementVelocity.X, 0, MovementVelocity.Y).ProjectToPlane(0, GroundNormal) * Performance::DeltaTime;
 	GetParent()->GetTransform().Position += TryMove(MoveDir, MoveDir, WorldTransform.Position, false);
+
 	MoveDir = Vector3(0, (std::min(VerticalVelocity, -5.0f) + (Jumping ? JumpHeight : 0)) * Performance::DeltaTime, 0);
 	Vector3 GravityMovement = TryMove(MoveDir, MoveDir, WorldTransform.Position, true);
 
