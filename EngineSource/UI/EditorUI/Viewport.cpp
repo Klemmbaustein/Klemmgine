@@ -297,29 +297,29 @@ void Viewport::Tick()
 					Dragging = true;
 					Axis = Vector3(0, 0, 1.0f);
 					BoxAxis = 2;
-					t = CollisionTest.t;
+					t = CollisionTest.Distance;
 				}
 				CollisionTest = Collision::LineCheckForAABB((ArrowBoxY * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
 					Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
-				if (CollisionTest.Hit && CollisionTest.t < t)
+				if (CollisionTest.Hit && CollisionTest.Distance < t)
 				{
 					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
 					Hit = true;
 					Dragging = true;
 					BoxAxis = 1;
 					Axis = Vector3(0, 1.0f, 0);
-					t = CollisionTest.t;
+					t = CollisionTest.Distance;
 				}
 				CollisionTest = Collision::LineCheckForAABB((ArrowBoxX * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
 					Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
-				if (CollisionTest.Hit && CollisionTest.t < t)
+				if (CollisionTest.Hit && CollisionTest.Distance < t)
 				{
 					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
 					Hit = true;
 					Dragging = true;
 					Axis = Vector3(1.0f, 0, 0);
 					BoxAxis = 0;
-					t = CollisionTest.t;
+					t = CollisionTest.Distance;
 				}
 				FirstDragFrame = true;
 				DragOffset = 0;

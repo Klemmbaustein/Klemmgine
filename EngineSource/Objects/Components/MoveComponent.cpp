@@ -32,39 +32,74 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 		return Direction;
 	}
 
+	Vector3 HitNormal = Vector3(0, 0, 0);
+	float MaxDistance = 0;
+
+	bool HitStep = false;
+
+	Vector3 AvgPos = 0;
+
 	for (auto& i : Hits)
 	{
-		float AbsoluteDistance = i.Distance * Direction.Length();
-		Vector3 SnapToSurface = Direction.Normalize() * (AbsoluteDistance - 0.01f);
-		Vector3 LeftOver = Direction - SnapToSurface;
-
-		float Angle = Vector3::Dot(i.Normal, Vector3(0, 1, 0));
-		float Length = LeftOver.Length();
-		LeftOver = LeftOver.ProjectToPlane(0, i.Normal);
-		LeftOver = LeftOver.Normalize() * Length;
-		if (Angle > 0.75f)
+		HitNormal += i.Normal * i.Depth;
+		MaxDistance = std::max(i.Distance, MaxDistance);
+		AvgPos += i.ImpactPoint;
+	}
+	HitNormal = HitNormal.Normalize();
+	AvgPos = AvgPos / Vector3((float)Hits.size());
+	
+	if (HitNormal.Length() == 0)
+	{
+		HitNormal = 0;
+		for (auto& i : Hits)
 		{
-			if (GravityPass)
-			{
-				GroundedTimer = 5;
-				GroundNormal = i.Normal;
-				return SnapToSurface;
-			}
+			HitNormal += i.Normal;
 		}
-		else
-		{
-			float Scale = 1 - Vector3::Dot(
-				Vector3(i.Normal.X, 0, i.Normal.Z).Normalize(),
-				Vector3(-InitialDireciton.X, 0, -InitialDireciton.Z).Normalize()
-			);
-			LeftOver = LeftOver * Scale;
-		}
-
-
-		return SnapToSurface + TryMove(LeftOver, InitialDireciton, Pos + SnapToSurface, GravityPass, Depth + 1);
+		HitNormal = HitNormal.Normalize();
 	}
 
-	return Direction;
+	if (!GravityPass)
+	{
+		HitStep = AvgPos.Y - Pos.Y < -0.95f;
+		if (HitStep)
+		{
+			HitNormal = Vector3(0, 1, 0);
+		}
+	}
+
+	float AbsoluteDistance = MaxDistance * Direction.Length();
+	Vector3 SnapToSurface = Direction.Normalize() * (AbsoluteDistance - 0.01f);
+	Vector3 LeftOver = Direction - SnapToSurface;
+
+	float Angle = Vector3::Dot(HitNormal, Vector3(0, 1, 0));
+	float Length = LeftOver.Length();
+	LeftOver = LeftOver.ProjectToPlane(0, HitNormal);
+	LeftOver = LeftOver.Normalize() * Length;
+	if (Angle > 0.75f)
+	{
+		if (GravityPass)
+		{
+			GroundedTimer = 5;
+			GroundNormal = HitNormal;
+			return SnapToSurface;
+		}
+	}
+	else
+	{
+		float Scale = 1 - Vector3::Dot(
+		Vector3(HitNormal.X, 0, HitNormal.Z).Normalize(),
+			Vector3(-InitialDireciton.X, 0, -InitialDireciton.Z).Normalize()
+		);
+		LeftOver = LeftOver * Scale;
+	}
+
+	if (!GravityPass)
+	{
+		SnapToSurface += HitNormal * Performance::DeltaTime * (HitStep ? 5.0f : 1.0f);
+	}
+
+
+	return SnapToSurface + TryMove(LeftOver, InitialDireciton, Pos + SnapToSurface, GravityPass, Depth + 1);
 }
 
 bool MoveComponent::GetIsOnGround() const
@@ -72,7 +107,7 @@ bool MoveComponent::GetIsOnGround() const
 	return GroundedTimer > 0;
 }
 
-Vector3 MoveComponent::GetVelocity()
+Vector3 MoveComponent::GetVelocity() const
 {
 	return Vector3(MovementVelocity.X, VerticalVelocity, MovementVelocity.Y);
 }
@@ -101,9 +136,31 @@ void MoveComponent::Update()
 	Transform WorldTransform = GetWorldTransform();
 
 	InputDirection.Y = 0;
-	Vector3 MoveDir = (InputDirection * Performance::DeltaTime * 15).ProjectToPlane(0, GroundNormal);
-	GetParent()->GetTransform().Position += TryMove(MoveDir, MoveDir, WorldTransform.Position, false);
+	if (InputDirection.Length() > 1)
+	{
+		InputDirection = InputDirection.Normalize();
+	}
 
+	MovementVelocity += Vector2(InputDirection.X, InputDirection.Z) * Performance::DeltaTime * Acceleration;
+
+	float InputLength = InputDirection.Length();
+	float MovementLength = MovementVelocity.Length();
+
+	if (MovementLength > MaxSpeed * InputLength)
+	{
+		if (MovementLength > MaxSpeed && InputLength >= 0.95f)
+		{
+			MovementVelocity = MovementVelocity.Normalize() * MaxSpeed;
+		}
+		else
+		{
+			MovementLength = std::max(MovementLength - Deceleration * Performance::DeltaTime, 0.0f);
+			MovementVelocity = MovementVelocity.Normalize() * MovementLength;
+		}
+	}
+
+	Vector3 MoveDir = Vector3(MovementVelocity.X, 0, MovementVelocity.Y).ProjectToPlane(0, GroundNormal) * Performance::DeltaTime;
+	GetParent()->GetTransform().Position += TryMove(MoveDir, MoveDir, WorldTransform.Position, false);
 	MoveDir = Vector3(0, (std::min(VerticalVelocity, -5.0f) + (Jumping ? JumpHeight : 0)) * Performance::DeltaTime, 0);
 	Vector3 GravityMovement = TryMove(MoveDir, MoveDir, WorldTransform.Position, true);
 

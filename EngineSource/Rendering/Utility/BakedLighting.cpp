@@ -160,11 +160,11 @@ namespace Bake
 		Collision::HitResponse r;
 		if (mode)
 		{
-			r.t = INFINITY;
+			r.Distance = INFINITY;
 		}
 		else
 		{
-			r.t = 0;
+			r.Distance = 0;
 		}
 		/*
 		for (auto& mesh : Bake::Meshes)
@@ -212,7 +212,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	glm::vec3 StartPos = glm::vec3((float)x, (float)y, (float)z);
 	StartPos = StartPos + glm::vec3(Bake::BakeScale / (float)LightmapResolution / 2);
 	Collision::HitResponse r;
-	r.t = 0;
+	r.Distance = 0;
 	
 	float TotalLightIntensity = 0;
 	/*

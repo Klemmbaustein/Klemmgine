@@ -22,7 +22,7 @@ public:
 	Vector2 ColliderSize = Vector2(1.0f, 1.0f);
 	// Returns true if the object is touching the ground, false if not.
 	bool GetIsOnGround() const;
-	Vector3 GetVelocity();
+	Vector3 GetVelocity() const;
 	void Begin() override;
 	void Update() override;
 	void Destroy() override;
@@ -32,8 +32,10 @@ public:
 	void Jump();
 
 	// Parameters for the movement
-	float Velocity = 1000;
-	float JumpHeight = 15;
-	float Gravity = 25;
+	float JumpHeight = 35;
+	float MaxSpeed = 15;
+	float Acceleration = 200;
+	float Deceleration = 150;
+	float Gravity = 100;
 	bool Active = true;
 };
