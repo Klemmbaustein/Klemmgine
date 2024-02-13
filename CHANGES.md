@@ -1,5 +1,13 @@
 # Changes
 
+## Version 1.9.0
+
+### Changes
+
+- Added a new physics/collision system, using Jolt physics.
+- Removed most of the old collision system.
+- Completely rewrote MoveComponent.
+
 ## Version 1.8.2
 
 ### Fixes

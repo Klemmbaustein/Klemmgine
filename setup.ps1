@@ -33,7 +33,7 @@ Build-MsBuild -name OpenAL.vcxproj -config Release
 cd ..\..
 
 cd Dependencies\JoltPhysics\Build
-.\cmake_vs2022_cl.bat
+.\cmake_vs2022_cl.bat -DINTERPROCEDURAL_OPTIMIZATION=OFF -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF
 cd VS2022_CL
 Build-MsBuild -name Jolt.vcxproj -config Distribution
 cd ..\..\..\..

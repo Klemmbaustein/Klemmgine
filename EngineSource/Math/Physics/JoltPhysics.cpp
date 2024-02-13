@@ -154,6 +154,7 @@ public:
 #endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
 };
 
+auto a = EMotionType::Kinematic;
 class ObjectVsBroadPhaseLayerFilterImpl : public ObjectVsBroadPhaseLayerFilter
 {
 public:
@@ -360,6 +361,20 @@ Vector3 JoltPhysics::GetBodyRotation(Physics::PhysicsBody* Body)
 	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
 }
 
+Vector3 JoltPhysics::GetBodyVelocity(Physics::PhysicsBody* Body)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	Vec3 vec = JoltBodyInterface->GetLinearVelocity(Info->ID);
+	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
+}
+
+Vector3 JoltPhysics::GetBodyAngularVelocity(Physics::PhysicsBody* Body)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	Vec3 vec = JoltBodyInterface->GetAngularVelocity(Info->ID);
+	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
+}
+
 void JoltPhysics::SetBodyPosition(Physics::PhysicsBody* Body, Vector3 NewPosition)
 {
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
@@ -377,6 +392,24 @@ void JoltPhysics::MultiplyBodyScale(Physics::PhysicsBody* Body, Vector3 Scale)
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
 	auto ShapeInfo = JoltBodyInterface->GetShape(Info->ID).GetPtr()->ScaleShape(ToJPHVec3(Scale));
 	JoltBodyInterface->SetShape(Info->ID, ShapeInfo.Get(), true, EActivation::Activate);
+}
+
+void JoltPhysics::AddBodyForce(Physics::PhysicsBody* Body, Vector3 Direction, Vector3 Point)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	JoltBodyInterface->AddForce(Info->ID, ToJPHVec3(Direction), ToJPHVec3(Point));
+}
+
+void JoltPhysics::SetBodyVelocity(Physics::PhysicsBody* Body, Vector3 NewVelocity)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	JoltBodyInterface->SetLinearVelocity(Info->ID, ToJPHVec3(NewVelocity));
+}
+
+void JoltPhysics::SetBodyAngularVelocity(Physics::PhysicsBody* Body, Vector3 NewVelocity)
+{
+	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
+	JoltBodyInterface->SetAngularVelocity(Info->ID, ToJPHVec3(NewVelocity));
 }
 
 void JoltPhysics::Update()

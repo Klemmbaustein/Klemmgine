@@ -58,9 +58,14 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 		HitNormal = HitNormal.Normalize();
 	}
 
+	float Angle = Vector3::Dot(HitNormal, Vector3(0, 1, 0));
+
 	if (!GravityPass)
 	{
-		HitStep = AvgPos.Y - Pos.Y < -0.95f;
+		Vector3 NewDir = (-HitNormal * Vector3(1, 0, 1)).Normalize() * 1;
+		Vector3 TestPos = Pos + Vector3(0, 0.9f, 0);
+		auto Hits = CollisionBody->ShapeCast(Transform(TestPos, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X)), TestPos + NewDir);
+		HitStep = AvgPos.Y - Pos.Y < -0.9f && !Hits.size();
 		if (HitStep)
 		{
 			HitNormal = Vector3(0, 1, 0);
@@ -71,7 +76,6 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 	Vector3 SnapToSurface = Direction.Normalize() * (AbsoluteDistance - 0.01f);
 	Vector3 LeftOver = Direction - SnapToSurface;
 
-	float Angle = Vector3::Dot(HitNormal, Vector3(0, 1, 0));
 	float Length = LeftOver.Length();
 	LeftOver = LeftOver.ProjectToPlane(0, HitNormal);
 	LeftOver = LeftOver.Normalize() * Length;

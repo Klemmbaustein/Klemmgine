@@ -15,10 +15,16 @@ namespace JoltPhysics
 
 	Vector3 GetBodyPosition(Physics::PhysicsBody* Body);
 	Vector3 GetBodyRotation(Physics::PhysicsBody* Body);
+	Vector3 GetBodyVelocity(Physics::PhysicsBody* Body);
+	Vector3 GetBodyAngularVelocity(Physics::PhysicsBody* Body);
 
 	void SetBodyPosition(Physics::PhysicsBody* Body, Vector3 NewPosition);
 	void SetBodyRotation(Physics::PhysicsBody* Body, Vector3 NewRotation);
 	void MultiplyBodyScale(Physics::PhysicsBody* Body, Vector3 Scale);
+	void AddBodyForce(Physics::PhysicsBody* Body, Vector3 Direction, Vector3 Point);
+	void SetBodyVelocity(Physics::PhysicsBody* Body, Vector3 NewVelocity);
+	void SetBodyAngularVelocity(Physics::PhysicsBody* Body, Vector3 NewVelocity);
+
 
 	void Update();
 

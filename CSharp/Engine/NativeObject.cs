@@ -4,6 +4,12 @@ using System.Runtime.InteropServices;
 
 namespace Engine;
 
+/**
+ * @brief
+ * Native object. Represents a native C++ object.
+ * 
+ * @ingroup CSharp-Objects
+ */
 public class NativeObject : WorldObject
 {
 	delegate NativeType GetPropertyTypeDelegate(IntPtr obj, [MarshalAs(UnmanagedType.LPUTF8Str)] string Name);
@@ -18,11 +24,19 @@ public class NativeObject : WorldObject
 
 	delegate Vector3 GetPropertyVector3Delegate(IntPtr obj, [MarshalAs(UnmanagedType.LPUTF8Str)] string Name);
 
+	/**
+	 * @brief
+	 * Sets the pointer to the native object this object represents.
+	 */
 	public void LoadFromPtr(IntPtr Pointer)
 	{
 		NativePtr = Pointer;
 	}
 
+	/**
+	 * @brief
+	 * Gets the value of a C++ property from the given name.
+	 */
 	public object GetProperty(string Name)
 	{
 		object[] args = [NativePtr, Name];

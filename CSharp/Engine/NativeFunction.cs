@@ -19,7 +19,7 @@ public static class NativeFunction
 	}
 	public static object? CallNativeFunction(string Name, Type del, object?[]? Args)
 	{
-		if (!LoadedNativeFunctions.ContainsKey(Name))
+		if (!LoadedNativeFunctions.TryGetValue(Name, out nint Value))
 		{
 			Log.Print("Failed to call native function: " + Name, Log.Severity.Error);
 			Log.Print("------------------------ Native functions: ------------------------", Log.Severity.Error);
@@ -30,7 +30,7 @@ public static class NativeFunction
 			return null;
 		}
 
-		var NewDel = Marshal.GetDelegateForFunctionPointer(LoadedNativeFunctions[Name], del);
+		var NewDel = Marshal.GetDelegateForFunctionPointer(Value, del);
 
 		if (NewDel == null)
 		{

@@ -2,29 +2,31 @@
 #include "JoltPhysics.h"
 #include <Engine/EngineError.h>
 
+#define PHYSICS_SYSTEM JoltPhysics
+
 void Physics::Init()
 {
-	JoltPhysics::Init();
+	PHYSICS_SYSTEM::Init();
 }
 
 void Physics::Update()
 {
-	JoltPhysics::Update();
+	PHYSICS_SYSTEM::Update();
 }
 
 void Physics::AddBody(PhysicsBody* Body)
 {
-	JoltPhysics::RegisterBody(Body);
+	PHYSICS_SYSTEM::RegisterBody(Body);
 }
 
 void Physics::RemoveBody(PhysicsBody* Body)
 {
-	JoltPhysics::RemoveBody(Body);
+	PHYSICS_SYSTEM::RemoveBody(Body);
 }
 
 Physics::HitResult Physics::RayCast(Vector3 Start, Vector3 End)
 {
-	return JoltPhysics::LineCast(Start, End);
+	return PHYSICS_SYSTEM::LineCast(Start, End);
 }
 
 Physics::PhysicsBody::PhysicsBody(BodyType Type, Transform BodyTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
@@ -43,37 +45,62 @@ const Transform& Physics::PhysicsBody::GetTransform() const
 
 Vector3 Physics::PhysicsBody::GetPosition()
 {
-	return JoltPhysics::GetBodyPosition(this);
+	return PHYSICS_SYSTEM::GetBodyPosition(this);
 }
 
 Vector3 Physics::PhysicsBody::GetRotation()
 {
-	return JoltPhysics::GetBodyRotation(this);
+	return PHYSICS_SYSTEM::GetBodyRotation(this);
 }
 
 void Physics::PhysicsBody::SetPosition(Vector3 NewPosition)
 {
-	JoltPhysics::SetBodyPosition(this, NewPosition);
+	PHYSICS_SYSTEM::SetBodyPosition(this, NewPosition);
 }
 
 void Physics::PhysicsBody::SetRotation(Vector3 NewRotation)
 {
-	JoltPhysics::SetBodyRotation(this, NewRotation);
+	PHYSICS_SYSTEM::SetBodyRotation(this, NewRotation);
 }
 
 void Physics::PhysicsBody::Scale(Vector3 ScaleMultiplier)
 {
-	JoltPhysics::MultiplyBodyScale(this, ScaleMultiplier);
+	PHYSICS_SYSTEM::MultiplyBodyScale(this, ScaleMultiplier);
+}
+
+void Physics::PhysicsBody::AddForce(Vector3 Direction, Vector3 Point)
+{
+	PHYSICS_SYSTEM::AddBodyForce(this, Direction, Point);
+}
+
+void Physics::PhysicsBody::SetVelocity(Vector3 NewVelocity)
+{
+	PHYSICS_SYSTEM::SetBodyVelocity(this, NewVelocity);
+}
+
+void Physics::PhysicsBody::SetAngularVelocity(Vector3 NewVelocity)
+{
+	PHYSICS_SYSTEM::SetBodyAngularVelocity(this, NewVelocity);
+}
+
+Vector3 Physics::PhysicsBody::GetVelocity()
+{
+	return PHYSICS_SYSTEM::GetBodyVelocity(this);
+}
+
+Vector3 Physics::PhysicsBody::GetAngularVelocity()
+{
+	return PHYSICS_SYSTEM::GetBodyAngularVelocity(this);
 }
 
 std::vector<Physics::HitResult> Physics::PhysicsBody::CollisionTest()
 {
-	return JoltPhysics::CollisionTest(this);
+	return PHYSICS_SYSTEM::CollisionTest(this);
 }
 
 std::vector<Physics::HitResult> Physics::PhysicsBody::ShapeCast(Transform StartTransform, Vector3 EndPos)
 {
-	return JoltPhysics::ShapeCastBody(this, StartTransform, EndPos);
+	return PHYSICS_SYSTEM::ShapeCastBody(this, StartTransform, EndPos);
 }
 
 Physics::SphereBody::SphereBody(Vector3 Position, Vector3 Rotation, float Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)

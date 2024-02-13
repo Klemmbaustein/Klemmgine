@@ -19,13 +19,16 @@ For shaders, I recommend [this Visual Studio extension](https://marketplace.visu
 
 2. Extract the .zip file and run `ProjectGenerator.exe` to create a new project.	
 
-    ```cmd
-    .\ProjectGenerator.exe -projectName {Your project name}
+    ```sh
+    # Windows
+    ProjectGenerator.exe -projectName {Your project name}
+    # Linux
+    ./ProjectGenerator -projectName {Your project name}
     ```
 
-    The new project files will be put in `EngineDir\Games\{Your project name}\`.
+    The new project files will be put in `EngineDir/Games/{Your project name}/`.
 
-3. Run `EngineDir\Games\{Your project name}\Editor.bat`.
+3. Run `EngineDir\Games\{Your project name}\Editor.bat` on windows or `EngineDir/Games/{Your project name}/Editor.sh` on linux.
 
 ## Build from source:
 
