@@ -28,7 +28,7 @@ For shaders, I recommend [this Visual Studio extension](https://marketplace.visu
 
     The new project files will be put in `EngineDir/Games/{Your project name}/`.
 
-3. Run `EngineDir\Games\{Your project name}\Editor.bat` on windows or `EngineDir/Games/{Your project name}/Editor.sh` on linux.
+3. Run `EngineDir\Games\{Your project name}\Editor.bat` on Windows or `EngineDir/Games/{Your project name}/Editor.sh` on Linux.
 
 ## Build from source:
 

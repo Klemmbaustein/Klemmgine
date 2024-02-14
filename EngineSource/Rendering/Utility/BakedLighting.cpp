@@ -81,8 +81,14 @@ constexpr uint8_t BKDAT_FILE_VERSION = 1;
 
 namespace Bake
 {
-	//std::vector<Collision::CollisionMesh> Meshes;
-	//std::vector<Graphics::Light> Lights;
+	struct BakeMesh
+	{
+		ModelGenerator::ModelData MeshData;
+		Transform MeshTransform;
+	};
+
+	std::vector<BakeMesh> Meshes;
+	std::vector<Graphics::Light> Lights;
 	Vector3 BakeScale;
 
 	static Vector3 BakeMapToPos(uint64_t TextureElement)
@@ -97,7 +103,7 @@ namespace Bake
 
 	std::byte* Texture = nullptr;
 
-	constexpr int NUM_CHUNK_SPLITS = 3;
+	constexpr int NUM_CHUNK_SPLITS = 2;
 	std::atomic<float> ThreadProgress[NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS * NUM_CHUNK_SPLITS];
 
 	static void BakeSection(int64_t x, int64_t y, int64_t z, size_t ThreadID)
@@ -166,42 +172,41 @@ namespace Bake
 		{
 			r.Distance = 0;
 		}
-		/*
+		
 		for (auto& mesh : Bake::Meshes)
 		{
-			Collision::Box BroadPhaseBox = Collision::Box(
-				mesh.SpherePosition.X - mesh.SphereCollisionSize, mesh.SpherePosition.X + mesh.SphereCollisionSize,
-				mesh.SpherePosition.Y - mesh.SphereCollisionSize, mesh.SpherePosition.Y + mesh.SphereCollisionSize,
-				mesh.SpherePosition.Z - mesh.SphereCollisionSize, mesh.SpherePosition.Z + mesh.SphereCollisionSize)
-				.TransformBy(Transform(mesh.WorldPosition, Vector3(), Vector3(1)));
+			Collision::Box BroadPhaseBox = mesh.MeshData.CollisionBox.TransformBy(Transform(mesh.MeshTransform.Position, Vector3(), Vector3(1)));
 			if (!Collision::LineCheckForAABB(BroadPhaseBox,
 				start, end).Hit)
 			{
 				continue;
 			}
-			for (size_t i = 0; i < mesh.Indices.size(); i += 3)
+			for (auto& elem : mesh.MeshData.Elements)
 			{
-				glm::vec3* CurrentTriangle[3] =
+				for (size_t i = 0; i < elem.Indices.size(); i += 3)
 				{
-					&mesh.Vertices[mesh.Indices[i]].Position,
-					&mesh.Vertices[mesh.Indices[i + 2]].Position,
-					&mesh.Vertices[mesh.Indices[i + 1]].Position
-				};
-				Collision::HitResponse newR
-					= (Bake::BakeRayTrace(start, end - start, *CurrentTriangle[0], *CurrentTriangle[1], *CurrentTriangle[2]));
-				if (newR.Hit)
-				{
-					if (mode && newR.t < r.t)
+					glm::vec3* CurrentTriangle[3] =
 					{
-						r = newR;
-					}
-					else if (!mode && newR.t > r.t)
+						&elem.Vertices[elem.Indices[i]].Position,
+						&elem.Vertices[elem.Indices[i + 2]].Position,
+						&elem.Vertices[elem.Indices[i + 1]].Position
+					};
+					Collision::HitResponse newR
+						= (Bake::BakeRayTrace(start, end - start, *CurrentTriangle[0], *CurrentTriangle[1], *CurrentTriangle[2]));
+					if (newR.Hit)
 					{
-						r = newR;
+						if (mode && newR.Distance < r.Distance)
+						{
+							r = newR;
+						}
+						else if (!mode && newR.Distance > r.Distance)
+						{
+							r = newR;
+						}
 					}
 				}
 			}
-		}*/
+		}
 		return r;
 	}
 }
@@ -215,7 +220,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	r.Distance = 0;
 	
 	float TotalLightIntensity = 0;
-	/*
+	
 	for (auto& i : Bake::Lights)
 	{
 		glm::vec3 pointLightDir = (i.Position - StartPos);
@@ -224,7 +229,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 		if (NewIntensity > 0)
 		{
 			r = Bake::BakeLine(i.Position, StartPos, true);
-			if (r.Hit && r.t < 0.9f)
+			if (r.Distance && r.Distance < 0.9f)
 			{
 				NewIntensity = 0;
 			}
@@ -242,12 +247,12 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f)
 				* 0.035f)
 			* TraceDistance, false);
-		LightInt += r.Hit ? 1 - std::min(r.t * TraceDistance / 12.0f, 1.0f) : 1;
+		LightInt += r.Hit ? 1 - std::min(r.Distance * TraceDistance / 12.0f, 1.0f) : 1;
 	}
 	LightInt /= 3.0f;
 
 	return std::min((LightInt / 2.0f + TotalLightIntensity / 4.0f), 1.0f);
-	*/
+	
 	return 0;
 }
 
@@ -267,33 +272,43 @@ void BakedLighting::BakeCurrentSceneToFile()
 {
 	const int Number = 25;
 	const bool IsEven = !(Number & 1);
-	//Bake::Meshes.clear();
+	Bake::Meshes.clear();
 
 	for (WorldObject* i : Objects::AllObjects)
 	{
 		for (Component* c : i->GetComponents())
 		{
-			if (dynamic_cast<MeshComponent*>(c))
+			if (!dynamic_cast<MeshComponent*>(c))
 			{
-				if (!dynamic_cast<MeshComponent*>(c)->GetModel()->CastShadow)
-				{
-					continue;
-				}
-				ModelGenerator::ModelData m = dynamic_cast<MeshComponent*>(c)->GetModelData();
-				if (!m.CastShadow)
-					continue;
-				Vector3 InvertedRotation = (i->GetTransform().Rotation + c->RelativeTransform.Rotation);
-				InvertedRotation = Vector3(-InvertedRotation.Z, InvertedRotation.Y, -InvertedRotation.X);
-				Transform ModelTransform = (Transform(Vector3::TranslateVector(c->RelativeTransform.Position, i->GetTransform()),
-					Vector3() - InvertedRotation.DegreesToRadians(),
-					c->RelativeTransform.Scale * 0.025f * i->GetTransform().Scale));
-
-				//Bake::Meshes.push_back(Collision::CollisionMesh(m.GetMergedVertices(), m.GetMergedIndices(), ModelTransform));
+				continue;
 			}
+			if (!dynamic_cast<MeshComponent*>(c)->GetModel()->CastShadow)
+			{
+				continue;
+			}
+			Bake::BakeMesh NewMesh;
+			NewMesh.MeshData = dynamic_cast<MeshComponent*>(c)->GetModelData();
+			if (!NewMesh.MeshData.CastShadow)
+				continue;
+			Vector3 InvertedRotation = (i->GetTransform().Rotation + c->RelativeTransform.Rotation);
+			InvertedRotation = Vector3(-InvertedRotation.Z, InvertedRotation.Y, -InvertedRotation.X);
+			Transform ModelTransform = (Transform(Vector3::TranslateVector(c->RelativeTransform.Position, i->GetTransform()),
+				Vector3() - InvertedRotation.DegreesToRadians(),
+				c->RelativeTransform.Scale * 0.025f * i->GetTransform().Scale));
+
+			glm::mat4 ModelMatrix = ModelTransform.ToMatrix();
+			for (ModelGenerator::ModelData::Element& elem : NewMesh.MeshData.Elements)
+			{
+				for (Vertex& vert : elem.Vertices)
+				{
+					vert.Position = ModelMatrix * glm::vec4(vert.Position, 1);
+				}
+			}
+			NewMesh.MeshTransform = ModelTransform;
+			Bake::Meshes.push_back(NewMesh);
 		}
 	}
-
-	//Bake::Lights = Graphics::MainFramebuffer->Lights;
+	Bake::Lights = Graphics::MainFramebuffer->Lights;
 
 	new std::thread([]() {
 
@@ -310,13 +325,14 @@ void BakedLighting::BakeCurrentSceneToFile()
 
 		Collision::Box sbox;
 
-		/*for (auto& i : Bake::Meshes)
+		for (auto& i : Bake::Meshes)
 		{
-			if (!i.CanOverlap)
+			if (!i.MeshData.CastShadow)
 			{
 				continue;
 			}
-			for (auto& vert : i.Vertices)
+			auto verts = i.MeshData.GetMergedVertices();
+			for (auto& vert : verts)
 			{
 				if (vert.Position.x > sbox.maxX)
 				{
@@ -397,7 +413,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 				}
 			}
 		}
-		*/
+		
 		// Simple RLE for lightmap compression.
 		std::byte* TexPtr = Bake::Texture;
 
@@ -455,7 +471,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 		BakeLog("Encoded voxels: " + std::to_string(TotalLength));
 
 		delete[] Bake::Texture;
-		//Bake::Meshes.clear();
+		Bake::Meshes.clear();
 		BakedLighting::FinishedBaking = true;
 		});
 }
