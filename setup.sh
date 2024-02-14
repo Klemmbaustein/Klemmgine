@@ -21,11 +21,17 @@ make -j 4 || fail
 cd ../../assimp/
 cmake CMakeLists.txt || fail
 make -j 4 || fail
+cd ../JoltPhysics/Build
+./cmake_linux_clang_gcc.sh Distribution c++ -DINTERPROCEDURAL_OPTIMIZATION=OFF
+cd Linux_Distribution
+make -j 4
+cd  ../../../..
 
-cd ../..
-
-KlemmBuild engine.kbld -DGenerator -DCiBuild || fail
-
+if [ "$is_ci" != 1 ]; then
+	KlemmBuild engine.kbld -DGenerator || fail
+else
+	KlemmBuild engine.kbld -DGenerator -DCiBuild || fail
+fi
 declare -a cs_projects=("CSharp/Engine/KlemmgineCSharp.csproj" "CSharp/Core/CSharpCore.csproj")
 
 for i in "${cs_projects[@]}"; do

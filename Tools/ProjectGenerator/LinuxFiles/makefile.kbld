@@ -54,6 +54,7 @@
         "GL",
         "dl",
         "../../Dependencies/assimp/bin/assimp",
+        "../../Dependencies/JoltPhysics/Build/Linux_Distribution/Jolt",
         "dl",
         "libGLEW.a",
         "../../Dependencies/openal-soft/Build/openal",

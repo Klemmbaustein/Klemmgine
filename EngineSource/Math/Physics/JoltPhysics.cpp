@@ -54,7 +54,7 @@ inline static Quat ToJPHQuat(Vector3 Rot)
 struct PhysicsBodyInfo
 {
 	BodyID ID;
-	Shape* Shape = nullptr;
+	Shape* BodyShape = nullptr;
 	Physics::PhysicsBody* Body = nullptr;
 };
 namespace JoltPhysics

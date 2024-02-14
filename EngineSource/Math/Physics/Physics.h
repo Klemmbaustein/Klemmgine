@@ -1,6 +1,7 @@
 #pragma once
 #include <Rendering/Mesh/ModelGenerator.h>
 #include <Math/Vector.h>
+#include <cmath>
 
 class Component;
 

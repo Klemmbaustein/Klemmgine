@@ -48,6 +48,7 @@
         "Dependencies/openal-soft/include",
         "Dependencies/SDL/include",
         "Dependencies/SDL_net/include",
+        "Dependencies/JoltPhysics",
         "Tools/BuildTool/Output"
       ],
       "defines": [
