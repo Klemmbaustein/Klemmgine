@@ -45,7 +45,8 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 		CurrentPath.string() + "/Dependencies/assimp/lib/Release",
 		CurrentPath.string() + "/Dependencies/openal-soft/Release",
 		CurrentPath.string() + "/Dependencies/SDL/VisualC/SDL/x64/Release",
-		CurrentPath.string() + "/Dependencies/SDL_net/Build/Release"
+		CurrentPath.string() + "/Dependencies/SDL_net/Build/Release",
+		CurrentPath.string() + "/Dependencies/JoltPhysics/Build/VS2022_CL/Distribution"
 
 	};
 
@@ -166,7 +167,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 				.Add(XML("EnableCOMDATFolding", "true"))
 				.Add(XML("FavorSizeOrSpeed", "Speed"))
 				.Add(XML("AdditionalDependencies",
-					"assimp-vc143-mt.lib;OpenAL32.lib;SDL2_net.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;%(AdditionalDependencies)"))
+					"assimp-vc143-mt.lib;OpenAL32.lib;SDL2_net.lib;SDL2.lib;opengl32.lib;glew.lib;Engine-$(Configuration).lib;nethost.lib;Jolt.lib;%(AdditionalDependencies)"))
 				.Add(XML("OutputFile", "$(OutputPath)$(TargetName)$(TargetExt)"))
 				.Add(XML("Subsystem", "Console")));
 

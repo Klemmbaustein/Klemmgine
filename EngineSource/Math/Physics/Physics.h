@@ -206,6 +206,24 @@ namespace Physics
 	*/
 	struct SphereBody : public PhysicsBody
 	{
+		/**
+		* @brief
+		* Box constructor.
+		* 
+		* @param Position
+		* The position of the new sphere.
+		* @param Rotation
+		* The rotation of the new sphere.
+		* @param Scale
+		* The scale of the sphere.
+		* @param ColliderMovability
+		* The movability of the collider.
+		* @param CollisionLayers
+		* The Layers this collider should be active on.
+		* @param Parent
+		* The component this collider belongs to. Can be nullptr.
+		*/
+
 		SphereBody(Vector3 Position, Vector3 Rotation, float Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
 
 		/**
@@ -247,17 +265,64 @@ namespace Physics
 		virtual void SetTransform(Transform T) override;
 	};
 
+	/**
+	* @brief
+	* A PhysicsBody representing a box.
+	* 
+	* @ingroup Physics
+	*/
 	struct BoxBody : public PhysicsBody
 	{
+		/**
+		* @brief
+		* Box constructor.
+		*
+		* @param Position
+		* The position of the new box.
+		* @param Rotation
+		* The rotation of the new box.
+		* @param Extents
+		* The xyz extent of the new box.
+		* @param ColliderMovability
+		* The movability of the collider.
+		* @param CollisionLayers
+		* The Layers this collider should be active on.
+		* @param Parent
+		* The component this collider belongs to. Can be nullptr.
+		*/
 		BoxBody(Vector3 Position, Vector3 Rotation, Vector3 Extents, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
 
 		Vector3 Extents;
 		virtual void SetTransform(Transform T) override;
 	};
 
+	/**
+	* @brief
+	* A PhysicsBody representing a polygon mesh.
+	* 
+	* Note: This PhysicsBody only supports static movability. (See @ref MotionType)
+	* 
+	* @ingroup Physics
+	*/
 	struct MeshBody : public PhysicsBody
 	{
+		/**
+		* @brief
+		* Mesh constructor.
+		*
+		* @param Mesh
+		* The mesh data for the collider.
+		* @param MeshTransform
+		* Position, rotation and scale for the collider.
+		* @param ColliderMovability
+		* The movability of the collider.
+		* @param CollisionLayers
+		* The Layers this collider should be active on.
+		* @param Parent
+		* The component this collider belongs to. Can be nullptr.
+		*/
 		MeshBody(const ModelGenerator::ModelData& Mesh, Transform MeshTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
+
 		virtual void SetTransform(Transform T) override;
 
 		ModelGenerator::ModelData MeshData;

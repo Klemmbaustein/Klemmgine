@@ -314,7 +314,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 
 		Application::Timer BakeTimer;
 		BakeLogMessages.clear();
-		BakeLog("Baking lightmap for scene " + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene));
+		BakeLog("Baking lightmap for scene " + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene) + "...");
 		for (auto& i : Bake::ThreadProgress)
 		{
 			i = 0;
@@ -362,9 +362,9 @@ void BakedLighting::BakeCurrentSceneToFile()
 		}
 
 		Bake::BakeScale = (sbox.GetExtent() * 2) + sbox.GetCenter();
-		BakeLog("Calculated scene bounding box: " + std::to_string(Bake::BakeScale.Length()));
-
-		Bake::BakeScale = std::max(Bake::BakeScale.X, std::max(Bake::BakeScale.Y, Bake::BakeScale.Z)) * LightmapScaleMultiplier;
+		Bake::BakeScale = std::max(Bake::BakeScale.X, std::max(Bake::BakeScale.Y, Bake::BakeScale.Z));
+		BakeLog("Calculated scene bounding box: " + std::to_string(Bake::BakeScale.X));
+		Bake::BakeScale = Bake::BakeScale * LightmapScaleMultiplier;
 		BakeLog("Baking with scale: " + std::to_string(Bake::BakeScale.X));
 		Bake::SunDirection = (glm::vec3)Vector3::GetForwardVector(Graphics::WorldSun.Rotation);
 		size_t Thread3DArraySize = Bake::NUM_CHUNK_SPLITS;
@@ -383,11 +383,10 @@ void BakedLighting::BakeCurrentSceneToFile()
 
 		BakeLog("Invoked " + std::to_string(BakeThreads.size()) + " threads");
 
-		size_t i = 0;
-		for (std::thread* t : BakeThreads)
+		for (int i = (int)BakeThreads.size() - 1; i >= 0; i--)
 		{
-			t->join();
-			BakeLog("Thread " + std::to_string(++i) + "/" + std::to_string(BakeThreads.size()) + " is done.");
+			BakeThreads[i]->join();
+			BakeLog("Thread " + std::to_string(BakeThreads.size() - i) + "/" + std::to_string(BakeThreads.size()) + " is done.");
 		}
 
 		BakeLog("Finished baking lightmap.");

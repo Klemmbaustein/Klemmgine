@@ -90,6 +90,12 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 	}
 	else
 	{
+		if (Angle < -0.5)
+		{
+			Jumping = false;
+			VerticalVelocity = 0;
+		}
+
 		float Scale = 1 - Vector3::Dot(
 		Vector3(HitNormal.X, 0, HitNormal.Z).Normalize(),
 			Vector3(-InitialDireciton.X, 0, -InitialDireciton.Z).Normalize()
