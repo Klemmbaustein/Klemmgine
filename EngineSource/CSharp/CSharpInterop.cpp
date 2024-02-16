@@ -144,7 +144,7 @@ namespace CSharp
 		// Pre-allocate a large buffer for the path to hostfxr
 		char_t buffer[MAX_PATH];
 		size_t buffer_size = sizeof(buffer) / sizeof(char_t);
-#if RELEASE
+#if RELEASE && _WIN32
 		string_t Path = std::filesystem::current_path().fs_string() + STR("/bin");
 		string_t NetPath = Path + STR("/NetRuntime");
 
@@ -184,9 +184,10 @@ namespace CSharp
 		// Load .NET Core
 		void* load_assembly_and_get_function_pointer = nullptr;
 
-#if RELEASE
-		std::wstring Path = std::filesystem::current_path().wstring() + L"/bin";
-		std::wstring NetPath = Path + L"/NetRuntime";
+		// For some unknown reason this doesn't work on linux.
+#if RELEASE && _WIN32
+		string_t Path = std::filesystem::current_path().fs_string() + STR("/bin");
+		string_t NetPath = Path + STR("/NetRuntime");
 
 		hostfxr_initialize_parameters parameters = 
 		{
@@ -195,13 +196,14 @@ namespace CSharp
 			string_t(NetPath.begin(), NetPath.end()).c_str()
 		};
 
+		Log::Print(config_path);
 		int rc = init_fptr(config_path, &parameters, &cxt);
 #else
 		int rc = init_fptr(config_path, nullptr, &cxt);
 #endif
 		if (rc != 0 || cxt == nullptr)
 		{
-			Log::Print("Init failed: ");
+			CSharpLog("Init failed", CS_Log_Runtime, CS_Log_Err);
 			close_fptr(cxt);
 			return nullptr;
 		}

@@ -136,22 +136,16 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 #if ENGINE_CSHARP
 			if (CSharp::GetUseCSharp())
 			{
-#if _WIN32
-				std::string DotnetConfig = "win-x64";
-#else
-				std::string DotnetConfig = "linux-x64";
-#endif
-
 				Log::Print("[Build]: Building C# core...");
-				system(("cd " + Application::GetEditorPath() + "/CSharp/Core && dotnet publish -r " + DotnetConfig + " --self-contained false").c_str());
-				system(("cd " + Application::GetEditorPath() + "/CSharp/Engine && dotnet publish -r " + DotnetConfig + " --self-contained false").c_str());
+				system(("cd " + Application::GetEditorPath() + "/CSharp/Core && dotnet build").c_str());
+				system(("cd " + Application::GetEditorPath() + "/CSharp/Engine && dotnet build").c_str());
 
 				std::filesystem::create_directories(TargetFolder + "/bin/CSharp/Core");
 				std::filesystem::create_directories(TargetFolder + "/bin/CSharp/Engine");
 				std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Core/Build", TargetFolder + "/bin/CSharp/Core");
 				std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build", TargetFolder + "/bin/CSharp/Engine");
 				Log::Print("[Build]: Building game C# assembly...");
-				system(("cd Scripts && dotnet publish -r " + DotnetConfig + " --self-contained false").c_str());
+				system("cd Scripts && dotnet build");
 
 				std::filesystem::copy("CSharp/Build/", TargetFolder + "/bin/CSharp");
 
