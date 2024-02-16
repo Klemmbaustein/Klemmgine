@@ -17,14 +17,15 @@ fail()
 cd Dependencies/SDL_net
 cmake -S . -B Build/ || fail
 cd Build
-make -j 4 || fail
+make -j 4 SDL2_net || fail
 cd ../../assimp/
 cmake CMakeLists.txt || fail
-make -j 4 || fail
+make -j 4 assimp || fail
 cd ../JoltPhysics/Build
-./cmake_linux_clang_gcc.sh Distribution c++ -DINTERPROCEDURAL_OPTIMIZATION=OFF
+# With GCC, JoltPhysics fails to compile with warnings as error due to some uninitialized variables.
+./cmake_linux_clang_gcc.sh Distribution c++ -DINTERPROCEDURAL_OPTIMIZATION=OFF || fail
 cd Linux_Distribution
-make -j 4
+make -j 4 Jolt || fail
 cd  ../../../..
 
 if [ "$is_ci" != 1 ]; then

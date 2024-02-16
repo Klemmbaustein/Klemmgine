@@ -343,8 +343,7 @@ void JoltPhysics::RemoveBody(Physics::PhysicsBody* Body)
 
 void JoltPhysics::CreateShape(Physics::PhysicsBody* Body)
 {
-	auto Shape = new BodyCreationSettings(CreateJoltShapeFromBody(Body));
-	Body->ShapeInfo = Shape;
+	Body->ShapeInfo = new BodyCreationSettings(CreateJoltShapeFromBody(Body));
 }
 
 Vector3 JoltPhysics::GetBodyPosition(Physics::PhysicsBody* Body)

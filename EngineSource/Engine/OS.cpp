@@ -284,6 +284,6 @@ void OS::OpenFile(std::string Path)
 #if __linux__
 void OS::OpenFile(std::string Path)
 {
-	int ret = system(("xdg-open " + Path).c_str());
+	int ret = system(("xdg-open " + Path + " &").c_str());
 }
 #endif

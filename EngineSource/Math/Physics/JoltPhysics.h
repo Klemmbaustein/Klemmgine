@@ -2,6 +2,13 @@
 #include "Physics.h"
 
 /**
+* @file
+* 
+* @brief
+* File containing jolt physics implementation functions.
+*/
+
+/**
 * @brief
 * Namespace containing the jolt physics implementation.
 */
