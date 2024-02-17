@@ -67,11 +67,8 @@ namespace Collision
 	* 
 	* @param ObjectsToIgnore
 	* Objects that should be ignored in the collision check.
-	* 
-	* @param MeshesToIgnore
-	* Collision meshes that should be ignored in the collision check.
 	*/
-	HitResponse LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<WorldObject*> ObjectsToIgnore = {}, std::set<CollisionComponent*> MeshesToIgnore = {});
+	HitResponse LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<WorldObject*> ObjectsToIgnore = {});
 
 	HitResponse LineCheckForAABB(Box b, Vector3 RayStart, Vector3 RayEnd);
 }

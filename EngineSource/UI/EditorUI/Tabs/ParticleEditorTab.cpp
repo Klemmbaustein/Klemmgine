@@ -19,16 +19,16 @@ void ParticleEditorTab::AddParametersForElement(Particles::ParticleElement* Elem
 {
 	std::vector<ParticleParam> Params =
 	{
-		ParticleParam(&Element->Direction, Type::Vector3, "Start velocity"),
-		ParticleParam(&Element->DirectionRandom, Type::Vector3, "Velocity random"),
-		ParticleParam(&Element->Force, Type::Vector3, "Force"),
-		ParticleParam(MaterialPtr, Type::String, "Material"),
-		ParticleParam(&Element->StartScale, Type::Float, "Start scale"),
-		ParticleParam(&Element->EndScale, Type::Float, "End scale"),
-		ParticleParam(&Element->PositionRandom, Type::Vector3, "Position random"),
-		ParticleParam(&Element->LifeTime, Type::Float, "Lifetime"),
-		ParticleParam(&Element->NumLoops, Type::Int, "Particle count"),
-		ParticleParam(&Element->SpawnDelay, Type::Float, "Spawn delay"),
+		ParticleParam(&Element->Direction, NativeType::Vector3, "Start velocity"),
+		ParticleParam(&Element->DirectionRandom, NativeType::Vector3, "Velocity random"),
+		ParticleParam(&Element->Force, NativeType::Vector3, "Force"),
+		ParticleParam(MaterialPtr, NativeType::String, "Material"),
+		ParticleParam(&Element->StartScale, NativeType::Float, "Start scale"),
+		ParticleParam(&Element->EndScale, NativeType::Float, "End scale"),
+		ParticleParam(&Element->PositionRandom, NativeType::Vector3, "Position random"),
+		ParticleParam(&Element->LifeTime, NativeType::Float, "Lifetime"),
+		ParticleParam(&Element->NumLoops, NativeType::Int, "Particle count"),
+		ParticleParam(&Element->SpawnDelay, NativeType::Float, "Spawn delay"),
 	};
 
 	Parameters.push_back(Params);
@@ -46,12 +46,12 @@ void ParticleEditorTab::GenerateElementButtons(const std::vector<ParticleParam>&
 			->SetPadding(0.01f, 0, 0.01f, 0));
 		switch (i.ParamType)
 		{
-		case Type::Vector3:
+		case NativeType::Vector3:
 			New = new UIVectorField(Size, *(Vector3*)i.ValuePointer, this, Index, EditorUI::Text);
 			Target->AddChild(New
 				->SetPadding(0, 0.01f, 0.01f, 0));
 			break;
-		case Type::String:
+		case NativeType::String:
 			New = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 				->SetText(*(std::string*)i.ValuePointer);
 			Target->AddChild(New
@@ -65,14 +65,14 @@ void ParticleEditorTab::GenerateElementButtons(const std::vector<ParticleParam>&
 					: EditorUI::UIColors[2]);
 			}
 			break;
-		case Type::Float:
+		case NativeType::Float:
 			New = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 				->SetText(EditorUI::ToShortString(*(float*)i.ValuePointer));
 			Target->AddChild(New
 				->SetMinSize(Vector2(Size, 0))
 				->SetPadding(0, 0.01f, 0.01f, 0));
 			break;
-		case Type::Int:
+		case NativeType::Int:
 			New = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 				->SetText(std::to_string(*(int*)i.ValuePointer));
 			Target->AddChild(New
@@ -273,16 +273,16 @@ void ParticleEditorTab::OnButtonClicked(int Index)
 		{
 			switch (param->ParamType)
 			{
-			case Type::Float:
+			case NativeType::Float:
 				*(float*)param->ValuePointer = std::stof(((UITextField*)Button)->GetText());
 				break;
-			case Type::Vector3:
+			case NativeType::Vector3:
 				*(Vector3*)param->ValuePointer = ((UIVectorField*)Button)->GetValue();
 				break;
-			case Type::String:
+			case NativeType::String:
 				*(std::string*)param->ValuePointer = ((UITextField*)Button)->GetText();
 				break;
-			case Type::Int:
+			case NativeType::Int:
 				*(int*)param->ValuePointer = std::stoi(((UITextField*)Button)->GetText());
 				break;
 			default:
@@ -312,7 +312,7 @@ ParticleEditorTab::~ParticleEditorTab()
 	delete Particle;
 }
 
-ParticleEditorTab::ParticleParam::ParticleParam(void* ValuePointer, Type::TypeEnum ParamType, std::string Name)
+ParticleEditorTab::ParticleParam::ParticleParam(void* ValuePointer, NativeType::NativeType ParamType, std::string Name)
 {
 	this->ValuePointer = ValuePointer;
 	this->ParamType = ParamType;

@@ -2,16 +2,6 @@
 #include <Math/Physics/Physics.h>
 #include <Engine/Log.h>
 
-
-Collision::HitResponse CollisionComponent::OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore)
-{
-	//CollMesh->SetTransform(Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform()),
-	//	RelativeTransform.Rotation + GetParent()->GetTransform().Rotation,
-	//	RelativeTransform.Scale * 0.025f * GetParent()->GetTransform().Scale));
-	//return CollMesh->OverlapCheck(MeshesToIgnore);
-	return Collision::HitResponse();
-}
-
 void CollisionComponent::Destroy()
 {
 	Physics::MeshBody* m = static_cast<Physics::MeshBody*>(Collider);

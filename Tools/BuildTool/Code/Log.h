@@ -15,6 +15,6 @@ namespace Log
 
 	void SetConsoleColor(MessageType TypeColor);
 
-	void Print(std::string Message, MessageType Type = MessageType::Info, std::string LogClass = "");
+	void Print(std::string Message, MessageType NativeType = MessageType::Info, std::string LogClass = "");
 	void PrintVerbose(std::string Message);
 }

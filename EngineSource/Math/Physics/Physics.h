@@ -2,8 +2,10 @@
 #include <Rendering/Mesh/ModelGenerator.h>
 #include <Math/Vector.h>
 #include <cmath>
+#include <set>
 
 class Component;
+class WorldObject;
 
 /**
 * @defgroup Physics
@@ -126,7 +128,7 @@ namespace Physics
 			Mesh,
 		};
 
-		BodyType Type = BodyType::Box;
+		BodyType NativeType = BodyType::Box;
 
 		/**
 		* @brief
@@ -136,7 +138,7 @@ namespace Physics
 
 		Layer CollisionLayers = Layer::None;
 		Component* Parent = nullptr;
-		PhysicsBody(BodyType Type, Transform BodyTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
+		PhysicsBody(BodyType NativeType, Transform BodyTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
 
 		/**
 		* @brief
@@ -331,5 +333,5 @@ namespace Physics
 	void AddBody(PhysicsBody* Body);
 	void RemoveBody(PhysicsBody* Body);
 
-	HitResult RayCast(Vector3 Start, Vector3 End);
+	HitResult RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<WorldObject*> ObjectsToIgnore = {});
 }

@@ -60,13 +60,13 @@ void MaterialTab::OnButtonClicked(int Index)
 
 		auto& Value = LoadedMaterial.Uniforms.at(Index).Value;
 
-		switch (LoadedMaterial.Uniforms.at(Index).Type)
+		switch (LoadedMaterial.Uniforms.at(Index).NativeType)
 		{
-		case Type::Int:
-		case Type::Float:
+		case NativeType::Int:
+		case NativeType::Float:
 			Value = ((UITextField*)TextFields[Index])->GetText();
 			break;
-		case Type::GL_Texture:
+		case NativeType::GL_Texture:
 		{
 			Texture::TextureInfo Info;
 			Info.File = ((UITextField*)TextFields[Index])->GetText();
@@ -75,11 +75,11 @@ void MaterialTab::OnButtonClicked(int Index)
 			Value = Texture::CreateTextureInfoString(Info);
 			break;
 		}
-		case Type::Vector3:
-		case Type::Vector3Color:
+		case NativeType::Vector3:
+		case NativeType::Vector3Color:
 			Value = ((UIVectorField*)TextFields[Index])->GetValue().ToString();
 			break;
-		case Type::Bool:
+		case NativeType::Bool:
 			Value = (Value == "1") ? "0" : "1";
 			break;
 		default:
@@ -175,7 +175,7 @@ void MaterialTab::Load(std::string File)
 				LoadedMaterial.Uniforms.push_back(ShaderUniforms[i]);
 			}
 			else if (LoadedMaterial.Uniforms[i].UniformName != ShaderUniforms[i].UniformName
-					|| LoadedMaterial.Uniforms[i].Type != ShaderUniforms[i].Type)
+					|| LoadedMaterial.Uniforms[i].NativeType != ShaderUniforms[i].NativeType)
 			{
 				LoadedMaterial.Uniforms[i] = ShaderUniforms[i];
 			}
@@ -257,16 +257,16 @@ void MaterialTab::GenerateUI()
 
 		UIBox* NewField = nullptr;
 
-		switch (i.Type)
+		switch (i.NativeType)
 		{
-		case Type::Vector3:
+		case NativeType::Vector3:
 		{	
 			NewField = (new UIVectorField(DesiredValueSize, Vector3::FromString(i.Value), this, Index, EditorUI::Text))
 				->SetValueType(UIVectorField::VecType::rgb);
 			break;
 		}
-		case Type::Float:
-		case Type::Int:
+		case NativeType::Float:
+		case NativeType::Int:
 		{
 			NewField = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 				->SetText(i.Value)
@@ -274,7 +274,7 @@ void MaterialTab::GenerateUI()
 				->SetMinSize(Vector2(DesiredValueSize, 0.04f));
 			break;
 		}
-		case Type::Bool:
+		case NativeType::Bool:
 		{
 			NewField = new UIButton(UIBox::Orientation::Horizontal, 0, 1, this, Index);
 			NewField->SetSizeMode(UIBox::SizeMode::PixelRelative);
@@ -287,7 +287,7 @@ void MaterialTab::GenerateUI()
 			}
 			break;
 		}
-		case Type::GL_Texture:
+		case NativeType::GL_Texture:
 		{
 			auto TextureInfo = Texture::ParseTextureInfoString(i.Value);
 			unsigned int NewTexture = Texture::LoadTexture(TextureInfo);
@@ -352,7 +352,7 @@ void MaterialTab::GenerateUI()
 			break;
 		}
 		Index++;
-		if (NewField && i.Type != Type::GL_Texture)
+		if (NewField && i.NativeType != NativeType::GL_Texture)
 		{
 			ParamBox->AddChild(NewField);
 			TextureDropdowns.push_back(nullptr);

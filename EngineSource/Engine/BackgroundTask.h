@@ -6,7 +6,7 @@
 
 struct BackgroundTask
 {
-	size_t Type = 0;
+	size_t NativeType = 0;
 	std::atomic<float> Progress = 0;
 	std::string Status;
 	std::thread* Thread = nullptr;

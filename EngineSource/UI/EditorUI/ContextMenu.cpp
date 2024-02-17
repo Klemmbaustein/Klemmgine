@@ -92,28 +92,28 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 
 	if (Value.find("\r") == std::string::npos)
 	{
-		switch (Element.Type)
+		switch (Element.NativeType)
 		{
-		case Type::Vector3Color:
+		case NativeType::Vector3Color:
 			VectorType = UIVectorField::VecType::rgb;
 			[[fallthrough]];
-		case Type::Vector3Rotation:
+		case NativeType::Vector3Rotation:
 			if (VectorType == UIVectorField::VecType::xyz)
 			{
 				VectorType = UIVectorField::VecType::PitchYawRoll;
 			}
 			[[fallthrough]];
-		case Type::Vector3:
+		case NativeType::Vector3:
 			NewElement = new UIVectorField(Scale.X - 0.04f, Vector3::FromString(Value), this, -1, EditorUI::Text);
 			NewElement->SetPadding(0.005f, 0, 0.02f, 0);
 			((UIVectorField*)NewElement)->SetValueType(VectorType);
 			break;
-		case Type::String:
-		case Type::Float:
-		case Type::Int:
+		case NativeType::String:
+		case NativeType::Float:
+		case NativeType::Int:
 			NewElement = GenerateTextField(Value, -1);
 			break;
-		case Type::Bool:
+		case NativeType::Bool:
 			NewElement = new UIButton(UIBox::Orientation::Horizontal, 0, 0.75f, this, -1);
 			NewElement->SetSizeMode(UIBox::SizeMode::PixelRelative);
 			NewElement->SetMinSize(0.04f);
@@ -140,25 +140,25 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 	auto Elements = StrUtil::SeperateString(Value, '\r');
 	for (auto& i : Elements)
 	{
-		switch (Element.Type & ~Type::List)
+		switch (Element.NativeType & ~NativeType::List)
 		{
-		case Type::Vector3Color:
+		case NativeType::Vector3Color:
 			VectorType = UIVectorField::VecType::rgb;
 			[[fallthrough]];
-		case Type::Vector3Rotation:
+		case NativeType::Vector3Rotation:
 			if (VectorType == UIVectorField::VecType::xyz)
 			{
 				VectorType = UIVectorField::VecType::PitchYawRoll;
 			}
 			[[fallthrough]];
-		case Type::Vector3:
+		case NativeType::Vector3:
 			NewElement = new UIVectorField(Scale.X - 0.04f, Vector3::FromString(i), this, -1, EditorUI::Text);
 			NewElement->SetPadding(0.005f, 0, 0.02f, 0);
 			((UIVectorField*)NewElement)->SetValueType(VectorType);
 			break;
-		case Type::String:
-		case Type::Float:
-		case Type::Int:
+		case NativeType::String:
+		case NativeType::Float:
+		case NativeType::Int:
 			NewElement = GenerateTextField(i, -1);
 			break;
 		default:
@@ -182,29 +182,29 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 	int ElemIndex = Name == "Object" ? -2 : -1;
 	UIVectorField::VecType VectorType = UIVectorField::VecType::xyz;
 
-	bool IsList = Element.Type & Type::List;
+	bool IsList = Element.NativeType & NativeType::List;
 
 	size_t NumElements = 1;
 
 	if (IsList && Element.Variable)
 	{
-		switch (Element.Type & ~Type::List)
+		switch (Element.NativeType & ~NativeType::List)
 		{
-		case Type::Vector3Color:
-		case Type::Vector3:
-		case Type::Vector3Rotation:
+		case NativeType::Vector3Color:
+		case NativeType::Vector3:
+		case NativeType::Vector3Rotation:
 			NumElements = VecSize<Vector3>(Element.Variable);
 			break;
-		case Type::Int:
+		case NativeType::Int:
 			NumElements = VecSize<int>(Element.Variable);
 			break;
-		case Type::Float:
+		case NativeType::Float:
 			NumElements = VecSize<float>(Element.Variable);
 			break;
-		case Type::String:
+		case NativeType::String:
 			NumElements = VecSize<std::string>(Element.Variable);
 			break;
-		case Type::Bool:
+		case NativeType::Bool:
 			NumElements = VecSize<bool>(Element.Variable);
 			break;
 		default:
@@ -223,20 +223,20 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 		}
 		if (IsList)
 		{
-			switch (Element.Type & ~Type::List)
+			switch (Element.NativeType & ~NativeType::List)
 			{
-			case Type::Vector3Color:
-			case Type::Vector3:
-			case Type::Vector3Rotation:
+			case NativeType::Vector3Color:
+			case NativeType::Vector3:
+			case NativeType::Vector3Rotation:
 				val = &GetVec<Vector3>(Element.Variable).at(i);
 				break;
-			case Type::Int:
+			case NativeType::Int:
 				val = &GetVec<int>(Element.Variable).at(i);
 				break;
-			case Type::Float:
+			case NativeType::Float:
 				val = &GetVec<float>(Element.Variable).at(i);
 				break;
-			case Type::String:
+			case NativeType::String:
 				val = &GetVec<std::string>(Element.Variable).at(i);
 				break;
 			default:
@@ -244,34 +244,34 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 			}
 		}
 
-		switch (Element.Type & ~Type::List)
+		switch (Element.NativeType & ~NativeType::List)
 		{
 			// Vector3_Colors and Vector3s both use VectorFields, so we treat them the same
-		case Type::Vector3Color:
+		case NativeType::Vector3Color:
 			VectorType = UIVectorField::VecType::rgb;
 			[[fallthrough]];
-		case Type::Vector3Rotation:
+		case NativeType::Vector3Rotation:
 			if (VectorType == UIVectorField::VecType::xyz)
 			{
 				VectorType = UIVectorField::VecType::PitchYawRoll;
 			}
 			[[fallthrough]];
-		case Type::Vector3:
+		case NativeType::Vector3:
 			NewElement = new UIVectorField(Scale.X - 0.04f, *(Vector3*)val, this, ElemIndex, EditorUI::Text);
 			NewElement->SetPadding(0.005f, 0, 0.02f, 0);
 			((UIVectorField*)NewElement)->SetValueType(VectorType);
 			break;
-		case Type::Float:
+		case NativeType::Float:
 			NewElement = GenerateTextField(EditorUI::ToShortString(*((float*)val)), ElemIndex);
 			break;
-		case Type::Int:
+		case NativeType::Int:
 			NewElement = GenerateTextField(std::to_string(*((int*)val)), ElemIndex);
 
 			break;
-		case Type::String:
+		case NativeType::String:
 			NewElement = GenerateTextField(*((std::string*)val), ElemIndex);
 			break;
-		case Type::Bool:
+		case NativeType::Bool:
 		{
 			bool Value = false;
 			if (IsList)
@@ -338,7 +338,7 @@ void ContextMenu::OnButtonClicked(int Index)
 				auto& Element = ContextSettings[IteratedElement];
 				CSharpObject* obj = static_cast<CSharpObject*>(EditorUI::SelectedObjects[0]);
 
-				if (ContextSettings[IteratedElement].Type & Type::List)
+				if (ContextSettings[IteratedElement].NativeType & NativeType::List)
 				{
 					auto arr = StrUtil::SeperateString(obj->GetProperty(Element.Name), '\r');
 					std::string Value;
@@ -354,19 +354,19 @@ void ContextMenu::OnButtonClicked(int Index)
 				}
 				else
 				{
-					switch (Element.Type)
+					switch (Element.NativeType)
 					{
-					case Type::Int:
-					case Type::Float:
-					case Type::String:
+					case NativeType::Int:
+					case NativeType::Float:
+					case NativeType::String:
 						obj->SetProperty(Element.Name, ((UITextField*)ContextButtons[i])->GetText());
 						break;
-					case Type::Vector3:
-					case Type::Vector3Color:
-					case Type::Vector3Rotation:
+					case NativeType::Vector3:
+					case NativeType::Vector3Color:
+					case NativeType::Vector3Rotation:
 						obj->SetProperty(Element.Name, ((UIVectorField*)ContextButtons[i])->GetValue().ToString());
 						break;
-					case Type::Bool:
+					case NativeType::Bool:
 						if (((UIButton*)ContextButtons[i])->GetIsHovered())
 						{
 							obj->SetProperty(Element.Name, obj->GetProperty(Element.Name) == "True" ? "False" : "True");
@@ -380,29 +380,29 @@ void ContextMenu::OnButtonClicked(int Index)
 				IteratedElement++;
 				continue;
 			}
-			if (ContextSettings[IteratedElement].Type & Type::List)
+			if (ContextSettings[IteratedElement].NativeType & NativeType::List)
 			{
 				size_t NumElements = 1;
 
 				auto& Element = ContextSettings[IteratedElement];
 
-				switch (Element.Type & ~Type::List)
+				switch (Element.NativeType & ~NativeType::List)
 				{
-				case Type::Vector3Color:
-				case Type::Vector3:
-				case Type::Vector3Rotation:
+				case NativeType::Vector3Color:
+				case NativeType::Vector3:
+				case NativeType::Vector3Rotation:
 					NumElements = VecSize<Vector3>(Element.Variable);
 					break;
-				case Type::Int:
+				case NativeType::Int:
 					NumElements = VecSize<int>(Element.Variable);
 					break;
-				case Type::Float:
+				case NativeType::Float:
 					NumElements = VecSize<float>(Element.Variable);
 					break;
-				case Type::String:
+				case NativeType::String:
 					NumElements = VecSize<std::string>(Element.Variable);
 					break;
-				case Type::Bool:
+				case NativeType::Bool:
 					NumElements = VecSize<bool>(Element.Variable);
 					break;
 				default:
@@ -413,26 +413,26 @@ void ContextMenu::OnButtonClicked(int Index)
 				{
 					try
 					{
-						switch (Element.Type & ~Type::List)
+						switch (Element.NativeType & ~NativeType::List)
 						{
-						case Type::Vector3Color:
-						case Type::Vector3Rotation:
-						case Type::Vector3:
+						case NativeType::Vector3Color:
+						case NativeType::Vector3Rotation:
+						case NativeType::Vector3:
 							if (Element.Normalized)
 								GetVec<Vector3>(Element.Variable).at(j) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
 							else
 								GetVec<Vector3>(Element.Variable).at(j) = ((UIVectorField*)ContextButtons[i])->GetValue();
 							break;
-						case Type::Float:
+						case NativeType::Float:
 							GetVec<float>(Element.Variable).at(j) = std::stof(((UITextField*)ContextButtons[i])->GetText());
 							break;
-						case Type::Int:
+						case NativeType::Int:
 							GetVec<int>(Element.Variable).at(j) = std::stoi(((UITextField*)ContextButtons[i])->GetText());
 							break;
-						case Type::String:
+						case NativeType::String:
 							GetVec<std::string>(Element.Variable).at(j) = ((UITextField*)ContextButtons[i])->GetText();
 							break;
-						case Type::Bool:
+						case NativeType::Bool:
 							if (((UIButton*)ContextButtons[i])->GetIsHovered())
 							{
 								bool val = GetVec<bool>(Element.Variable).at(j);
@@ -454,27 +454,27 @@ void ContextMenu::OnButtonClicked(int Index)
 			{
 				try
 				{
-					switch (ContextSettings[IteratedElement].Type & ~Type::List)
+					switch (ContextSettings[IteratedElement].NativeType & ~NativeType::List)
 					{
-					case Type::Vector3Color:
-					case Type::Vector3Rotation:
-					case Type::Vector3:
+					case NativeType::Vector3Color:
+					case NativeType::Vector3Rotation:
+					case NativeType::Vector3:
 						if (ContextSettings[IteratedElement].Normalized) 
 							*(Vector3*)(ContextSettings[IteratedElement].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue().Normalize();
 						else
 							*(Vector3*)(ContextSettings[IteratedElement].Variable) = ((UIVectorField*)ContextButtons[i])->GetValue();
 						break;
-					case Type::Float:
+					case NativeType::Float:
 						*(float*)(ContextSettings[IteratedElement].Variable) = std::stof(((UITextField*)ContextButtons[i])->GetText());
 						break;
-					case Type::Int:
+					case NativeType::Int:
 						*(int*)(ContextSettings[IteratedElement].Variable) = std::stoi(((UITextField*)ContextButtons[i])->GetText());
 						break;
-					case Type::String:
+					case NativeType::String:
 						*(std::string*)(ContextSettings[IteratedElement].Variable) = ((UITextField*)ContextButtons[i])->GetText();
 						EditorUI::UpdateAllInstancesOf<ObjectList>();
 						break;
-					case Type::Bool:
+					case NativeType::Bool:
 						if (((UIButton*)ContextButtons[i])->GetIsHovered())
 						{
 							*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
@@ -544,10 +544,10 @@ void ContextMenu::OnResized()
 
 		GenerateSection(
 			{
-				ContextMenuSection(&SelectedObject->GetTransform().Position, Type::Vector3, "Position"),
-				ContextMenuSection(&SelectedObject->GetTransform().Rotation, Type::Vector3Rotation, "Rotation"),
-				ContextMenuSection(&SelectedObject->GetTransform().Scale, Type::Vector3, "Scale"),
-				ContextMenuSection(&SelectedObject->Name, Type::String, "Name"),
+				ContextMenuSection(&SelectedObject->GetTransform().Position, NativeType::Vector3, "Position"),
+				ContextMenuSection(&SelectedObject->GetTransform().Rotation, NativeType::Vector3Rotation, "Rotation"),
+				ContextMenuSection(&SelectedObject->GetTransform().Scale, NativeType::Vector3, "Scale"),
+				ContextMenuSection(&SelectedObject->Name, NativeType::String, "Name"),
 			},
 			"Object", nullptr, 0);
 
@@ -573,11 +573,11 @@ void ContextMenu::OnResized()
 			}
 			if (!Categories.contains(CategoryName))
 			{
-				Categories.insert(std::pair(CategoryName, std::vector<ContextMenuSection>({ ContextMenuSection(i.Data, i.Type, i.Name) })));
+				Categories.insert(std::pair(CategoryName, std::vector<ContextMenuSection>({ ContextMenuSection(i.Data, i.NativeType, i.Name) })));
 			}
 			else
 			{
-				Categories[CategoryName].push_back(ContextMenuSection(i.Data, i.Type, i.Name));
+				Categories[CategoryName].push_back(ContextMenuSection(i.Data, i.NativeType, i.Name));
 			}
 		}
 
@@ -608,28 +608,28 @@ void ContextMenu::OnResized()
 
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::WorldSun.Rotation, Type::Vector3Rotation, "Rotation"),
-				ContextMenuSection(&Graphics::WorldSun.SunColor, Type::Vector3Color, "Color"),
-				ContextMenuSection(&Graphics::WorldSun.Intensity, Type::Float, "Intensity")
+				ContextMenuSection(&Graphics::WorldSun.Rotation, NativeType::Vector3Rotation, "Rotation"),
+				ContextMenuSection(&Graphics::WorldSun.SunColor, NativeType::Vector3Color, "Color"),
+				ContextMenuSection(&Graphics::WorldSun.Intensity, NativeType::Float, "Intensity")
 			},
 			"Sun", nullptr, 0);
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::WorldSun.AmbientColor, Type::Vector3Color, "Color"),
-				ContextMenuSection(&Graphics::WorldSun.AmbientIntensity, Type::Float, "Intensity")
+				ContextMenuSection(&Graphics::WorldSun.AmbientColor, NativeType::Vector3Color, "Color"),
+				ContextMenuSection(&Graphics::WorldSun.AmbientIntensity, NativeType::Float, "Intensity")
 			},
 			"Ambient light", nullptr, 1);
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::WorldFog.FogColor, Type::Vector3Color, "Color"),
-				ContextMenuSection(&Graphics::WorldFog.Distance, Type::Float, "Start distance"),
-				ContextMenuSection(&Graphics::WorldFog.Falloff, Type::Float, "Falloff"),
-				ContextMenuSection(&Graphics::WorldFog.MaxDensity, Type::Float, "Max density")
+				ContextMenuSection(&Graphics::WorldFog.FogColor, NativeType::Vector3Color, "Color"),
+				ContextMenuSection(&Graphics::WorldFog.Distance, NativeType::Float, "Start distance"),
+				ContextMenuSection(&Graphics::WorldFog.Falloff, NativeType::Float, "Falloff"),
+				ContextMenuSection(&Graphics::WorldFog.MaxDensity, NativeType::Float, "Max density")
 			},
 			"Fog", nullptr, 2);
 		GenerateSection(
 			{
-				ContextMenuSection(&Graphics::MainFramebuffer->ReflectionCubemapName, Type::String, "Cubemap file"),
+				ContextMenuSection(&Graphics::MainFramebuffer->ReflectionCubemapName, NativeType::String, "Cubemap file"),
 			},
 			"Reflection", nullptr, 3);
 	}

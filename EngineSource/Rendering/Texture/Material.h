@@ -8,13 +8,13 @@ struct Material
 	struct Param
 	{
 		std::string UniformName;
-		Type::TypeEnum Type;
+		NativeType::NativeType NativeType;
 		std::string Value;
 		std::string Description;
-		Param(std::string UniformName, Type::TypeEnum Type, std::string Value, std::string Description = "")
+		Param(std::string UniformName, NativeType::NativeType NativeType, std::string Value, std::string Description = "")
 		{
 			this->UniformName = UniformName;
-			this->Type = Type;
+			this->NativeType = NativeType;
 			this->Value = Value;
 			this->Description = Description;
 		}

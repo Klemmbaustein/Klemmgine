@@ -128,7 +128,7 @@ void CubemapTab::OnButtonClicked(int Index)
 	case 0:
 		for (size_t i = 0; i < SideFields.size(); i++)
 		{
-			SaveFile->SetProperty(SaveGame::SaveProperty(Cubenames[i], SideFields[i]->GetText(), Type::String));
+			SaveFile->SetProperty(SaveGame::SaveProperty(Cubenames[i], SideFields[i]->GetText(), NativeType::String));
 		}
 		Generate();
 		break;

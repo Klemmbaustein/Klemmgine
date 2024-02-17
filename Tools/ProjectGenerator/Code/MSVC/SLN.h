@@ -10,7 +10,7 @@ namespace SLN
 		std::string GUID;
 		std::string Path;
 		std::string Name;
-		std::string Type;
+		std::string NativeType;
 		std::vector<std::string> Dependencies;
 	};
 

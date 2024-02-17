@@ -21,7 +21,7 @@ class SettingsPanel : public EditorPanel
 		struct Setting
 		{
 			std::string Name;
-			Type::TypeEnum Type;
+			NativeType::NativeType NativeType;
 			std::string Value;
 			void (*OnChanged)(std::string NewValue);
 			size_t cat = 0, entry = 0;
@@ -41,37 +41,37 @@ class SettingsPanel : public EditorPanel
 	{
 		SettingsCategory("Editor",
 			{
-			SettingsCategory::Setting("UI:Light mode [Experimental]", Type::Bool, "0", [](std::string NewValue)
+			SettingsCategory::Setting("UI:Light mode [Experimental]", NativeType::Bool, "0", [](std::string NewValue)
 			{
 				Application::EditorInstance->SetUseLightMode(std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Save Button", Type::Bool, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Save Button", NativeType::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Save", std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Bake button", Type::Bool, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Bake button", NativeType::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Bake", std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Wireframe Button", Type::Bool, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Wireframe Button", NativeType::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Wireframe", std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show Build Button", Type::Bool, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show Build Button", NativeType::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Build", std::stoi(NewValue));
 			}),
-			SettingsCategory::Setting("Toolbar:Show run button", Type::Bool, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show run button", NativeType::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Run", std::stoi(NewValue));
 			}),
 #if ENGINE_CSHARP
-			SettingsCategory::Setting("Toolbar:Show reload C# button", Type::Bool, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Toolbar:Show reload C# button", NativeType::Bool, "1", [](std::string NewValue)
 			{
 				Toolbar::ToolbarInstance->SetButtonVisibility("Reload C#", std::stoi(NewValue));
 			}),
 #endif
-			SettingsCategory::Setting("Editor:Start in fullscreen", Type::Bool, "0", [](std::string NewValue)
+			SettingsCategory::Setting("Editor:Start in fullscreen", NativeType::Bool, "0", [](std::string NewValue)
 			{
 				if (Stats::Time == 0)
 				{
@@ -83,29 +83,29 @@ class SettingsPanel : public EditorPanel
 
 		SettingsCategory("Project specific",
 			{
-				SettingsCategory::Setting("Run from editor:Launch arguments", Type::String, "", [](std::string NewValue)
+				SettingsCategory::Setting("Run from editor:Launch arguments", NativeType::String, "", [](std::string NewValue)
 				{
 					EditorUI::LaunchInEditorArgs = NewValue;
 				}),
-				SettingsCategory::Setting("Run from editor:Launch scene that is currently loaded in editor", Type::Bool, "1", [](std::string NewValue)
+				SettingsCategory::Setting("Run from editor:Launch scene that is currently loaded in editor", NativeType::Bool, "1", [](std::string NewValue)
 				{
 					EditorUI::SetLaunchCurrentScene(NewValue == "1");
 				}),
-				SettingsCategory::Setting("Run from editor:Save current scene before launch", Type::Bool, "0", [](std::string NewValue)
+				SettingsCategory::Setting("Run from editor:Save current scene before launch", NativeType::Bool, "0", [](std::string NewValue)
 				{
 					EditorUI::SetSaveSceneOnLaunch(NewValue == "1");
 				}),
-				SettingsCategory::Setting("Networking:Start server on launch", Type::Bool, "0", [](std::string NewValue)
+				SettingsCategory::Setting("Networking:Start server on launch", NativeType::Bool, "0", [](std::string NewValue)
 				{
 					EditorUI::LaunchWithServer = std::stoi(NewValue);
 				}),
-				SettingsCategory::Setting("Networking:Number of clients", Type::Int, "1", [](std::string NewValue)
+				SettingsCategory::Setting("Networking:Number of clients", NativeType::Int, "1", [](std::string NewValue)
 				{
 					EditorUI::NumLaunchClients = std::stoi(NewValue);
 				}),
 
 #if ENGINE_CSHARP && !ENGINE_NO_SOURCE
-				SettingsCategory::Setting("C#:Use C# in project (Requires restart)", Type::Bool, "1", [](std::string NewValue)
+				SettingsCategory::Setting("C#:Use C# in project (Requires restart)", NativeType::Bool, "1", [](std::string NewValue)
 				{
 				}),
 #endif
@@ -115,7 +115,7 @@ class SettingsPanel : public EditorPanel
 	};
 
 	void GenerateUI();
-	void GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value);
+	void GenerateSection(UIBox* Parent, std::string Name, int Index, NativeType::NativeType SectionType, std::string Value);
 public:
 	static void NewSettingsPanel();
 	void OpenSettingsPage(std::string Name);

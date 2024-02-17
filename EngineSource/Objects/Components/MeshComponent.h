@@ -45,7 +45,7 @@ public:
 	* @param Name
 	* The name of the uniform.
 	* 
-	* @param Type
+	* @param NativeType
 	* The type of the uniform.
 	* Possible values:
 	* 
@@ -55,7 +55,7 @@ public:
 	* @param MeshSection
 	* The section of the mesh that should have the uniform set.
 	*/
-	void SetUniform(std::string Name, Type::TypeEnum Type, std::string Content, uint8_t MeshSection);
+	void SetUniform(std::string Name, NativeType::NativeType NativeType, std::string Content, uint8_t MeshSection);
 
 	Model* GetModel()
 	{

@@ -141,9 +141,9 @@ has a non-stencil-renderable image attached.\n";
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		Console::RegisterConVar(Console::Variable("shadow_resolution", Type::Int, &Graphics::ShadowResolution, CSM::ReInit));
-		Console::RegisterConVar(Console::Variable("shadows", Type::Bool, &Graphics::RenderShadows, CSM::ReInit));
-		Console::RegisterConVar(Console::Variable("shadow_distance", Type::Float, &CSMDistance, nullptr));
+		Console::RegisterConVar(Console::Variable("shadow_resolution", NativeType::Int, &Graphics::ShadowResolution, CSM::ReInit));
+		Console::RegisterConVar(Console::Variable("shadows", NativeType::Bool, &Graphics::RenderShadows, CSM::ReInit));
+		Console::RegisterConVar(Console::Variable("shadow_distance", NativeType::Float, &CSMDistance, nullptr));
 	}
 
 	void ReInit()

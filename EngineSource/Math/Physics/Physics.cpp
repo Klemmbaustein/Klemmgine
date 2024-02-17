@@ -1,6 +1,7 @@
 #include "Physics.h"
 #include "JoltPhysics.h"
 #include <Engine/EngineError.h>
+#include <Objects/WorldObject.h>
 
 #define PHYSICS_SYSTEM JoltPhysics
 
@@ -24,14 +25,14 @@ void Physics::RemoveBody(PhysicsBody* Body)
 	PHYSICS_SYSTEM::RemoveBody(Body);
 }
 
-Physics::HitResult Physics::RayCast(Vector3 Start, Vector3 End)
+Physics::HitResult Physics::RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
 {
-	return PHYSICS_SYSTEM::LineCast(Start, End);
+	return PHYSICS_SYSTEM::LineCast(Start, End, Layers, ObjectsToIgnore);
 }
 
-Physics::PhysicsBody::PhysicsBody(BodyType Type, Transform BodyTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
+Physics::PhysicsBody::PhysicsBody(BodyType NativeType, Transform BodyTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
 {
-	this->Type = Type;
+	this->NativeType = NativeType;
 	this->BodyTransform = BodyTransform;
 	this->ColliderMovability = ColliderMovability;
 	this->CollisionLayers = CollisionLayers;

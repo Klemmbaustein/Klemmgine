@@ -33,22 +33,22 @@ namespace Console
 	std::map<std::string, Command> Commands;
 	std::vector<std::string> ConsoleInput;
 
-	Type::TypeEnum GetDataTypeFromString(std::string& str)
+	NativeType::NativeType GetDataTypeFromString(std::string& str)
 	{
 		if (strspn(str.c_str(), "-0123456789") == str.size())
 		{
-			return Type::Int;
+			return NativeType::Int;
 		}
 
 		if (strspn(str.c_str(), "-.0123456789") == str.size())
 		{
-			return Type::Float;
+			return NativeType::Float;
 		}
-		return Type::String;
+		return NativeType::String;
 	}
-	bool IsTypeNumber(Type::TypeEnum GivenType)
+	bool IsTypeNumber(NativeType::NativeType GivenType)
 	{
-		return GivenType == Type::Int || GivenType == Type::Float;
+		return GivenType == NativeType::Int || GivenType == NativeType::Float;
 	}
 
 	template<typename T>
@@ -144,7 +144,7 @@ void Console::InitializeConsole()
 	RegisterCommand(Command("echo",
 		[]() {
 			Console::ConsoleLog(CommandArgs()[0]);
-		}, { Console::Command::Argument("msg", Type::String) }));
+		}, { Console::Command::Argument("msg", NativeType::String) }));
 
 	RegisterCommand(Command("version",
 		[]() {
@@ -226,7 +226,7 @@ void Console::InitializeConsole()
 	}
 	ConsoleLog("Unknown info topic: " + CommandArgs()[0], E_ERROR);
 	ConsoleLog("Topics are: version, graphics, sound.", E_ERROR);
-		}, { Command::Argument("info_type", Type::String, true) }));
+		}, { Command::Argument("info_type", NativeType::String, true) }));
 
 
 	RegisterCommand(Command("listpack",
@@ -253,7 +253,7 @@ void Console::InitializeConsole()
 		}
 		ConsoleLog(LogString);
 	}
-		}, { Command::Argument("pack_file", Type::String) }));
+		}, { Command::Argument("pack_file", NativeType::String) }));
 
 
 	RegisterCommand(Command("find",
@@ -266,7 +266,7 @@ void Console::InitializeConsole()
 	}
 	ConsoleLog(CommandArgs()[0] + " -> " + File);
 
-		}, { Command::Argument("file", Type::String) }));
+		}, { Command::Argument("file", NativeType::String) }));
 
 	RegisterCommand(Command("open", []() {
 		if (std::filesystem::exists(Assets::GetAsset(CommandArgs()[0] + +".jscn")))
@@ -277,7 +277,7 @@ void Console::InitializeConsole()
 		{
 			ConsoleLog("Could not find scene \"" + CommandArgs()[0] + "\"", E_ERROR);
 		}
-		}, { Command::Argument("scene", Type::String)}));
+		}, { Command::Argument("scene", NativeType::String)}));
 
 	RegisterCommand(Command("help", []() {
 		std::string CommandString = CommandArgs()[0];
@@ -289,7 +289,7 @@ void Console::InitializeConsole()
 			return;
 		}
 		ConsoleLog("Help: " + CommandString + " is not a registered command.", E_ERROR);
-		}, { Command::Argument("command", Type::String) }));
+		}, { Command::Argument("command", NativeType::String) }));
 
 	RegisterCommand(Command("getcommands", []() {
 		for (auto& i : Commands)
@@ -323,7 +323,7 @@ void Console::InitializeConsole()
 			}
 
 			ConsoleLog(LogMessage);
-		}, { Command::Argument("file", Type::String), Command::Argument("displayFetchTime", Type::Bool, true) }));
+		}, { Command::Argument("file", NativeType::String), Command::Argument("displayFetchTime", NativeType::Bool, true) }));
 
 	RegisterCommand(Command("assetdmp", []()
 		{
@@ -344,12 +344,12 @@ void Console::InitializeConsole()
 				}
 			}
 			ConsoleLog("Could not find class " + CommandArgs()[0], E_WARNING);
-		}, { Command::Argument("objectName", Type::String) }));
-	RegisterConVar(Variable("wireframe", Type::Bool, &Graphics::IsWireframe, nullptr));
-	RegisterConVar(Variable("vignette", Type::Float, &Graphics::Vignette, nullptr));
-	RegisterConVar(Variable("vsync", Type::Bool, &Graphics::VSync, nullptr));
-	RegisterConVar(Variable("timescale", Type::Float, &Performance::TimeMultiplier, nullptr));
-	RegisterConVar(Variable("resolution_scale", Type::Float, &Graphics::ResolutionScale, []() {Graphics::SetWindowResolution(Application::GetWindowSize()); }));
+		}, { Command::Argument("objectName", NativeType::String) }));
+	RegisterConVar(Variable("wireframe", NativeType::Bool, &Graphics::IsWireframe, nullptr));
+	RegisterConVar(Variable("vignette", NativeType::Float, &Graphics::Vignette, nullptr));
+	RegisterConVar(Variable("vsync", NativeType::Bool, &Graphics::VSync, nullptr));
+	RegisterConVar(Variable("timescale", NativeType::Float, &Performance::TimeMultiplier, nullptr));
+	RegisterConVar(Variable("resolution_scale", NativeType::Float, &Graphics::ResolutionScale, []() {Graphics::SetWindowResolution(Application::GetWindowSize()); }));
 }
 
 void Console::ConsoleLog(std::string Message, ConsoleLogType Severity)
@@ -369,21 +369,21 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 	{
 		std::string ValueString;
 		Variable FoundVar = ConVars[CommandVec[0]];
-		switch (FoundVar.Type)
+		switch (FoundVar.NativeType)
 		{
-		case Type::Float:
+		case NativeType::Float:
 			ValueString = std::to_string(*(float*)FoundVar.Var);
 			break;
-		case Type::Int:
+		case NativeType::Int:
 			ValueString = std::to_string(*(int*)FoundVar.Var);
 			break;
-		case Type::Byte:
+		case NativeType::Byte:
 			ValueString = std::to_string(*(char*)FoundVar.Var);
 			break;
-		case Type::Bool:
+		case NativeType::Bool:
 			ValueString = std::to_string(*(bool*)FoundVar.Var);
 			break;
-		case Type::String:
+		case NativeType::String:
 			ValueString = *(std::string*)FoundVar.Var;
 			break;
 		default:
@@ -414,21 +414,21 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 		auto& FoundVar = ConVars[CommandVec[0]];
 		try
 		{
-			switch (FoundVar.Type)
+			switch (FoundVar.NativeType)
 			{
-			case Type::Float:
+			case NativeType::Float:
 				SafePtrAssign<float>(FoundVar.Var, std::stof(CommandVec[2]));
 				break;
-			case Type::Int:
+			case NativeType::Int:
 				SafePtrAssign<int>(FoundVar.Var, std::stoi(CommandVec[2]));
 				break;
-			case Type::Byte:
+			case NativeType::Byte:
 				SafePtrAssign<char>(FoundVar.Var, std::stoi(CommandVec[2]));
 				break;
-			case Type::Bool:
+			case NativeType::Bool:
 				SafePtrAssign<bool>(FoundVar.Var, std::stoi(CommandVec[2]));
 				break;
-			case Type::String:
+			case NativeType::String:
 				SafePtrAssign<std::string>(FoundVar.Var, CommandVec[2]);
 				break;
 			default:
@@ -437,7 +437,7 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 		}
 		catch (std::exception& e)
 		{
-			ConsoleLog("Invalid type. Expected " + Type::Types[FoundVar.Type] + " (" + std::string(e.what()) + ")", E_ERROR);
+			ConsoleLog("Invalid type. Expected " + NativeType::TypeStrings[FoundVar.NativeType] + " (" + std::string(e.what()) + ")", E_ERROR);
 			return false;
 		}
 		ConsoleLog("Assigned " + FoundVar.Name + " = " + CommandVec[2]);
@@ -459,21 +459,21 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 			{
 				continue;
 			}
-			switch (ConVars[i].Type)
+			switch (ConVars[i].NativeType)
 			{
-			case Type::Int:
+			case NativeType::Int:
 				i = std::to_string(*(int*)ConVars[i].Var);
 				break;
-			case Type::Byte:
+			case NativeType::Byte:
 				i = std::to_string(*(char*)ConVars[i].Var);
 				break;
-			case Type::Float:
+			case NativeType::Float:
 				i = std::to_string(*(int*)ConVars[i].Var);
 				break;
-			case Type::String:
+			case NativeType::String:
 				i = *(std::string*)ConVars[i].Var;
 				break;
-			case Type::Bool:
+			case NativeType::Bool:
 				i = std::to_string(*(bool*)ConVars[i].Var);
 				break;
 			default:
@@ -504,9 +504,9 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 				break;
 			}
 
-			if (IsTypeNumber(FoundCommand.Arguments[i].Type) && !IsTypeNumber(GetDataTypeFromString(CommandVec[i + 1])))
+			if (IsTypeNumber(FoundCommand.Arguments[i].NativeType) && !IsTypeNumber(GetDataTypeFromString(CommandVec[i + 1])))
 			{
-				ConsoleLog("Expected " + Type::Types[FoundCommand.Arguments[i].Type] + " for '" + FoundCommand.Arguments[i].Name + "', found string.", E_ERROR);
+				ConsoleLog("Expected " + NativeType::TypeStrings[FoundCommand.Arguments[i].NativeType] + " for '" + FoundCommand.Arguments[i].Name + "', found string.", E_ERROR);
 				PrintArguments(FoundCommand.Arguments, E_ERROR);
 				return false;
 			}
@@ -573,7 +573,7 @@ void Console::PrintArguments(std::vector<Command::Argument> args, ConsoleLogType
 	std::string PrintArgs = "Arguments are: ";
 	for (auto& i : args)
 	{
-		PrintArgs.append((i.Optional ? "(optional " : "(") + Type::Types[i.Type] + ") " + i.Name);
+		PrintArgs.append((i.Optional ? "(optional " : "(") + NativeType::TypeStrings[i.NativeType] + ") " + i.Name);
 		if (i.Name != args[args.size() - 1].Name)
 		{
 			PrintArgs.append(", ");
@@ -583,17 +583,17 @@ void Console::PrintArguments(std::vector<Command::Argument> args, ConsoleLogType
 }
 
 
-Console::Command::Argument::Argument(std::string Name, Type::TypeEnum Type, bool Optional)
+Console::Command::Argument::Argument(std::string Name, NativeType::NativeType NativeType, bool Optional)
 {
 	this->Name = Name;
-	this->Type = Type;
+	this->NativeType = NativeType;
 	this->Optional = Optional;
 }
 
-Console::Variable::Variable(std::string Name, Type::TypeEnum Type, void* Var, void(*OnSet)())
+Console::Variable::Variable(std::string Name, NativeType::NativeType NativeType, void* Var, void(*OnSet)())
 {
 	this->Name = Name;
-	this->Type = Type;
+	this->NativeType = NativeType;
 	this->Var = Var;
 	this->OnSet = OnSet;
 }

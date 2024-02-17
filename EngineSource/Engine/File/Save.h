@@ -10,11 +10,11 @@ struct SaveGame
 	SaveGame(std::string SaveName, std::string Extension = "save", bool InSaveFolder = true, bool ShouldSaveOnClose = true);
 	struct SaveProperty
 	{
-		SaveProperty(std::string Name, std::string Value, Type::TypeEnum Type);
+		SaveProperty(std::string Name, std::string Value, NativeType::NativeType NativeType);
 		SaveProperty() {}
 		std::string Name = "";
 		std::string Value = "";
-		Type::TypeEnum Type = Type::Null;
+		NativeType::NativeType NativeType = NativeType::Null;
 		auto operator<=>(SaveProperty const&) const = default;
 	};
 
@@ -22,7 +22,7 @@ struct SaveGame
 
 	void SetProperty(SaveProperty S);
 
-	SaveProperty GetPropertyOfType(std::string Name, Type::TypeEnum PropertyType) const;
+	SaveProperty GetPropertyOfType(std::string Name, NativeType::NativeType PropertyType) const;
 
 	int GetInt(std::string Name) const;
 	bool GetBool(std::string Name) const;

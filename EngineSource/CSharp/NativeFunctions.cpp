@@ -26,8 +26,10 @@
 #include <cstring>
 #include <Engine/Utility/StringUtility.h>
 #include "CSharpUICanvas.h"
+#include <Objects/Components/PhysicsComponent.h>
+#include <Math/Physics/Physics.h>
 
-char* CopyString(const char* s)
+static char* CopyString(const char* s)
 {
 	size_t len = 1 + strlen(s);
 	char* p = (char*)malloc(len);
@@ -87,6 +89,27 @@ namespace NativeFunctions
 		return Movement;
 	}
 
+	static PhysicsComponent* NewPhysicsComponent(WorldObject* Parent, Transform t, Physics::PhysicsBody::BodyType BodyType, Physics::MotionType Movability, Physics::Layer Layers)
+	{
+		PhysicsComponent* c = new PhysicsComponent();
+		switch (BodyType)
+		{
+		case Physics::PhysicsBody::BodyType::Box:
+			c->CreateBox(t, Movability, Layers);
+			break;
+		case Physics::PhysicsBody::BodyType::Sphere:
+			c->CreateSphere(t, Movability, Layers);
+			break;
+		case Physics::PhysicsBody::BodyType::Capsule:
+			c->CreateCapsule(t, Movability, Layers);
+			break;
+		default:
+			CSharp::CSharpLog("Invalid physics component type: " + std::to_string((int)BodyType), CSharp::CS_Log_Runtime, CSharp::CS_Log_Warn);
+			break;
+		}
+		return c;
+	}
+
 	static void MovementComponentJump(MoveComponent* Target)
 	{
 		Target->Jump();
@@ -100,16 +123,6 @@ namespace NativeFunctions
 	static void UseCamera(CameraComponent* Cam)
 	{
 		Cam->Use();
-	}
-
-	static Collision::HitResponse CollisionComponentOverlap(CollisionComponent** IgnoredComponents, int32_t IgnoredLength, CollisionComponent* Target)
-	{
-		std::set<CollisionComponent*> Ignored;
-		for (int32_t i = 0; i < IgnoredLength; i++)
-		{
-			Ignored.insert(IgnoredComponents[i]);
-		}
-		return Target->OverlapCheck(Ignored);
 	}
 
 	static void DestroyComponent(Component* c, WorldObject* Parent)
@@ -180,10 +193,14 @@ namespace NativeFunctions
 		delete s;
 	}
 
-	static Collision::HitResponse NativeRaycast(Vector3 Start, Vector3 End, WorldObject* ObjectsToIgnore)
+	static Collision::HitResponse NativeRaycast(Vector3 Start, Vector3 End, WorldObject** IgnoredObjects, int32_t IgnoredLength)
 	{
-		auto hit = Collision::LineTrace(Start, End, { ObjectsToIgnore });
-		return hit;
+		std::set<WorldObject*> Ignored;
+		for (int32_t i = 0; i < IgnoredLength; i++)
+		{
+			Ignored.insert(IgnoredObjects[i]);
+		}
+		return Collision::LineTrace(Start, End, Ignored);
 	}
 
 	static bool CallConsoleCommand(const char* cmd)
@@ -439,7 +456,7 @@ namespace NativeFunctions
 		return Input::Gamepad();
 	}
 
-	static Type::TypeEnum GetObjectPropertyType(WorldObject* Obj, const char* Property)
+	static NativeType::NativeType GetObjectPropertyType(WorldObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
 		{
@@ -447,17 +464,17 @@ namespace NativeFunctions
 			StrUtil::ReplaceChar(Name, '\n', "");
 			if (Name == Property)
 			{
-				return i.Type;
+				return i.NativeType;
 			}
 		}
-		return Type::Null;
+		return NativeType::Null;
 	}
 
 	static const char* GetObjectPropertyString(WorldObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
 		{
-			if (i.Type != Type::String)
+			if (i.NativeType != NativeType::String)
 			{
 				continue;
 			}
@@ -476,7 +493,7 @@ namespace NativeFunctions
 	{
 		for (auto& i : Obj->Properties)
 		{
-			if (i.Type != Type::Int)
+			if (i.NativeType != NativeType::Int)
 			{
 				continue;
 			}
@@ -495,7 +512,7 @@ namespace NativeFunctions
 	{
 		for (auto& i : Obj->Properties)
 		{
-			if (i.Type != Type::Bool)
+			if (i.NativeType != NativeType::Bool)
 			{
 				continue;
 			}
@@ -514,7 +531,7 @@ namespace NativeFunctions
 	{
 		for (auto& i : Obj->Properties)
 		{
-			if (i.Type != Type::Vector3)
+			if (i.NativeType != NativeType::Vector3)
 			{
 				continue;
 			}
@@ -533,7 +550,7 @@ namespace NativeFunctions
 	{
 		for (auto& i : Obj->Properties)
 		{
-			if (i.Type != Type::Float)
+			if (i.NativeType != NativeType::Float)
 			{
 				continue;
 			}
@@ -579,7 +596,6 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(GetComponentTransform);
 
 	REGISTER_FUNCTION(UseCamera);
-	REGISTER_FUNCTION(CollisionComponentOverlap);
 	REGISTER_FUNCTION(MovementComponentAddMovementInput);
 	REGISTER_FUNCTION(MovementComponentJump);
 	 

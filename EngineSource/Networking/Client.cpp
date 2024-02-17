@@ -226,17 +226,17 @@ bool Client::HandleValueUpdate(uint64_t ObjNetID, std::string Name, std::string 
 			continue;
 		}
 
-		switch (i.Type)
+		switch (i.NativeType)
 		{
-		case Type::Int:
+		case NativeType::Int:
 			*(int*)i.Data = std::stoi(Value);
 			break;
-		case Type::Float:
+		case NativeType::Float:
 			*(float*)i.Data = std::stof(Value);
 			break;
-		case Type::Vector3:
-		case Type::Vector3Color:
-		case Type::Vector3Rotation:
+		case NativeType::Vector3:
+		case NativeType::Vector3Color:
+		case NativeType::Vector3Rotation:
 			*(Vector3*)i.Data = Vector3::FromString(Value);
 			break;
 		default:

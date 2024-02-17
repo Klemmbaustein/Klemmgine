@@ -21,13 +21,13 @@
 struct Uniform
 {
 	std::string Name;
-	int Type;
+	int NativeType;
 	void* Content;
-	Uniform(std::string Name, int Type, void* Content)
+	Uniform(std::string Name, int NativeType, void* Content)
 	{
 		this->Content = Content;
 		this->Name = Name;
-		this->Type = Type;
+		this->NativeType = NativeType;
 	}
 };
 

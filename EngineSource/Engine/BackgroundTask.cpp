@@ -12,7 +12,7 @@ std::vector<BackgroundTask*> BackgroundTask::AllTasks;
 BackgroundTask::BackgroundTask(void(*Function)(), void(*Callback)())
 {
 	// Using a pointer as an ID. Why not?
-	Type = (size_t)Function;
+	NativeType = (size_t)Function;
 	AllTasks.push_back(this);
 	this->Callback = Callback;
 
@@ -48,7 +48,7 @@ bool BackgroundTask::IsFunctionRunningAsTask(void(*Function)())
 {
 	for (auto& i : AllTasks)
 	{
-		if (i->Type == (size_t)Function)
+		if (i->NativeType == (size_t)Function)
 		{
 			return true;
 		}

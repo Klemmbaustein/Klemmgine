@@ -13,13 +13,13 @@ struct ObjectRenderContext
 	struct Uniform
 	{
 		std::string Name;
-		Type::TypeEnum Type;
+		NativeType::NativeType NativeType;
 		void* Content;
-		Uniform(std::string Name, Type::TypeEnum Type, void* Content)
+		Uniform(std::string Name, NativeType::NativeType NativeType, void* Content)
 		{
 			this->Content = Content;
 			this->Name = Name;
-			this->Type = Type;
+			this->NativeType = NativeType;
 		}
 	};
 

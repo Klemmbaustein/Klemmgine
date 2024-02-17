@@ -8,6 +8,9 @@
 - Removed most of the old collision system.
 - Completely rewrote MoveComponent.
 
+### Fixes
+- Fixed an issue where release builds on linux would fail to load any C# assembly.
+
 ## Version 1.8.2
 
 ### Fixes

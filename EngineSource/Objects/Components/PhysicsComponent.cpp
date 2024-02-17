@@ -1,6 +1,5 @@
 #include "PhysicsComponent.h"
 #include <Math/Physics/Physics.h>
-#include <Engine/Log.h>
 
 void PhysicsComponent::Begin()
 {
@@ -128,10 +127,33 @@ void PhysicsComponent::SetScale(Vector3 NewScale)
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 
 	Vector3 ScaleDifference = NewScale / Body->GetTransform().Scale;
-	Log::Print(ScaleDifference);
 	if (ScaleDifference != Vector3(1))
 	{
 		Body->Scale(ScaleDifference);
 	}
 
+}
+
+Vector3 PhysicsComponent::GetVelocity()
+{
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	return Body->GetVelocity();
+}
+
+Vector3 PhysicsComponent::GetAngularVelocity()
+{
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	return Body->GetAngularVelocity();
+}
+
+void PhysicsComponent::SetVelocity(Vector3 NewVelocity)
+{
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	Body->SetVelocity(NewVelocity);
+}
+
+void PhysicsComponent::SetAngularVelocity(Vector3 NewVelocity)
+{
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	Body->SetAngularVelocity(NewVelocity);
 }

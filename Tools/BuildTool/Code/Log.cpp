@@ -38,15 +38,15 @@ bool Log::GetIsVerbose()
 	return IsVerbose;
 }
 
-void Log::Print(std::string Message, MessageType Type, std::string LogClass)
+void Log::Print(std::string Message, MessageType NativeType, std::string LogClass)
 {
 	if (LogClass.empty())
 	{
-		LogClass = MessageTypeStrings[(int)Type];
+		LogClass = MessageTypeStrings[(int)NativeType];
 	}
-	SetConsoleTextAttribute(hConsole, MessageTypeMinorColors[(int)Type]);
+	SetConsoleTextAttribute(hConsole, MessageTypeMinorColors[(int)NativeType]);
 	std::cout << LogClass;
-	SetConsoleTextAttribute(hConsole, MessageTypeMajorColors[(int)Type]);
+	SetConsoleTextAttribute(hConsole, MessageTypeMajorColors[(int)NativeType]);
 	std::cout << ": " << Message << std::endl;
 	SetConsoleTextAttribute(hConsole, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED);
 }
@@ -60,11 +60,11 @@ void Log::PrintVerbose(std::string Message)
 }
 #elif __linux__
 
-void Log::Print(std::string Message, MessageType Type, std::string LogClass)
+void Log::Print(std::string Message, MessageType NativeType, std::string LogClass)
 {
 	if (LogClass.empty())
 	{
-		LogClass = MessageTypeStrings[(int)Type];
+		LogClass = MessageTypeStrings[(int)NativeType];
 	}
 	std::cout << LogClass;
 	std::cout << ": " << Message << std::endl;

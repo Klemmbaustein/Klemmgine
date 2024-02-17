@@ -13,7 +13,6 @@
 class CollisionComponent : public Component
 {
 public:
-	Collision::HitResponse OverlapCheck(std::set<CollisionComponent*> MeshesToIgnore = {});
 	CollisionComponent() {}
 	virtual void Destroy() override;
 	void Update() override;

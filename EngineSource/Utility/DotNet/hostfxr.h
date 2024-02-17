@@ -255,7 +255,7 @@ typedef int32_t(HOSTFXR_CALLTYPE *hostfxr_run_app_fn)(const hostfxr_handle host_
 //     host_context_handle
 //       Handle to the initialized host context
 //     type
-//       Type of runtime delegate requested
+//       NativeType of runtime delegate requested
 //     delegate
 //       An out parameter that will be assigned the delegate.
 //

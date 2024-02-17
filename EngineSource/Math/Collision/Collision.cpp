@@ -13,11 +13,11 @@ bool Collision::IsPointIn3DBox(Box a, Vector3 p)
 		(a.minY <= p.Y && a.maxY >= p.Y) &&
 		(a.minZ <= p.Z && a.maxZ >= p.Z);
 }
-Collision::HitResponse Collision::LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<WorldObject*> ObjectsToIgnore, std::set<CollisionComponent*> MeshesToIgnore)
+Collision::HitResponse Collision::LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<WorldObject*> ObjectsToIgnore)
 {
 	HitResponse Result;
 
-	auto Hit = Physics::RayCast(RayStart, RayEnd);
+	auto Hit = Physics::RayCast(RayStart, RayEnd, Physics::Layer::Static, ObjectsToIgnore);
 
 	Result.Hit = Hit.Hit;
 	Result.HitComponent = Hit.HitComponent;

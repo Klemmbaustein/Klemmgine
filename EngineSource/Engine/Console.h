@@ -19,8 +19,8 @@ namespace Console
 		// If OnSet == nullptr/NULL, OnSet will be ignored.
 		void(*OnSet)() = nullptr;
 		void* Var = nullptr;
-		Type::TypeEnum Type = Type::Int;
-		Variable(std::string Name, Type::TypeEnum Type, void* Var, void (*OnSet)());
+		NativeType::NativeType NativeType = NativeType::Int;
+		Variable(std::string Name, NativeType::NativeType NativeType, void* Var, void (*OnSet)());
 		Variable() {}
 	};
 
@@ -31,9 +31,9 @@ namespace Console
 		void(*Function)() = nullptr;
 		struct Argument
 		{
-			Argument(std::string Name, Type::TypeEnum Type, bool Optional = false);
+			Argument(std::string Name, NativeType::NativeType NativeType, bool Optional = false);
 			std::string Name;
-			Type::TypeEnum Type;
+			NativeType::NativeType NativeType;
 			bool Optional;
 		};
 		std::vector<Argument> Arguments;

@@ -76,7 +76,7 @@ void SSAO::Init()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssaoColorBuffer, 0);
 	AOShader = new Shader("Shaders/Internal/postprocess.vert", "Shaders/Internal/ssao.frag");
-	Console::RegisterConVar(Console::Variable("ssao", Type::Bool, &Graphics::SSAO, nullptr));
+	Console::RegisterConVar(Console::Variable("ssao", NativeType::Bool, &Graphics::SSAO, nullptr));
 }
 
 unsigned int SSAO::Render(unsigned int NormalBuffer, unsigned int PositionBuffer)

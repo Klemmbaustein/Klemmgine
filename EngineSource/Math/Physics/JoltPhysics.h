@@ -37,5 +37,5 @@ namespace JoltPhysics
 
 	std::vector<Physics::HitResult> CollisionTest(Physics::PhysicsBody* Body);
 	std::vector<Physics::HitResult> ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos);
-	Physics::HitResult LineCast(Vector3 Start, Vector3 End);
+	Physics::HitResult LineCast(Vector3 Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
 }

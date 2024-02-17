@@ -28,7 +28,7 @@ struct Shader
 	void SetMat4(std::string Field, glm::mat4 Value);
 
 private:
-	unsigned int Compile(std::string ShaderCode, unsigned int Type);
+	unsigned int Compile(std::string ShaderCode, unsigned int NativeType);
 	std::string parse(const char* Filename);
 	unsigned int CreateShader(const char* VertexShader, const char* FragmentShader, const char* GeometryShader);
 	void checkCompileErrors(unsigned int shader, std::string type, std::string ShaderName);

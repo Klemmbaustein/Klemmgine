@@ -216,8 +216,8 @@ namespace Sound
 					return;
 				}
 				Console::ConsoleLog("Sound " + Console::CommandArgs()[0] + " doesn't exist!", Console::E_ERROR);
-			}, {Console::Command::Argument("sound", Type::String)}));
-		Console::RegisterConVar(Console::Variable("soundvolume", Type::Float, &MasterVolume, nullptr));
+			}, {Console::Command::Argument("sound", NativeType::String)}));
+		Console::RegisterConVar(Console::Variable("soundvolume", NativeType::Float, &MasterVolume, nullptr));
 #endif
 	}
 	void End()

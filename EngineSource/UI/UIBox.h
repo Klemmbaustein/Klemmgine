@@ -276,7 +276,7 @@ public:
 	 * A pointer to this %UIBox.
 	 */
 
-	UIBox* SetBorder(UIBox::BorderType Type, float Size);
+	UIBox* SetBorder(UIBox::BorderType NativeType, float Size);
 	static void ForceUpdateUI();
 	static void InitUI();
 	static unsigned int* GetUITextures();

@@ -19,10 +19,10 @@ class ParticleEditorTab : public EditorTab
 	struct ParticleParam
 	{
 		void* ValuePointer;
-		Type::TypeEnum ParamType;
+		NativeType::NativeType ParamType;
 		std::string Name;
 
-		ParticleParam(void* ValuePointer, Type::TypeEnum ParamType, std::string Name);
+		ParticleParam(void* ValuePointer, NativeType::NativeType ParamType, std::string Name);
 	};
 	UIBackground* PreviewBackground = nullptr;
 	UIScrollBox* ChildBox = nullptr;

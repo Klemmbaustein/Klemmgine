@@ -23,13 +23,13 @@ public:
 	struct ContextMenuSection
 	{
 		void* Variable;
-		Type::TypeEnum Type;
+		NativeType::NativeType NativeType;
 		std::string Name;
 		bool Normalized;
-		ContextMenuSection(void* Variable, Type::TypeEnum Type, std::string Name, bool Normalized = false)
+		ContextMenuSection(void* Variable, NativeType::NativeType NativeType, std::string Name, bool Normalized = false)
 		{
 			this->Variable = Variable;
-			this->Type = Type;
+			this->NativeType = NativeType;
 			this->Name = Name;
 			this->Normalized = Normalized;
 		}

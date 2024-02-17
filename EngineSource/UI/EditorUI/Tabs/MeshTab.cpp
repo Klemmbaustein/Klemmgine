@@ -18,12 +18,12 @@ namespace MaterialTemplates
 	struct TemplateParam
 	{
 		std::string UniformName;
-		int Type;
+		int NativeType;
 		std::string Value;
-		TemplateParam(std::string UniformName, int Type, std::string Value)
+		TemplateParam(std::string UniformName, int NativeType, std::string Value)
 		{
 			this->UniformName = UniformName;
-			this->Type = Type;
+			this->NativeType = NativeType;
 			this->Value = Value;
 		}
 	};

@@ -100,20 +100,20 @@ void ObjectRenderContext::BindWithShader(Shader* s)
 		{
 			continue;
 		}
-		switch (Uniforms.at(i).Type)
+		switch (Uniforms.at(i).NativeType)
 		{
-		case Type::Bool:
-		case Type::Int:
+		case NativeType::Bool:
+		case NativeType::Int:
 			s->SetInt(Uniforms.at(i).Name, *static_cast<int*>(Uniforms.at(i).Content));
 			break;
-		case Type::Float:
+		case NativeType::Float:
 			s->SetFloat(Uniforms.at(i).Name, *static_cast<float*>(Uniforms.at(i).Content));
 			break;
-		case Type::Vector3Color:
-		case Type::Vector3:
+		case NativeType::Vector3Color:
+		case NativeType::Vector3:
 			s->SetVector3(Uniforms.at(i).Name, *static_cast<Vector3*>(Uniforms.at(i).Content));
 			break;
-		case Type::GL_Texture:
+		case NativeType::GL_Texture:
 			glActiveTexture(GL_TEXTURE7 + TexIterator);
 			glBindTexture(GL_TEXTURE_2D, *(unsigned int*)Uniforms.at(i).Content);
 			glUniform1i(glGetUniformLocation(s->GetShaderID(), Uniforms.at(i).Name.c_str()), 7 + TexIterator);
@@ -140,24 +140,24 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 	size_t UniformIndex = SIZE_MAX;
 	for (size_t i = 0; i < Uniforms.size(); i++)
 	{
-		if (Uniforms[i].Type == u.Type && Uniforms[i].Name == u.UniformName)
+		if (Uniforms[i].NativeType == u.NativeType && Uniforms[i].Name == u.UniformName)
 		{
 			UniformIndex = i;
-			switch (u.Type)
+			switch (u.NativeType)
 			{
-			case Type::Int:
-			case Type::Bool:
+			case NativeType::Int:
+			case NativeType::Bool:
 				delete (int*)Uniforms[i].Content;
 				break;
-			case Type::Vector3Color:
-			case Type::Vector3Rotation:
-			case Type::Vector3:
+			case NativeType::Vector3Color:
+			case NativeType::Vector3Rotation:
+			case NativeType::Vector3:
 				delete (Vector3*)Uniforms[i].Content;
 				break;
-			case Type::Float:
+			case NativeType::Float:
 				delete (float*)Uniforms[UniformIndex].Content;
 				break;
-			case Type::GL_Texture:
+			case NativeType::GL_Texture:
 				delete (unsigned int*)Uniforms[i].Content;
 				break;
 			default:
@@ -169,27 +169,27 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 
 	if (UniformIndex == SIZE_MAX)
 	{
-		Uniforms.push_back(Uniform(u.UniformName, u.Type, nullptr));
+		Uniforms.push_back(Uniform(u.UniformName, u.NativeType, nullptr));
 		UniformIndex = Uniforms.size() - 1;
 	}
 
 	try
 	{
-		switch (u.Type)
+		switch (u.NativeType)
 		{
-		case Type::Int:
-		case Type::Bool:
+		case NativeType::Int:
+		case NativeType::Bool:
 			Uniforms[UniformIndex].Content = new int(std::stoi(u.Value));
 			break;
-		case Type::Float:
+		case NativeType::Float:
 			Uniforms[UniformIndex].Content = new float(std::stof(u.Value));
 			break;
-		case Type::Vector3Color:
-		case Type::Vector3Rotation:
-		case Type::Vector3:
+		case NativeType::Vector3Color:
+		case NativeType::Vector3Rotation:
+		case NativeType::Vector3:
 			Uniforms[UniformIndex].Content = new Vector3(Vector3::FromString(u.Value));
 			break;
-		case Type::GL_Texture:
+		case NativeType::GL_Texture:
 		{
 			Texture::TextureInfo TextureInfo = Texture::ParseTextureInfoString(u.Value);
 			unsigned int LoadedTexture = Texture::LoadTexture(TextureInfo);
@@ -210,20 +210,20 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 	catch (std::exception& e)
 	{
 		Log::Print(e.what(), Log::LogColor::Yellow);
-		switch (u.Type)
+		switch (u.NativeType)
 		{
-		case Type::Int:
-		case Type::Bool:
+		case NativeType::Int:
+		case NativeType::Bool:
 			Uniforms[UniformIndex].Content = new int(0);
 			break;
-		case Type::Float:
+		case NativeType::Float:
 			Uniforms[UniformIndex].Content = new float(0);
 			break;
-		case Type::Vector3Color:
-		case Type::Vector3:
+		case NativeType::Vector3Color:
+		case NativeType::Vector3:
 			Uniforms[UniformIndex].Content = new Vector3();
 			break;
-		case Type::GL_Texture:
+		case NativeType::GL_Texture:
 			Uniforms[UniformIndex].Content = new unsigned int(0);
 			break;
 		default:
@@ -242,20 +242,20 @@ void ObjectRenderContext::Unload()
 		{
 			continue;
 		}
-		switch (u.Type)
+		switch (u.NativeType)
 		{
-		case Type::Int:
-		case Type::Bool:
+		case NativeType::Int:
+		case NativeType::Bool:
 			delete reinterpret_cast<int*>(u.Content);
 			break;
-		case Type::Float:
+		case NativeType::Float:
 			delete reinterpret_cast<float*>(u.Content);
 			break;
-		case Type::Vector3:
-		case Type::Vector3Color:
+		case NativeType::Vector3:
+		case NativeType::Vector3Color:
 			delete reinterpret_cast<Vector3*>(u.Content);
 			break;
-		case Type::GL_Texture:
+		case NativeType::GL_Texture:
 			delete reinterpret_cast<unsigned int*>(u.Content);
 			break;
 		default:

@@ -196,7 +196,6 @@ namespace CSharp
 			string_t(NetPath.begin(), NetPath.end()).c_str()
 		};
 
-		Log::Print(config_path);
 		int rc = init_fptr(config_path, &parameters, &cxt);
 #else
 		int rc = init_fptr(config_path, nullptr, &cxt);
@@ -335,9 +334,9 @@ bool CSharp::IsAssemblyLoaded()
 	return hostfxr_lib;
 }
 
-void CSharp::CSharpLog(std::string Msg, CSharpLogType Type, CSharpLogSev Severity)
+void CSharp::CSharpLog(std::string Msg, CSharpLogType NativeType, CSharpLogSev Severity)
 {
-	Log::PrintMultiLine(Msg, CSharpLogColors[Severity], "[C#]: [" + CSharpLogTypes[Type] + "]: ");
+	Log::PrintMultiLine(Msg, CSharpLogColors[Severity], "[C#]: [" + CSharpLogTypes[NativeType] + "]: ");
 }
 
 void CSharp::RegisterNativeFunction(std::string Name, void* Function)

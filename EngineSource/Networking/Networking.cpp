@@ -221,7 +221,7 @@ void Networking::Init()
 			}
 
 			Client::ConnectToServer(Console::CommandArgs()[0], Port);
-		}, {Console::Command::Argument("address", Type::String), Console::Command::Argument("port", Type::Int, true) }));
+		}, {Console::Command::Argument("address", NativeType::String), Console::Command::Argument("port", NativeType::Int, true) }));
 #endif
 
 #if !SERVER
@@ -233,7 +233,7 @@ void Networking::Init()
 	Console::RegisterCommand(Console::Command("disconnect", []()
 		{
 			Server::DisconnectPlayer(std::stoi(Console::CommandArgs()[0]));
-		}, { Console::Command::Argument("player_uid", Type::Int) }));
+		}, { Console::Command::Argument("player_uid", NativeType::Int) }));
 #endif
 #if SERVER
 	Server::Init();

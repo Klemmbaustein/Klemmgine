@@ -8,28 +8,17 @@
 
 /**
 * @brief
-* Namespace containing information about types.
+* Namespace containing information about native types.
 */
-namespace Type
+namespace NativeType
 {
-	inline const std::vector<std::string> Types =
-	{
-		"vector3",
-		"float",
-		"int",
-		"string",
-		"color",
-		"texture",
-		"byte",
-		"bool",
-		"rotation",
-	};
+	extern std::vector<std::string> TypeStrings;
 
 	/**
 	* @brief
 	* enum containing possible types.
 	*/
-	enum TypeEnum
+	enum NativeType
 	{
 		/// No type.
 		Null = -1,

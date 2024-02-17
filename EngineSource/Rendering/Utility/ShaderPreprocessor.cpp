@@ -24,13 +24,13 @@ namespace Preprocessor
 		return "\n";
 	}
 
-	std::map<std::string, Type::TypeEnum> GLSLTypes =
+	std::map<std::string, NativeType::NativeType> GLSLTypes =
 	{
-		std::pair("int", Type::Int),
-		std::pair("vec3", Type::Vector3),
-		std::pair("float", Type::Float),
-		std::pair("sampler2D", Type::GL_Texture),
-		std::pair("bool", Type::Bool),
+		std::pair("int", NativeType::Int),
+		std::pair("vec3", NativeType::Vector3),
+		std::pair("float", NativeType::Float),
+		std::pair("sampler2D", NativeType::GL_Texture),
+		std::pair("bool", NativeType::Bool),
 	};
 }
 
@@ -107,14 +107,14 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 				Log::Print("--------------------------------------------------------------------------------", Log::LogColor::Red);
 				Log::Print("ShaderParseError: expected a valid type.", Log::LogColor::Red);
 				Log::Print(Line + std::string(" <--"), Log::LogColor::Red);
-				Log::Print("Possible Types: ", Log::LogColor::Red);
+				Log::Print("Possible TypeStrings: ", Log::LogColor::Red);
 				for (auto& i : GLSLTypes)
 				{
 					Log::Print("    " + i.first, Log::LogColor::Red);
 				}
 				throw "ShaderParseError";
 			}
-			Type::TypeEnum ParamType = GLSLTypes[NextWord];
+			NativeType::NativeType ParamType = GLSLTypes[NextWord];
 			//Params.push_back(Material::Param(CurrentLine.str(), ));
 			std::string Name;
 			CurrentLine >> Name;
@@ -126,7 +126,7 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 			{
 				switch (ParamType)
 				{
-				case Type::Vector3:
+				case NativeType::Vector3:
 				{
 					// xy = vec3(1, 2, 3);
 					LineString = LineString.substr(LineString.find_first_of("=") + 1);
@@ -168,17 +168,17 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 
 				}
 					break;
-				case Type::Float:
-				case Type::Int:
+				case NativeType::Float:
+				case NativeType::Int:
 				{
 					CurrentLine >> Default;
 					StrUtil::ReplaceChar(Default, ';', "");
 				}
 					break;
-				case Type::GL_Texture:
+				case NativeType::GL_Texture:
 					Default.clear();
 					break;
-				case Type::Bool:
+				case NativeType::Bool:
 				{
 					CurrentLine >> Default;
 					StrUtil::ReplaceChar(Default, ';', "");

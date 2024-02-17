@@ -62,7 +62,7 @@ namespace Engine
 	 * @brief
 	 * Contains functions related to the engine console.
 	 * 
-	 * Equivalent to Console:: namespace in <Engine/Console.h>. It needed to be
+	 * Equivalent to Console namespace in <Engine/Console.h>. It needed to be
 	 * renamed because it's original name conflicted with the System.Console namespace.
 	 */
 	public static class Command
@@ -81,19 +81,58 @@ namespace Engine
 
 	public static class Collision
 	{
-		private delegate HitResponse LineTraceDelegate(Vector3 Start, Vector3 End, IntPtr This);
+		private delegate HitResponse LineTraceDelegate(Vector3 Start,
+			Vector3 End,
+			[MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] IntPtr[] ComponentsToIgnore,
+			int Length);
 
+		enum Layer : UInt16
+		{
+			/// No layer.
+			None = 0b00000000,
+			/// Collide with everything else on this layer.
+			Layer0 = 0b00000001,
+			/// Collide with everything else on this layer.
+			Layer1 = 0b00000010,
+			/// Collide with everything else on this layer.
+			Layer2 = 0b00000100,
+			/// Collide with everything else on this layer.
+			Layer3 = 0b00001000,
+			/// Collide with everything else on this layer.
+			Layer4 = 0b00010000,
+			/// @todo Implement or replace with another "Layer" collision type.
+			Trigger = 0b00100000,
+			/// Will collide with everything.
+			Static = 0b01000000,
+			/// Will only collide with static objects.
+			Dynamic = 0b10000000
+
+		}
+
+		/**
+		 * @brief
+		 * A struct containing information about a collision hit.
+		 */
 		[StructLayout(LayoutKind.Sequential)]
 		public struct HitResponse
 		{
+			/// True if the collision check hit something, false if not.
 			[MarshalAs(UnmanagedType.U1)]
 			public bool Hit;
+			/// The point where the collision check hit something.
 			public Vector3 ImpactPoint;
-			public float t;
+			/// The depth of the collision.
+			public float Depth;
+			/// The distance the collision ray has traveled, from 0 - 1. If the collision is not a RayCast or ShapeCast, this can be ignored.
+			public float Distance;
+			/// The object that was hit.
 			private IntPtr HitObject;
+			/// The component that was hit.
 			private IntPtr HitComponent;
+			/// The normal vector of the collision.
 			public Vector3 Normal;
 
+			/// Gets the object that was hit, in the form of a C# object class..
 			public readonly WorldObject GetHitObject()
 			{
 				if (!Hit)
@@ -104,9 +143,35 @@ namespace Engine
 			}
 		}
 
-		public static HitResponse LineTrace(Vector3 Start, Vector3 End, WorldObject This)
+		/**
+		 * @brief
+		 * Casts a ray from Start to End.
+		 * 
+		 * @param Start
+		 * The start position of the ray.
+		 * @param End
+		 * The end positionof the ray.
+		 * @param ObjectsToIgnore
+		 * Colliders that belong to these objects should be ignored.
+		 */
+		public static HitResponse RayCast(Vector3 Start, Vector3 End, WorldObject[] ObjectsToIgnore = null)
 		{
-			return (HitResponse)NativeFunction.CallNativeFunction("NativeRaycast", typeof(LineTraceDelegate), new object[] { Start, End, This.NativePtr });
+			IntPtr[] ComponentPtrs;
+			if (ObjectsToIgnore == null)
+			{
+				ComponentPtrs = [];
+			}
+			else
+			{
+				ComponentPtrs = new IntPtr[ObjectsToIgnore.Length];
+
+				for (int i = 0; i < ObjectsToIgnore.Length; i++)
+				{
+					ComponentPtrs[i] = ObjectsToIgnore[i].NativePtr;
+				}
+			}
+
+			return (HitResponse)NativeFunction.CallNativeFunction("NativeRaycast", typeof(LineTraceDelegate), [ Start, End, ComponentPtrs, ComponentPtrs.Length ]);
 		}
 	}
 

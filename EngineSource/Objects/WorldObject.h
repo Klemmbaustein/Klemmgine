@@ -35,7 +35,7 @@ NetEvent e;\
 e.Name = # InFunction;\
 e.Function = static_cast<NetEvent::NetEventFunction>(& InFunction);\
 e.Parent = this;\
-e.Type = InType;\
+e.NativeType = InType;\
 this->NetEvents.push_back(e);\
 } while (0)
 
@@ -115,23 +115,23 @@ public:
 			Clients
 		};
 
-		EventType Type;
+		EventType NativeType;
 		
 		void Invoke(std::vector<std::string> Arguments) const;
 	};
 
 	struct Property
 	{
-		Property(std::string Name, Type::TypeEnum Type, void* Data)
+		Property(std::string Name, NativeType::NativeType NativeType, void* Data)
 		{
 			this->Name = Name;
-			this->Type = Type;
+			this->NativeType = NativeType;
 			this->Data = Data;
 		}
-		Property(std::string Name, int Type, void* Data)
+		Property(std::string Name, int NativeType, void* Data)
 		{
 			this->Name = Name;
-			this->Type = (Type::TypeEnum)Type;
+			this->NativeType = (NativeType::NativeType)NativeType;
 			this->Data = Data;
 		}
 		Property()
@@ -141,7 +141,7 @@ public:
 
 		std::string Name;
 		std::string ValueString;
-		Type::TypeEnum Type = Type::Null;
+		NativeType::NativeType NativeType = NativeType::Null;
 		void* Data = nullptr;
 		enum class PropertyType
 		{

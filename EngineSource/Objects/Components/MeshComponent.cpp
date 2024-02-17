@@ -78,10 +78,10 @@ FrustumCulling::AABB MeshComponent::GetBoundingBox()
 	return FrustumCulling::AABB(glm::vec3(0), glm::vec3(0));
 }
 
-void MeshComponent::SetUniform(std::string Name, Type::TypeEnum Type, std::string Content, uint8_t MeshSection)
+void MeshComponent::SetUniform(std::string Name, NativeType::NativeType NativeType, std::string Content, uint8_t MeshSection)
 {
 #if !SERVER
-	MeshModel->SetUniform(Material::Param(Name, Type, Content), MeshSection);
+	MeshModel->SetUniform(Material::Param(Name, NativeType, Content), MeshSection);
 #endif
 }
 

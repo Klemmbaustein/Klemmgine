@@ -22,6 +22,7 @@
     <ClCompile Include="CSharp\CSharpUICanvas.cpp" />
     <ClCompile Include="Engine\BackgroundTask.cpp" />
     <ClCompile Include="Engine\Gamepad.cpp" />
+    <ClCompile Include="Engine\TypeEnum.cpp" />
     <ClCompile Include="Math\Physics\JoltPhysics.cpp" />
     <ClCompile Include="Math\Physics\Physics.cpp" />
     <ClCompile Include="Objects\Components\PhysicsComponent.cpp" />

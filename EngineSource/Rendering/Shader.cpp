@@ -68,9 +68,9 @@ void Shader::SetMat4(std::string Field, glm::mat4 Value)
 	glUniformMatrix4fv(glGetUniformLocation(ShaderID, Field.c_str()), 1, GL_FALSE, &Value[0][0]);
 }
 
-GLuint Shader::Compile(std::string ShaderCode, unsigned int Type)
+GLuint Shader::Compile(std::string ShaderCode, unsigned int NativeType)
 {
-	GLuint id = glCreateShader(Type);
+	GLuint id = glCreateShader(NativeType);
 	const char* src = ShaderCode.c_str();
 	glShaderSource(id, 1, &src, 0);
 

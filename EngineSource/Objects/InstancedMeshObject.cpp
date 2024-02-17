@@ -48,11 +48,11 @@ void InstancedMeshObject::Update()
 
 void InstancedMeshObject::Begin()
 {
-	AddEditorProperty(Property("Mesh", Type::String, &Filename));
-	AddEditorProperty(Property("NumInstances", Type::Int, &Amount));
-	AddEditorProperty(Property("Range", Type::Int, &Range));
-	AddEditorProperty(Property("Component Name", Type::String, &ComponentName));
-	AddEditorProperty(Property("Scale", Type::Vector3, &Scale));
+	AddEditorProperty(Property("Mesh", NativeType::String, &Filename));
+	AddEditorProperty(Property("NumInstances", NativeType::Int, &Amount));
+	AddEditorProperty(Property("Range", NativeType::Int, &Range));
+	AddEditorProperty(Property("Component Name", NativeType::String, &ComponentName));
+	AddEditorProperty(Property("Scale", NativeType::Vector3, &Scale));
 
 	IMComponent = nullptr;
 

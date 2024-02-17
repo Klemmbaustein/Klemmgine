@@ -72,14 +72,14 @@ SaveGame::SaveGame(std::string SaveName, std::string Extension, bool InSaveFolde
 				switch (ReadingState++)
 				{
 				case 0:
-					for (size_t i = 0; i < Type::Types.size(); i++)
+					for (size_t i = 0; i < NativeType::TypeStrings.size(); i++)
 					{
-						if (Type::Types[i] == NewLine)
+						if (NativeType::TypeStrings[i] == NewLine)
 						{
-							NewProperty.Type = (Type::TypeEnum)i;
+							NewProperty.NativeType = (NativeType::NativeType)i;
 						}
 					}
-					if (NewProperty.Type == Type::Null)
+					if (NewProperty.NativeType == NativeType::Null)
 					{
 						CurrentLine.pop_back();
 						Log::PrintMultiLine("Loading error: expected a valid type:\n"
@@ -210,12 +210,12 @@ void SaveGame::SetProperty(SaveProperty S)
 	}
 }
 
-SaveGame::SaveProperty SaveGame::GetPropertyOfType(std::string Name, Type::TypeEnum PropertyType) const
+SaveGame::SaveProperty SaveGame::GetPropertyOfType(std::string Name, NativeType::NativeType PropertyType) const
 {
 	auto P = GetProperty(Name);
-	if (P.Type != PropertyType)
+	if (P.NativeType != PropertyType)
 	{
-		Log::Print("Incorrect property - Expected " + Type::Types[PropertyType] + ", found: " + Type::Types[P.Type], Log::LogColor::Red);
+		Log::Print("Incorrect property - Expected " + NativeType::TypeStrings[PropertyType] + ", found: " + NativeType::TypeStrings[P.NativeType], Log::LogColor::Red);
 	}
 	return P;
 }
@@ -224,7 +224,7 @@ int SaveGame::GetInt(std::string Name) const
 {
 	try
 	{
-		return std::stoi(GetPropertyOfType(Name, Type::Int).Value);
+		return std::stoi(GetPropertyOfType(Name, NativeType::Int).Value);
 	}
 	catch (std::exception&)
 	{
@@ -236,7 +236,7 @@ bool SaveGame::GetBool(std::string Name) const
 {
 	try
 	{
-		return std::stoi(GetPropertyOfType(Name, Type::Bool).Value);
+		return std::stoi(GetPropertyOfType(Name, NativeType::Bool).Value);
 	}
 	catch (std::exception&)
 	{
@@ -248,7 +248,7 @@ std::string SaveGame::GetString(std::string Name) const
 {
 	try
 	{
-		return GetPropertyOfType(Name, Type::String).Value;
+		return GetPropertyOfType(Name, NativeType::String).Value;
 	}
 	catch (std::exception&)
 	{
@@ -260,7 +260,7 @@ float SaveGame::GetFloat(std::string Name) const
 {
 	try
 	{
-		return std::stof(GetPropertyOfType(Name, Type::Float).Value);
+		return std::stof(GetPropertyOfType(Name, NativeType::Float).Value);
 	}
 	catch (std::exception&)
 	{
@@ -273,7 +273,7 @@ Vector3 SaveGame::GetVector(std::string Name) const
 {
 	try
 	{
-		return Vector3::FromString(GetPropertyOfType(Name, Type::Vector3).Value);
+		return Vector3::FromString(GetPropertyOfType(Name, NativeType::Vector3).Value);
 	}
 	catch (std::exception&)
 	{
@@ -291,24 +291,24 @@ SaveGame::~SaveGame()
 	// loop through all the properties and write them to the "OpenedSave" file
 	for (const auto& p : Properties)
 	{
-		OutFile << Type::Types[p.second.Type];
+		OutFile << NativeType::TypeStrings[p.second.NativeType];
 		OutFile << " ";
 		OutFile << p.second.Name;
 		OutFile << " = ";
-		switch (p.second.Type)
+		switch (p.second.NativeType)
 		{
-		case Type::Int:
-		case Type::Float:
-		case Type::Byte:
-		case Type::Bool:
+		case NativeType::Int:
+		case NativeType::Float:
+		case NativeType::Byte:
+		case NativeType::Bool:
 			OutFile << p.second.Value;
 			break;
-		case Type::String:
+		case NativeType::String:
 			OutFile << "\"" << p.second.Value << "\"";
 			break;
-		case Type::Vector3:
-		case Type::Vector3Color:
-		case Type::Vector3Rotation:
+		case NativeType::Vector3:
+		case NativeType::Vector3Color:
+		case NativeType::Vector3Rotation:
 			OutFile << "<" << p.second.Value << ">";
 			break;
 		default:
@@ -330,9 +330,9 @@ std::map<std::string, SaveGame::SaveProperty> SaveGame::GetProperties() const
 	return Properties;
 }
 
-SaveGame::SaveProperty::SaveProperty(std::string Name, std::string Value, Type::TypeEnum Type)
+SaveGame::SaveProperty::SaveProperty(std::string Name, std::string Value, NativeType::NativeType NativeType)
 {
 	this->Name = Name;
 	this->Value = Value;
-	this->Type = Type;
+	this->NativeType = NativeType;
 }

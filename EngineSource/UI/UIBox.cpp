@@ -134,11 +134,11 @@ void UIBox::OnChildClicked(int Index)
 {
 }
 
-UIBox* UIBox::SetBorder(BorderType Type, float Size)
+UIBox* UIBox::SetBorder(BorderType NativeType, float Size)
 {
-	if (BoxBorder != Type || Size != BorderRadius)
+	if (BoxBorder != NativeType || Size != BorderRadius)
 	{
-		BoxBorder = Type;
+		BoxBorder = NativeType;
 		BorderRadius = Size;
 		InvalidateLayout();
 	}

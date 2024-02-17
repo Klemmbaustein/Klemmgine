@@ -90,7 +90,7 @@ void SettingsPanel::GenerateUI()
 		{
 			try
 			{
-				GenerateSection(SettingsBox, cat.second[i].Name, -200 + CurrentSettingIndex, cat.second[i].Type, cat.second[i].Value);
+				GenerateSection(SettingsBox, cat.second[i].Name, -200 + CurrentSettingIndex, cat.second[i].NativeType, cat.second[i].Value);
 			}
 			catch (std::exception)
 			{
@@ -103,16 +103,16 @@ void SettingsPanel::GenerateUI()
 	}
 }
 
-void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, Type::TypeEnum SectionType, std::string Value)
+void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, NativeType::NativeType SectionType, std::string Value)
 {
 	Parent->AddChild((new UIText(0.5f, EditorUI::UIColors[2], Name, EditorUI::Text))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
 	UIBox* Element;
 	switch (SectionType)
 	{
-	case Type::Float:
+	case NativeType::Float:
 		break;
-	case Type::Int:
-	case Type::String:
+	case NativeType::Int:
+	case NativeType::String:
 		Element = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 			->SetText(Value)
 			->SetMinSize(Vector2(std::min(Scale.X - 0.25f, 0.35f), 0))
@@ -120,14 +120,14 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
 		break;
-	case Type::Vector3:
-	case Type::Vector3Color:
+	case NativeType::Vector3:
+	case NativeType::Vector3Color:
 		Element = (new UIVectorField(0, Vector3::FromString(Value), this, Index, EditorUI::Text))
-			->SetValueType(SectionType == Type::Vector3 ? UIVectorField::VecType::xyz : UIVectorField::VecType::rgb)
+			->SetValueType(SectionType == NativeType::Vector3 ? UIVectorField::VecType::xyz : UIVectorField::VecType::rgb)
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f);
 		Parent->AddChild(Element);
 		break;
-	case Type::Bool:
+	case NativeType::Bool:
 		if (Value != "0" && Value != "1")
 		{
 			Value = "1";
@@ -181,18 +181,18 @@ void SettingsPanel::OnButtonClicked(int Index)
 	{
 		Index += 200;
 		auto& Setting = Preferences[LoadedSettings.at(Index).cat].Settings[LoadedSettings.at(Index).entry];
-		switch (Setting.Type)
+		switch (Setting.NativeType)
 		{
-		case Type::Bool:
+		case NativeType::Bool:
 		{
 			bool Val = (bool)std::stoi(Setting.Value);
 			Setting.Value = std::to_string(!Val);
 		}
 			break;
-		case Type::String:
+		case NativeType::String:
 			Setting.Value = dynamic_cast<UITextField*>(LoadedSettingElements[Index])->GetText();
 			break;
-		case Type::Int:
+		case NativeType::Int:
 		{
 			try
 			{
@@ -251,7 +251,7 @@ void SettingsPanel::Load()
 				}
 				NameCopy[Space] = '_';
 			}
-			if (UsedSave.GetProperty(NameCopy).Type != Type::Null)
+			if (UsedSave.GetProperty(NameCopy).NativeType != NativeType::Null)
 			{
 				i.Value = UsedSave.GetProperty(NameCopy).Value;
 				i.OnChanged(i.Value);
@@ -279,7 +279,7 @@ void SettingsPanel::Save()
 				}
 				i.Name[Space] = '_';
 			}
-			UsedSave.SetProperty(SaveGame::SaveProperty(i.Name, i.Value, i.Type));
+			UsedSave.SetProperty(SaveGame::SaveProperty(i.Name, i.Value, i.NativeType));
 		}
 	}
 }

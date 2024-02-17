@@ -179,7 +179,7 @@ int main(int argc, char** argv)
 		CppProject.Name = ProjectName;
 		CppProject.Path = "Code";
 		CppProject.GUID = "A2BEFDE1-9019-4A47-839E-545ACCF559F2";
-		CppProject.Type = "vcxproj";
+		CppProject.NativeType = "vcxproj";
 		Projects.push_back(CppProject);
 	}
 	if (LaunchArgs["includeCsharp"] == "true")
@@ -191,7 +191,7 @@ int main(int argc, char** argv)
 		CSProject.Name = "CSharpAssembly";
 		CSProject.Path = "Scripts";
 		CSProject.GUID = CsGUID;
-		CSProject.Type = "csproj";
+		CSProject.NativeType = "csproj";
 #if !ENGINE_NO_SOURCE && !__linux__
 		Projects[0].Dependencies.push_back(CsGUID);
 #endif
@@ -204,7 +204,7 @@ int main(int argc, char** argv)
 		std::cout << "- Including engine project in solution" << std::endl;
 		SLN::Project EngineProject;
 		EngineProject.Name = "Engine";
-		EngineProject.Type = "vcxproj";
+		EngineProject.NativeType = "vcxproj";
 		EngineProject.Path = std::filesystem::current_path().append("EngineSource").string();
 		EngineProject.GUID = "E25491B8-04A8-4B57-9B45-C73718142C84";
 		Projects.push_back(EngineProject);
@@ -213,7 +213,7 @@ int main(int argc, char** argv)
 		EngineFolder.GUID = "5B7656A8-A442-4EFA-B737-97B9CA169A78";
 		EngineFolder.Name = "Klemmgine";
 		EngineFolder.Dependencies = { EngineProject.GUID };
-		EngineFolder.Type = "folder";
+		EngineFolder.NativeType = "folder";
 		Projects.push_back(EngineFolder);
 		Projects[0].Dependencies.push_back(EngineProject.GUID);
 	}
@@ -225,7 +225,7 @@ int main(int argc, char** argv)
 	ShaderProject.Name = "Shaders";
 	ShaderProject.Path = "Shaders";
 	ShaderProject.GUID = "91315EA7-5B25-4D8E-A732-C66EB73E510E";
-	ShaderProject.Type = "vcxproj";
+	ShaderProject.NativeType = "vcxproj";
 	Projects.push_back(ShaderProject);
 #endif
 

@@ -31,13 +31,13 @@ protected:
 	TextRenderer* Renderer;
 	UICanvas* ParentUI;
 	int Index;
-	VecType Type = VecType::xyz;
+	VecType NativeType = VecType::xyz;
 	UIBox* FieldBox = nullptr;
 	UIText* ColorText = nullptr;
 	float Size = 0.0f;
 public:
 	void SendNotifyEvent();
-	UIVectorField* SetValueType(VecType Type);
+	UIVectorField* SetValueType(VecType NativeType);
 	Vector3 GetValue();
 	void SetValue(Vector3 NewValue);
 	UIVectorField(float Size, Vector3 StartValue, UICanvas* ParentUI, int Index, TextRenderer* Renderer);

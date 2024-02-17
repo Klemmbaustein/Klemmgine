@@ -95,7 +95,7 @@ static bool LayerMask(Physics::Layer Bit, Physics::Layer Mask)
 class ObjectLayerPairFilterImpl : public ObjectLayerPairFilter
 {
 public:
-	bool CheckForStaticDynamic(Physics::Layer inObject1, Physics::Layer inObject2) const
+	static bool CheckForStaticDynamic(Physics::Layer inObject1, Physics::Layer inObject2)
 	{
 		if (LayerMask(inObject1, Physics::Layer::Static) && LayerMask(inObject2, Physics::Layer::Dynamic))
 		{
@@ -104,11 +104,17 @@ public:
 
 		return LayerMask(inObject1, inObject2);
 	}
-	virtual bool ShouldCollide(ObjectLayer inObject1, ObjectLayer inObject2) const override
+	
+	static bool ShouldLayersCollide(ObjectLayer inObject1, ObjectLayer inObject2)
 	{
 		if (CheckForStaticDynamic((Physics::Layer)inObject1, (Physics::Layer)inObject2)) return true;
 		if (CheckForStaticDynamic((Physics::Layer)inObject2, (Physics::Layer)inObject1)) return true;
 		return inObject1 & inObject2;
+	}
+
+	virtual bool ShouldCollide(ObjectLayer inObject1, ObjectLayer inObject2) const override
+	{
+		return ShouldLayersCollide(inObject1, inObject2);
 	}
 };
 
@@ -193,7 +199,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 {
 	using namespace Physics;
 
-	switch (Body->Type)
+	switch (Body->NativeType)
 	{
 	case PhysicsBody::BodyType::Sphere:
 	{
@@ -525,11 +531,45 @@ std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody*
 
 }
 
-Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End)
+class ObjectLayerFilterImpl : public ObjectLayerFilter
+{
+public:
+	Physics::Layer ObjLayer = Physics::Layer::Static;
+	virtual bool ShouldCollide(ObjectLayer inLayer) const override
+	{
+		return ObjectLayerPairFilterImpl::ShouldLayersCollide((ObjectLayer)ObjLayer, inLayer);
+	}
+};
+
+class BodyFilterImpl : public BodyFilter
+{
+public:
+	std::set<WorldObject*>* ObjectsToIgnore;
+
+	virtual bool ShouldCollide(const BodyID& inObject) const override
+	{
+		auto body = JoltPhysics::Bodies.find(inObject);
+		if (body != JoltPhysics::Bodies.end()
+			&& body->second.Body->Parent
+			&& body->second.Body->Parent->GetParent())
+		{
+			return ObjectsToIgnore->find(body->second.Body->Parent->GetParent()) == ObjectsToIgnore->end();
+		}
+		return true;
+	}
+};
+
+Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
 {
 	RRayCast Cast = RRayCast(ToJPHVec3(Start), ToJPHVec3(End - Start));
 	RayCastResult HitInfo;
-	bool Hit = System->GetNarrowPhaseQuery().CastRay(Cast, HitInfo);
+
+	BroadPhaseLayerFilter BplF;
+	ObjectLayerFilterImpl LayerF;
+	LayerF.ObjLayer = Layers;
+	BodyFilterImpl ObjF;
+	ObjF.ObjectsToIgnore = &ObjectsToIgnore;
+	bool Hit = System->GetNarrowPhaseQuery().CastRay(Cast, HitInfo, BplF, LayerF, ObjF);
 
 	Physics::HitResult r;
 	r.Hit = Hit;

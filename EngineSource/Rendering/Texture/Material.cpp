@@ -81,7 +81,7 @@ Ensure that all of your models have a material assigned.");
 	while (!In.eof())
 	{
 
-		Type::TypeEnum CurrentType = Type::Null;
+		NativeType::NativeType CurrentType = NativeType::Null;
 		std::string CurrentName = "";
 		std::string Value = "";
 
@@ -99,18 +99,18 @@ Ensure that all of your models have a material assigned.");
 		if (!CurrentLine.empty())
 		{
 
-			std::string Type;
-			CurrentLineStream >> Type;
+			std::string NativeType;
+			CurrentLineStream >> NativeType;
 			for (unsigned int i = 0; i < 8; i++)
 			{
-				if (Type::Types[i] == Type)
+				if (NativeType::TypeStrings[i] == NativeType)
 				{
-					CurrentType = (Type::TypeEnum)((int)i);
+					CurrentType = (NativeType::NativeType)((int)i);
 				}
 			}
-			if (CurrentType == Type::Null)
+			if (CurrentType == NativeType::Null)
 			{
-				Log::Print("Error reading material: " + Type + " is not a valid type (" + CurrentLine + ")", Vector3(1, 0, 0));
+				Log::Print("Error reading material: " + NativeType + " is not a valid type (" + CurrentLine + ")", Vector3(1, 0, 0));
 				return Material();
 			}
 			std::string Equals;
@@ -184,9 +184,9 @@ void Material::SaveMaterialFile(std::string Path, Material m)
 
 	for (const auto& Uniform : m.Uniforms)
 	{
-		if (Uniform.Type >= 0 && !Uniform.UniformName.empty())
+		if (Uniform.NativeType >= 0 && !Uniform.UniformName.empty())
 		{
-			Out << Type::Types.at(Uniform.Type) << " " << Uniform.UniformName << " = " << Uniform.Value << "\n";
+			Out << NativeType::TypeStrings.at(Uniform.NativeType) << " " << Uniform.UniformName << " = " << Uniform.Value << "\n";
 		}
 	}
 	Out.close();

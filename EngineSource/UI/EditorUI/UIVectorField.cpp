@@ -17,9 +17,9 @@ void UIVectorField::SendNotifyEvent()
 		Application::ButtonEvents.insert(ButtonEvent(nullptr, ParentUI, this->Index));
 }
 
-UIVectorField* UIVectorField::SetValueType(VecType Type)
+UIVectorField* UIVectorField::SetValueType(VecType NativeType)
 {
-	this->Type = Type;
+	this->NativeType = NativeType;
 	Generate();
 	return this;
 }
@@ -126,12 +126,12 @@ void UIVectorField::Generate()
 			->SetHorizontalAlign(UIBox::Align::Centered)
 			->SetMinSize(Vector2(0.015f, 0.04f))
 			->SetMaxSize(Vector2(0.015f, 0.04f));
-		auto ItemName = new UIText(0.4f, 1, DimensionStrings[(int)Type][i], Renderer);
+		auto ItemName = new UIText(0.4f, 1, DimensionStrings[(int)NativeType][i], Renderer);
 		ItemName->SetPadding(0.0075f, 0.005f, 0.005f, 0.005f);
 		auto NewTextField = new UITextField(0, EditorUI::UIColors[1], nullptr, i, Renderer);
 		FieldBox->AddChild(NewItemColor);
 		NewItemColor->AddChild(ItemName);
-		NewTextField->HintText = DimensionStrings[(int)Type][i];
+		NewTextField->HintText = DimensionStrings[(int)NativeType][i];
 		NewTextField->SetPadding(0);
 		NewTextField->SetTextColor(EditorUI::UIColors[2]);
 		NewTextField->SetMinSize(Vector2(ElementSize, 0.04f));
@@ -144,7 +144,7 @@ void UIVectorField::Generate()
 		TextFields[i] = NewTextField;
 		FieldBox->AddChild(NewTextField);
 	}
-	if (Type == VecType::rgb)
+	if (NativeType == VecType::rgb)
 	{
 		ColorDisplay = new UIButton(UIBox::Orientation::Horizontal, 0, Value, nullptr, 3);
 		ColorDisplay->ParentOverride = this;

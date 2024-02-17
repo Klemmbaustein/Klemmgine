@@ -16,7 +16,7 @@ void MeshObject::Update()
 void MeshObject::Begin()
 {
 	GenerateDefaultCategories();
-	AddEditorProperty(Property("Materials:Materials", Type::String | Type::List, &MaterialNames));
+	AddEditorProperty(Property("Materials:Materials", NativeType::String | NativeType::List, &MaterialNames));
 	OnPropertySet();
 }
 
@@ -90,6 +90,6 @@ void MeshObject::OnPropertySet()
 void MeshObject::GenerateDefaultCategories()
 {	
 	// Categories are sorted alphabetically. The text renderer doesn't render newlines, so the categories have \n first so they will be sorted first.
-	AddEditorProperty(Property("\nMesh:Mesh file", Type::String, &Filename));
-	AddEditorProperty(Property("\nMesh:Cast Shadow", Type::Bool, &MeshCastShadow));
+	AddEditorProperty(Property("\nMesh:Mesh file", NativeType::String, &Filename));
+	AddEditorProperty(Property("\nMesh:Cast Shadow", NativeType::Bool, &MeshCastShadow));
 }

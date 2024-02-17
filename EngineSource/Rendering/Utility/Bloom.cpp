@@ -78,8 +78,8 @@ void Bloom::Init()
 			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0
 		);
 	}
-	Console::RegisterConVar(Console::Variable("bloom", Type::Bool, &Graphics::Bloom, nullptr));
-	Console::RegisterConVar(Console::Variable("bloom_shape", Type::Int, &Bloom::BloomShape, nullptr));
+	Console::RegisterConVar(Console::Variable("bloom", NativeType::Bool, &Graphics::Bloom, nullptr));
+	Console::RegisterConVar(Console::Variable("bloom_shape", NativeType::Int, &Bloom::BloomShape, nullptr));
 }
 
 void Bloom::OnResized()

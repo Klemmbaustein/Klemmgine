@@ -4,18 +4,18 @@
 #include <Engine/Utility/StringUtility.h>
 #include <map>
 
-static std::map<std::string, Type::TypeEnum> ManagedTypes =
+static std::map<std::string, NativeType::NativeType> ManagedTypes =
 {
-	{"String", Type::String},
-	{"Float", Type::Float},
-	{"Single", Type::Float},
-	{"Vector3", Type::Vector3},
-	{"Boolean", Type::Bool},
+	{"String", NativeType::String},
+	{"Float", NativeType::Float},
+	{"Single", NativeType::Float},
+	{"Vector3", NativeType::Vector3},
+	{"Boolean", NativeType::Bool},
 };
 
 void CSharpObject::Begin()
 {
-	AddEditorProperty(Property("C#:Object class", Type::String, &CSharpClass));
+	AddEditorProperty(Property("C#:Object class", NativeType::String, &CSharpClass));
 }
 
 void CSharpObject::Update()
@@ -41,7 +41,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 	if (DeleteParameters)
 	{
 		Properties.clear();
-		AddEditorProperty(Property("C#:Object class", Type::String, &CSharpClass));
+		AddEditorProperty(Property("C#:Object class", NativeType::String, &CSharpClass));
 	}
 	OldCSharpClass = CSharpClass;
 	if (CS_Obj.ID)
@@ -83,7 +83,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 			Property p = Property(values[1], ManagedTypes[values[0]], nullptr);
 			if (Array)
 			{
-				p.Type = (Type::TypeEnum)(p.Type | Type::List);
+				p.NativeType = (NativeType::NativeType)(p.NativeType | NativeType::List);
 			}
 			p.PType = Property::PropertyType::CSharpProperty;
 

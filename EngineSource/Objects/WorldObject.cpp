@@ -185,7 +185,7 @@ std::string WorldObject::GetPropertiesAsString()
 		{
 			OutProperties << "@csharp_";
 		}
-		OutProperties << p.Name << ";" << p.Type << ";";
+		OutProperties << p.Name << ";" << p.NativeType << ";";
 		OutProperties << p.ValueToString(this);
 		OutProperties << "#";
 	}
@@ -193,9 +193,9 @@ std::string WorldObject::GetPropertiesAsString()
 }
 
 template<typename T>
-static void AssignStringToPtr(Type::TypeEnum t, std::string str, void* ptr, T (*FromString)(std::string val))
+static void AssignStringToPtr(NativeType::NativeType t, std::string str, void* ptr, T (*FromString)(std::string val))
 {
-	if (t & Type::List)
+	if (t & NativeType::List)
 	{
 		auto vec = (std::vector<T>*)ptr;
 		vec->clear();
@@ -224,7 +224,7 @@ static void AssignStringToPtr(Type::TypeEnum t, std::string str, void* ptr, T (*
 void WorldObject::LoadProperties(std::string in)
 {
 	int i = 0;
-	Property CurrentProperty = Property("", Type::Float, nullptr);
+	Property CurrentProperty = Property("", NativeType::Float, nullptr);
 	std::string current;
 	char prev = 0;
 	for (char c : in)
@@ -252,7 +252,7 @@ void WorldObject::LoadProperties(std::string in)
 			case 1:
 				try
 				{
-					CurrentProperty.Type = (Type::TypeEnum)std::stoi(current);
+					CurrentProperty.NativeType = (NativeType::NativeType)std::stoi(current);
 				}
 				catch (std::exception)
 				{
@@ -270,7 +270,7 @@ void WorldObject::LoadProperties(std::string in)
 					std::string CSharpSeperator = "@csharp";
 					if (CurrentProperty.Name.substr(0, CSharpSeperator.size()) == CSharpSeperator)
 					{
-						Property p = Property(CurrentProperty.Name, CurrentProperty.Type, nullptr);
+						Property p = Property(CurrentProperty.Name, CurrentProperty.NativeType, nullptr);
 						p.PType = Property::PropertyType::CSharpProperty;
 						p.ValueString = current;
 						Properties.push_back(p);
@@ -284,27 +284,27 @@ void WorldObject::LoadProperties(std::string in)
 					}
 					if (p.Name == CurrentProperty.Name)
 					{
-						switch ((Type::TypeEnum)(CurrentProperty.Type &  ~Type::List))
+						switch ((NativeType::NativeType)(CurrentProperty.NativeType &  ~NativeType::List))
 						{
-						case Type::Float:
-							AssignStringToPtr<float>(p.Type, current, p.Data, [](std::string val){return std::stof(val);});
+						case NativeType::Float:
+							AssignStringToPtr<float>(p.NativeType, current, p.Data, [](std::string val){return std::stof(val);});
 							break;
-						case Type::Int:
-							AssignStringToPtr<int>(p.Type, current, p.Data, [](std::string val) {return std::stoi(val); });
+						case NativeType::Int:
+							AssignStringToPtr<int>(p.NativeType, current, p.Data, [](std::string val) {return std::stoi(val); });
 							break;
-						case Type::String:
-							AssignStringToPtr<std::string>(p.Type, current, p.Data, [](std::string val) {return val; });
+						case NativeType::String:
+							AssignStringToPtr<std::string>(p.NativeType, current, p.Data, [](std::string val) {return val; });
 							break;
-						case Type::Vector3Color:
-						case Type::Vector3Rotation:
-						case Type::Vector3:
-							AssignStringToPtr<Vector3>(p.Type, current, p.Data, [](std::string val) {return Vector3::FromString(val); });
+						case NativeType::Vector3Color:
+						case NativeType::Vector3Rotation:
+						case NativeType::Vector3:
+							AssignStringToPtr<Vector3>(p.NativeType, current, p.Data, [](std::string val) {return Vector3::FromString(val); });
 							break;
-						case Type::Bool:
-							AssignStringToPtr<bool>(p.Type, current, p.Data, [](std::string val) {return (bool)std::stoi(val); });
+						case NativeType::Bool:
+							AssignStringToPtr<bool>(p.NativeType, current, p.Data, [](std::string val) {return (bool)std::stoi(val); });
 							break;
 						default:
-							Log::Print(std::to_string(CurrentProperty.Type ^ Type::List));
+							Log::Print(std::to_string(CurrentProperty.NativeType ^ NativeType::List));
 							break;
 						}
 						break;
@@ -391,39 +391,39 @@ std::string WorldObject::Property::ValueToString(WorldObject* Context)
 		return static_cast<CSharpObject*>(Context)->GetProperty(Name.substr(Name.find_first_of(":") + 1));
 	}
 #endif
-	if (Type & Type::List)
+	if (NativeType & NativeType::List)
 	{
-		Type = (Type::TypeEnum)(Type ^ Type::List);
+		NativeType = (NativeType::NativeType)(NativeType ^ NativeType::List);
 
-		switch (Type)
+		switch (NativeType)
 		{
-		case Type::Vector3Color:
-		case Type::Vector3Rotation:
-		case Type::Vector3:
+		case NativeType::Vector3Color:
+		case NativeType::Vector3Rotation:
+		case NativeType::Vector3:
 		{
 			return ListToString<Vector3>(Data, [](Vector3 Data){
 				return Data.ToString();
 				});
 		}
-		case Type::Float:
+		case NativeType::Float:
 		{
 			return ListToString<float>(Data, [](float Data) {
 				return std::to_string(Data);
 				});
 		}
-		case Type::Int:
+		case NativeType::Int:
 			return ListToString<int>(Data, [](int Data) {
 				return std::to_string(Data);
 				});
-		case Type::String:
+		case NativeType::String:
 			return ListToString<std::string>(Data, [](std::string Data) {
 				return Data;
 				});
-		case Type::Byte:
+		case NativeType::Byte:
 			return ListToString<uint8_t>(Data, [](uint8_t Data) {
 				return std::to_string(Data);
 				});
-		case Type::Bool:
+		case NativeType::Bool:
 			return ListToString<bool>(Data, [](bool Data) {
 				return std::to_string(Data);
 				});
@@ -433,18 +433,18 @@ std::string WorldObject::Property::ValueToString(WorldObject* Context)
 		return std::string();
 	}
 
-	switch (Type)
+	switch (NativeType)
 	{
-	case Type::Float:
+	case NativeType::Float:
 		return std::to_string(*(float*)Data);
-	case Type::Int:
+	case NativeType::Int:
 		return std::to_string(*((int*)Data));
-	case Type::String:
+	case NativeType::String:
 		return *((std::string*)Data);
-	case Type::Vector3Color:
-	case Type::Vector3:
+	case NativeType::Vector3Color:
+	case NativeType::Vector3:
 		return (*(Vector3*)Data).ToString();
-	case Type::Bool:
+	case NativeType::Bool:
 		return std::to_string(*((bool*)Data));
 	default:
 		break;
@@ -455,7 +455,7 @@ std::string WorldObject::Property::ValueToString(WorldObject* Context)
 void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
 {
 #if !EDITOR
-	switch (Type)
+	switch (NativeType)
 	{
 	case WorldObject::NetEvent::EventType::Server:
 		if (Client::GetClientID() == Parent->NetOwner)

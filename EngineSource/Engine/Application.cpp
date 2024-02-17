@@ -1152,7 +1152,7 @@ int Application::Initialize(int argc, char** argv)
 	Cubemap::RegisterCommands();
 #if !SERVER
 	BakedLighting::Init();
-	Console::RegisterConVar(Console::Variable("post_process", Type::Bool, &Application::RenderPostProcess, nullptr));
+	Console::RegisterConVar(Console::Variable("post_process", NativeType::Bool, &Application::RenderPostProcess, nullptr));
 	InitializeShaders();
 	UIBox::InitUI();
 	Application::UIMergeEffect = new PostProcess::Effect("Internal/uimerge.frag", PostProcess::EffectType::UI_Internal);

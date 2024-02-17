@@ -29,10 +29,10 @@ MinimumVisualStudioVersion = 10.0.40219.1\n";
 
 	for (const auto& i : Projects)
 	{
-		out << "Project(\"{" << GUIDTypes.at(i.Type) << "}\") = \"" << i.Name << + "\", ";
-		if (i.Type != "folder")
+		out << "Project(\"{" << GUIDTypes.at(i.NativeType) << "}\") = \"" << i.Name << + "\", ";
+		if (i.NativeType != "folder")
 		{
-			out << "\"" << i.Path + "/" + i.Name + "." + i.Type << "\", ";
+			out << "\"" << i.Path + "/" + i.Name + "." + i.NativeType << "\", ";
 		}
 		else
 		{
@@ -41,7 +41,7 @@ MinimumVisualStudioVersion = 10.0.40219.1\n";
 		}
 		out << "\"{" << i.GUID << "}\"" << std::endl;
 
-		if (i.Dependencies.size() && i.Type != "folder")
+		if (i.Dependencies.size() && i.NativeType != "folder")
 		{
 			out << "	ProjectSection(ProjectDependencies) = postProject" << std::endl;
 			for (auto& dep : i.Dependencies)
@@ -65,7 +65,7 @@ MinimumVisualStudioVersion = 10.0.40219.1\n";
 
 	for (auto& i : Projects)
 	{
-		if (i.Type == "vcxproj")
+		if (i.NativeType == "vcxproj")
 		{
 			out << "		{" + i.GUID + "}.Debug|x64.ActiveCfg = Debug|x64\n\
 		{" + i.GUID + "}.Debug|x64.Build.0 = Debug|x64\n\
@@ -76,7 +76,7 @@ MinimumVisualStudioVersion = 10.0.40219.1\n";
 		{" + i.GUID + "}.Release|x64.ActiveCfg = Release|x64\n\
 		{" + i.GUID + "}.Release|x64.Build.0 = Release|x64\n";
 		}
-		else if (i.Type == "csproj")
+		else if (i.NativeType == "csproj")
 		{
 			out << "		{" + i.GUID + "}.Debug|x64.ActiveCfg = Release|Any CPU\n\
 		{" + i.GUID + "}.Debug|x64.Build.0 = Release|Any CPU\n\
