@@ -126,6 +126,8 @@ namespace Project
 * ```
 * 
 * <h1 id="editor">Editor guide</h1>
+* 
+* @todo Finish editor documentation.
 */
 
 

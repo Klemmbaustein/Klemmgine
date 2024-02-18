@@ -128,7 +128,7 @@ jobs:
         chmod +x ProjectGenerator
         chmod +x Tools/ProjectGenerator/LinuxFiles/Editor.sh
         cd ..
-        tar -cz -C $LINUX_ARTIFACT_NAME  -f ${{ github.workspace }}/klemmgine-linux.tar.gz $LINUX_ARTIFACT_NAME
+        tar -czf ${{ github.workspace }}/klemmgine-linux.tar.gz Klemmgine-Linux-${{ github.run_number }}
 
     - name: list-directory
       run: ls -R
