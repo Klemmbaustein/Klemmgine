@@ -2,7 +2,7 @@
 
 for i in "$*" ; do
 	if [[ $i == "CI_BUILD" ]] ; then
- 		echo "Building for CI"
+		echo "Building for CI"
 		is_ci=1
 		break
 	fi
@@ -23,7 +23,7 @@ cmake CMakeLists.txt || fail
 make -j 4 assimp || fail
 cd ../JoltPhysics/Build
 # With GCC, JoltPhysics fails to compile with warnings as error due to some uninitialized variables.
-./cmake_linux_clang_gcc.sh Distribution c++ -DINTERPROCEDURAL_OPTIMIZATION=OFF || fail
+cmake -S . -B Linux_Distribution/ -DCMAKE_BUILD_TYPE=Distribution -DINTERPROCEDURAL_OPTIMIZATION=OFF -DGENERATE_DEBUG_SYMBOLS=OFF || fail
 cd Linux_Distribution
 make -j 4 Jolt || fail
 cd  ../../../..
