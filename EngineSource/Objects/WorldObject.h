@@ -60,7 +60,7 @@ this->NetEvents.push_back(e);\
  * 
  * A (very basic) type reflection system exists for WorldObjects in C++.
  * The "BuildTool" searches for header files (.h or .hpp) in the `Code/Objects` directory before each build.
- * It then generates GENERATED/* header files.
+ * It then generates GENERATED/ header files.
  * 
  * These header files include:
  * - A spawn list for Objects::SpawnObjectFromID().

@@ -1,6 +1,7 @@
 #pragma once
 #include <Objects/Components/Component.h>
 #include <Math/Physics/Physics.h>
+#include <set>
 
 /**
 * @brief
@@ -20,7 +21,7 @@ public:
 	* 
 	* @param RelativeTransform
 	* The Transform of the PhysicsBody, relative to this component's parent.
-	* @parma BoxMovability
+	* @param BoxMovability
 	* The movability of the PhysicsBody.
 	* @param CollisionLayers
 	* The layers of the PhysicsBody.
@@ -33,7 +34,7 @@ public:
 	*
 	* @param RelativeTransform
 	* The Transform of the PhysicsBody, relative to this component's parent.
-	* @parma BoxMovability
+	* @param SphereMovability
 	* The movability of the PhysicsBody.
 	* @param CollisionLayers
 	* The layers of the PhysicsBody.
@@ -46,7 +47,7 @@ public:
 	*
 	* @param RelativeTransform
 	* The Transform of the PhysicsBody, relative to this component's parent.
-	* @parma BoxMovability
+	* @param CapsuleMovability
 	* The movability of the PhysicsBody.
 	* @param CollisionLayers
 	* The layers of the PhysicsBody.
@@ -73,6 +74,20 @@ public:
 	/// Sets the angular velocity of the physics body.
 	void SetAngularVelocity(Vector3 NewVelocity);
 
+	/**
+	* @brief
+	* Sets the activeness of the body
+	* 
+	* Active means the collider can interact with the physics system.
+	* Inactive means it can't.
+	*/
+	void SetActive(bool NewActive);
+
+	Physics::HitResult ShapeCast(Transform Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
+
+	Physics::HitResult CollisionCheck(Transform Start, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
+
 private:
+	bool Active = false;
 	void* PhysicsBodyPtr = nullptr;
 };

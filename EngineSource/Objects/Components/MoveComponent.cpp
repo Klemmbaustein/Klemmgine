@@ -12,7 +12,12 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 
 	float Distance = Direction.Length() + 0.01f;
 
-	auto Hits = CollisionBody->ShapeCast(Transform(Pos, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X)), Pos + Direction.Normalize() * Distance);
+	auto Hits = CollisionBody->ShapeCast(
+		Transform(Pos, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X)),
+		Pos + Direction.Normalize() * Distance,
+		Physics::Layer::Static,
+		{ GetParent() }
+	);
 
 	if (Depth >= MoveMaxDepth)
 	{
@@ -64,7 +69,14 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 	{
 		Vector3 NewDir = (-HitNormal * Vector3(1, 0, 1)).Normalize() * 1;
 		Vector3 TestPos = Pos + Vector3(0, 0.9f, 0);
-		auto Hits = CollisionBody->ShapeCast(Transform(TestPos, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X)), TestPos + NewDir);
+
+		auto Hits = CollisionBody->ShapeCast(
+			Transform(TestPos, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X)),
+			TestPos + NewDir,
+			Physics::Layer::Static,
+			{ GetParent() }
+		);
+
 		HitStep = AvgPos.Y - Pos.Y < -0.9f && !Hits.size();
 		if (HitStep)
 		{
@@ -136,7 +148,11 @@ void MoveComponent::Begin()
 
 void MoveComponent::Update()
 {
-	if (IsInEditor || !Active || (GetParent()->GetIsReplicated() && Client::GetIsConnected() && GetParent()->NetOwner != Client::GetClientID()))
+	if (IsInEditor
+		|| !Active 
+		|| (GetParent()->GetIsReplicated()
+			&& Client::GetIsConnected()
+			&& GetParent()->NetOwner != Client::GetClientID()))
 	{
 		return;
 	}
@@ -151,7 +167,9 @@ void MoveComponent::Update()
 		InputDirection = InputDirection.Normalize();
 	}
 
-	MovementVelocity += Vector2(InputDirection.X, InputDirection.Z) * Performance::DeltaTime * Acceleration;
+	float AccelModifier = GroundedTimer ? 1 : AirAccelMultiplier;
+
+	MovementVelocity += Vector2(InputDirection.X, InputDirection.Z) * Performance::DeltaTime * Acceleration * AccelModifier;
 
 	float InputLength = InputDirection.Length();
 	float MovementLength = MovementVelocity.Length();
@@ -164,7 +182,7 @@ void MoveComponent::Update()
 		}
 		else
 		{
-			MovementLength = std::max(MovementLength - Deceleration * Performance::DeltaTime, 0.0f);
+			MovementLength = std::max(MovementLength - Deceleration * Performance::DeltaTime * AccelModifier, 0.0f);
 			MovementVelocity = MovementVelocity.Normalize() * MovementLength;
 		}
 	}
@@ -189,8 +207,8 @@ void MoveComponent::Update()
 	
 	InputDirection = 0;
 
-	CollisionBody->SetTransform(Transform(WorldTransform.Position, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X)));
-	auto Hits = CollisionBody->CollisionTest();
+	CollisionBody->BodyTransform = Transform(WorldTransform.Position, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X));
+	auto Hits = CollisionBody->CollisionTest(Physics::Layer::Static, {GetParent()});
 	for (auto& h : Hits)
 	{
 		GetParent()->GetTransform().Position += h.Normal * h.Depth;

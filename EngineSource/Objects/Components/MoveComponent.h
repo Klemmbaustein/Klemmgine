@@ -36,6 +36,7 @@ public:
 	float MaxSpeed = 15;
 	float Acceleration = 200;
 	float Deceleration = 150;
+	float AirAccelMultiplier = 0.5f;
 	float Gravity = 100;
 	bool Active = true;
 };

@@ -204,18 +204,18 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 	case PhysicsBody::BodyType::Sphere:
 	{
 		SphereBody* SpherePtr = static_cast<SphereBody*>(Body);
-		return BodyCreationSettings(new SphereShape(SpherePtr->GetTransform().Scale.X),
-			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(SpherePtr->GetTransform().Rotation.RadiansToDegrees()),
+		return BodyCreationSettings(new SphereShape(SpherePtr->BodyTransform.Scale.X),
+			ToJPHVec3(Body->BodyTransform.Position),
+			ToJPHQuat(SpherePtr->BodyTransform.Rotation.RadiansToDegrees()),
 			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
 	case PhysicsBody::BodyType::Box:
 	{
 		BoxBody* BoxPtr = static_cast<BoxBody*>(Body);
-		return BodyCreationSettings(new BoxShape(ToJPHVec3(BoxPtr->GetTransform().Scale)),
-			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(BoxPtr->GetTransform().Rotation.RadiansToDegrees()),
+		return BodyCreationSettings(new BoxShape(ToJPHVec3(BoxPtr->BodyTransform.Scale)),
+			ToJPHVec3(Body->BodyTransform.Position),
+			ToJPHQuat(BoxPtr->BodyTransform.Rotation.RadiansToDegrees()),
 			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
@@ -225,8 +225,8 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		CapsuleShapeSettings Settings = CapsuleShapeSettings(1, 1);
 		Shape::ShapeResult r;
 		return BodyCreationSettings(new CapsuleShape(Settings, r),
-			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(CapsulePtr->GetTransform().Rotation.RadiansToDegrees()),
+			ToJPHVec3(Body->BodyTransform.Position),
+			ToJPHQuat(CapsulePtr->BodyTransform.Rotation.RadiansToDegrees()),
 			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
@@ -242,7 +242,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 
 		Vertices.reserve(MergedVertices.size());
 		Indices.reserve(MergedIndices.size() / 3);
-		Transform OffsetTransform = MeshPtr->GetTransform();
+		Transform OffsetTransform = MeshPtr->BodyTransform;
 		OffsetTransform.Position = 0;
 		OffsetTransform.Rotation = 0;
 		OffsetTransform.Scale = OffsetTransform.Scale * Vector3(0.025f);
@@ -271,8 +271,8 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		}
 
 		return BodyCreationSettings(Shape,
-			ToJPHVec3(MeshPtr->GetTransform().Position),
-			ToJPHQuat(MeshPtr->GetTransform().Rotation),
+			ToJPHVec3(MeshPtr->BodyTransform.Position),
+			ToJPHQuat(MeshPtr->BodyTransform.Rotation),
 			EMotionType::Static,
 			(ObjectLayer)MeshPtr->CollisionLayers);
 	}
@@ -481,7 +481,35 @@ public:
 	}
 };
 
-std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody* Body)
+class ObjectLayerFilterImpl : public ObjectLayerFilter
+{
+public:
+	Physics::Layer ObjLayer = Physics::Layer::Static;
+	virtual bool ShouldCollide(ObjectLayer inLayer) const override
+	{
+		return ObjectLayerPairFilterImpl::ShouldLayersCollide((ObjectLayer)ObjLayer, inLayer);
+	}
+};
+
+class BodyFilterImpl : public BodyFilter
+{
+public:
+	std::set<WorldObject*>* ObjectsToIgnore = nullptr;
+
+	virtual bool ShouldCollide(const BodyID& inObject) const override
+	{
+		auto body = JoltPhysics::Bodies.find(inObject);
+		if (body != JoltPhysics::Bodies.end()
+			&& body->second.Body->Parent
+			&& body->second.Body->Parent->GetParent())
+		{
+			return ObjectsToIgnore->find(body->second.Body->Parent->GetParent()) == ObjectsToIgnore->end();
+		}
+		return true;
+	}
+};
+
+std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody* Body, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
 {
 	using namespace Physics;
 
@@ -491,7 +519,7 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 	}
 	auto JoltShape = static_cast<BodyCreationSettings*>(Body->ShapeInfo);
 
-	Transform t = Body->GetTransform();
+	Transform t = Body->BodyTransform;
 	t.Scale = 1;
 	glm::mat4 mat = t.ToMatrix();
 
@@ -501,12 +529,19 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 	CollideShapeSettings Settings = CollideShapeSettings();
 	Settings.mPenetrationTolerance = 0;
 	Settings.mCollisionTolerance = 0;
-	System->GetNarrowPhaseQuery().CollideShape(JoltShape->GetShape(), ToJPHVec3(1), ResultMat, Settings, Vec3(), cl);
+
+	BroadPhaseLayerFilter BplF;
+	ObjectLayerFilterImpl LayerF;
+	LayerF.ObjLayer = Layers;
+	BodyFilterImpl ObjF;
+	ObjF.ObjectsToIgnore = &ObjectsToIgnore;
+
+	System->GetNarrowPhaseQuery().CollideShape(JoltShape->GetShape(), ToJPHVec3(1), ResultMat, Settings, Vec3(), cl, BplF, LayerF, ObjF);
 	
 	return cl.Hits;
 }
 
-std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos)
+std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
 {
 	using namespace Physics;
 
@@ -525,39 +560,18 @@ std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody*
 
 	CastShapeCollectorImpl cl;
 	ShapeCastSettings s;
-	RShapeCast c = RShapeCast(JoltShape->GetShape(), ToJPHVec3(Body->GetTransform().Scale), ResultMat, ToJPHVec3(Direction));
-	System->GetNarrowPhaseQuery().CastShape(c, s, Vec3(0, 0, 0), cl);
+
+	BroadPhaseLayerFilter BplF;
+	ObjectLayerFilterImpl LayerF;
+	LayerF.ObjLayer = Layers;
+	BodyFilterImpl ObjF;
+	ObjF.ObjectsToIgnore = &ObjectsToIgnore;
+
+	RShapeCast c = RShapeCast(JoltShape->GetShape(), ToJPHVec3(StartPos.Scale), ResultMat, ToJPHVec3(Direction));
+	System->GetNarrowPhaseQuery().CastShape(c, s, Vec3(0, 0, 0), cl, BplF, LayerF, ObjF);
 	return cl.Hits;
 
 }
-
-class ObjectLayerFilterImpl : public ObjectLayerFilter
-{
-public:
-	Physics::Layer ObjLayer = Physics::Layer::Static;
-	virtual bool ShouldCollide(ObjectLayer inLayer) const override
-	{
-		return ObjectLayerPairFilterImpl::ShouldLayersCollide((ObjectLayer)ObjLayer, inLayer);
-	}
-};
-
-class BodyFilterImpl : public BodyFilter
-{
-public:
-	std::set<WorldObject*>* ObjectsToIgnore;
-
-	virtual bool ShouldCollide(const BodyID& inObject) const override
-	{
-		auto body = JoltPhysics::Bodies.find(inObject);
-		if (body != JoltPhysics::Bodies.end()
-			&& body->second.Body->Parent
-			&& body->second.Body->Parent->GetParent())
-		{
-			return ObjectsToIgnore->find(body->second.Body->Parent->GetParent()) == ObjectsToIgnore->end();
-		}
-		return true;
-	}
-};
 
 Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
 {

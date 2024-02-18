@@ -109,6 +109,8 @@ namespace Physics
 		Vector3 ImpactPoint;
 		/// Surface normal of the collision.
 		Vector3 Normal;
+
+		static HitResult GetAverageHit(std::vector<HitResult> Hits);
 	};
 
 	/**
@@ -120,7 +122,7 @@ namespace Physics
 	*/
 	struct PhysicsBody
 	{
-		/// The type of physics 
+		/// The type a physics body can have.
 		enum class BodyType
 		{
 			Box,
@@ -140,12 +142,6 @@ namespace Physics
 		Layer CollisionLayers = Layer::None;
 		Component* Parent = nullptr;
 		PhysicsBody(BodyType NativeType, Transform BodyTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
-
-		/**
-		* @brief
-		* Gets the bodies *initial* transform.
-		*/
-		const Transform& GetTransform() const;
 
 		/**
 		* @brief
@@ -188,15 +184,16 @@ namespace Physics
 		Vector3 GetVelocity();
 		Vector3 GetAngularVelocity();
 
-		std::vector<HitResult> CollisionTest();
-		std::vector<HitResult> ShapeCast(Transform StartTransform, Vector3 EndPos);
+		std::vector<HitResult> CollisionTest(Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore = {});
+		std::vector<HitResult> ShapeCast(Transform StartTransform, Vector3 EndPos, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore = {});
+
+		/// The *initial* Transform of the body.
+		Transform BodyTransform;
 
 		void* PhysicsSystemBody = nullptr;
 		void* ShapeInfo = nullptr;
 	protected:
-		Transform BodyTransform;
 	private:
-		virtual void SetTransform(Transform T) = 0;
 	};
 
 	/**
@@ -228,14 +225,6 @@ namespace Physics
 		*/
 
 		SphereBody(Vector3 Position, Vector3 Rotation, float Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
-
-		/**
-		* @brief
-		* Sets the Position, Rotation and Scale of the sphere.
-		*/
-		void SetSphereTransform(Vector3 Position, Vector3 Rotation, float Scale);
-	private:
-		virtual void SetTransform(Transform T) override;
 	};
 
 	/**
@@ -264,8 +253,6 @@ namespace Physics
 		* The component this collider belongs to. Can be nullptr.
 		*/
 		CapsuleBody(Vector3 Position, Vector3 Rotation, Vector2 Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
-
-		virtual void SetTransform(Transform T) override;
 	};
 
 	/**
@@ -296,7 +283,6 @@ namespace Physics
 		BoxBody(Vector3 Position, Vector3 Rotation, Vector3 Extents, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
 
 		Vector3 Extents;
-		virtual void SetTransform(Transform T) override;
 	};
 
 	/**
@@ -325,8 +311,6 @@ namespace Physics
 		* The component this collider belongs to. Can be nullptr.
 		*/
 		MeshBody(const ModelGenerator::ModelData& Mesh, Transform MeshTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent);
-
-		virtual void SetTransform(Transform T) override;
 
 		ModelGenerator::ModelData MeshData;
 	};

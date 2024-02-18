@@ -151,6 +151,63 @@ namespace NativeFunctions
 		PhysComponent->SetAngularVelocity(Vel);
 	}
 
+	static Collision::HitResponse PhysicsComponentCollisionCheck(
+		PhysicsComponent* PhysComponent,
+		Transform Where,
+		Physics::Layer Layers,
+		WorldObject** IgnoredObjects,
+		int32_t IgnoredLength)
+	{
+		std::set<WorldObject*> Ignored;
+		for (int32_t i = 0; i < IgnoredLength; i++)
+		{
+			Ignored.insert(IgnoredObjects[i]);
+		}
+
+		auto hit = PhysComponent->CollisionCheck(Where, Layers, Ignored);
+		Collision::HitResponse Response;
+		Response.Hit = hit.Hit;
+		Response.Depth = hit.Depth;
+		Response.HitComponent = hit.HitComponent;
+		if (hit.HitComponent)
+		{
+			Response.HitObject = hit.HitComponent->GetParent();
+		}
+		Response.Distance = hit.Distance;
+		Response.ImpactPoint = hit.ImpactPoint;
+		Response.Normal = hit.Normal;
+		return Response;
+	}
+
+	static Collision::HitResponse PhysicsComponentShapeCast(
+		PhysicsComponent* PhysComponent,
+		Transform Start,
+		Vector3 End,
+		Physics::Layer Layers,
+		WorldObject** IgnoredObjects,
+		int32_t IgnoredLength)
+	{
+		std::set<WorldObject*> Ignored = { PhysComponent->GetParent() };
+		for (int32_t i = 0; i < IgnoredLength; i++)
+		{
+			Ignored.insert(IgnoredObjects[i]);
+		}
+
+		auto hit = PhysComponent->ShapeCast(Start, End, Layers, Ignored);
+		Collision::HitResponse Response;
+		Response.Hit = hit.Hit;
+		Response.Depth = hit.Depth;
+		Response.HitComponent = hit.HitComponent;
+		if (hit.HitComponent)
+		{
+			Response.HitObject = hit.HitComponent->GetParent();
+		}
+		Response.Distance = hit.Distance;
+		Response.ImpactPoint = hit.ImpactPoint;
+		Response.Normal = hit.Normal;
+		return Response;
+	}
+
 	static void MovementComponentJump(MoveComponent* Target)
 	{
 		Target->Jump();
@@ -649,6 +706,8 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(PhysicsComponentSetScale);
 	REGISTER_FUNCTION(PhysicsComponentSetVelocity);
 	REGISTER_FUNCTION(PhysicsComponentSetAngularVelocity);
+	REGISTER_FUNCTION(PhysicsComponentCollisionCheck);
+	REGISTER_FUNCTION(PhysicsComponentShapeCast);
 
 	REGISTER_FUNCTION(IsKeyDown);
 	REGISTER_FUNCTION(GetMouseMovement);

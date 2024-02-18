@@ -1,5 +1,6 @@
 #include "PhysicsComponent.h"
 #include <Math/Physics/Physics.h>
+#include <iostream>
 
 void PhysicsComponent::Begin()
 {
@@ -8,9 +9,11 @@ void PhysicsComponent::Begin()
 void PhysicsComponent::Destroy()
 {
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
-
-	Physics::RemoveBody(Body);
-	delete Body;
+	if (Body)
+	{
+		Physics::RemoveBody(Body);
+		delete Body;
+	}
 }
 
 
@@ -34,7 +37,7 @@ void PhysicsComponent::CreateBox(Transform RelativeTransform, Physics::MotionTyp
 
 	
 	PhysicsBodyPtr = Body;
-	Physics::AddBody(Body);
+	SetActive(true);
 }
 
 void PhysicsComponent::CreateSphere(Transform RelativeTransform, Physics::MotionType BoxMovability, Physics::Layer CollisionLayers)
@@ -57,7 +60,7 @@ void PhysicsComponent::CreateSphere(Transform RelativeTransform, Physics::Motion
 
 
 	PhysicsBodyPtr = Body;
-	Physics::AddBody(Body);
+	SetActive(true);
 }
 
 void PhysicsComponent::CreateCapsule(Transform RelativeTransform, Physics::MotionType CapsuleMovability, Physics::Layer CollisionLayers)
@@ -80,8 +83,7 @@ void PhysicsComponent::CreateCapsule(Transform RelativeTransform, Physics::Motio
 
 
 	PhysicsBodyPtr = Body;
-	Physics::AddBody(Body);
-
+	SetActive(true);
 }
 
 Transform PhysicsComponent::GetBodyWorldTransform()
@@ -126,7 +128,7 @@ void PhysicsComponent::SetScale(Vector3 NewScale)
 
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 
-	Vector3 ScaleDifference = NewScale / Body->GetTransform().Scale;
+	Vector3 ScaleDifference = NewScale / Body->BodyTransform.Scale;
 	if (ScaleDifference != Vector3(1))
 	{
 		Body->Scale(ScaleDifference);
@@ -136,24 +138,85 @@ void PhysicsComponent::SetScale(Vector3 NewScale)
 
 Vector3 PhysicsComponent::GetVelocity()
 {
+	if (!PhysicsBodyPtr)
+	{
+		return 0;
+	}
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 	return Body->GetVelocity();
 }
 
 Vector3 PhysicsComponent::GetAngularVelocity()
 {
+	if (!PhysicsBodyPtr)
+	{
+		return 0;
+	}
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 	return Body->GetAngularVelocity();
 }
 
 void PhysicsComponent::SetVelocity(Vector3 NewVelocity)
 {
+	if (!PhysicsBodyPtr)
+	{
+		return;
+	}
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 	Body->SetVelocity(NewVelocity);
 }
 
 void PhysicsComponent::SetAngularVelocity(Vector3 NewVelocity)
 {
+	if (!PhysicsBodyPtr)
+	{
+		return;
+	}
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 	Body->SetAngularVelocity(NewVelocity);
+}
+
+void PhysicsComponent::SetActive(bool NewActive)
+{
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	if (NewActive == Active || !Body)
+	{
+		return;
+	}
+	if (NewActive)
+	{
+		Physics::AddBody(Body);
+	}
+	else
+	{
+		Physics::RemoveBody(Body);
+	}
+	Active = NewActive;
+}
+
+Physics::HitResult PhysicsComponent::ShapeCast(Transform Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+{
+	if (!PhysicsBodyPtr)
+	{
+		return Physics::HitResult();
+	}
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	return Physics::HitResult::GetAverageHit(Body->ShapeCast(Start, End, Layers, ObjectsToIgnore));
+
+}
+
+Physics::HitResult PhysicsComponent::CollisionCheck(Transform Start, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+{
+	if (!PhysicsBodyPtr)
+	{
+		return Physics::HitResult();
+	}
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+	Transform InitialTransform = Body->BodyTransform;
+	Body->BodyTransform = Start;
+	auto Hit =  Physics::HitResult::GetAverageHit(Body->CollisionTest(Layers, ObjectsToIgnore));
+
+	std::swap(InitialTransform, Body->BodyTransform);
+
+	return Hit;
 }

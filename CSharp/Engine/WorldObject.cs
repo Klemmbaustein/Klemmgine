@@ -7,7 +7,7 @@ using Engine.Native;
 namespace Engine;
 
 /**
- * @defgroup CSharp-Objects
+ * @defgroup CSharp-Objects C# Objects
  * @ingroup CSharp
  * 
  * @brief

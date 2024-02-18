@@ -39,11 +39,6 @@ Physics::PhysicsBody::PhysicsBody(BodyType NativeType, Transform BodyTransform, 
 	this->Parent = Parent;
 }
 
-const Transform& Physics::PhysicsBody::GetTransform() const
-{
-	return BodyTransform;
-}
-
 Vector3 Physics::PhysicsBody::GetPosition()
 {
 	return PHYSICS_SYSTEM::GetBodyPosition(this);
@@ -94,29 +89,19 @@ Vector3 Physics::PhysicsBody::GetAngularVelocity()
 	return PHYSICS_SYSTEM::GetBodyAngularVelocity(this);
 }
 
-std::vector<Physics::HitResult> Physics::PhysicsBody::CollisionTest()
+std::vector<Physics::HitResult> Physics::PhysicsBody::CollisionTest(Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
 {
-	return PHYSICS_SYSTEM::CollisionTest(this);
+	return PHYSICS_SYSTEM::CollisionTest(this, Layers, ObjectsToIgnore);
 }
 
-std::vector<Physics::HitResult> Physics::PhysicsBody::ShapeCast(Transform StartTransform, Vector3 EndPos)
+std::vector<Physics::HitResult> Physics::PhysicsBody::ShapeCast(Transform StartTransform, Vector3 EndPos, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
 {
-	return PHYSICS_SYSTEM::ShapeCastBody(this, StartTransform, EndPos);
+	return PHYSICS_SYSTEM::ShapeCastBody(this, StartTransform, EndPos, Layers, ObjectsToIgnore);
 }
 
 Physics::SphereBody::SphereBody(Vector3 Position, Vector3 Rotation, float Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
 	: PhysicsBody(BodyType::Sphere, Transform(Position, Rotation, Scale), ColliderMovability, CollisionLayers, Parent)
 {
-}
-
-void Physics::SphereBody::SetSphereTransform(Vector3 Position, Vector3 Rotation, float Scale)
-{
-	this->BodyTransform = Transform(Position, Rotation, Scale);
-}
-
-void Physics::SphereBody::SetTransform(Transform T)
-{
-	ENGINE_UNREACHABLE();
 }
 
 Physics::MeshBody::MeshBody(const ModelGenerator::ModelData& Mesh, Transform MeshTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
@@ -125,19 +110,9 @@ Physics::MeshBody::MeshBody(const ModelGenerator::ModelData& Mesh, Transform Mes
 	this->MeshData = Mesh;
 }
 
-void Physics::MeshBody::SetTransform(Transform T)
-{
-	this->BodyTransform = T;
-}
-
 Physics::BoxBody::BoxBody(Vector3 Position, Vector3 Rotation, Vector3 Extents, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
 	: PhysicsBody(BodyType::Box, Transform(Position, Rotation, Extents), ColliderMovability, CollisionLayers, Parent)
 {
-}
-
-void Physics::BoxBody::SetTransform(Transform T)
-{
-	this->BodyTransform = T;
 }
 
 Physics::CapsuleBody::CapsuleBody(Vector3 Position, Vector3 Rotation, Vector2 Scale, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
@@ -145,7 +120,46 @@ Physics::CapsuleBody::CapsuleBody(Vector3 Position, Vector3 Rotation, Vector2 Sc
 {
 }
 
-void Physics::CapsuleBody::SetTransform(Transform T)
+Physics::HitResult Physics::HitResult::GetAverageHit(std::vector<HitResult> Hits)
 {
-	this->BodyTransform = T;
+	if (!Hits.size())
+	{
+		return Physics::HitResult();
+	}
+
+	Vector3 HitNormal = Vector3(0, 0, 0);
+	float MaxDistance = 0;
+
+	float AvgDepth = 0, AvgDist = 0;
+
+	Vector3 AvgPos = 0;
+
+	for (auto& i : Hits)
+	{
+		HitNormal += i.Normal * i.Depth;
+		MaxDistance = std::max(i.Distance, MaxDistance);
+		AvgPos += i.ImpactPoint;
+		AvgDepth += i.Depth;
+		AvgDist += i.Distance;
+	}
+	HitNormal = HitNormal.Normalize();
+	AvgPos = AvgPos / Vector3((float)Hits.size());
+
+	if (HitNormal.Length() == 0)
+	{
+		HitNormal = 0;
+		for (auto& i : Hits)
+		{
+			HitNormal += i.Normal;
+		}
+		HitNormal = HitNormal.Normalize();
+	}
+
+	Physics::HitResult h;
+	h.Normal = HitNormal;
+	h.Distance = AvgDist / (float)Hits.size();
+	h.Depth = AvgDepth / (float)Hits.size();
+	h.HitComponent = Hits[0].HitComponent;
+	h.Hit = true;
+	return h;
 }

@@ -3,7 +3,7 @@ using System;
 using Engine.Native;
 
 /**
- * @defgroup CSharp
+ * @defgroup CSharp C#
  * 
  * @brief
  * C# engine API.
@@ -44,7 +44,7 @@ namespace Engine
 		Bool = 7,
 		/// Vector3. A UIVectorField will display 'P', 'Y' 'R' (Pitch, Yaw, Roll) instead of 'X', 'Y', 'Z' when editing a Vector3Color.
 		Vector3Rotation = 8,
-		/// List modifier. Bitwise and this with any other value in this enum to make it a list.
+		/// List modifier. Bitwise or this with any other value in this enum to make it a list.
 		List = 0b10000000
 	};
 
@@ -81,7 +81,7 @@ namespace Engine
 	}
 
 	/**
-	 * @defgroup CSharp-Physics
+	 * @defgroup CSharp-Physics C# Physics
 	 * @ingroup CSharp
 	 * Functions/classes related to the physics system, C# scripting API.
 	 */
@@ -135,7 +135,6 @@ namespace Engine
 		/**
 		 * @brief
 		 * A struct containing information about a collision query.
-		 * C++ equivalent: @ref Collision::HitResult.
 		 */
 		[StructLayout(LayoutKind.Sequential)]
 		public struct HitResponse

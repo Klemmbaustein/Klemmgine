@@ -260,6 +260,7 @@ public:
 	bool GetTryFill();
 	friend UIScrollBox;
 	virtual void OnChildClicked(int Index);
+
 	/**
 	 * @brief
 	 * Sets the border type of the UIBox.
@@ -275,8 +276,7 @@ public:
 	 * @return
 	 * A pointer to this %UIBox.
 	 */
-
-	UIBox* SetBorder(UIBox::BorderType NativeType, float Size);
+	UIBox* SetBorder(UIBox::BorderType NewBorderType, float Size);
 	static void ForceUpdateUI();
 	static void InitUI();
 	static unsigned int* GetUITextures();

@@ -20,7 +20,7 @@ namespace Project
 #define OPENGL_MIN_REQUIRED_VERSION "GL_VERSION_4_2"
 
 /**
-* @defgroup Getting-Started
+* @defgroup Getting-Started Getting Started
 * 
 * # Sections:
 * 

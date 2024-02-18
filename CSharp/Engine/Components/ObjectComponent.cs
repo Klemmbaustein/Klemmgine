@@ -3,7 +3,7 @@ using Engine.Native;
 namespace Engine;
 
 /**
- * @defgroup CSharp-Components
+ * @defgroup CSharp-Components C# Components
  * @ingroup CSharp-Objects
  * 
  * @brief

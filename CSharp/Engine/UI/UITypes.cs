@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 using Engine.Native;
 
 /**
- * @defgroup CSharp-UI
+ * @defgroup CSharp-UI C# UI
  * @ingroup CSharp
  * 
  * @brief
