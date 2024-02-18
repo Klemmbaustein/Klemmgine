@@ -37,7 +37,7 @@
         "EngineSource/*.cpp"
       ],
       "u8char": false,
-#if !CiBuild || Release
+#if !CiBuild && !Release
       "debug": true,
 #else
       "debug": false,

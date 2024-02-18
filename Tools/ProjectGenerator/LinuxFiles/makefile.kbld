@@ -23,7 +23,7 @@
       "sources": [
         "Code/*.cpp"
       ],
-#if !CiBuild || Release
+#if !CiBuild && !Release
       "debug": true,
 #else
       "debug": false,
