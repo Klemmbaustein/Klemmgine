@@ -37,8 +37,10 @@
         "EngineSource/*.cpp"
       ],
       "u8char": false,
-#if !CiBuild
+#if !CiBuild || Release
       "debug": true,
+#else
+      "debug": false,
 #endif
       "includes": [
         "EngineSource",

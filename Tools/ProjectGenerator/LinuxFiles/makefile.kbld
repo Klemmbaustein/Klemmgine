@@ -23,8 +23,10 @@
       "sources": [
         "Code/*.cpp"
       ],
-#if !CiBuild
+#if !CiBuild || Release
       "debug": true,
+#else
+      "debug": false,
 #endif
       "outputPath": "bin",
       "includes": [
