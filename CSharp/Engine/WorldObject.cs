@@ -1,11 +1,8 @@
-﻿using Engine;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-#nullable enable
+using Engine.Native;
 
 namespace Engine;
 
@@ -61,8 +58,8 @@ public abstract class WorldObject
 	private delegate void SetTransformDelegate(Transform NewTransform, IntPtr NativeObjectPtr);
 	private delegate Transform GetTransformDelegate(IntPtr NativeObjectPtr);
 
-	private static Delegate? GetCSObjectDelegate;
-	private static Delegate? GetCSObjectByPtrDelegate;
+	private static Delegate GetCSObjectDelegate;
+	private static Delegate GetCSObjectByPtrDelegate;
 
 	private static readonly Dictionary<IntPtr, WorldObject> Objects = [];
 
@@ -99,9 +96,9 @@ public abstract class WorldObject
 	 * 
 	 * If no object has been found, a new Engine.NativePtr is created from the given pointer.
 	 */
-	public static WorldObject? GetObjectFromNativePointer(IntPtr Pointer)
+	public static WorldObject GetObjectFromNativePointer(IntPtr Pointer)
 	{
-		WorldObject? ManagedObject = (WorldObject?)GetCSObjectByPtrDelegate?.DynamicInvoke(Pointer);
+		WorldObject ManagedObject = (WorldObject)GetCSObjectByPtrDelegate?.DynamicInvoke(Pointer);
 		if (ManagedObject != null)
 		{
 			return ManagedObject;
@@ -121,7 +118,7 @@ public abstract class WorldObject
 	 */
 	public string GetNativeTypeName()
 	{
-		return (string)NativeFunction.CallNativeFunction("GetTypeNameOfObject", typeof(GetObjNameDelegate), new object[] { NativePtr })!;
+		return (string)NativeFunction.CallNativeFunction("GetTypeNameOfObject", typeof(GetObjNameDelegate), [ NativePtr ])!;
 	}
 
 	/**
@@ -134,9 +131,9 @@ public abstract class WorldObject
 	 * @param t
 	 * The Transform of the new object.
 	 */
-	public static WorldObject? NewCSObject(string TypeName, Transform t)
+	public static WorldObject NewCSObject(string TypeName, Transform t)
 	{
-		object? RetVal = NativeFunction.CallNativeFunction("NewCSObject", typeof(NewCSObjectDelegate), new object[] { TypeName, t });
+		object RetVal = NativeFunction.CallNativeFunction("NewCSObject", typeof(NewCSObjectDelegate), [ TypeName, t ]);
 		if (RetVal == null)
 		{
 			return null;
@@ -147,7 +144,7 @@ public abstract class WorldObject
 			return null;
 		}
 
-		object? objRef = GetCSObjectDelegate.DynamicInvoke(ObjID);
+		object objRef = GetCSObjectDelegate.DynamicInvoke(ObjID);
 		if (objRef == null)
 		{
 			return null;
@@ -161,7 +158,7 @@ public abstract class WorldObject
 	 */
 	public void SetName(string NewName)
 	{
-		NativeFunction.CallNativeFunction("SetObjectName", typeof(SetObjNameDelegate), new object[] { NativePtr, NewName });
+		NativeFunction.CallNativeFunction("SetObjectName", typeof(SetObjNameDelegate), [ NativePtr, NewName ]);
 	}
 
 	/**
@@ -170,7 +167,7 @@ public abstract class WorldObject
 	 */
 	public string GetName()
 	{
-		return (string)NativeFunction.CallNativeFunction("GetObjectName", typeof(GetObjNameDelegate), new object[] { NativePtr })!;
+		return (string)NativeFunction.CallNativeFunction("GetObjectName", typeof(GetObjNameDelegate), [ NativePtr ])!;
 	}
 
 
@@ -240,7 +237,7 @@ public abstract class WorldObject
 	 */
 	public Transform GetTransform()
 	{
-		return (Transform)NativeFunction.CallNativeFunction("GetObjectTransform", typeof(GetTransformDelegate), new object[] { NativePtr })!;
+		return (Transform)NativeFunction.CallNativeFunction("GetObjectTransform", typeof(GetTransformDelegate), [ NativePtr ])!;
 	}
 	/**
 	 * @brief
@@ -248,7 +245,7 @@ public abstract class WorldObject
 	 */
 	public void SetTransform(Transform NewTransform)
 	{
-		NativeFunction.CallNativeFunction("SetObjectTransform", typeof(SetTransformDelegate), new object[] { NewTransform, NativePtr });
+		NativeFunction.CallNativeFunction("SetObjectTransform", typeof(SetTransformDelegate), [NewTransform, NativePtr ]);
 	}
 
 	readonly List<ObjectComponent> AttachedComponents = [];
@@ -262,7 +259,7 @@ public abstract class WorldObject
 	 */
 	public static void DestroyObject(WorldObject o)
 	{
-		NativeFunction.CallNativeFunction("DestroyObject", typeof(DestroyObjectDelegate), new object[] { o.NativePtr });
+		NativeFunction.CallNativeFunction("DestroyObject", typeof(DestroyObjectDelegate), [ o.NativePtr ]);
 		return;
 	}
 

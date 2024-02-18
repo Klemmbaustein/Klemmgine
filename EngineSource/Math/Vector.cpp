@@ -245,11 +245,12 @@ float Vector3::Dot(Vector3 a, Vector3 b)
 Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
 {
 	Vector3 Dir = (End - Start).Normalize();
-	Vector3 Rotation = Vector3(-atan2f(Dir.Y, Dir.X) + Math::PI_F / 2, atan2f(Dir.Z, Dir.X), 0);
+	glm::quat quat = glm::quatLookAt((glm::vec3)Dir, glm::vec3(0, 0, 1));
+	glm::vec3 Euler = glm::eulerAngles(quat) + glm::vec3(-Math::PI_F / 2, 0, 0);
 	if (Radiants)
-		return Rotation;
+		return Euler;
 	else
-		return Rotation.RadiansToDegrees();
+		return Vector3(Euler).RadiansToDegrees();
 }
 
 Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)

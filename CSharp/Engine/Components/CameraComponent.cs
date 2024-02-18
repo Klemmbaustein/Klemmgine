@@ -1,4 +1,5 @@
 ﻿using System;
+using Engine.Native;
 namespace Engine;
 
 public class CameraComponent : ObjectComponent
@@ -18,7 +19,7 @@ public class CameraComponent : ObjectComponent
 		{
 			return;
 		}
-		NativeFunction.CallNativeFunction("UseCamera", typeof(UseCamera), new object[] { NativePtr });
+		NativeFunction.CallNativeFunction("UseCamera", typeof(UseCamera), [ NativePtr ]);
 	}
 
 	public override void OnAttached()
@@ -30,19 +31,13 @@ public class CameraComponent : ObjectComponent
 
 		if (!NativePtr.Equals(new IntPtr()))
 		{
-			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
+			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), [ NativePtr, Parent.NativePtr ]);
 		}
 
-		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewCameraComponent", typeof(NewCamera), new object[] { 60, Parent.NativePtr });
+		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewCameraComponent", typeof(NewCamera), [ 60, Parent.NativePtr ]);
 	}
 
 	public override void Tick()
 	{
-	}
-
-	public override void Destroy()
-	{
-		NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
-		NativePtr = new IntPtr();
 	}
 }

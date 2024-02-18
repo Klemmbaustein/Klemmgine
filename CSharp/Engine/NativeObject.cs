@@ -3,6 +3,7 @@ using System;
 using System.Runtime.InteropServices;
 
 namespace Engine;
+using Engine.Native;
 
 /**
  * @brief

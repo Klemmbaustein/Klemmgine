@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Engine.Native;
 namespace Engine;
 
 public class ParticleComponent : ObjectComponent
@@ -15,15 +16,9 @@ public class ParticleComponent : ObjectComponent
 		}
 		if (!NativePtr.Equals(new IntPtr()))
 		{
-			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
+			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), [ NativePtr, Parent.NativePtr ]);
 		}
-		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewParticleComponent", typeof(NewParticle), new object[] { FileName, Parent.NativePtr });
-	}
-
-	public override void Destroy()
-	{
-		NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
-		NativePtr = new IntPtr();
+		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewParticleComponent", typeof(NewParticle), [ FileName, Parent.NativePtr ]);
 	}
 
 	public override void Tick()

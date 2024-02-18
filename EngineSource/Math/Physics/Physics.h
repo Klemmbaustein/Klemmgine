@@ -101,7 +101,7 @@ namespace Physics
 		bool Hit = false;
 		/// The penetration depth of the collision.
 		float Depth = 0.0f;
-		/// For ray/shape casts only. The distance at which soemthing has been hit. From 0 (start of the ray) to 1 (end of the ray
+		/// For ray/shape casts only. The distance at which soemthing has been hit. From 0 (start of the ray) to 1 (end of the ray)
 		float Distance = INFINITY;
 		/// The component that has been hit. For the hit object, call `HitComponent->GetParent()`.
 		Component* HitComponent = nullptr;
@@ -120,6 +120,7 @@ namespace Physics
 	*/
 	struct PhysicsBody
 	{
+		/// The type of physics 
 		enum class BodyType
 		{
 			Box,

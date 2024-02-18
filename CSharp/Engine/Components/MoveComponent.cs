@@ -1,4 +1,5 @@
 ﻿using System;
+using Engine.Native;
 namespace Engine;
 
 public class MoveComponent : ObjectComponent
@@ -10,7 +11,7 @@ public class MoveComponent : ObjectComponent
 	public override void OnAttached()
 	{
 		base.OnAttached();
-		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewMoveComponent", typeof(NewMovement), new object[] { Parent.NativePtr });
+		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewMoveComponent", typeof(NewMovement), [ Parent.NativePtr ]);
 	}
 
 	public override void Tick()
@@ -22,7 +23,7 @@ public class MoveComponent : ObjectComponent
 	{
 		if (NativePtr != new IntPtr())
 		{
-			NativeFunction.CallNativeFunction("MovementComponentAddMovementInput", typeof(AddMovementDelegate), new object[] { Direction, NativePtr });
+			NativeFunction.CallNativeFunction("MovementComponentAddMovementInput", typeof(AddMovementDelegate), [ Direction, NativePtr ]);
 		}
 	}
 
@@ -30,16 +31,7 @@ public class MoveComponent : ObjectComponent
 	{
 		if (NativePtr != new IntPtr())
 		{
-			NativeFunction.CallNativeFunction("MovementComponentJump", typeof(JumpDelegate), new object[] { NativePtr });
+			NativeFunction.CallNativeFunction("MovementComponentJump", typeof(JumpDelegate), [ NativePtr ]);
 		}
-	}
-
-	public override void Destroy()
-	{
-		if (NativePtr != new IntPtr())
-		{
-			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
-		}
-		NativePtr = new IntPtr();
 	}
 }

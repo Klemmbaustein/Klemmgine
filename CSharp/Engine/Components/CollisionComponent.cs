@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Engine.Native;
+using System;
 using System.Runtime.InteropServices;
 namespace Engine;
 
@@ -57,11 +58,5 @@ public class CollisionComponent : ObjectComponent
 
 	public override void Tick()
 	{
-	}
-
-	public override void Destroy()
-	{
-		NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), new object[] { NativePtr, Parent.NativePtr });
-		NativePtr = new IntPtr();
 	}
 }

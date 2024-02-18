@@ -54,7 +54,7 @@ public:
 	void CreateCapsule(Transform RelativeTransform, Physics::MotionType CapsuleMovability, Physics::Layer CollisionLayers = Physics::Layer::Dynamic);
 	
 	/// Gets the transform of the simulated physics body, in world space.
-	Transform GetWorldTransform() override;
+	Transform GetBodyWorldTransform();
 
 	/// Sets the position of the physics body, in world space.
 	void SetPosition(Vector3 NewPosition);

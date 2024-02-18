@@ -69,7 +69,7 @@ void PhysicsComponent::CreateCapsule(Transform RelativeTransform, Physics::Motio
 
 	this->RelativeTransform = RelativeTransform;
 
-	Transform ComponentTransform = Component::GetWorldTransform();
+	Transform ComponentTransform = GetWorldTransform();
 
 	Physics::PhysicsBody* Body = new Physics::CapsuleBody(ComponentTransform.Position,
 		ComponentTransform.Rotation,
@@ -84,7 +84,7 @@ void PhysicsComponent::CreateCapsule(Transform RelativeTransform, Physics::Motio
 
 }
 
-Transform PhysicsComponent::GetWorldTransform()
+Transform PhysicsComponent::GetBodyWorldTransform()
 {
 	if (!PhysicsBodyPtr)
 	{

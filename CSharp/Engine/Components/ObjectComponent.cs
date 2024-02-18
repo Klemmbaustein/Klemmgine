@@ -1,4 +1,5 @@
 ﻿using System;
+using Engine.Native;
 namespace Engine;
 
 /**
@@ -22,7 +23,7 @@ namespace Engine;
 public abstract class ObjectComponent
 {
 	// Points to the native version of this class
-	protected IntPtr NativePtr = new();
+	public IntPtr NativePtr = new();
 
 	public WorldObject Parent = null;
 	protected delegate void DestroyComponent(IntPtr Component, IntPtr Parent);
@@ -34,12 +35,12 @@ public abstract class ObjectComponent
 
 	public Transform GetRelativeTransform()
 	{
-		if (NativePtr.Equals(new IntPtr()))
+		if (NativePtr == 0)
 		{
 			return new Transform();
 		}
 
-		return (Transform)NativeFunction.CallNativeFunction("GetComponentTransform", typeof(GetTransformDelegate), new object[] { NativePtr });
+		return (Transform)NativeFunction.CallNativeFunction("GetComponentTransform", typeof(GetTransformDelegate), [ NativePtr ]);
 	}
 
 	/**
@@ -104,15 +105,22 @@ public abstract class ObjectComponent
 
 	public void SetRelativeTransform(Transform t)
 	{
-		if (NativePtr.Equals(new IntPtr()))
+		if (NativePtr == 0)
 		{
 			return;
 		}
 
-		NativeFunction.CallNativeFunction("SetComponentTransform", typeof(SetTransformDelegate), new object[] { NativePtr, t });
+		NativeFunction.CallNativeFunction("SetComponentTransform", typeof(SetTransformDelegate), [ NativePtr, t ]);
 	}
 
 	public abstract void Tick();
 
-	public abstract void Destroy();
+	public virtual void Destroy()
+	{
+		if (NativePtr != 0)
+		{
+			NativeFunction.CallNativeFunction("DestroyComponent", typeof(DestroyComponent), [ NativePtr, Parent.NativePtr ]);
+		}
+		NativePtr = 0;
+	}
 }

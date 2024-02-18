@@ -206,7 +206,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		SphereBody* SpherePtr = static_cast<SphereBody*>(Body);
 		return BodyCreationSettings(new SphereShape(SpherePtr->GetTransform().Scale.X),
 			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(SpherePtr->GetTransform().Rotation),
+			ToJPHQuat(SpherePtr->GetTransform().Rotation.RadiansToDegrees()),
 			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
@@ -215,7 +215,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		BoxBody* BoxPtr = static_cast<BoxBody*>(Body);
 		return BodyCreationSettings(new BoxShape(ToJPHVec3(BoxPtr->GetTransform().Scale)),
 			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(BoxPtr->GetTransform().Rotation),
+			ToJPHQuat(BoxPtr->GetTransform().Rotation.RadiansToDegrees()),
 			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
@@ -226,7 +226,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		Shape::ShapeResult r;
 		return BodyCreationSettings(new CapsuleShape(Settings, r),
 			ToJPHVec3(Body->GetTransform().Position),
-			ToJPHQuat(CapsulePtr->GetTransform().Rotation),
+			ToJPHQuat(CapsulePtr->GetTransform().Rotation.RadiansToDegrees()),
 			ConvertMovability(Body->ColliderMovability),
 			(ObjectLayer)Body->CollisionLayers);
 	}
@@ -370,7 +370,7 @@ Vector3 JoltPhysics::GetBodyVelocity(Physics::PhysicsBody* Body)
 {
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
 	Vec3 vec = JoltBodyInterface->GetLinearVelocity(Info->ID);
-	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
+	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX());
 }
 
 Vector3 JoltPhysics::GetBodyAngularVelocity(Physics::PhysicsBody* Body)
@@ -414,7 +414,7 @@ void JoltPhysics::SetBodyVelocity(Physics::PhysicsBody* Body, Vector3 NewVelocit
 void JoltPhysics::SetBodyAngularVelocity(Physics::PhysicsBody* Body, Vector3 NewVelocity)
 {
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
-	JoltBodyInterface->SetAngularVelocity(Info->ID, ToJPHVec3(NewVelocity));
+	JoltBodyInterface->SetAngularVelocity(Info->ID, ToJPHVec3(NewVelocity.DegreesToRadians()));
 }
 
 void JoltPhysics::Update()

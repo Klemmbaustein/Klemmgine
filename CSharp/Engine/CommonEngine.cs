@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using System;
+using Engine.Native;
 
 /**
  * @defgroup CSharp
@@ -79,6 +80,11 @@ namespace Engine
 		}
 	}
 
+	/**
+	 * @defgroup CSharp-Physics
+	 * @ingroup CSharp
+	 * Functions/classes related to the physics system, C# scripting API.
+	 */
 	public static class Collision
 	{
 		private delegate HitResponse LineTraceDelegate(Vector3 Start,
@@ -86,7 +92,7 @@ namespace Engine
 			[MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] IntPtr[] ComponentsToIgnore,
 			int Length);
 
-		enum Layer : UInt16
+		public enum Layer : UInt16
 		{
 			/// No layer.
 			None = 0b00000000,
@@ -110,8 +116,26 @@ namespace Engine
 		}
 
 		/**
+		* @brief
+		* Defines the motion type a PhysicsBody can have.
+		* 
+		* C++ equivalent: @ref Physics::MotionType
+		* @ingroup CSharp-Physics
+		*/
+		public enum PhysicsMotionType
+		{
+			/// PhysicsBody cannot move.
+			Static = 0,
+			/// PhysicsBody is only movable using velocities only, does not respond to forces.
+			Kinematic = 1,
+			/// Physicsbody is fully movable.
+			Dynamic = 2,
+		}
+
+		/**
 		 * @brief
-		 * A struct containing information about a collision hit.
+		 * A struct containing information about a collision query.
+		 * C++ equivalent: @ref Collision::HitResult.
 		 */
 		[StructLayout(LayoutKind.Sequential)]
 		public struct HitResponse

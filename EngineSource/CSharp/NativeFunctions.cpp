@@ -92,6 +92,7 @@ namespace NativeFunctions
 	static PhysicsComponent* NewPhysicsComponent(WorldObject* Parent, Transform t, Physics::PhysicsBody::BodyType BodyType, Physics::MotionType Movability, Physics::Layer Layers)
 	{
 		PhysicsComponent* c = new PhysicsComponent();
+		Parent->Attach(c);
 		switch (BodyType)
 		{
 		case Physics::PhysicsBody::BodyType::Box:
@@ -108,6 +109,46 @@ namespace NativeFunctions
 			break;
 		}
 		return c;
+	}
+
+	static Transform PhysicsComponentGetTransform(PhysicsComponent* PhysComponent)
+	{
+		return PhysComponent->GetBodyWorldTransform();
+	}
+
+	static void PhysicsComponentSetPosition(PhysicsComponent* PhysComponent, Vector3 Pos)
+	{
+		PhysComponent->SetPosition(Pos);
+	}
+
+	static void PhysicsComponentSetRotation(PhysicsComponent* PhysComponent, Vector3 Rot)
+	{
+		PhysComponent->SetRotation(Rot);
+	}
+
+	static void PhysicsComponentSetScale(PhysicsComponent* PhysComponent, Vector3 Scl)
+	{
+		PhysComponent->SetScale(Scl);
+	}
+
+	static void PhysicsComponentSetVelocity(PhysicsComponent* PhysComponent, Vector3 Vel)
+	{
+		PhysComponent->SetVelocity(Vel);
+	}
+
+	static Vector3 PhysicsComponentGetVelocity(PhysicsComponent* PhysComponent)
+	{
+		return PhysComponent->GetVelocity();
+	}
+
+	static Vector3 PhysicsComponentGetAngularVelocity(PhysicsComponent* PhysComponent)
+	{
+		return PhysComponent->GetAngularVelocity();
+	}
+
+	static void PhysicsComponentSetAngularVelocity(PhysicsComponent* PhysComponent, Vector3 Vel)
+	{
+		PhysComponent->SetAngularVelocity(Vel);
 	}
 
 	static void MovementComponentJump(MoveComponent* Target)
@@ -470,6 +511,7 @@ namespace NativeFunctions
 		return NativeType::Null;
 	}
 
+#pragma region Properties
 	static const char* GetObjectPropertyString(WorldObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
@@ -564,7 +606,7 @@ namespace NativeFunctions
 		}
 		return 0;
 	}
-
+#pragma endregion
 }
 
 #define REGISTER_FUNCTION(func) CSharp::RegisterNativeFunction(# func, (void*)func)
@@ -583,6 +625,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(NewCameraComponent);
 	REGISTER_FUNCTION(NewParticleComponent);
 	REGISTER_FUNCTION(NewMoveComponent);
+	REGISTER_FUNCTION(NewPhysicsComponent);
 
 	REGISTER_FUNCTION(GetObjectTransform);
 	REGISTER_FUNCTION(SetObjectTransform);
@@ -598,7 +641,15 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(UseCamera);
 	REGISTER_FUNCTION(MovementComponentAddMovementInput);
 	REGISTER_FUNCTION(MovementComponentJump);
-	 
+	REGISTER_FUNCTION(PhysicsComponentGetTransform);
+	REGISTER_FUNCTION(PhysicsComponentGetVelocity);
+	REGISTER_FUNCTION(PhysicsComponentGetAngularVelocity);
+	REGISTER_FUNCTION(PhysicsComponentSetPosition);
+	REGISTER_FUNCTION(PhysicsComponentSetRotation);
+	REGISTER_FUNCTION(PhysicsComponentSetScale);
+	REGISTER_FUNCTION(PhysicsComponentSetVelocity);
+	REGISTER_FUNCTION(PhysicsComponentSetAngularVelocity);
+
 	REGISTER_FUNCTION(IsKeyDown);
 	REGISTER_FUNCTION(GetMouseMovement);
 	REGISTER_FUNCTION(PlayDefaultCameraShake);

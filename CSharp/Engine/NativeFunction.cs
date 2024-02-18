@@ -1,12 +1,12 @@
-﻿using Engine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-#nullable enable
+
+namespace Engine.Native;
 
 public static class NativeFunction
 {
-	static Dictionary<string, IntPtr> LoadedNativeFunctions = new Dictionary<string, IntPtr>();
+	static readonly Dictionary<string, IntPtr> LoadedNativeFunctions = [];
 
 	public static void UnloadAll()
 	{
@@ -17,7 +17,7 @@ public static class NativeFunction
 	{
 		LoadedNativeFunctions.Add(Name, FunctionPtr);
 	}
-	public static object? CallNativeFunction(string Name, Type del, object?[]? Args)
+	public static object CallNativeFunction(string Name, Type del, object[] Args)
 	{
 		if (!LoadedNativeFunctions.TryGetValue(Name, out nint Value))
 		{
