@@ -20,11 +20,11 @@ namespace Project
 #define OPENGL_MIN_REQUIRED_VERSION "GL_VERSION_4_2"
 
 /**
-* @defgroup Getting-Started Getting Started
+* @defgroup Getting-Started Guide
 * 
 * # Sections:
 * 
-* - <a href="#install">Editor guide</a>
+* - <a href="#install">Installation</a>
 * - <a href="#editor">Editor guide</a>
 *
 * <h1 id="install">Installing the editor</h1>
@@ -34,7 +34,7 @@ namespace Project
 * With this method, you can only write game logic in C#.
 * This requires the .NET 8 SDK to be installed.
 * 
-* Download the editor [here](https://github.com/Klemmbaustein/Klemmgine/releases/latest).
+* Download the engine [here](https://github.com/Klemmbaustein/Klemmgine/releases/latest).
 * 
 * ## From source
 * 
@@ -55,11 +55,11 @@ namespace Project
 * - Install [KlemmBuild](https://github.com/Klemmbaustein/KlemmBuild).
 * - Install SDL2, GLEW and OpenAL developement libraries.
 *   With `apt`, this would be:
-*	```sh
-*	sudo apt-get install libsdl2-dev
-*   sudo apt-get install libglew-dev
-*   sudo apt-get install libopenal-dev
+* 
 *   ```
+*	sudo apt-get install libsdl2-dev libglew-dev libopenal-dev
+*   ```
+* 
 * - Install the .NET 8 SDK.
 * 
 * ### How to build and run:
@@ -82,7 +82,7 @@ namespace Project
 * Run the newly built 'ProjectGenerator.exe' to create a new project.
 * 
 * ```pwsh
-* .\ProjectGenerator.exe -projectName {Your project name}
+* ProjectGenerator.exe -projectName {Your project name}
 * ```
 * 
 * The new project files will be put in `EngineDir\Games\{Your project name}\`.
@@ -95,12 +95,37 @@ namespace Project
 * 
 * Set the project configuration of your project to 'Editor' and press F5 to run the editor.
 * 
+* 
 * #### Linux
 * 
-* @todo Make the Linux build process not horrible.
-*
+* Clone the repository and it's submodules.
+* ```sh
+* git clone https://github.com/Klemmbaustein/Klemmgine.git --recurse-submodules
+* ```
 * 
+* Run the setup script.
+* ```sh
+* ./setup.sh
+* ```
 * 
+* Build the project generator
+* ```sh
+* KlemmBuild engine.kbld -DGenerator
+* ```
+* 
+* Run the project generator
+* ```sh
+* ./ProjectGenerator -projectName {Project name}
+* ```
+* 
+* Build and run the project
+* ```sh
+* cd Games/{Project name}
+* KlemmBuild -DEditor
+* ./Editor.sh
+* ```
+* 
+* <h1 id="editor">Editor guide</h1>
 */
 
 

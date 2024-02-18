@@ -83,9 +83,33 @@ public:
 	*/
 	void SetActive(bool NewActive);
 
+	/**
+	* @brief
+	* Casts this physics component shape from Start to End.
+	* 
+	* @param Start
+	* The start Transform of the cast.
+	* @param End
+	* The end position of the cast.
+	* @param Layers
+	* The layers to check.
+	* @param ObjectsToIgnore
+	* These objects shouldn't be considered for the query.
+	*/
 	Physics::HitResult ShapeCast(Transform Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
 
-	Physics::HitResult CollisionCheck(Transform Start, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
+	/**
+	* @brief
+	* Queries collision with this physics component's shape.
+	* 
+	* @param Where
+	* The Transform of the query.
+	* @param Layers
+	* The layers to check.
+	* @param ObjectsToIgnore
+	* These objects shouldn't be considered for the query.
+	*/
+	Physics::HitResult CollisionCheck(Transform Where, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
 
 private:
 	bool Active = false;

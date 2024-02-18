@@ -88,7 +88,7 @@ For shaders, I recommend [this Visual Studio extension](https://marketplace.visu
     sudo apt-get install libglew-dev
     sudo apt-get install libopenal-dev
     ```
-    
+
   - The [KlemmBuild](https://github.com/Klemmbaustein/KlemmBuild) build system is required to build the engine.
 
 - #### How to build

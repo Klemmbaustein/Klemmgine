@@ -185,6 +185,19 @@ public class PhysicsComponent : ObjectComponent
 		NativeFunction.CallNativeFunction("PhysicsComponentSetActive", typeof(SetBoolDelegate), [NativePtr, NewActive]);
 	}
 
+	/**
+	* @brief
+	* Casts this physics component shape from Start to End.
+	* 
+	* @param Start
+	* The start Engine.Transform of the cast.
+	* @param End
+	* The end position of the cast.
+	* @param Layers
+	* The layers to check.
+	* @param ObjectsToIgnore
+	* These objects shouldn't be considered for the query.
+	*/
 	public Collision.HitResponse ShapeCast(Transform Start, Vector3 End, Collision.Layer Layers, WorldObject[] ObjectsToIgnore = null)
 	{
 		IntPtr[] ComponentPtrs;
@@ -209,6 +222,17 @@ public class PhysicsComponent : ObjectComponent
 			);
 	}
 
+	/**
+	* @brief
+	* Queries collision with this physics component's shape.
+	* 
+	* @param Where
+	* The Engine.Transform of the query.
+	* @param Layers
+	* The layers to check.
+	* @param ObjectsToIgnore
+	* These objects shouldn't be considered for the query.
+	*/
 	public Collision.HitResponse PhysicsComponentCollisionCheck(Transform Where, Collision.Layer Layers, WorldObject[] ObjectsToIgnore = null)
 	{
 		IntPtr[] ComponentPtrs;

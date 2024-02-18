@@ -33,7 +33,6 @@ using namespace JPH::literals;
 #include <glm/gtx/quaternion.hpp>
 #include <Objects/Components/Component.h>
 #include <glm/mat4x4.hpp>
-#include <Engine/Input.h>
 
 inline static Vec3 ToJPHVec3(const Vector3& Vec)
 {
@@ -419,10 +418,9 @@ void JoltPhysics::SetBodyAngularVelocity(Physics::PhysicsBody* Body, Vector3 New
 
 void JoltPhysics::Update()
 {
-	if (Performance::DeltaTime > 0 && (Input::IsKeyDown(Input::Key::f) || !IsInEditor))
-	{
-		System->Update(Performance::DeltaTime, 1, TempAllocator, JobSystem);
-	}
+#if !EDITOR
+	System->Update(Performance::DeltaTime, 1, TempAllocator, JobSystem);
+#endif
 }
 
 class CollisionShapeCollectorImpl : public CollideShapeCollector
