@@ -89,7 +89,7 @@ static class Engine
 		}
 		else
 		{
-			LoadTypeFromAssembly("NativeFunction")?.GetMethod("UnloadAll")?.Invoke(null, null);
+			LoadTypeFromAssembly("Engine.Native.NativeFunction")?.GetMethod("UnloadAll")?.Invoke(null, null);
 		}
 		LoadedAsm = Assembly.Load(File.ReadAllBytes(Path));
 		LoadTypeFromAssembly("Engine.Log")!.GetMethod("LoadLogFunction")!.Invoke(null, [new Action<string, int>(EngineLog.Print)]);
