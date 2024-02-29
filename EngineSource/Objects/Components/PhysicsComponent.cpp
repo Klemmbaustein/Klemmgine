@@ -16,6 +16,25 @@ void PhysicsComponent::Destroy()
 	}
 }
 
+void PhysicsComponent::Update()
+{
+	if (!PhysicsBodyPtr)
+	{
+		return;
+	}
+
+	if (!Attached)
+	{
+		return;
+	}
+
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
+
+	Transform ComponentTransform = Component::GetWorldTransform();
+	Body->SetPosition(ComponentTransform.Position);
+	Body->SetRotation(ComponentTransform.Rotation);
+}
+
 
 void PhysicsComponent::CreateBox(Transform RelativeTransform, Physics::MotionType BoxMovability, Physics::Layer CollisionLayers)
 {

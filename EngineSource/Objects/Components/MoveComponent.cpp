@@ -30,10 +30,11 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 		{
 			GroundedTimer--;
 		}
-		else
+		else if (GravityPass)
 		{
 			GroundNormal = Vector3(0, 1, 0);
 		}
+		LastMoveSuccessful = true;
 		return Direction;
 	}
 
@@ -131,7 +132,7 @@ bool MoveComponent::GetIsOnGround() const
 
 Vector3 MoveComponent::GetVelocity() const
 {
-	return Vector3(MovementVelocity.X, VerticalVelocity, MovementVelocity.Y);
+	return Vector3(MovementVelocity.X, VerticalVelocity + (Jumping ? JumpHeight : 0), MovementVelocity.Y);
 }
 
 void MoveComponent::Begin()
@@ -190,6 +191,8 @@ void MoveComponent::Update()
 	Vector3 MoveDir = Vector3(MovementVelocity.X, 0, MovementVelocity.Y).ProjectToPlane(0, GroundNormal) * Performance::DeltaTime;
 	GetParent()->GetTransform().Position += TryMove(MoveDir, MoveDir, WorldTransform.Position, false);
 
+	LastMoveSuccessful = MoveDir.Length() / Performance::DeltaTime > 0.1f;
+
 	MoveDir = Vector3(0, (std::min(VerticalVelocity, -5.0f) + (Jumping ? JumpHeight : 0)) * Performance::DeltaTime, 0);
 	Vector3 GravityMovement = TryMove(MoveDir, MoveDir, WorldTransform.Position, true);
 
@@ -208,11 +211,6 @@ void MoveComponent::Update()
 	InputDirection = 0;
 
 	CollisionBody->BodyTransform = Transform(WorldTransform.Position, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X));
-	auto Hits = CollisionBody->CollisionTest(Physics::Layer::Static, {GetParent()});
-	for (auto& h : Hits)
-	{
-		GetParent()->GetTransform().Position += h.Normal * h.Depth;
-	}
 }
 
 void MoveComponent::Destroy()

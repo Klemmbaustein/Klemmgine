@@ -237,7 +237,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 		TotalLightIntensity += glm::clamp(NewIntensity, 0.0f, 4.0f);
 	}
 	float LightInt = 0;
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 1; i++)
 	{
 		r = Bake::BakeLine(StartPos, StartPos
 			+ (Bake::SunDirection
@@ -249,7 +249,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 			* TraceDistance, false);
 		LightInt += r.Hit ? 1 - std::min(r.Distance * TraceDistance / 12.0f, 1.0f) : 1;
 	}
-	LightInt /= 3.0f;
+	LightInt /= 1.0f;
 
 	return std::min((LightInt / 2.0f + TotalLightIntensity / 4.0f), 1.0f);
 	
@@ -327,7 +327,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 
 		for (auto& i : Bake::Meshes)
 		{
-			if (!i.MeshData.CastShadow)
+			if (!i.MeshData.CastStaticShadow)
 			{
 				continue;
 			}

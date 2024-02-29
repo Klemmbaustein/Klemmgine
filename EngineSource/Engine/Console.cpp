@@ -224,8 +224,8 @@ void Console::InitializeConsole()
 		ConsoleLog("------------------------------------------------------------------------------");
 		return;
 	}
-	ConsoleLog("Unknown info topic: " + CommandArgs()[0], E_ERROR);
-	ConsoleLog("Topics are: version, graphics, sound.", E_ERROR);
+	ConsoleLog("Unknown info topic: " + CommandArgs()[0], Err);
+	ConsoleLog("Topics are: version, graphics, sound.", Err);
 		}, { Command::Argument("info_type", NativeType::String, true) }));
 
 
@@ -261,7 +261,7 @@ void Console::InitializeConsole()
 			std::string File = Assets::GetAsset(CommandArgs()[0]);
 	if (File.empty())
 	{
-		ConsoleLog("Could not find " + CommandArgs()[0], E_ERROR);
+		ConsoleLog("Could not find " + CommandArgs()[0], Err);
 		return;
 	}
 	ConsoleLog(CommandArgs()[0] + " -> " + File);
@@ -275,7 +275,7 @@ void Console::InitializeConsole()
 		}
 		else
 		{
-			ConsoleLog("Could not find scene \"" + CommandArgs()[0] + "\"", E_ERROR);
+			ConsoleLog("Could not find scene \"" + CommandArgs()[0] + "\"", Err);
 		}
 		}, { Command::Argument("scene", NativeType::String)}));
 
@@ -288,7 +288,7 @@ void Console::InitializeConsole()
 			PrintArguments(FoundCommand.Arguments);
 			return;
 		}
-		ConsoleLog("Help: " + CommandString + " is not a registered command.", E_ERROR);
+		ConsoleLog("Help: " + CommandString + " is not a registered command.", Err);
 		}, { Command::Argument("command", NativeType::String) }));
 
 	RegisterCommand(Command("getcommands", []() {
@@ -343,7 +343,7 @@ void Console::InitializeConsole()
 					return;
 				}
 			}
-			ConsoleLog("Could not find class " + CommandArgs()[0], E_WARNING);
+			ConsoleLog("Could not find class " + CommandArgs()[0], Warn);
 		}, { Command::Argument("objectName", NativeType::String) }));
 	RegisterConVar(Variable("wireframe", NativeType::Bool, &Graphics::IsWireframe, nullptr));
 	RegisterConVar(Variable("vignette", NativeType::Float, &Graphics::Vignette, nullptr));
@@ -401,13 +401,13 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 	{
 		if (CommandVec.size() == 2)
 		{
-			ConsoleLog("Expected assignement.", E_ERROR);
+			ConsoleLog("Expected assignement.", Err);
 			return false;
 		}
 
 		if (CommandVec.size() > 3)
 		{
-			ConsoleLog("Too many arguments. Expected one for assignement.", E_ERROR);
+			ConsoleLog("Too many arguments. Expected one for assignement.", Err);
 			return false;
 		}
 
@@ -437,7 +437,7 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 		}
 		catch (std::exception& e)
 		{
-			ConsoleLog("Invalid type. Expected " + NativeType::TypeStrings[FoundVar.NativeType] + " (" + std::string(e.what()) + ")", E_ERROR);
+			ConsoleLog("Invalid type. Expected " + NativeType::TypeStrings[FoundVar.NativeType] + " (" + std::string(e.what()) + ")", Err);
 			return false;
 		}
 		ConsoleLog("Assigned " + FoundVar.Name + " = " + CommandVec[2]);
@@ -486,8 +486,8 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 
 		if (CommandVec.size() - 1 > FoundCommand.Arguments.size())
 		{
-			ConsoleLog(Command + ": Too many arguments.", E_ERROR);
-			PrintArguments(FoundCommand.Arguments, E_ERROR);
+			ConsoleLog(Command + ": Too many arguments.", Err);
+			PrintArguments(FoundCommand.Arguments, Err);
 			return false;
 		}
 
@@ -495,8 +495,8 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 		{
 			if (!FoundCommand.Arguments[i].Optional && (int)CommandVec.size() < i + 2)
 			{
-				ConsoleLog(Command + ": Not enough arguments.", E_ERROR);
-				PrintArguments(FoundCommand.Arguments, E_ERROR);
+				ConsoleLog(Command + ": Not enough arguments.", Err);
+				PrintArguments(FoundCommand.Arguments, Err);
 				return false;
 			}
 			if (FoundCommand.Arguments[i].Optional && CommandVec.size() < i + 2)
@@ -506,8 +506,8 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 
 			if (IsTypeNumber(FoundCommand.Arguments[i].NativeType) && !IsTypeNumber(GetDataTypeFromString(CommandVec[i + 1])))
 			{
-				ConsoleLog("Expected " + NativeType::TypeStrings[FoundCommand.Arguments[i].NativeType] + " for '" + FoundCommand.Arguments[i].Name + "', found string.", E_ERROR);
-				PrintArguments(FoundCommand.Arguments, E_ERROR);
+				ConsoleLog("Expected " + NativeType::TypeStrings[FoundCommand.Arguments[i].NativeType] + " for '" + FoundCommand.Arguments[i].Name + "', found string.", Err);
+				PrintArguments(FoundCommand.Arguments, Err);
 				return false;
 			}
 		}
@@ -518,11 +518,11 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 
 	if (CommandVec.size())
 	{
-		ConsoleLog("Unknown convar or command: " + CommandVec[0], E_ERROR);
+		ConsoleLog("Unknown convar or command: " + CommandVec[0], Err);
 	}
 	else
 	{
-		ConsoleLog("Expected a command.", E_ERROR);
+		ConsoleLog("Expected a command.", Err);
 	}
 	return false;
 }
@@ -550,8 +550,8 @@ void Console::RegisterCommand(Command NewCommand)
 		}
 		else if (PreviousOptional)
 		{
-			ConsoleLog("Error while registering new console command: " + NewCommand.Name + ". All optional arguments should be last.", E_ERROR);
-			ConsoleLog("However, " + i.Name + " is not optional but the previous argument was.", E_ERROR);
+			ConsoleLog("Error while registering new console command: " + NewCommand.Name + ". All optional arguments should be last.", Err);
+			ConsoleLog("However, " + i.Name + " is not optional but the previous argument was.", Err);
 			return;
 		}
 	}

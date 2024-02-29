@@ -38,6 +38,8 @@ public:
 	* True of the mesh should call a shadow. False if not.
 	*/
 	bool MeshCastShadow = true;
+
+	bool MeshCastStaticShadow = true;
 protected:
 	CollisionComponent* MeshCollision = nullptr;
 

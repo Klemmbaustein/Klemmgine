@@ -1,5 +1,17 @@
 # Changes
 
+## Version 1.9.1
+
+### Changes
+
+- Added `bool PhysicsComponent::Attached`.
+- Mesh object performance optimizations.
+- Better sound falloff.
+
+### Fixes
+
+- Fixed some dialogs not appearing.
+
 ## Version 1.9.0
 
 ### Changes

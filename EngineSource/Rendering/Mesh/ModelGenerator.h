@@ -63,7 +63,7 @@ namespace ModelGenerator
 		*/
 		Element& AddElement();
 
-		bool CastShadow = true, TwoSided = false, HasCollision = false;
+		bool CastShadow = true, CastStaticShadow = true, TwoSided = false, HasCollision = false;
 		/// Loads a model (.jsm) file with the given name, then adds the model data of that file to the current model.
 		void LoadModelFromFile(std::string File);
 

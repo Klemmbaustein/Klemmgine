@@ -135,13 +135,21 @@ void EditorUI::LaunchInEditor()
 			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Debug.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
 		{
 			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
-			Build::BuildCurrentSolution("Debug");
+			if (Build::BuildCurrentSolution("Debug"))
+			{
+				Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
+				return;
+			}
 		}
 
 		if (Project::UseNetworkFunctions && (!std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
 			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
 		{
-			Build::BuildCurrentSolution("Server");
+			if (Build::BuildCurrentSolution("Server"))
+			{
+				Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
+				return;
+			}
 		}
 #endif
 

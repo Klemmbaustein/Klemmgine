@@ -37,12 +37,6 @@ PostProcess::Effect::Effect(std::string FragmentShader, EffectType UsedType)
 	glBindTexture(GL_TEXTURE_2D, EffectTexture);
 	int SizeX = (int)(Graphics::WindowResolution.X), SizeY = (int)(Graphics::WindowResolution.Y);
 
-	if (UsedType == EffectType::UI || UsedType == EffectType::UI_Internal)
-	{
-	//	SizeX *= 2;
-	//	SizeY *= 2;
-	}
-
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
@@ -74,12 +68,6 @@ void PostProcess::Effect::UpdateSize()
 
 	int SizeX = (int)(Graphics::WindowResolution.X), SizeY = (int)(Graphics::WindowResolution.Y);
 
-	if (UsedType == EffectType::UI || UsedType == EffectType::UI_Internal)
-	{
-	//	SizeX *= 2;
-	//	SizeY *= 2;
-	}
-
 	glTexImage2D(
 		GL_TEXTURE_2D,
 		0,
@@ -91,8 +79,8 @@ void PostProcess::Effect::UpdateSize()
 		GL_FLOAT,
 		NULL
 	);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glFramebufferTexture2D(

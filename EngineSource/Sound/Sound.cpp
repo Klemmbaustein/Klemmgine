@@ -139,7 +139,7 @@ namespace Sound
 	void Update3DVolumeOfSound(const Source& CurrentSource, const Vector3& Position)
 	{
 		float Distance = (CurrentSource.Position - Position).Length();
-		Distance = Distance * Distance * (CurrentSource.Distance / 100.0f) / 100.f;
+		Distance = Distance - CurrentSource.Distance;
 		alSourcef(CurrentSource.AudioSource, AL_GAIN, std::max(CurrentSource.Volume - Distance, 0.0f));
 	}
 #endif
@@ -215,7 +215,7 @@ namespace Sound
 					Console::ConsoleLog("Played sound " + Console::CommandArgs()[0]);
 					return;
 				}
-				Console::ConsoleLog("Sound " + Console::CommandArgs()[0] + " doesn't exist!", Console::E_ERROR);
+				Console::ConsoleLog("Sound " + Console::CommandArgs()[0] + " doesn't exist!", Console::Err);
 			}, {Console::Command::Argument("sound", NativeType::String)}));
 		Console::RegisterConVar(Console::Variable("soundvolume", NativeType::Float, &MasterVolume, nullptr));
 #endif

@@ -14,6 +14,7 @@ void MeshComponent::Begin()
 	if (MeshModel)
 	{
 		MeshModel->ModelTransform = GetParent()->GetTransform() + RelativeTransform;
+		MeshModel->UpdateTransform();
 	}
 #endif
 }
@@ -39,8 +40,12 @@ void MeshComponent::Update()
 #if !SERVER
 	if (AutomaticallyUpdateTransform)
 	{
-		MeshModel->ModelTransform = GetWorldTransform();
-		MeshModel->UpdateTransform();
+		Transform WorldTransform = GetWorldTransform();
+		if (WorldTransform != MeshModel->ModelTransform)
+		{
+			MeshModel->ModelTransform = WorldTransform;
+			MeshModel->UpdateTransform();
+		}
 	}
 #endif
 }

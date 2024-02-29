@@ -12,8 +12,10 @@
 class PhysicsComponent : public Component
 {
 public:
+	bool Attached = true;
 	void Begin() override;
 	virtual void Destroy() override;
+	virtual void Update() override;
 
 	/**
 	* @brief

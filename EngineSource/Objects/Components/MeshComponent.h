@@ -64,7 +64,7 @@ public:
 	const ModelGenerator::ModelData& GetModelData();
 	void SetVisibility(bool NewVisibility);
 
-
+	bool CastStaticShadow = true;
 	bool AutomaticallyUpdateTransform = true;
 	void UpdateTransform();
 protected:

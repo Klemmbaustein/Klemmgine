@@ -39,4 +39,5 @@ public:
 	float AirAccelMultiplier = 0.5f;
 	float Gravity = 100;
 	bool Active = true;
+	bool LastMoveSuccessful = false;
 };
