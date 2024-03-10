@@ -16,6 +16,7 @@
 - Improved how baked point light shadows are calculated.
 - Fixed the MovementComponent sometiems letting the object to go through walls.
 - Fixed a crash when a MeshComponent has no mesh loaded.
+- Fixed a crash when reloading the C# assembly.
 
 ## Version 1.9.1
 
