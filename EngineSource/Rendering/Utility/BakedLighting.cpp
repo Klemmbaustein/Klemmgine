@@ -223,18 +223,26 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	
 	for (auto& i : Bake::Lights)
 	{
+		if (i.Falloff == 0 || i.Intensity == 0)
+		{
+			continue;
+		}
+
 		glm::vec3 pointLightDir = (i.Position - StartPos);
 		float dist = length(pointLightDir);
-		float NewIntensity = std::pow(std::max((i.Falloff * 10.0f) - dist, 0.0f) / (i.Falloff * 10.0f), 16.0f) * i.Intensity * 16.0f;
-		if (NewIntensity > 0)
+		float NewIntensity = std::pow(std::max((i.Falloff * 10.0f) - dist, 0.0f) / (i.Falloff * 10.0f), 16.0f) * i.Intensity * 32.0f;
+		if (NewIntensity > 0.5f)
 		{
 			r = Bake::BakeLine(i.Position, StartPos, true);
 			if (r.Distance && r.Distance < 0.9f)
 			{
 				NewIntensity = 0;
 			}
+			else
+			{
+				TotalLightIntensity += NewIntensity;
+			}
 		}
-		TotalLightIntensity += glm::clamp(NewIntensity, 0.0f, 4.0f);
 	}
 	float LightInt = 0;
 	for (int i = 0; i < 1; i++)
@@ -252,8 +260,6 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	LightInt /= 1.0f;
 
 	return std::min((LightInt / 2.0f + TotalLightIntensity / 4.0f), 1.0f);
-	
-	return 0;
 }
 
 static std::byte Sample3DArray(std::byte* Arr, int64_t x, int64_t y, int64_t z)
@@ -278,11 +284,13 @@ void BakedLighting::BakeCurrentSceneToFile()
 	{
 		for (Component* c : i->GetComponents())
 		{
-			if (!dynamic_cast<MeshComponent*>(c))
+			MeshComponent* MeshC = dynamic_cast<MeshComponent*>(c);
+
+			if (!MeshC)
 			{
 				continue;
 			}
-			if (!dynamic_cast<MeshComponent*>(c)->GetModel()->CastShadow)
+			if (!MeshC->GetModel() || !MeshC->GetModel()->CastShadow)
 			{
 				continue;
 			}

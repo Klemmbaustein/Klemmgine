@@ -1,23 +1,21 @@
 #include "Console.h"
-#include <Sound/Sound.h>
-#include <Engine/EngineProperties.h>
-#include <Engine/Build/Pack.h>
-#include <Engine/OS.h>
-#include <Rendering/Utility/ShaderManager.h>
-#include <set>
-#include <map>
-#include <sstream>
-#include <GL/glew.h>
-#include <Engine/Log.h>
-#include <Engine/Scene.h>
-#include <filesystem>
-#include <Engine/Application.h>
 #include <CSharp/CSharpInterop.h>
 #include <cstring>
+#include <Engine/Application.h>
+#include <Engine/Build/Pack.h>
+#include <Engine/EngineProperties.h>
+#include <Engine/Log.h>
+#include <Engine/OS.h>
+#include <Engine/Scene.h>
+#include <filesystem>
+#include <GL/glew.h>
+#include <Rendering/Utility/ShaderManager.h>
+#include <set>
+#include <Sound/Sound.h>
 
-#include <Rendering/Graphics.h>
-#include <Engine/Stats.h>
 #include <Engine/File/Assets.h>
+#include <Engine/Stats.h>
+#include <Rendering/Graphics.h>
 
 struct ForceQuitException : std::exception
 {
@@ -349,7 +347,10 @@ void Console::InitializeConsole()
 	RegisterConVar(Variable("vignette", NativeType::Float, &Graphics::Vignette, nullptr));
 	RegisterConVar(Variable("vsync", NativeType::Bool, &Graphics::VSync, nullptr));
 	RegisterConVar(Variable("timescale", NativeType::Float, &Performance::TimeMultiplier, nullptr));
-	RegisterConVar(Variable("resolution_scale", NativeType::Float, &Graphics::ResolutionScale, []() {Graphics::SetWindowResolution(Application::GetWindowSize()); }));
+	RegisterConVar(Variable("resolution_scale", NativeType::Float, &Graphics::ResolutionScale, []() 
+		{
+			Graphics::SetWindowResolution(Application::GetWindowSize()); 
+		}));
 }
 
 void Console::ConsoleLog(std::string Message, ConsoleLogType Severity)

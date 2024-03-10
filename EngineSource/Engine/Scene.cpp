@@ -59,6 +59,10 @@ namespace Scene
 		{
 #if !SERVER
 			Graphics::MainCamera = DefaultCamera;
+			if (DefaultCamera->Position == 0)
+			{
+				DefaultCamera->Position.Y += 1;
+			}
 			if (!IsInEditor)
 			{
 				auto UIR = Graphics::UIToRender;
@@ -124,6 +128,9 @@ namespace Scene
 			{
 				Graphics::WorldSun = Graphics::Sun();
 				Graphics::WorldFog = Graphics::Fog();
+#if !SERVER
+				BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(FilePath));
+#endif
 
 				Log::Print("Loaded Scene (Scene File is empty)");
 				return;

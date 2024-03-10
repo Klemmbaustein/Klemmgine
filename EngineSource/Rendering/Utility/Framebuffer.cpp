@@ -2,6 +2,10 @@
 #include "Framebuffer.h"
 #include <Rendering/Graphics.h>
 #include <GL/glew.h>
+#include <Engine/Log.h>
+#include <Rendering/Mesh/ModelGenerator.h>
+#include <Engine/Application.h>
+#include <Rendering/Mesh/Model.h>
 FramebufferObject::FramebufferObject()
 {
 	buf = new Framebuffer();
@@ -39,10 +43,10 @@ void FramebufferObject::ReInit()
 	}
 	else
 	{
-		buf->ReInit((unsigned int)(Graphics::WindowResolution.X),
-			(unsigned int)(Graphics::WindowResolution.Y));
+		buf->ReInit((unsigned int)(Graphics::RenderResolution.X),
+			(unsigned int)(Graphics::RenderResolution.Y));
 
-		FramebufferCamera->ReInit(FramebufferCamera->FOV, Graphics::WindowResolution.X, Graphics::WindowResolution.X);
+		FramebufferCamera->ReInit(FramebufferCamera->FOV, Graphics::RenderResolution.X, Graphics::RenderResolution.X);
 	}
 }
 
@@ -56,28 +60,51 @@ Framebuffer* FramebufferObject::GetBuffer()
 	return buf;
 }
 
-void FramebufferObject::ClearContent()
+void FramebufferObject::AddEditorGrid()
 {
+	ModelGenerator::ModelData PlaneMesh;
+	auto& Elem = PlaneMesh.AddElement();
+	Elem.AddFace(2, Vector3(0, 1, 0), Vector3(0, -0.5f, 0));
+	Elem.ElemMaterial = Application::GetEditorPath() + "/EditorContent/Materials/WorldGrid.jsmat";
+	PlaneMesh.CastShadow = false;
+	PlaneMesh.TwoSided = true;
+	Model* GridModel = new Model(PlaneMesh);
+	GridModel->ModelTransform.Scale = 10000;
+	GridModel->UpdateTransform();
+	GridModel->DestroyOnUnload = false;
+	Renderables.push_back(GridModel);
+}
+
+void FramebufferObject::ClearContent(bool Full)
+{
+	std::vector<Renderable*> Remaining;
 	for (Renderable* r : Renderables)
 	{
-		delete r;
+		if (r->DestroyOnUnload || Full)
+		{
+			delete r;
+		}
+		else
+		{
+			Remaining.push_back(r);
+		}
 	}
 	Lights.clear();
-	Renderables.clear();
+	Renderables = Remaining;
 	ParticleEmitters.clear();
 }
 
 void Framebuffer::AttachFramebuffer(unsigned int Buffer, unsigned int Attachement)
 {
 	Bind();
-	GLuint* newArray = new GLuint[numbuffers + 1];
+	GLuint* NewArray = new GLuint[numbuffers + 1];
 	for (unsigned int i = 0; i < numbuffers; i++)
 	{
-		newArray[i] = Textures[i];
+		NewArray[i] = Textures[i];
 	}
-	newArray[numbuffers] = Buffer;
+	NewArray[numbuffers] = Buffer;
 	numbuffers++;
-	Textures = newArray;
+	Textures = NewArray;
 	Attachements.push_back(Attachement);
 	Unbind();
 }

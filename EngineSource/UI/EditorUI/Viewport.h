@@ -25,6 +25,7 @@ class Viewport : public EditorPanel
 	Vector3 PreviousLocation;
 	Model* ArrowsModel = nullptr;
 	bool IsCopying = false;
+	FramebufferObject* CurrentMainBuffer = nullptr;
 public:
 	static Viewport* ViewportInstance;
 	WorldObject* PreviousSelectedObject = nullptr;

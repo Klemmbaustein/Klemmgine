@@ -51,4 +51,5 @@ public:
 	static void ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFramebuffer);
 
 	bool CastShadow = true;
+	bool DestroyOnUnload = true;
 };

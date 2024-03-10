@@ -1,5 +1,22 @@
 # Changes
 
+## Version 1.9.2
+
+### Changes
+
+- Changed behavior of ResolutionScale.
+- Added editor graphics settings.
+- Added editor display settings.
+- Text is now culled when not visible in a scroll area.
+- Added a grid display in the editor.
+- Added collision visualization.
+
+### Fixes
+
+- Improved how baked point light shadows are calculated.
+- Fixed the MovementComponent sometiems letting the object to go through walls.
+- Fixed a crash when a MeshComponent has no mesh loaded.
+
 ## Version 1.9.1
 
 ### Changes

@@ -62,10 +62,7 @@ void InstancedModel::Render(Camera* WorldCamera, bool MainFrameBuffer, bool Tran
 		glEnable(GL_CULL_FACE);
 	}
 	glm::mat4 ModelView;
-	if (!Graphics::IsRenderingShadows)
-	{
-		ModelView = WorldCamera->getView() * MatModel[0];
-	}
+	ModelView = WorldCamera->getView() * MatModel[0];
 	glm::mat4 InvModelView = glm::transpose(glm::inverse(ModelView));
 	glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
 	for (int i = 0; i < Meshes.size(); i++)

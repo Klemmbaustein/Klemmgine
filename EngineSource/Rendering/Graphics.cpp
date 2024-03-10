@@ -14,22 +14,22 @@ namespace Graphics
 	bool VSync = true;
 	bool Bloom = true, FXAA = false;
 	bool IsWireframe = false;
-
+	bool RenderFullbright = false;
 	Sun WorldSun;
 	Fog WorldFog;
 	int ShadowResolution = 2000;
 	std::vector<UICanvas*> UIToRender;
 	Vector2 WindowResolution(1600, 900);
+	Vector2 RenderResolution = WindowResolution;
 	unsigned int PCFQuality = 0;
 	float AspectRatio = 16.0f / 9.0f;
 	void SetWindowResolution(Vector2 NewResolution)
 	{
 #if !SERVER
-		if (NewResolution == WindowResolution)
+		if (NewResolution * ResolutionScale == RenderResolution)
 		{
 			return;
 		}
-
 
 		for (FramebufferObject* o : AllFramebuffers)
 		{
@@ -40,7 +40,8 @@ namespace Graphics
 		}
 		Graphics::MainCamera->ReInit(Graphics::MainCamera->FOV, NewResolution.X, NewResolution.Y, false);
 		AspectRatio = NewResolution.X / NewResolution.Y;
-		WindowResolution = NewResolution * ResolutionScale;
+		WindowResolution = NewResolution;
+		RenderResolution = NewResolution * ResolutionScale;
 		SSAO::ResizeBuffer((unsigned int)(NewResolution.X * ResolutionScale), (unsigned int)(NewResolution.Y * ResolutionScale));
 		Bloom::OnResized();
 		for (PostProcess::Effect* i : PostProcess::GetCurrentEffects())
@@ -60,7 +61,6 @@ namespace Graphics
 	Shader* TextShader;
 	Shader* UIShader;
 #endif
-	bool IsRenderingShadows = false;
 	namespace UI
 	{
 		std::vector<ScrollObject*> ScrollObjects;

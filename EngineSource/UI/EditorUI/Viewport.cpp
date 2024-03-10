@@ -145,6 +145,14 @@ void Viewport::OnResized()
 void Viewport::Tick()
 {
 	TickPanel();
+
+	if (CurrentMainBuffer != Graphics::MainFramebuffer)
+	{
+		Graphics::MainFramebuffer->AddEditorGrid();
+		
+		CurrentMainBuffer = Graphics::MainFramebuffer;
+	}
+
 	Graphics::MainCamera->FOV = Math::PI_F / 1.2f;
 
 	if (EditorPanel::Dragged)
@@ -174,7 +182,12 @@ void Viewport::Tick()
 		{
 			if (dynamic_cast<MeshComponent*>(j))
 			{
-				OutlineBuffer->Renderables.push_back(dynamic_cast<MeshComponent*>(j)->GetModel());
+				Model* Mdl = dynamic_cast<MeshComponent*>(j)->GetModel();
+				if (Mdl == nullptr)
+				{
+					continue;
+				}
+				OutlineBuffer->Renderables.push_back(Mdl);
 			}
 			if (dynamic_cast<InstancedMeshComponent*>(j))
 			{

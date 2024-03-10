@@ -23,6 +23,7 @@
     <ClCompile Include="Engine\BackgroundTask.cpp" />
     <ClCompile Include="Engine\Gamepad.cpp" />
     <ClCompile Include="Engine\TypeEnum.cpp" />
+    <ClCompile Include="Math\Collision\CollisionVisualize.cpp" />
     <ClCompile Include="Math\Physics\JoltPhysics.cpp" />
     <ClCompile Include="Math\Physics\Physics.cpp" />
     <ClCompile Include="Objects\Components\PhysicsComponent.cpp" />
@@ -144,6 +145,7 @@
     <ClInclude Include="Objects\Components\PhysicsComponent.h" />
     <ClInclude Include="UI\EditorUI\AssetBrowser.h" />
     <ClInclude Include="UI\EditorUI\ClassesBrowser.h" />
+    <ClInclude Include="Math\Collision\CollisionVisualize.h" />
     <ClInclude Include="UI\EditorUI\Popups\AboutWindow.h" />
     <ClInclude Include="CSharp\CSharpInterop.h" />
     <ClInclude Include="CSharp\NativeFunctions.h" />

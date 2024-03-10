@@ -139,7 +139,7 @@ void MoveComponent::Begin()
 {
 	Physics::PhysicsBody* CollisionBody = new Physics::CapsuleBody(GetWorldTransform().Position,
 		0,
-		Vector2(1.0f, 2.0f),
+		ColliderSize,
 		Physics::MotionType::Static,
 		Physics::Layer::Static,
 		this);
@@ -211,6 +211,11 @@ void MoveComponent::Update()
 	InputDirection = 0;
 
 	CollisionBody->BodyTransform = Transform(WorldTransform.Position, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X));
+	auto Hits = CollisionBody->CollisionTest(Physics::Layer::Static, { GetParent() });
+	for (auto& h : Hits)
+	{
+		GetParent()->GetTransform().Position += h.Normal * h.Depth;
+	}
 }
 
 void MoveComponent::Destroy()

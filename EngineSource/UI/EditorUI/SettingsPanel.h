@@ -6,6 +6,7 @@
 #include <Engine/Log.h>
 #include <Engine/EngineProperties.h>
 #include <Engine/Application.h>
+#include <Rendering/Utility/CSM.h>
 
 /**
 * @brief
@@ -80,6 +81,33 @@ class SettingsPanel : public EditorPanel
 			}),
 			}
 		),
+
+		SettingsCategory("Graphics",
+			{
+			SettingsCategory::Setting("Graphics:Shadows", NativeType::Bool, "1", [](std::string NewValue)
+			{
+				Graphics::RenderShadows = std::stoi(NewValue);
+			}),
+			SettingsCategory::Setting("Graphics:Shadow Resolution", NativeType::Int, "2000", [](std::string NewValue)
+			{
+				int NewVal = std::stoi(NewValue);
+				if (NewVal != Graphics::ShadowResolution)
+				{
+					Graphics::ShadowResolution = NewVal;
+					CSM::ReInit();
+				}
+			}),
+			SettingsCategory::Setting("Graphics:Bloom", NativeType::Bool, "1", [](std::string NewValue)
+			{
+				Graphics::Bloom = std::stoi(NewValue);
+			}),
+			SettingsCategory::Setting("Graphics:Ambient Occlusion", NativeType::Bool, "1", [](std::string NewValue)
+			{
+				Graphics::SSAO = std::stoi(NewValue);
+			}),
+			}
+		),
+
 
 		SettingsCategory("Project specific",
 			{

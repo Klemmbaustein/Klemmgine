@@ -112,8 +112,8 @@ public:
 	* These objects shouldn't be considered for the query.
 	*/
 	Physics::HitResult CollisionCheck(Transform Where, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
+	void* PhysicsBodyPtr = nullptr;
 
 private:
 	bool Active = false;
-	void* PhysicsBodyPtr = nullptr;
 };

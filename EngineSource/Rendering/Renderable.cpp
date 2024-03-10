@@ -11,6 +11,14 @@
 #include <Engine/Log.h>
 #include "Utility/ShaderPreprocessor.h"
 
+Graphics::Sun FullbrightSun =
+{
+	.Intensity = 0,
+	.AmbientIntensity = 1,
+	.SunColor = 1,
+	.AmbientColor = 1,
+};
+
 void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFramebuffer)
 {
 #if !SERVER
@@ -38,10 +46,13 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFr
 	ShaderToApply->SetVector3("FogColor", Graphics::WorldFog.FogColor);
 
 	ShaderToApply->SetVector3("u_directionallight.Direction", Vector3::GetForwardVector(Graphics::WorldSun.Rotation));
-	ShaderToApply->SetFloat("u_directionallight.Intensity", Graphics::WorldSun.Intensity);
-	ShaderToApply->SetFloat("u_directionallight.AmbientIntensity", Graphics::WorldSun.AmbientIntensity);
-	ShaderToApply->SetVector3("u_directionallight.SunColor", Graphics::WorldSun.SunColor);
-	ShaderToApply->SetVector3("u_directionallight.AmbientColor", Graphics::WorldSun.AmbientColor);
+
+	const Graphics::Sun& UsedSun = Graphics::RenderFullbright ? FullbrightSun : Graphics::WorldSun;
+
+	ShaderToApply->SetFloat("u_directionallight.Intensity", UsedSun.Intensity);
+	ShaderToApply->SetFloat("u_directionallight.AmbientIntensity", UsedSun.AmbientIntensity);
+	ShaderToApply->SetVector3("u_directionallight.SunColor", UsedSun.SunColor);
+	ShaderToApply->SetVector3("u_directionallight.AmbientColor", UsedSun.AmbientColor);
 
 	ShaderToApply->SetFloat("u_time", Stats::Time);
 

@@ -64,8 +64,8 @@ void SSAO::Init()
 	glTexImage2D(GL_TEXTURE_2D,
 		0,
 		GL_RG,
-		(int)(Graphics::WindowResolution.X / ResolutionDivider),
-		(int)(Graphics::WindowResolution.Y / ResolutionDivider),
+		(int)(Graphics::RenderResolution.X / ResolutionDivider),
+		(int)(Graphics::RenderResolution.Y / ResolutionDivider),
 		0,
 		GL_RED,
 		GL_FLOAT,
@@ -83,7 +83,7 @@ unsigned int SSAO::Render(unsigned int NormalBuffer, unsigned int PositionBuffer
 {
 	if (!Graphics::MainCamera) return 0;
 	if (!Graphics::SSAO) return 0;
-	glViewport(0, 0, (int)(Graphics::WindowResolution.X / ResolutionDivider), (int)(Graphics::WindowResolution.Y / ResolutionDivider));
+	glViewport(0, 0, (int)(Graphics::RenderResolution.X / ResolutionDivider), (int)(Graphics::RenderResolution.Y / ResolutionDivider));
 	glBindFramebuffer(GL_FRAMEBUFFER, ssaoFBO);
 	glDisable(GL_BLEND);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -101,13 +101,13 @@ unsigned int SSAO::Render(unsigned int NormalBuffer, unsigned int PositionBuffer
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "gNormal"), 1);
 	glUniform1f(glGetUniformLocation(AOShader->GetShaderID(), "ResDiv"), ResolutionDivider);
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "texNoise"), 2);
-	glUniform2f(glGetUniformLocation(AOShader->GetShaderID(), "screenRes"), Graphics::WindowResolution.X, Graphics::WindowResolution.Y);
+	glUniform2f(glGetUniformLocation(AOShader->GetShaderID(), "screenRes"), Graphics::RenderResolution.X, Graphics::RenderResolution.Y);
 	for (unsigned int i = 0; i < Samples; ++i)
 		glUniform3fv(glGetUniformLocation(AOShader->GetShaderID(), ("samples[" + std::to_string(i) + "]").c_str()), 1, &ssaoKernel[i].x);
 	glUniformMatrix4fv(glGetUniformLocation(AOShader->GetShaderID(), "projection"), 1, false, &Graphics::MainCamera->GetProjection()[0][0]);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glViewport(0, 0, (GLsizei)Graphics::WindowResolution.X, (GLsizei)Graphics::WindowResolution.Y);
+	glViewport(0, 0, (GLsizei)Graphics::RenderResolution.X, (GLsizei)Graphics::RenderResolution.Y);
 	glEnable(GL_BLEND);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -128,8 +128,8 @@ void SSAO::ResizeBuffer(unsigned int X, unsigned int Y)
 	glTexImage2D(GL_TEXTURE_2D,
 		0,
 		GL_RG,
-		(GLsizei)(Graphics::WindowResolution.X / ResolutionDivider),
-		(GLsizei)(Graphics::WindowResolution.Y / ResolutionDivider),
+		(GLsizei)(Graphics::RenderResolution.X / ResolutionDivider),
+		(GLsizei)(Graphics::RenderResolution.Y / ResolutionDivider),
 		0,
 		GL_RED,
 		GL_FLOAT,

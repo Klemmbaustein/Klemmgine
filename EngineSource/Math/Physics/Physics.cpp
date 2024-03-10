@@ -2,6 +2,7 @@
 #include "JoltPhysics.h"
 #include <Engine/EngineError.h>
 #include <Objects/WorldObject.h>
+#include <iostream>
 
 #define PHYSICS_SYSTEM JoltPhysics
 
@@ -32,7 +33,7 @@ Physics::HitResult Physics::RayCast(Vector3 Start, Vector3 End, Layer Layers, st
 
 Physics::PhysicsBody::PhysicsBody(BodyType NativeType, Transform BodyTransform, MotionType ColliderMovability, Layer CollisionLayers, Component* Parent)
 {
-	this->NativeType = NativeType;
+	this->Type = NativeType;
 	this->BodyTransform = BodyTransform;
 	this->ColliderMovability = ColliderMovability;
 	this->CollisionLayers = CollisionLayers;
@@ -62,6 +63,7 @@ void Physics::PhysicsBody::SetRotation(Vector3 NewRotation)
 void Physics::PhysicsBody::Scale(Vector3 ScaleMultiplier)
 {
 	PHYSICS_SYSTEM::MultiplyBodyScale(this, ScaleMultiplier);
+	BodyTransform.Scale = BodyTransform.Scale * ScaleMultiplier;
 }
 
 void Physics::PhysicsBody::AddForce(Vector3 Direction, Vector3 Point)

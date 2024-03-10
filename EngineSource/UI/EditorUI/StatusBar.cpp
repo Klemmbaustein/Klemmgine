@@ -14,6 +14,8 @@
 #include "Viewport.h"
 #include <Engine/BackgroundTask.h>
 #include "SettingsPanel.h"
+#include <Math/Collision/CollisionVisualize.h>
+#include <Engine/Utility/FileUtility.h>
 
 StatusBar* CurrentStatusBar = nullptr;
 
@@ -34,8 +36,16 @@ static std::vector<MenuBarItem> MenuBarItems =
 {
 	MenuBarItem("File",
 		{
-			//MenuBarEntry("New", nullptr),
-			//MenuBarEntry("Open", nullptr),
+			MenuBarEntry("Open", []() 
+				{ 
+					std::string File = OS::ShowOpenFileDialog();
+					if (FileUtil::GetExtension(File) != "jscn")
+					{
+						Log::Print("Can only open scene files.");
+						return;
+					}
+					Application::EditorInstance->OpenScene(File);
+				}),
 			MenuBarEntry("Save", []() { Application::EditorInstance->SaveCurrentScene(); }, true),
 			MenuBarEntry("Build Project", []() { new BackgroundTask([]() {Build::TryBuildProject("Build/"); }); }, true),
 			MenuBarEntry("Exit", []() { Application::Quit(); })
@@ -53,6 +63,17 @@ static std::vector<MenuBarItem> MenuBarItems =
 	MenuBarItem("View",
 		{
 			MenuBarEntry("Toggle Wireframe", []() {Graphics::IsWireframe = !Graphics::IsWireframe; }),
+			MenuBarEntry("Toggle Fullbright", []() {Graphics::RenderFullbright = !Graphics::RenderFullbright; }),
+			MenuBarEntry("Toggle Collision View", []() {
+					if (!CollisionVisualize::GetIsActive())
+					{
+						CollisionVisualize::Activate();
+					}
+					else
+					{
+						CollisionVisualize::Deactivate();
+					}
+				}),
 		}),
 	MenuBarItem("C#",
 		{

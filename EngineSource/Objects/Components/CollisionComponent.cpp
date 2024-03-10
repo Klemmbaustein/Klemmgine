@@ -38,7 +38,6 @@ void CollisionComponent::Update()
 
 void CollisionComponent::Load(const ModelGenerator::ModelData& Data, Transform RelativeTransform)
 {
-	
 	this->RelativeTransform = RelativeTransform;
 	this->RelativeTransform.Scale = this->RelativeTransform.Scale;
 	Transform MeshTransform = CalculateMeshTransform();

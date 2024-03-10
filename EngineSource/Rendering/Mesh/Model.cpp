@@ -108,11 +108,8 @@ void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyP
 			glEnable(GL_CULL_FACE);
 		}
 		glm::mat4 ModelView;
-		if (!Graphics::IsRenderingShadows)
-		{
-			ModelViewProjection = WorldCamera->getViewProj() * MatModel;
-			ModelView = WorldCamera->getView() * MatModel;
-		}
+		ModelViewProjection = WorldCamera->getViewProj() * MatModel;
+		ModelView = WorldCamera->getView() * MatModel;
 		glm::mat4 InvModelView = glm::transpose(glm::inverse(ModelView));
 		glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
 

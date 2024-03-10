@@ -197,7 +197,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 {
 	using namespace Physics;
 
-	switch (Body->NativeType)
+	switch (Body->Type)
 	{
 	case PhysicsBody::BodyType::Sphere:
 	{

@@ -38,7 +38,7 @@ void MeshComponent::Destroy()
 void MeshComponent::Update()
 {
 #if !SERVER
-	if (AutomaticallyUpdateTransform)
+	if (AutomaticallyUpdateTransform && MeshModel)
 	{
 		Transform WorldTransform = GetWorldTransform();
 		if (WorldTransform != MeshModel->ModelTransform)

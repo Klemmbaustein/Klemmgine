@@ -95,7 +95,7 @@ void PhysicsComponent::CreateCapsule(Transform RelativeTransform, Physics::Motio
 
 	Physics::PhysicsBody* Body = new Physics::CapsuleBody(ComponentTransform.Position,
 		ComponentTransform.Rotation,
-		Vector2(ComponentTransform.Scale.X + ComponentTransform.Scale.Y),
+		Vector2(ComponentTransform.Scale.X, ComponentTransform.Scale.Y),
 		CapsuleMovability,
 		CollisionLayers,
 		this);

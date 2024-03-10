@@ -39,7 +39,7 @@ public:
 	std::vector<Graphics::Light> Lights;
 
 	unsigned int GetTextureID();
-	void ClearContent();
+	void ClearContent(bool Full = false);
 	Camera* FramebufferCamera = nullptr;
 	void ReInit();
 	void UseWith(Renderable* r);
@@ -49,6 +49,9 @@ public:
 	std::string PreviousReflectionCubemapName;
 	unsigned int ReflectionCubemap = 0;
 	std::vector<Renderable*> Renderables;
+
+	void AddEditorGrid();
+
 protected:
 	Framebuffer* buf;
 };

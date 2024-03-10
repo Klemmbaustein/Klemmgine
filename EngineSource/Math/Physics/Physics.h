@@ -131,7 +131,7 @@ namespace Physics
 			Mesh,
 		};
 
-		BodyType NativeType = BodyType::Box;
+		BodyType Type = BodyType::Box;
 
 		/**
 		* @brief

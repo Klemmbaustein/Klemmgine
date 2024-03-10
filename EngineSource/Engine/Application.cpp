@@ -40,6 +40,7 @@
 #include <Rendering/BillboardSprite.h>
 #include <Rendering/Texture/Texture.h>
 
+#include <Math/Collision/CollisionVisualize.h>
 #include <Math/Collision/Collision.h>
 
 #include <CSharp/CSharpInterop.h>
@@ -430,9 +431,8 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 	const auto LightSpaceMatrices = CSM::getLightSpaceMatrices();
 
 	CSM::UpdateMatricesUBO();
-	if (Graphics::RenderShadows && Graphics::ShadowResolution > 0)
+	if (Graphics::RenderShadows && Graphics::ShadowResolution > 0 && !Graphics::RenderFullbright)
 	{
-		Graphics::IsRenderingShadows = true;
 		glBindFramebuffer(GL_FRAMEBUFFER, CSM::LightFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);
 		for (int j = 0; j < Buffer->Renderables.size(); j++)
@@ -441,7 +441,6 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 				Buffer->Renderables.at(j)->SimpleRender(Application::ShadowShader);
 		}
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		Graphics::IsRenderingShadows = false;
 	}
 
 	FrustumCulling::Active = false;
@@ -449,7 +448,7 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 	Buffer->GetBuffer()->Bind();
 	Debugging::EngineStatus = "Rendering (Framebuffer: Main pass)";
 
-	Vector2 BufferResolution = Buffer->UseMainWindowResolution ? Graphics::WindowResolution : Buffer->CustomFramebufferResolution;
+	Vector2 BufferResolution = Buffer->UseMainWindowResolution ? Graphics::RenderResolution : Buffer->CustomFramebufferResolution;
 	glViewport(0, 0, (int)BufferResolution.X, (int)BufferResolution.Y);
 	auto Matrices = CSM::getLightSpaceMatrices();
 	for (auto& s : Shaders)
@@ -835,14 +834,17 @@ static void DrawPostProcessing()
 	}
 #endif
 
+	FramebufferObject* DrawnBuffer = CollisionVisualize::GetVisualizeBuffer()
+		? CollisionVisualize::GetVisualizeBuffer()
+		: Graphics::MainFramebuffer;
+
 	if (!ShouldSkip3D)
 	{
-
 		Application::AOBuffer = SSAO::Render(
-			Graphics::MainFramebuffer->GetBuffer()->GetTextureID(2),
-			Graphics::MainFramebuffer->GetBuffer()->GetTextureID(3));
+			DrawnBuffer->GetBuffer()->GetTextureID(2),
+			DrawnBuffer->GetBuffer()->GetTextureID(3));
 
-		Application::MainPostProcessBuffer = Graphics::MainFramebuffer->GetBuffer()->GetTextureID(0);
+		Application::MainPostProcessBuffer = DrawnBuffer->GetBuffer()->GetTextureID(0);
 
 		if (Application::RenderPostProcess)
 		{
@@ -882,7 +884,7 @@ static void DrawPostProcessing()
 	glActiveTexture(GL_TEXTURE5);
 	glBindTexture(GL_TEXTURE_2D, Application::AOBuffer);
 	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, Graphics::MainFramebuffer->GetBuffer()->GetTextureID(1));
+	glBindTexture(GL_TEXTURE_2D, DrawnBuffer->GetBuffer()->GetTextureID(1));
 
 	glActiveTexture(GL_TEXTURE7);
 	glBindTexture(GL_TEXTURE_2D, UIBuffer);
@@ -916,7 +918,7 @@ static void DrawPostProcessing()
 	glClear(GL_COLOR_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	Application::PostProcessShader->Unbind();
-	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
+	glViewport(0, 0, (int)Graphics::RenderResolution.X, (int)Graphics::RenderResolution.Y);
 #endif
 }
 
@@ -957,6 +959,7 @@ static void ApplicationLoop()
 	float LogicTime = LogicTimer.Get();
 	const Application::Timer RenderTimer;
 #if !SERVER
+	CollisionVisualize::Update();
 	Debugging::EngineStatus = "Rendering (Framebuffer)";
 	for (FramebufferObject* Buffer : Graphics::AllFramebuffers)
 	{
@@ -1077,6 +1080,7 @@ int Application::Initialize(int argc, char** argv)
 	SDL_DisplayMode DM;
 	SDL_GetCurrentDisplayMode(0, &DM);
 	Graphics::WindowResolution = Vector2((float)DM.w, (float)DM.h) / 1.5f;
+	Graphics::RenderResolution = Graphics::WindowResolution;
 	Application::Window = SDL_CreateWindow(ToAppTitle(Project::ProjectName).c_str(),
 		SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
 		(int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y,
@@ -1153,6 +1157,9 @@ int Application::Initialize(int argc, char** argv)
 #if !SERVER
 	BakedLighting::Init();
 	Console::RegisterConVar(Console::Variable("post_process", NativeType::Bool, &Application::RenderPostProcess, nullptr));
+	Console::RegisterConVar(Console::Variable("full_bright", NativeType::Bool, &Graphics::RenderFullbright, nullptr));
+	Console::RegisterCommand(Console::Command("show_collision", CollisionVisualize::Activate, {}));
+	Console::RegisterCommand(Console::Command("hide_collision", CollisionVisualize::Deactivate, {}));
 	InitializeShaders();
 	UIBox::InitUI();
 	Application::UIMergeEffect = new PostProcess::Effect("Internal/uimerge.frag", PostProcess::EffectType::UI_Internal);

@@ -17,6 +17,7 @@ namespace Graphics
 	extern bool IsWireframe;
 	extern int ShadowResolution;
 	extern bool Bloom, FXAA;
+	extern bool RenderFullbright;
 	extern float Gamma;
 
 	struct Fog
@@ -51,7 +52,7 @@ namespace Graphics
 
 		Vector3 Position = 0.f;
 		float Intensity = 1.f;
-		float Falloff = 250.f;
+		float Falloff = 20.f;
 		Vector3 Color = 1.f;
 
 		bool operator==(Light b);
@@ -61,6 +62,7 @@ namespace Graphics
 	extern Fog WorldFog;
 	extern std::vector<UICanvas*> UIToRender;
 	extern Vector2 WindowResolution;
+	extern Vector2 RenderResolution;
 	void SetWindowResolution(Vector2 NewResolution);
 	extern float AspectRatio;
 #if !SERVER
@@ -70,7 +72,6 @@ namespace Graphics
 	extern Shader* TextShader;
 	extern Shader* UIShader;
 #endif
-	extern bool IsRenderingShadows;
 	extern float ChrAbbSize, Vignette;
 	extern unsigned int PCFQuality;
 #if !SERVER

@@ -105,6 +105,8 @@ void SettingsPanel::GenerateUI()
 
 void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, NativeType::NativeType SectionType, std::string Value)
 {
+	float Size = std::min(PanelMainBackground->GetUsedSize().X - 0.5f, 0.5f);
+
 	Parent->AddChild((new UIText(0.5f, EditorUI::UIColors[2], Name, EditorUI::Text))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
 	UIBox* Element;
 	switch (SectionType)
@@ -115,14 +117,14 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 	case NativeType::String:
 		Element = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 			->SetText(Value)
-			->SetMinSize(Vector2(std::min(Scale.X - 0.25f, 0.35f), 0))
+			->SetMinSize(Vector2(Size, 0))
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		Parent->AddChild(Element);
 		break;
 	case NativeType::Vector3:
 	case NativeType::Vector3Color:
-		Element = (new UIVectorField(0, Vector3::FromString(Value), this, Index, EditorUI::Text))
+		Element = (new UIVectorField(Size, Vector3::FromString(Value), this, Index, EditorUI::Text))
 			->SetValueType(SectionType == NativeType::Vector3 ? UIVectorField::VecType::xyz : UIVectorField::VecType::rgb)
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f);
 		Parent->AddChild(Element);
@@ -172,6 +174,7 @@ void SettingsPanel::OnResized()
 
 void SettingsPanel::OnButtonClicked(int Index)
 {
+	HandlePanelButtons(Index);
 	if (Index >= 0)
 	{
 		SelectedSetting = Index;

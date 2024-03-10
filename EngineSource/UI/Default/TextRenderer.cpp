@@ -523,8 +523,27 @@ DrawableText::DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumV
 
 void DrawableText::Draw(ScrollObject* CurrentScrollObject)
 {
-	glBindVertexArray(VAO);
 	Graphics::TextShader->Bind();
+	if (CurrentScrollObject != nullptr)
+	{
+		float TextPos = (Position.Y) / -450 + CurrentScrollObject->Percentage;
+
+		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"),
+			-CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
+		if (CurrentScrollObject->Position.Y > TextPos + Scale * 0.01f)
+		{
+			return;
+		}
+		if (CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y < TextPos)
+		{
+			return;
+		}
+	}
+	else
+	{
+		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
+	}
+	glBindVertexArray(VAO);
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture);
 	glUniform1i(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_texture"), 0);
@@ -533,13 +552,6 @@ void DrawableText::Draw(ScrollObject* CurrentScrollObject)
 	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "transform"), (float)Position.X, (float)Position.Y, Scale);
 	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_opacity"), Opacity);
 	Graphics::TextShader->SetVector2("u_screenRes", Graphics::WindowResolution);
-	if (CurrentScrollObject != nullptr)
-	{
-		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"),
-			-CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
-	}
-	else
-		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
 	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
 	glDrawArrays(GL_TRIANGLES, 0, NumVerts);
