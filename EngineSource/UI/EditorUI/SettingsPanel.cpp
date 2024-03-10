@@ -112,7 +112,6 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 	switch (SectionType)
 	{
 	case NativeType::Float:
-		break;
 	case NativeType::Int:
 	case NativeType::String:
 		Element = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
@@ -205,8 +204,20 @@ void SettingsPanel::OnButtonClicked(int Index)
 			{
 
 			}
-		}
 			break;
+		}
+		case NativeType::Float:
+		{
+			try
+			{
+				Setting.Value = std::to_string(std::stof(dynamic_cast<UITextField*>(LoadedSettingElements[Index])->GetText()));
+			}
+			catch (std::exception)
+			{
+
+			}
+			break;
+		}
 		default:
 			break;
 		}

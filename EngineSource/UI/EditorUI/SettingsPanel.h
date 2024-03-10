@@ -105,6 +105,15 @@ class SettingsPanel : public EditorPanel
 			{
 				Graphics::SSAO = std::stoi(NewValue);
 			}),
+			SettingsCategory::Setting("Display:VSync", NativeType::Bool, "1", [](std::string NewValue)
+			{
+				Graphics::VSync = std::stoi(NewValue);
+			}),
+			SettingsCategory::Setting("Display:Resolution scale", NativeType::Float, "1", [](std::string NewValue)
+			{
+				Graphics::ResolutionScale = std::stof(NewValue);
+				Graphics::SetWindowResolution(Graphics::WindowResolution);
+			}),
 			}
 		),
 
