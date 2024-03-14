@@ -54,7 +54,7 @@ WorldObject::~WorldObject()
 WorldObject* WorldObject::Start(std::string ObjectName, Transform Transform, uint64_t NetID)
 {
 #if !EDITOR
-	if ((!Client::GetIsConnected() && !Server::IsServer()) || (!GetIsReplicated() || NetID != UINT64_MAX))
+	if (!GetIsReplicated() || NetID != UINT64_MAX)
 #endif
 	{
 		this->NetID = NetID;
@@ -64,12 +64,15 @@ WorldObject* WorldObject::Start(std::string ObjectName, Transform Transform, uin
 		SetTransform(Transform);
 		Begin();
 	}
-#if !EDITOR && SERVER
-	else if (NetID == Networking::ServerID)
+#if !EDITOR
+#if SERVER
+	else if (NetID == UINT64_MAX)
+#else
+	else if (NetID == UINT64_MAX && !Client::GetIsConnected())
+#endif
 	{
 		return Networking::SpawnReplicatedObjectFromID(TypeID, Transform);
 	}
-#elif !EDITOR
 	else
 	{
 		delete this;
@@ -455,6 +458,12 @@ std::string WorldObject::Property::ValueToString(WorldObject* Context)
 void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
 {
 #if !EDITOR
+	if (!Client::GetIsConnected())
+	{
+		(Parent->*Function)(Arguments);
+		return;
+	}
+
 	switch (NativeType)
 	{
 	case WorldObject::NetEvent::EventType::Server:

@@ -1,5 +1,6 @@
-#if !EDITOR
 #include "Networking.h"
+#include <Objects/WorldObject.h>
+#if !EDITOR
 #include <iostream>
 #include <Engine/Log.h>
 #include <SDL_net.h>
@@ -12,7 +13,6 @@
 #include "NetworkEvent.h"
 #include "Server.h"
 #include <Engine/Console.h>
-#include <Objects/WorldObject.h>
 #include <Engine/EngineError.h>
 
 namespace Networking
@@ -284,7 +284,9 @@ WorldObject* Networking::SpawnReplicatedObjectFromID(uint32_t ID, Transform Posi
 {
 	WorldObject* obj = Objects::SpawnObjectFromID(ID, Position, NetIDCounter);
 	obj->NetOwner = UINT64_MAX;
+#if SERVER
 	Server::SpawnObject(ID, NetIDCounter, Position);
+#endif
 	NetIDCounter++;
 	return obj;
 }
@@ -330,6 +332,7 @@ std::string Networking::ClientIDToString(uint64_t ID)
 	}
 	return "Client " + std::to_string(ID);
 }
+#endif
 
 // TODO: Have a map of all replicated objects to speed this up.
 WorldObject* Networking::GetObjectFromNetID(uint64_t NetID)
@@ -343,4 +346,3 @@ WorldObject* Networking::GetObjectFromNetID(uint64_t NetID)
 	}
 	return nullptr;
 }
-#endif

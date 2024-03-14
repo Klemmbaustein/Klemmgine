@@ -1,10 +1,12 @@
 #pragma once
 #include <cstdint>
+
+class WorldObject;
+
 #if !EDITOR
 #include <string>
 #include <Math/Vector.h>
 
-class WorldObject;
 
 namespace Networking
 {
@@ -22,13 +24,13 @@ namespace Networking
 
 	std::string ClientIDToString(uint64_t ID);
 
-	WorldObject* GetObjectFromNetID(uint64_t NetID);
 }
 #endif
 
 namespace Networking
 {
 	const uint64_t ServerID = UINT64_MAX;
+	WorldObject* GetObjectFromNetID(uint64_t NetID);
 }
 
 namespace Project

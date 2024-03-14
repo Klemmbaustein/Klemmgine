@@ -5,6 +5,10 @@
 int Random::GetRandomInt(int Min, int Max)
 {
 	int Range = std::abs(Max - Min);
+	if (Range == 0)
+	{
+		return Min;
+	}
 	int RandomNumber = std::rand() % Range;
 	return RandomNumber + Min;
 }

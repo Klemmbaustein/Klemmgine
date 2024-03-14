@@ -96,7 +96,7 @@ void CollisionVisualize::Activate()
 				case Physics::PhysicsBody::BodyType::Capsule:
 					MeshData.LoadModelFromFile(Application::GetEditorPath() + "/EditorContent/Models/Sphere.jsm");
 					{
-						float diff = (MeshTransform.Scale.Y - MeshTransform.Scale.X) * 50;
+						float diff = (MeshTransform.Scale.Y - MeshTransform.Scale.X) * 45;
 
 						for (auto& i : MeshData.Elements[0].Vertices)
 						{

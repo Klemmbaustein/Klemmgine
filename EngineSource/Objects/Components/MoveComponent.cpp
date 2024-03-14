@@ -159,7 +159,6 @@ void MoveComponent::Update()
 	}
 	GET_COLLISION_PTR();
 
-
 	Transform WorldTransform = GetWorldTransform();
 
 	InputDirection.Y = 0;
