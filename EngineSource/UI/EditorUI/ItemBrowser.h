@@ -41,6 +41,7 @@ public:
 		Vector3 Color;
 		uint32_t TypeID = 0;
 		bool Selected = false;
+		bool CanCopy = false;
 		bool Deleteable = true;
 		bool Renameable = true;
 		bool Openable = true;

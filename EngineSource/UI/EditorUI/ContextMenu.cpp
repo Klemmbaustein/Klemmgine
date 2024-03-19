@@ -300,9 +300,9 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 		{
 			BackgroundBox->AddChild(NewElement);
 			ContextButtons.push_back(NewElement);
-			ContextSettings.push_back(Element);
 		}
 	}
+	ContextSettings.push_back(Element);
 }
 
 void ContextMenu::Tick()
@@ -489,7 +489,7 @@ void ContextMenu::OnButtonClicked(int Index)
 				}
 			}
 			IteratedElement++;
-}
+		}
 		if (EditorUI::SelectedObjects.size()
 			&& Index == -1)
 		{

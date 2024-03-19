@@ -22,6 +22,9 @@ namespace Networking
 	uint32_t GetTickRate();
 	uint64_t GetGameTick();
 
+	bool GetIsServerTickFrame();
+	float GetTickDelta();
+
 	std::string ClientIDToString(uint64_t ID);
 
 }

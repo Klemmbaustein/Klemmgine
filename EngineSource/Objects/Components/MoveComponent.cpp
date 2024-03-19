@@ -39,7 +39,7 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 	}
 
 	Vector3 HitNormal = Vector3(0, 0, 0);
-	float MaxDistance = 0;
+	float MinDistance = INFINITY;
 
 	bool HitStep = false;
 
@@ -48,7 +48,7 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 	for (auto& i : Hits)
 	{
 		HitNormal += i.Normal * i.Depth;
-		MaxDistance = std::max(i.Distance, MaxDistance);
+		MinDistance = std::min(i.Distance, MinDistance);
 		AvgPos += i.ImpactPoint;
 	}
 	HitNormal = HitNormal.Normalize();
@@ -85,7 +85,7 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 		}
 	}
 
-	float AbsoluteDistance = MaxDistance * Direction.Length();
+	float AbsoluteDistance = MinDistance * Direction.Length();
 	Vector3 SnapToSurface = Direction.Normalize() * (AbsoluteDistance - 0.01f);
 	Vector3 LeftOver = Direction - SnapToSurface;
 

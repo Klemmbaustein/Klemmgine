@@ -139,8 +139,8 @@ namespace Sound
 	void Update3DVolumeOfSound(const Source& CurrentSource, const Vector3& Position)
 	{
 		float Distance = (CurrentSource.Position - Position).Length();
-		Distance = Distance - CurrentSource.Distance;
-		alSourcef(CurrentSource.AudioSource, AL_GAIN, std::max(CurrentSource.Volume - Distance, 0.0f));
+		float Volume = (CurrentSource.Distance - Distance) / CurrentSource.Distance;
+		alSourcef(CurrentSource.AudioSource, AL_GAIN, std::max(CurrentSource.Volume * Volume, 0.0f));
 	}
 #endif
 	void StopAllSounds()
@@ -160,7 +160,7 @@ namespace Sound
 	void Update()
 	{
 #if !SERVER
-		Vector3 ForwardVec, PositionVec;
+		Vector3 ForwardVec, PositionVec = Vector3(0, 100000, 0);
 		if (Graphics::MainCamera)
 		{
 			ForwardVec = Vector3::GetForwardVector(Graphics::MainCamera->Rotation);
@@ -206,7 +206,7 @@ namespace Sound
 		alcMakeContextCurrent(context);
 		alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 		alListenerf(AL_GAIN, 1.1f);
-		Console::RegisterCommand(Console::Command("playsound", []()
+		Console::RegisterCommand(Console::Command("play_sound", []()
 			{
 				auto LoadedBuffer = LoadSound(Console::CommandArgs()[0]);
 				if (LoadedBuffer)
@@ -217,7 +217,9 @@ namespace Sound
 				}
 				Console::ConsoleLog("Sound " + Console::CommandArgs()[0] + " doesn't exist!", Console::Err);
 			}, {Console::Command::Argument("sound", NativeType::String)}));
-		Console::RegisterConVar(Console::Variable("soundvolume", NativeType::Float, &MasterVolume, nullptr));
+		Console::RegisterConVar(Console::Variable("sound_volume", NativeType::Float, &MasterVolume, nullptr));
+
+		Update();
 #endif
 	}
 	void End()
@@ -272,7 +274,7 @@ namespace Sound
 	{
 #if !SERVER
 		ALuint NewSource;
-		Vector3 PositionVec;
+		Vector3 PositionVec = Vector3(0, 10000, 0);
 		alGenSources(1, &NewSource);
 		if (Graphics::MainCamera)
 		{
@@ -280,9 +282,9 @@ namespace Sound
 		}
 		alSourcef(NewSource, AL_PITCH, Pitch);
 		alSourcef(NewSource, AL_GAIN, Volume);
-		alSource3f(NewSource, AL_POSITION, PositionVec.X, PositionVec.Y, PositionVec.Z);
 		alSource3f(NewSource, AL_POSITION, Position.X, Position.Y, Position.Z);
 		alSource3f(NewSource, AL_VELOCITY, 0, 0, 0);
+		alSourcef(NewSource, AL_ROLLOFF_FACTOR, 0.0f);
 		alSourcei(NewSource, AL_LOOPING, Looping);
 		alSourcei(NewSource, AL_BUFFER, Sound->Buffer);
 		alSourcePlay(NewSource);

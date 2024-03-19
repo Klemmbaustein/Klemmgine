@@ -253,7 +253,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f,
 					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f,
 					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f)
-				* 0.035f)
+				* 0.025f)
 			* TraceDistance, false);
 		LightInt += r.Hit ? 1 - std::min(r.Distance * TraceDistance / 12.0f, 1.0f) : 1;
 	}
@@ -286,7 +286,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 		{
 			MeshComponent* MeshC = dynamic_cast<MeshComponent*>(c);
 
-			if (!MeshC)
+			if (!MeshC || !MeshC->CastStaticShadow)
 			{
 				continue;
 			}

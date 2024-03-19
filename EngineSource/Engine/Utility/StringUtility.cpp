@@ -45,23 +45,25 @@ std::string StrUtil::VectorToString(std::vector<char> In)
 std::vector<std::string> StrUtil::SeperateString(std::string Value, char Sep)
 {
 	std::vector<std::string> Values;
-	size_t Last = 0;
 
-	do
+	std::string New;
+
+	for (char c : Value)
 	{
-		size_t PrevLast = Last == 0 ? Last : Last + 1;
-		Last = Value.find_first_of(Sep, PrevLast);
-		Values.push_back(Value.substr(PrevLast, Last - PrevLast));
-
-		if (Last == PrevLast && Last == 0)
+		if (c != Sep)
 		{
-			break;
+			New.push_back(c);
 		}
-	} while (Last != std::string::npos);
+		else
+		{
+			Values.push_back(New);
+			New.clear();
+		}
+	}
 
-	if (!Values.empty() && Values[Values.size() - 1].empty())
+	if (!New.empty())
 	{
-		Values.pop_back();
+		Values.push_back(New);
 	}
 
 	return Values;

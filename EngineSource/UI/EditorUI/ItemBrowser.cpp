@@ -127,6 +127,17 @@ void ItemBrowser::Tick()
 		{
 			Items.push_back(EditorUI::DropdownItem("Rename", []() { new RenameBox(DropdownItem.Path); }));
 		}
+		if (DropdownItem.CanCopy)
+		{
+			Items.push_back(EditorUI::DropdownItem("Copy", []() 
+				{
+					std::filesystem::copy(
+						DropdownItem.Path,
+						FileUtil::GetFilePathWithoutExtension(DropdownItem.Path) + "_Copy." + FileUtil::GetExtension(DropdownItem.Path)
+					); 
+					DropdownBrowser->OnPathChanged();
+				}));
+		}
 		if (DropdownItem.Deleteable)
 		{
 			Items.push_back(EditorUI::DropdownItem("Delete", []() 

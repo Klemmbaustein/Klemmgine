@@ -213,35 +213,44 @@ bool Client::HandleValueUpdate(uint64_t ObjNetID, std::string Name, std::string 
 		obj->GetTransform().Scale = Vector3::FromString(Value);
 		return true;
 	}
-
-	for (auto& i : obj->Properties)
+	try
 	{
-		if (i.PType != WorldObject::Property::PropertyType::NetProperty)
+		for (auto& i : obj->Properties)
 		{
-			continue;
-		}
+			if (i.PType != WorldObject::Property::PropertyType::NetProperty)
+			{
+				continue;
+			}
 
-		if (i.Name != Name)
-		{
-			continue;
-		}
+			if (i.Name != Name)
+			{
+				continue;
+			}
 
-		switch (i.NativeType)
-		{
-		case NativeType::Int:
-			*(int*)i.Data = std::stoi(Value);
-			break;
-		case NativeType::Float:
-			*(float*)i.Data = std::stof(Value);
-			break;
-		case NativeType::Vector3:
-		case NativeType::Vector3Color:
-		case NativeType::Vector3Rotation:
-			*(Vector3*)i.Data = Vector3::FromString(Value);
-			break;
-		default:
-			break;
+			switch (i.NativeType)
+			{
+			case NativeType::Int:
+				*(int*)i.Data = std::stoi(Value);
+				break;
+			case NativeType::Float:
+				*(float*)i.Data = std::stof(Value);
+				break;
+			case NativeType::Vector3:
+			case NativeType::Vector3Color:
+			case NativeType::Vector3Rotation:
+				*(Vector3*)i.Data = Vector3::FromString(Value);
+				break;
+			case NativeType::Bool:
+				*(bool*)i.Data = std::stoi(Value);
+				break;
+			default:
+				break;
+			}
 		}
+	}
+	catch (std::exception)
+	{
+
 	}
 	return true;
 }

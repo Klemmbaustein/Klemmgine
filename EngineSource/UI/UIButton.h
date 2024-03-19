@@ -22,7 +22,6 @@ protected:
 	UICanvas* ParentUI;
 	int ButtonIndex;
 	bool CanBeDragged = false;
-	unsigned int TextureID = 0;
 	virtual void Tick() override;
 	virtual void Update() override;
 	virtual void OnClicked();

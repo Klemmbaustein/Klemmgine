@@ -1,5 +1,19 @@
 # Changes
 
+## Version 1.9.3
+
+### Changes
+
+- Networking stability improvements.
+
+### Fixes
+
+- Fixed a crash related to lists in object properties.
+- Fixed a crash with the physics system in certain conditions.
+- Fixed scaling for some shape types for collision visualization.
+- Fixed glitchy behaviour of MoveComponent when colliding with multiple polygons at once.
+- Fixed sound falloff being too abrupt.
+
 ## Version 1.9.2
 
 ### Changes

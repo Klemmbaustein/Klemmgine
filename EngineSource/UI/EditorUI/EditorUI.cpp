@@ -142,7 +142,7 @@ void EditorUI::LaunchInEditor()
 			}
 		}
 
-		if (Project::UseNetworkFunctions && (!std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
+		if (Project::UseNetworkFunctions && LaunchWithServer && (!std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
 			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
 		{
 			if (Build::BuildCurrentSolution("Server"))
@@ -189,7 +189,7 @@ void EditorUI::LaunchInEditor()
 	if (LaunchWithServer)
 	{
 		CommandLine.append(" -connect localhost ");
-}
+	}
 
 	Log::Print("[Debug]: Starting process: " + CommandLine, Log::LogColor::Blue);
 #if _WIN32

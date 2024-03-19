@@ -42,8 +42,7 @@ void CollisionVisualize::Activate()
 	VisualizeFramebuffer->AddEditorGrid();
 #endif
 
-	std::string StaticMaterial = Application::GetEditorPath() + "/EditorContent/Materials/StaticCollider.jsmat";
-	std::string DynamicMaterial = Application::GetEditorPath() + "/EditorContent/Materials/DynamicCollider.jsmat";
+	std::string MaterialPath = Application::GetEditorPath() + "/EditorContent/Materials/CollisionVisualize/";
 
 	for (WorldObject* Obj : Objects::AllObjects)
 	{
@@ -66,7 +65,7 @@ void CollisionVisualize::Activate()
 
 				for (auto& i : MeshData.Elements)
 				{
-					i.ElemMaterial = StaticMaterial;
+					i.ElemMaterial = MaterialPath + "Collider.jsmat";
 				}
 
 				MeshData.TwoSided = true;
@@ -89,9 +88,11 @@ void CollisionVisualize::Activate()
 				{
 				case Physics::PhysicsBody::BodyType::Box:
 					MeshData.AddElement().MakeCube(2, 0);
+					MeshTransform.Scale = MeshTransform.Scale / 2.5f;
 					break;
 				case Physics::PhysicsBody::BodyType::Sphere:
 					MeshData.LoadModelFromFile(Application::GetEditorPath() + "/EditorContent/Models/Sphere.jsm");
+					MeshTransform.Scale = MeshTransform.Scale / 2.5f;
 					break;
 				case Physics::PhysicsBody::BodyType::Capsule:
 					MeshData.LoadModelFromFile(Application::GetEditorPath() + "/EditorContent/Models/Sphere.jsm");
@@ -119,9 +120,27 @@ void CollisionVisualize::Activate()
 				MeshData.TwoSided = false;
 				MeshData.CastShadow = false;
 
+				std::string ColliderMaterial = MaterialPath;
+
+				switch (Body->ColliderMovability)
+				{
+				case Physics::MotionType::Dynamic:
+					ColliderMaterial.append("Dynamic");
+					break;
+				case Physics::MotionType::Kinematic:
+					ColliderMaterial.append("Kinematic");
+					break;
+				case Physics::MotionType::Static:
+					ColliderMaterial.append("Static");
+					break;
+				default:
+					break;
+				}
+				ColliderMaterial.append("PhysicsBody.jsmat");
+
 				for (auto& i : MeshData.Elements)
 				{
-					i.ElemMaterial = DynamicMaterial;
+					i.ElemMaterial = ColliderMaterial;
 				}
 			}
 

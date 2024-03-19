@@ -44,6 +44,7 @@ namespace Networking
 	UDPpacket* SentPacket;
 	float TickTimer = 0;
 	uint64_t Gametick = 0;
+	bool IsServerTickFrame = false;
 	uint64_t NetIDCounter = 0;
 }
 
@@ -272,10 +273,16 @@ void Networking::Update()
 	{
 		Gametick += (uint64_t)(TickTimer / TickInterval);
 		TickTimer = 0;
+		IsServerTickFrame = true;
 		HandleTick();
+	}
+	else
+	{
+		IsServerTickFrame = false;
 	}
 #else
 	HandleTick();
+	IsServerTickFrame = true;
 	Gametick++;
 #endif
 }
@@ -322,6 +329,16 @@ uint32_t Networking::GetTickRate()
 uint64_t Networking::GetGameTick()
 {
 	return Gametick;
+}
+
+bool Networking::GetIsServerTickFrame()
+{
+	return IsServerTickFrame;
+}
+
+float Networking::GetTickDelta()
+{
+	return 1.0f / (float)TICK_RATE;
 }
 
 std::string Networking::ClientIDToString(uint64_t ID)
