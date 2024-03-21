@@ -103,10 +103,10 @@ public:
 	* @param Command
 	* The Command to execute
 	* 
-	* @param Async
-	* If true, the function will not block the current thread until the command has finished. If false, it will.
+	* @param Prefix
+	* Log prefix added to the output of the command.
 	*/
-	static void PipeProcessToLog(std::string Command, bool Async);
+	static void PipeProcessToLog(std::string Command, std::string Prefix = "");
 
 	/**
 	* @brief

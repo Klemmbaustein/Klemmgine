@@ -182,7 +182,7 @@ struct Vector3
 	* If the function fails, an empty vector (0, 0, 0) is returned.
 	*/
 	static Vector3 FromString(std::string In);
-	static Vector3 SnapToGrid(Vector3 In, float GridSize);
+	static Vector3 SnapToGrid(Vector3 In, Vector3 GridSize);
 
 	/**
 	* @brief
@@ -240,6 +240,9 @@ struct Vector3
 	* Returns the distance between point a and b.
 	*/
 	static float Distance(Vector3 a, Vector3 b);
+
+	static float DistanceSquared(Vector3 a, Vector3 b);
+
 	static Vector3 GetScaledAxis(Vector3 Rot, unsigned int Dir);
 	static Vector3 RotateVector(Vector3 Vec, Vector3 Rot);
 

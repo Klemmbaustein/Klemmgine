@@ -107,7 +107,6 @@ UDPsocket Networking::InitSocketFrom(IPaddress* Target)
 		exit(1);
 	}
 
-	//get my address
 	IPaddress* myaddress = SDLNet_UDP_GetPeerAddress(fret, -1);
 	if (!myaddress)
 	{

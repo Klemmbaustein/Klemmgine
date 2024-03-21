@@ -21,8 +21,8 @@ namespace pkt
 	std::thread* pktThread = nullptr;
 	static bool RecvPacket = false;
 	std::condition_variable cv;
-	std::mutex mutex;
-	std::map<uint64_t, Packet> lines;
+	std::mutex Mutex;
+	std::map<uint64_t, Packet> Lines;
 	UDPpacket* threadPacket;
 }
 using namespace pkt;
@@ -197,7 +197,7 @@ void Packet::Send(void* TargetAddr)
 	}
 }
 
-void pktReceive()
+void PacketReceive()
 {
 	while (true)
 	{
@@ -228,7 +228,7 @@ void pktReceive()
 					NewP.Data.push_back(threadPacket->data[i]);
 				}
 				NewP.FromAddr = &threadPacket->address;
-				lines.insert(std::pair(pID, NewP));
+				Lines.insert(std::pair(pID, NewP));
 			}
 			else
 			{
@@ -240,11 +240,11 @@ void pktReceive()
 
 std::map<uint64_t, Packet> Packet::Receive()
 {
-	std::unique_lock lock{ mutex };
+	std::unique_lock lock{ Mutex };
 	std::map<uint64_t, Packet> toProcess;
-	if (cv.wait_for(lock, std::chrono::seconds(0), [&] { return !lines.empty(); }))
+	if (cv.wait_for(lock, std::chrono::seconds(0), [&] { return !Lines.empty(); }))
 	{
-		std::swap(lines, toProcess);
+		std::swap(Lines, toProcess);
 	}
 #if 0
 	for (auto& i : toProcess)
@@ -267,7 +267,7 @@ void Packet::Init()
 	{
 		return;
 	}
-	pktThread = new std::thread(pktReceive);
+	pktThread = new std::thread(PacketReceive);
 	threadPacket = SDLNet_AllocPacket(Packet::MAX_PACKET_SIZE);
 	if (!threadPacket)
 	{

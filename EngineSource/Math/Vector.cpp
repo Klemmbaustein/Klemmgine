@@ -220,9 +220,9 @@ Vector3 Vector3::GetRightVector(Vector3 In)
 	return GetScaledAxis(In.DegreesToRadians(), 0);
 }
 
-Vector3 Vector3::SnapToGrid(Vector3 In, float GridSize)
+Vector3 Vector3::SnapToGrid(Vector3 In, Vector3 GridSize)
 {
-	Vector3 Result = Vector3((float)(int)(In.X / GridSize), (float)(int)(In.Y / GridSize), (float)(int)(In.Z / GridSize));
+	Vector3 Result = Vector3((float)(int)(In.X / GridSize.X), (float)(int)(In.Y / GridSize.Y), (float)(int)(In.Z / GridSize.Z));
 	Result = Result * GridSize;
 	return Result;
 }
@@ -275,6 +275,12 @@ float Vector3::Distance(Vector3 a, Vector3 b)
 {
 	Vector3 dif = b - a;
 	return dif.Length();
+}
+
+float Vector3::DistanceSquared(Vector3 a, Vector3 b)
+{
+	Vector3 dif = b - a;
+	return dif.X * dif.X + dif.Y * dif.Y + dif.Z * dif.Z;
 }
 
 Vector3 Vector3::GetUpVector(Vector3 In)

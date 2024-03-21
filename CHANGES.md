@@ -1,5 +1,20 @@
 # Changes
 
+## Version 1.9.4
+
+### Changes
+
+- Added FXAA anti aliasing. (`aa_enabled` convar to enabled/disable)
+- Removed "C#" toolbar option on projects that don't use C#.
+- Added filtering options to the billboard component.
+
+### Fixes
+
+- Fixed issues with more than 8 lights at once.
+- Fixed an issue with shadows in framebuffers that aren't the main one.
+- Fixed an issue with boolean editor properties.
+- Fixed an issue with occlusion culling with meshes that have a center position that isn't 0.
+
 ## Version 1.9.3
 
 ### Changes
@@ -114,7 +129,7 @@
 
 ### Changes
 - Added controller input support. (Engine/Gamepad.h)
-	- Added C# bindings for controller input.
+- Added C# bindings for controller input.
 - Added Linux support.
 - Added pre-built binaries for Linux (maybe?)
 

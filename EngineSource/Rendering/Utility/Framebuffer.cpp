@@ -151,8 +151,8 @@ void Framebuffer::ReInit(int Width, int Height, bool ColorAttachementType)
 		glTexImage2D(GL_TEXTURE_2D, 0,
 			(Attachements[i] == GL_DEPTH_STENCIL_ATTACHMENT) ? GL_DEPTH24_STENCIL8 : GL_RGBA16F, Width, Height, 0, (Attachements[i] == GL_DEPTH_STENCIL_ATTACHMENT) ? GL_DEPTH_STENCIL : GL_RGBA,
 			Attachements[i] == GL_DEPTH_STENCIL_ATTACHMENT ? GL_UNSIGNED_INT_24_8 : GL_FLOAT, 0);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, Graphics::RenderAntiAlias ? GL_LINEAR : GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Graphics::RenderAntiAlias ? GL_LINEAR : GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &BorderColor.X);

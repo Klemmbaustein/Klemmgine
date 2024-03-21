@@ -7,6 +7,7 @@
 #include <Engine/EngineProperties.h>
 #include <Engine/Application.h>
 #include <Rendering/Utility/CSM.h>
+#include <Engine/Console.h>
 
 /**
 * @brief
@@ -104,6 +105,11 @@ class SettingsPanel : public EditorPanel
 			SettingsCategory::Setting("Graphics:Ambient Occlusion", NativeType::Bool, "1", [](std::string NewValue)
 			{
 				Graphics::SSAO = std::stoi(NewValue);
+			}),
+			SettingsCategory::Setting("Graphics:Anti aliasing", NativeType::Bool, "1", [](std::string NewValue)
+			{
+				Graphics::RenderAntiAlias = std::stoi(NewValue);
+				Graphics::SetWindowResolution(Graphics::WindowResolution, true);
 			}),
 			SettingsCategory::Setting("Display:VSync", NativeType::Bool, "1", [](std::string NewValue)
 			{

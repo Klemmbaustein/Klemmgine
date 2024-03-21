@@ -37,7 +37,8 @@ Model::Model(std::string Filename)
 		ShouldCull = NumVerts > 100;
 		HasCollision = ModelMeshData.HasCollision;
 		NonScaledSize = ModelMeshData.CollisionBox.GetLength();
-		Vector3 Extent = ModelMeshData.CollisionBox.GetExtent();
+		ModelMeshData.MakeCollisionBox();
+		Vector3 Extent = ModelMeshData.CollisionBox.GetExtent() * 0.025f * 0.5f;
 		Size = FrustumCulling::AABB(ModelMeshData.CollisionBox.GetCenter() * 0.025f, Extent.X, Extent.Y, Extent.Z);
 		ConfigureVAO();
 	}
@@ -67,8 +68,9 @@ Model::Model(ModelGenerator::ModelData Data)
 	ShouldCull = NumVerts > 100;
 	HasCollision = Data.HasCollision;
 	NonScaledSize = Data.CollisionBox.GetLength();
-	Vector3 Extent = Data.CollisionBox.GetExtent() * 0.025f;
-	Size = FrustumCulling::AABB(Data.CollisionBox.GetCenter() * 0.025f, Extent.X, Extent.Y, Extent.Z);
+	ModelMeshData.MakeCollisionBox();
+	Vector3 Extent = ModelMeshData.CollisionBox.GetExtent() * 0.025f * 0.5f;
+	Size = FrustumCulling::AABB(ModelMeshData.CollisionBox.GetCenter() * 0.025f, Extent.X, Extent.Y, Extent.Z);
 	ConfigureVAO();
 }
 

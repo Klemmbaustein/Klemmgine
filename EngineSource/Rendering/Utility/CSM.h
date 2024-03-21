@@ -8,6 +8,8 @@
 #include <string>
 #include <Rendering/Shader.h>
 
+class Camera;
+
 namespace CSM
 {
 	extern float CSMDistance;
@@ -34,13 +36,13 @@ namespace CSM
 	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
 
 	std::string ErrorMessageFromGLStatus(int Status);
-	void UpdateMatricesUBO();
+	void UpdateMatricesUBO(Camera* From);
 	void BindLightSpaceMatricesToShader(const std::vector<glm::mat4>& Matrices, Shader* ShaderToBind);
 	std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
 	void Init();
 	void ReInit();
-	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane);
+	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane, Camera* From);
 
-	std::vector<glm::mat4> getLightSpaceMatrices();
+	std::vector<glm::mat4> getLightSpaceMatrices(Camera* From);
 }
 #endif

@@ -221,6 +221,7 @@ namespace Application
 	std::thread ConsoleThread;
 	size_t FrameCount = 0;
 #if !SERVER
+	PostProcess::Effect* AntiAliasEffect = nullptr;
 	Model* OcclusionCullMesh = nullptr;
 	Shader* CullShader = nullptr;
 	uint8_t NumOcclusionQueries = 0;
@@ -351,7 +352,11 @@ static void OcclusionCheck(Model* m, size_t i, FramebufferObject* Buffer)
 	}
 
 	glBeginQuery(GL_ANY_SAMPLES_PASSED, Query);
-	Transform t = Transform(m->ModelTransform.Position + m->Size.extents, m->ModelTransform.Rotation, m->Size.extents * m->ModelTransform.Scale);
+	Transform t = Transform(
+		m->ModelTransform.Position + Vector3::RotateVector(m->Size.center, m->ModelTransform.Rotation),
+		m->ModelTransform.Rotation,
+		m->Size.extents * m->ModelTransform.Scale
+	);
 	Application::OcclusionCullMesh->ModelTransform = t;
 	Application::OcclusionCullMesh->UpdateTransform();
 	Application::OcclusionCullMesh->SimpleRender(Application::CullShader);
@@ -428,9 +433,8 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 	glClearColor(0.f, 0.f, 0.f, 1.f);		//Clear color black
 	glViewport(0, 0, Graphics::ShadowResolution, Graphics::ShadowResolution);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	const auto LightSpaceMatrices = CSM::getLightSpaceMatrices();
+	CSM::UpdateMatricesUBO(Buffer->FramebufferCamera);
 
-	CSM::UpdateMatricesUBO();
 	if (Graphics::RenderShadows && Graphics::ShadowResolution > 0 && !Graphics::RenderFullbright)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, CSM::LightFBO);
@@ -450,20 +454,47 @@ static void DrawFramebuffer(FramebufferObject* Buffer)
 
 	Vector2 BufferResolution = Buffer->UseMainWindowResolution ? Graphics::RenderResolution : Buffer->CustomFramebufferResolution;
 	glViewport(0, 0, (int)BufferResolution.X, (int)BufferResolution.Y);
-	auto Matrices = CSM::getLightSpaceMatrices();
+	const auto LightSpaceMatrices = CSM::getLightSpaceMatrices(Buffer->FramebufferCamera);
+
+	std::vector<Graphics::Light*> DrawnLights;
+	DrawnLights.reserve(std::min(size_t(8), Buffer->Lights.size()));
+
+	for (auto& Light : Buffer->Lights)
+	{
+		float Distance = Vector3::DistanceSquared(Buffer->FramebufferCamera->Position, Light.Position);
+		if (DrawnLights.size() < Graphics::MAX_LIGHTS)
+		{
+			Light.Distance = Distance;
+			DrawnLights.push_back(&Light);
+		}
+		else
+		{
+			for (Graphics::Light*& i : DrawnLights)
+			{
+				if (Distance < i->Distance)
+				{
+					i = &Light;
+					i->Distance = Distance;
+					break;
+				}
+			}
+		}
+	}
+
 	for (auto& s : Shaders)
 	{
 		Renderable::ApplyDefaultUniformsToShader(s.second.UsedShader, Buffer == Graphics::MainFramebuffer);
-		CSM::BindLightSpaceMatricesToShader(Matrices, s.second.UsedShader);
-		for (int i = 0; i < 8; i++)
+		CSM::BindLightSpaceMatricesToShader(LightSpaceMatrices, s.second.UsedShader);
+
+		for (int i = 0; i < Graphics::MAX_LIGHTS; i++)
 		{
 			std::string CurrentLight = "u_lights[" + std::to_string(i) + "]";
-			if (i < Buffer->Lights.size())
+			if (i < DrawnLights.size())
 			{
-				s.second.UsedShader->SetVector3(CurrentLight + ".Position", Buffer->Lights[i].Position);
-				s.second.UsedShader->SetVector3(CurrentLight + ".Color", Buffer->Lights[i].Color);
-				s.second.UsedShader->SetFloat(CurrentLight + ".Falloff", Buffer->Lights[i].Falloff);
-				s.second.UsedShader->SetFloat(CurrentLight + ".Intensity", Buffer->Lights[i].Intensity);
+				s.second.UsedShader->SetVector3(CurrentLight + ".Position", DrawnLights[i]->Position);
+				s.second.UsedShader->SetVector3(CurrentLight + ".Color", DrawnLights[i]->Color);
+				s.second.UsedShader->SetFloat(CurrentLight + ".Falloff", DrawnLights[i]->Falloff);
+				s.second.UsedShader->SetFloat(CurrentLight + ".Intensity", DrawnLights[i]->Intensity);
 
 				s.second.UsedShader->SetInt(CurrentLight + ".Active", 1);
 			}
@@ -574,18 +605,18 @@ static void InitializeShaders()
 namespace ConsoleInput
 {
 	std::condition_variable cv;
-	std::mutex mutex;
-	std::deque<std::string> lines;
+	std::mutex Mutex;
+	std::deque<std::string> Lines;
 
 	std::thread* ReadConsoleThread;
 	static void ReadConsole()
 	{
 		while (true)
 		{
-			std::string tmp;
-			std::getline(std::cin, tmp);
-			std::lock_guard lock{ mutex };
-			lines.push_back(std::move(tmp));
+			std::string ReadString;
+			std::getline(std::cin, ReadString);
+			std::lock_guard lock{ Mutex };
+			Lines.push_back(std::move(ReadString));
 			cv.notify_one();
 		}
 	}
@@ -813,8 +844,6 @@ static void DrawPostProcessing()
 		ShouldSkip3D = true;
 	}
 #endif
-
-
 	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 	Application::UIMergeEffect->EffectShader->Bind();
 	glActiveTexture(GL_TEXTURE1);
@@ -840,6 +869,7 @@ static void DrawPostProcessing()
 
 	if (!ShouldSkip3D)
 	{
+		glViewport(0, 0, (int)Graphics::RenderResolution.X, (int)Graphics::RenderResolution.Y);
 		Application::AOBuffer = SSAO::Render(
 			DrawnBuffer->GetBuffer()->GetTextureID(2),
 			DrawnBuffer->GetBuffer()->GetTextureID(3));
@@ -848,6 +878,10 @@ static void DrawPostProcessing()
 
 		if (Application::RenderPostProcess)
 		{
+			if (Graphics::RenderAntiAlias)
+			{
+				Application::MainPostProcessBuffer = Application::AntiAliasEffect->Render(Application::MainPostProcessBuffer);
+			}
 			for (const PostProcess::Effect* i : PostProcess::GetCurrentEffects())
 			{
 				if (i->UsedType == PostProcess::EffectType::World)
@@ -859,8 +893,7 @@ static void DrawPostProcessing()
 		Application::BloomBuffer = Bloom::BlurFramebuffer(Application::MainPostProcessBuffer);
 	}
 
-	Vector2 ActualRes = Application::GetWindowSize();
-	glViewport(0, 0, (int)ActualRes.X, (int)ActualRes.Y);
+	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	Debugging::EngineStatus = "Rendering (Post process: Main)";
@@ -940,16 +973,16 @@ static void ApplicationLoop()
 	}
 #endif
 
-	std::deque<std::string> toProcess;
+	std::deque<std::string> ConsoleCommands;
 	{
-		std::unique_lock lock{ ConsoleInput::mutex };
-		if (ConsoleInput::cv.wait_for(lock, std::chrono::seconds(0), [&] { return !ConsoleInput::lines.empty(); }))
+		std::unique_lock Lock { ConsoleInput::Mutex };
+		if (ConsoleInput::cv.wait_for(Lock, std::chrono::seconds(0), [&] { return !ConsoleInput::Lines.empty(); }))
 		{
-			std::swap(ConsoleInput::lines, toProcess);
+			std::swap(ConsoleInput::Lines, ConsoleCommands);
 		}
 	}
 
-	for (auto& i : toProcess)
+	for (auto& i : ConsoleCommands)
 	{
 		Console::ExecuteConsoleCommand(i);
 	}
@@ -1158,12 +1191,17 @@ int Application::Initialize(int argc, char** argv)
 	BakedLighting::Init();
 	Console::RegisterConVar(Console::Variable("post_process", NativeType::Bool, &Application::RenderPostProcess, nullptr));
 	Console::RegisterConVar(Console::Variable("full_bright", NativeType::Bool, &Graphics::RenderFullbright, nullptr));
+	Console::RegisterConVar(Console::Variable("aa_enabled", NativeType::Bool, &Graphics::RenderAntiAlias, []() {
+		Graphics::SetWindowResolution(Graphics::WindowResolution, true);
+		}));
 	Console::RegisterCommand(Console::Command("show_collision", CollisionVisualize::Activate, {}));
 	Console::RegisterCommand(Console::Command("hide_collision", CollisionVisualize::Deactivate, {}));
 	InitializeShaders();
 	UIBox::InitUI();
 	Application::UIMergeEffect = new PostProcess::Effect("Internal/uimerge.frag", PostProcess::EffectType::UI_Internal);
+	Application::AntiAliasEffect = new PostProcess::Effect("Internal/fxaa.frag", PostProcess::EffectType::World_Internal);
 	PostProcess::AddEffect(Application::UIMergeEffect);
+	PostProcess::AddEffect(Application::AntiAliasEffect);
 	CSM::Init();
 	Bloom::Init();
 	SSAO::Init();

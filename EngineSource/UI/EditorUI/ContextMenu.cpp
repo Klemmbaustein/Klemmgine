@@ -477,7 +477,7 @@ void ContextMenu::OnButtonClicked(int Index)
 					case NativeType::Bool:
 						if (((UIButton*)ContextButtons[i])->GetIsHovered())
 						{
-							*(bool*)ContextSettings[i].Variable = !(*(bool*)ContextSettings[i].Variable);
+							*(bool*)ContextSettings[IteratedElement].Variable = !(*(bool*)ContextSettings[IteratedElement].Variable);
 						}
 						break;
 					default:

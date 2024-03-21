@@ -11,6 +11,7 @@
 #include <GL/glew.h>
 #include <Rendering/Utility/ShaderManager.h>
 #include <set>
+#include <array>
 #include <Sound/Sound.h>
 
 #include <Engine/File/Assets.h>
@@ -355,7 +356,7 @@ void Console::InitializeConsole()
 
 void Console::ConsoleLog(std::string Message, ConsoleLogType Severity)
 {
-	Log::Print("[Console]: " + Message, (std::vector<Vector3>{ Log::LogColor::White, Log::LogColor::Yellow, Log::LogColor::Red })[Severity]);
+	Log::Print("[Console]: " + Message, (std::array<Vector3, 3>{ Log::LogColor::White, Log::LogColor::Yellow, Log::LogColor::Red })[Severity]);
 }
 
 bool Console::ExecuteConsoleCommand(std::string Command)

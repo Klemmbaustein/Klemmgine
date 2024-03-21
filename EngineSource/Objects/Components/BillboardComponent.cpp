@@ -1,6 +1,5 @@
 #include "BillboardComponent.h"
 #include <Rendering/BillboardSprite.h>
-#include <Rendering/Texture/Texture.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Log.h>
 
@@ -22,10 +21,10 @@ BillboardComponent::~BillboardComponent()
 #endif
 }
 
-void BillboardComponent::Load(std::string Texture)
+void BillboardComponent::Load(std::string Texture, Texture::TextureFiltering Filtering)
 {
 #if !SERVER
-	Load(Texture::LoadTexture(Texture, Texture::TextureFiltering::Linear));
+	Load(Texture::LoadTexture(Texture, Filtering));
 #endif
 }
 

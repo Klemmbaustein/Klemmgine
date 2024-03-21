@@ -16,7 +16,7 @@ namespace Project
 	void OnLaunch();
 	extern const char* ProjectName;
 }
-#define VERSION_STRING "1.9.3"
+#define VERSION_STRING "1.9.4"
 #define OPENGL_MIN_REQUIRED_VERSION "GL_VERSION_4_2"
 
 /**

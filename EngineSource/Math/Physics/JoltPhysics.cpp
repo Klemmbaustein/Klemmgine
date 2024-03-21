@@ -376,7 +376,7 @@ Vector3 JoltPhysics::GetBodyRotation(Physics::PhysicsBody* Body)
 
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
 	Vec3 vec = JoltBodyInterface->GetRotation(Info->ID).GetEulerAngles();
-	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
+	return Vector3(-vec.GetX(), -vec.GetY(), -vec.GetZ()).RadiansToDegrees();
 }
 
 Vector3 JoltPhysics::GetBodyVelocity(Physics::PhysicsBody* Body)

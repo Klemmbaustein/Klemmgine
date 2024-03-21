@@ -1,5 +1,6 @@
 #pragma once
 #include <Objects/Components/Component.h>
+#include <Rendering/Texture/Texture.h>
 
 class BillboardSprite;
 
@@ -9,7 +10,7 @@ public:
 	BillboardComponent();
 	~BillboardComponent();
 
-	void Load(std::string Texture);
+	void Load(std::string Texture, Texture::TextureFiltering Filtering = Texture::TextureFiltering::Linear);
 	void Load(unsigned int Texture);
 
 	BillboardSprite* GetSprite();

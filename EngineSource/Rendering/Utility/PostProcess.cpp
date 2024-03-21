@@ -18,6 +18,9 @@ unsigned int PostProcess::Effect::Render(unsigned int TargetBuffer) const
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, TargetBuffer);
 	EffectShader->SetInt("u_texture", 0);
+	EffectShader->SetInt("u_hasUITexCoords", 0);
+	EffectShader->SetVector2("Position", 0);
+	EffectShader->SetVector2("u_screenRes", Graphics::RenderResolution);
 	EffectShader->SetFloat("u_time", Stats::Time);
 
 	glClear(GL_COLOR_BUFFER_BIT);
@@ -35,7 +38,10 @@ PostProcess::Effect::Effect(std::string FragmentShader, EffectType UsedType)
 	glGenTextures(1, &EffectTexture);
 	glBindFramebuffer(GL_FRAMEBUFFER, EffectBuffer);
 	glBindTexture(GL_TEXTURE_2D, EffectTexture);
-	int SizeX = (int)(Graphics::WindowResolution.X), SizeY = (int)(Graphics::WindowResolution.Y);
+
+	Vector2 Resolution = (UsedType == EffectType::UI || UsedType == EffectType::UI_Internal) ? Graphics::WindowResolution : Graphics::RenderResolution;
+
+	int SizeX = (int)(Resolution.X), SizeY = (int)(Resolution.Y);
 
 	glTexImage2D(
 		GL_TEXTURE_2D,
@@ -66,7 +72,9 @@ void PostProcess::Effect::UpdateSize()
 	glBindFramebuffer(GL_FRAMEBUFFER, EffectBuffer);
 	glBindTexture(GL_TEXTURE_2D, EffectTexture);
 
-	int SizeX = (int)(Graphics::WindowResolution.X), SizeY = (int)(Graphics::WindowResolution.Y);
+	Vector2 Resolution = (UsedType == EffectType::UI || UsedType == EffectType::UI_Internal) ? Graphics::WindowResolution : Graphics::RenderResolution;
+
+	int SizeX = (int)(Resolution.X), SizeY = (int)(Resolution.Y);
 
 	glTexImage2D(
 		GL_TEXTURE_2D,

@@ -12,8 +12,9 @@ namespace Graphics
 	bool RenderShadows = true;
 	bool SSAO = true;
 	bool VSync = true;
-	bool Bloom = true, FXAA = false;
+	bool Bloom = true;
 	bool IsWireframe = false;
+	bool RenderAntiAlias = true;
 	bool RenderFullbright = false;
 	Sun WorldSun;
 	Fog WorldFog;
@@ -23,10 +24,10 @@ namespace Graphics
 	Vector2 RenderResolution = WindowResolution;
 	unsigned int PCFQuality = 0;
 	float AspectRatio = 16.0f / 9.0f;
-	void SetWindowResolution(Vector2 NewResolution)
+	void SetWindowResolution(Vector2 NewResolution, bool Force)
 	{
 #if !SERVER
-		if (NewResolution * ResolutionScale == RenderResolution)
+		if (NewResolution * ResolutionScale == RenderResolution && !Force)
 		{
 			return;
 		}

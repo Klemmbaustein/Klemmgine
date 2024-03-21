@@ -70,7 +70,7 @@ void CollisionVisualize::Activate()
 
 				MeshData.TwoSided = true;
 				MeshData.CastShadow = false;
-				MeshTransform = Transform(Body->GetPosition(), -Body->GetRotation().DegreesToRadians(), Body->BodyTransform.Scale);
+				MeshTransform = Transform(Body->GetPosition(), Body->GetRotation().DegreesToRadians(), Body->BodyTransform.Scale);
 
 			}
 			PhysicsComponent* DynamicCollider = dynamic_cast<PhysicsComponent*>(c);
@@ -82,7 +82,7 @@ void CollisionVisualize::Activate()
 
 				Body = static_cast<Physics::PhysicsBody*>(DynamicCollider->PhysicsBodyPtr);
 
-				MeshTransform = Transform(Body->GetPosition(), -Body->GetRotation().DegreesToRadians(), Body->BodyTransform.Scale);
+				MeshTransform = Transform(Body->GetPosition(), Body->GetRotation().DegreesToRadians(), Body->BodyTransform.Scale);
 
 				switch (Body->Type)
 				{

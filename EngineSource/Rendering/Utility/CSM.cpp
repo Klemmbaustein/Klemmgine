@@ -63,13 +63,13 @@ has a non-stencil-renderable image attached.\n";
 		return "Error: The given Status is not A glFramebufferError";
 	}
 
-	void UpdateMatricesUBO()
+	void UpdateMatricesUBO(Camera* From)
 	{
 		if (!Graphics::RenderShadows || Graphics::ShadowResolution <= 0)
 		{
 			return;
 		}
-		const auto LightSpaceMatrices = CSM::getLightSpaceMatrices();
+		const auto LightSpaceMatrices = CSM::getLightSpaceMatrices(From);
 
 		glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
 		for (size_t i = 0; i < LightSpaceMatrices.size(); ++i)
@@ -196,13 +196,13 @@ has a non-stencil-renderable image attached.\n";
 		}
 	}
 
-	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane)
+	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane, Camera* From)
 	{
 		const auto proj = glm::perspective(
-			Graphics::MainCamera->FOV, (float)Graphics::WindowResolution.X / (float)Graphics::WindowResolution.Y, nearPlane,
+			From->FOV, (float)Graphics::WindowResolution.X / (float)Graphics::WindowResolution.Y, nearPlane,
 			farPlane);
 
-		const auto corners = getFrustumCornersWorldSpace(proj, Graphics::MainCamera->getView());
+		const auto corners = getFrustumCornersWorldSpace(proj, From->getView());
 
 		glm::vec3 center = glm::vec3(0, 0, 0);
 		for (const auto& v : corners)
@@ -265,22 +265,22 @@ has a non-stencil-renderable image attached.\n";
 		return lightProjection * lightView;
 	}
 
-	std::vector<glm::mat4> getLightSpaceMatrices()
+	std::vector<glm::mat4> getLightSpaceMatrices(Camera* From)
 	{
 		std::vector<glm::mat4> ret;
 		for (size_t i = 0; i < shadowCascadeLevels.size() + 1; ++i)
 		{
 			if (i == 0)
 			{
-				ret.push_back(getLightSpaceMatrix(0.1f * CSMDistance, shadowCascadeLevels[i] * CSMDistance));
+				ret.push_back(getLightSpaceMatrix(0.1f * CSMDistance, shadowCascadeLevels[i] * CSMDistance, From));
 			}
 			else if (i < shadowCascadeLevels.size())
 			{
-				ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, shadowCascadeLevels[i] * CSMDistance));
+				ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, shadowCascadeLevels[i] * CSMDistance, From));
 			}
 			else
 			{
-				ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, cameraFarPlane * CSMDistance));
+				ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, cameraFarPlane * CSMDistance, From));
 			}
 		}
 		return ret;

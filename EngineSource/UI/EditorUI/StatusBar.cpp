@@ -16,6 +16,7 @@
 #include "SettingsPanel.h"
 #include <Math/Collision/CollisionVisualize.h>
 #include <Engine/Utility/FileUtility.h>
+#include <CSharp/CSharpInterop.h>
 
 StatusBar* CurrentStatusBar = nullptr;
 
@@ -117,13 +118,21 @@ StatusBar::StatusBar()
 	int Iterator = 0;
 	for (const auto& i : MenuBarItems)
 	{
-		UIButton* NewButton = new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, this, Iterator++);
-		BarBoxes[0]
-			->AddChild(NewButton
-				->SetPadding(0, 0, 0.005f, 0.005f)
-				->AddChild((new UIText(0.45f, EditorUI::UIColors[2], i.Name, EditorUI::Text))
-					->SetPadding(0.005f)));
-		MenuBarButtons.push_back(NewButton);
+		if (i.Name != "C#" || CSharp::GetUseCSharp())
+		{
+			UIButton* NewButton = new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, this, Iterator);
+			BarBoxes[0]
+				->AddChild(NewButton
+					->SetPadding(0, 0, 0.005f, 0.005f)
+					->AddChild((new UIText(0.45f, EditorUI::UIColors[2], i.Name, EditorUI::Text))
+						->SetPadding(0.005f)));
+			MenuBarButtons.push_back(NewButton);
+		}
+		else
+		{
+			MenuBarButtons.push_back(nullptr);
+		}
+		Iterator++;
 	}
 }
 
@@ -177,7 +186,10 @@ void StatusBar::Tick()
 	{
 		for (UIButton* i : MenuBarButtons)
 		{
-			i->SetColor(EditorUI::UIColors[0] * 0.75f);
+			if (i != nullptr)
+			{
+				i->SetColor(EditorUI::UIColors[0] * 0.75f);
+			}
 		}
 	}
 	StatusBackground->SetColor(EditorUI::UIColors[0] * 0.75f);
@@ -187,7 +199,10 @@ void StatusBar::Tick()
 	{
 		for (UIButton* i : MenuBarButtons)
 		{
-			i->SetColor(EditorUI::UIColors[0] * 0.75f);
+			if (i != nullptr)
+			{
+				i->SetColor(EditorUI::UIColors[0] * 0.75f);
+			}
 		}
 
 		delete MenuBarDropdown;
@@ -214,7 +229,10 @@ void StatusBar::OnButtonClicked(int Index)
 			delete MenuBarDropdown;
 			for (UIButton* i : MenuBarButtons)
 			{
-				i->SetColor(EditorUI::UIColors[0] * 0.75f);
+				if (i != nullptr)
+				{
+					i->SetColor(EditorUI::UIColors[0] * 0.75f);
+				}
 			}
 			MenuBarDropdown = nullptr;
 		}

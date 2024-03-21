@@ -121,6 +121,5 @@ void main()
 	//f_color += (rand(v_texcoords) / 50) - (1 / 25); // To combat color banding
 	f_color -= Vignette * u_vignette;
 	f_color.xyz = mix(clamp(f_color.xyz, 0, 1), clamp(uicolor.xyz, 0, 1), clamp(uicolor.w, 0, 1));
-	//f_color.xyz = vec3(uicolor.w);
 	f_color.w = 1;
 }

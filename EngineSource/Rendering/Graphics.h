@@ -16,9 +16,11 @@ namespace Graphics
 	extern bool VSync;
 	extern bool IsWireframe;
 	extern int ShadowResolution;
-	extern bool Bloom, FXAA;
+	extern bool Bloom;
 	extern bool RenderFullbright;
 	extern float Gamma;
+
+	constexpr int MAX_LIGHTS = 8;
 
 	struct Fog
 	{
@@ -53,6 +55,7 @@ namespace Graphics
 		Vector3 Position = 0.f;
 		float Intensity = 1.f;
 		float Falloff = 20.f;
+		float Distance = 0;
 		Vector3 Color = 1.f;
 
 		bool operator==(Light b);
@@ -60,10 +63,11 @@ namespace Graphics
 
 	extern Sun WorldSun;
 	extern Fog WorldFog;
+	extern bool RenderAntiAlias;
 	extern std::vector<UICanvas*> UIToRender;
 	extern Vector2 WindowResolution;
 	extern Vector2 RenderResolution;
-	void SetWindowResolution(Vector2 NewResolution);
+	void SetWindowResolution(Vector2 NewResolution, bool Force = false);
 	extern float AspectRatio;
 #if !SERVER
 	extern Camera* MainCamera;

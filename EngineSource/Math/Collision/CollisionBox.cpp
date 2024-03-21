@@ -1,6 +1,6 @@
 #include "CollisionBox.h"
-#include <iostream>
 #include <cmath>
+#include <Engine/Log.h>
 
 Collision::Box Collision::operator*(Box a, Vector3 b)
 {
@@ -14,7 +14,7 @@ Collision::Box Collision::operator+(Box a, Vector3 b)
 
 Vector3 Collision::Box::GetCenter()
 {
-	return Vector3(Vector3::Lerp(Vector3(minX, minY, minZ), Vector3(maxX, maxY, maxZ), 0.5));
+	return (Vector3(minX, minY, minZ) + Vector3(maxX, maxY, maxZ)) * 0.5f;
 }
 
 Collision::Box::Box(Vector3 Triangle1, Vector3 Triangle2, Vector3 Triangle3)

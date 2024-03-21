@@ -57,6 +57,11 @@ namespace Editor
 	bool IsSavingScene = false;
 	bool LaunchCurrentScene = true;
 	bool SaveSceneOnLaunch = false;
+	bool ReloadingCSharp = false;
+	DialogBox* CSharpReloadBox = nullptr;
+
+	bool Rebuilding = false;
+	DialogBox* RebuildingBox = nullptr;
 
 	Vector3 NewUIColors[EditorUI::NumUIColors] =
 	{
@@ -86,14 +91,13 @@ namespace Editor
 	{
 		std::string Command;
 		FILE* Pipe = nullptr;
+		std::string LogPrefix;
 		std::thread* Thread = nullptr;
 		std::atomic<bool> Active = false;
 		bool Async = false;
 	};
 
-	std::map<FILE*, ProcessInfo> ProcessPipes;
-
-	static void ReadProcessPipe(FILE* p)
+	static void ReadProcessPipe(FILE* p, ProcessInfo* Info)
 	{
 		std::string CurrentMessage;
 		while (!feof(p))
@@ -102,7 +106,7 @@ namespace Editor
 
 			if (NewChar == '\n')
 			{
-				Log::Print(CurrentMessage);
+				Log::Print(Info->LogPrefix + CurrentMessage);
 				CurrentMessage.clear();
 			}
 			else
@@ -111,7 +115,8 @@ namespace Editor
 			}
 		}
 		fclose(p);
-		ProcessPipes[p].Active = false;
+
+		Info->Active = false;
 	}
 }
 
@@ -134,6 +139,7 @@ void EditorUI::LaunchInEditor()
 		if (!std::filesystem::exists("bin/" + ProjectName + "-Debug.exe")
 			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Debug.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
 		{
+			Editor::Rebuilding = true;
 			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
 			if (Build::BuildCurrentSolution("Debug"))
 			{
@@ -145,12 +151,14 @@ void EditorUI::LaunchInEditor()
 		if (Project::UseNetworkFunctions && LaunchWithServer && (!std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
 			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
 		{
+			Editor::Rebuilding = true;
 			if (Build::BuildCurrentSolution("Server"))
 			{
 				Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
 				return;
 			}
 		}
+		Editor::Rebuilding = false;
 #endif
 
 		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll")
@@ -202,12 +210,28 @@ void EditorUI::LaunchInEditor()
 			Command.append(" && ");
 		}
 	}
-	int ret = system(Command.c_str());
+
+	int ret = 0;
+	if (NumLaunchClients == 1)
+	{
+		PipeProcessToLog(Command, "[Debug]: ");
+	}
+	else
+	{
+		int ret = system(Command.c_str());
+	}
 #else
 	for (int i = 0; i < NumLaunchClients; i++)
 	{
 		LaunchCommandLine = CommandLine;
-		new BackgroundTask([]() { system((LaunchCommandLine).c_str()); });
+		if (NumLaunchClients == 1)
+		{
+			PipeProcessToLog(Command, true, "[Debug]: ");
+}
+		else
+		{
+			new BackgroundTask([]() { system((LaunchCommandLine).c_str()); });
+		}
 	}
 #endif
 	if (LaunchWithServer)
@@ -226,7 +250,7 @@ void EditorUI::LaunchInEditor()
 			+ " "
 			+ Args).c_str());
 #else
-		int ret = system(("./bin/"
+		ret = system(("./bin/"
 		 + ProjectName 
 		 + "-Server -nostartupinfo -quitondisconnect -editorPath "
 		 + Application::GetEditorPath()
@@ -244,8 +268,9 @@ void EditorUI::SetSaveSceneOnLaunch(bool NewValue)
 #ifdef ENGINE_CSHARP
 void EditorUI::RebuildAssembly()
 {
-	Log::Print("Rebuilding C# assembly...", Log::LogColor::Green);
-	PipeProcessToLog("cd Scripts && dotnet build", false);
+	Editor::ReloadingCSharp = true;
+	PipeProcessToLog("cd Scripts && dotnet build", "[C#]: [Build]: ");
+	Editor::ReloadingCSharp = false;
 	Editor::CanHotreload = true;
 }
 #endif
@@ -349,28 +374,24 @@ void EditorUI::SetUseLightMode(bool NewLightMode)
 	UIBox::ForceUpdateUI();
 }
 
-void EditorUI::PipeProcessToLog(std::string Command, bool Async)
+void EditorUI::PipeProcessToLog(std::string Command, std::string Prefix)
 {
 	using namespace Editor;
 
 #if _WIN32
-	auto process = _popen(Command.c_str(), "r");
+	FILE* process = _popen(Command.c_str(), "r");
 #else
 	auto process = popen(Command.c_str(), "r");
 #endif
 
 	ProcessInfo proc;
 
+	proc.LogPrefix = Prefix;
 	proc.Active = true;
 	proc.Command = Command;
 	proc.Pipe = process;
-	proc.Async = Async;
-	proc.Thread = new std::thread(ReadProcessPipe, process);
 
-	if (!Async)
-	{
-		proc.Thread->join();
-	}
+	ReadProcessPipe(process, &proc);
 }
 
 void EditorUI::CreateFile(std::string Path, std::string Name, std::string Ext)
@@ -465,19 +486,6 @@ void EditorUI::OnLeave(void(*ReturnF)())
 
 void EditorUI::Tick()
 {
-	for (auto& i : Editor::ProcessPipes)
-	{
-		if (!i.second.Active)
-		{
-			if (i.second.Async)
-			{
-				i.second.Thread->join();
-			}
-			delete i.second.Thread;
-			Editor::ProcessPipes.erase(i.first);
-			break;
-		}
-	}
 	EditorPanel::TickPanels();
 #ifdef ENGINE_CSHARP
 	if (Editor::CanHotreload == true)
@@ -505,6 +513,26 @@ void EditorUI::Tick()
 		EditorUI::IsBakingScene = false;
 		Assets::ScanForAssets();
 		BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene));
+	}
+
+	if (Editor::ReloadingCSharp && !Editor::CSharpReloadBox)
+	{
+		Editor::CSharpReloadBox = new DialogBox("C#", 0, "Rebuilding C# assembly... Check log for details.", {});
+	}
+	else if (!Editor::ReloadingCSharp && Editor::CSharpReloadBox)
+	{
+		delete Editor::CSharpReloadBox;
+		Editor::CSharpReloadBox = nullptr;
+	}
+
+	if (Editor::Rebuilding && !Editor::RebuildingBox)
+	{
+		Editor::RebuildingBox = new DialogBox("Build", 0, "Compiling game...", {});
+	}
+	else if (!Editor::Rebuilding && Editor::RebuildingBox)
+	{
+		delete Editor::RebuildingBox;
+		Editor::RebuildingBox = nullptr;
 	}
 
 	if (dynamic_cast<UIButton*>(UI::HoveredBox))
