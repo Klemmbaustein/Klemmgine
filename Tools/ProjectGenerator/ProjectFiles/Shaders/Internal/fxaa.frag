@@ -8,10 +8,10 @@ out vec4 f_color;
 #define EDGE_THRESHOLD_MAX 0.125
 #define EDGE_THRESHOLD_MIN 0.0312
 
-#define ITERATIONS 4
-#define SUBPIXEL_QUALITY 0.5
+#define ITERATIONS 3
+#define SUBPIXEL_QUALITY 0.75
 
-#define QUALITY(x) 2 + int(x * 0.1)
+#define QUALITY(x) 1 + int(x * 0.4)
 
 // Thanks to https://blog.simonrodriguez.fr/articles/2016/07/implementing_fxaa.html
 
