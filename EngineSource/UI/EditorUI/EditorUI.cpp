@@ -144,6 +144,7 @@ void EditorUI::LaunchInEditor()
 			if (Build::BuildCurrentSolution("Debug"))
 			{
 				Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
+				Editor::Rebuilding = false;
 				return;
 			}
 		}
@@ -155,6 +156,7 @@ void EditorUI::LaunchInEditor()
 			if (Build::BuildCurrentSolution("Server"))
 			{
 				Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
+				Editor::Rebuilding = false;
 				return;
 			}
 		}
