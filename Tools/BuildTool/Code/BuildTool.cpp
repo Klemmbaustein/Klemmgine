@@ -1,120 +1,59 @@
 #include "Log.h"
 #include <vector>
 #include <filesystem>
-#include <fstream>
-#include <algorithm>
+#include "ParseFile.h"
 
-void ParseError(std::string Reason, std::string File, std::string Function, size_t Line)
+void ParseError(std::string Reason, std::string File, size_t Line)
 {
-	Log::Print(Reason, Log::MessageType::Error, File);
+	std::string Name = File.substr(File.find_last_of("/\\") + 1);
+
+	Log::Print(Reason, Log::MessageType::Error, Name);
 	exit(1);
 }
 
-#define PARSE_ERROR(reason) ParseError(reason, __FILE__, __FUNCTION__, __LINE__)
+#define PARSE_ERROR(reason) ParseError(reason, __FILE__, __LINE__)
 
-// 32-bit string hash for generating the ID of an object
-static uint32_t hash_str_uint32(const std::string& str)
-{
-
-	uint32_t hash = 0x811c9dc5;
-	uint32_t prime = 0x1000193;
-
-	for (int i = 0; i < str.size(); ++i) 
-	{
-		uint8_t value = str[i];
-		hash = hash ^ value;
-		hash *= prime;
-	}
-
-	return hash;
-
-}
-
-struct Object
-{
-	std::string Name;
-	std::string Path;
-};
-
-void WriteToFile(std::string str, std::string File)
-{
-	// Check if the new file is different from the old one. If it is, don't write the new content into it.
-	// VS won't rebuild everything once the BuildTool runs once if only the files that really needed to change have changed.
-	if (std::filesystem::exists(File))
-	{
-		std::ifstream CurrentFile = std::ifstream(File);
-		std::stringstream s;
-		s << CurrentFile.rdbuf();
-		CurrentFile.close();
-		if (str == s.str())
-		{
-			Log::Print("Do not need to write: " + File + ". File has not changed.");
-			return;
-		}
-	}
-	Log::Print("Written: " + File + ".");
-	std::ofstream out = std::ofstream(File);
-	out << str;
-	out.close();
-}
-
-void WriteObjectList(std::vector<Object> Objects, std::string TargetFolder)
+void WriteObjectList(std::vector<ParseFile::Object> Objects, std::string TargetFolder)
 {
 	std::string OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		uint32_t ID = hash_str_uint32(Objects[i].Name);
-		OutStream.append("ObjectDescription(\"" + Objects[i].Name + "\", " + std::to_string(ID) + "),\n");
+		OutStream.append("ObjectDescription(\"" + Objects[i].Name + "\", " + std::to_string(Objects[i].Hash) + "),\n");
 	}
-	WriteToFile(OutStream, TargetFolder + "/GENERATED_ListOfObjects.h");
+	ParseFile::WriteToFile(OutStream, TargetFolder + "/GENERATED_ListOfObjects.h");
 }
 
-void WriteIncludeList(std::vector<Object> Objects, std::string TargetFolder)
+void WriteIncludeList(std::vector<ParseFile::Object> Objects, std::string TargetFolder)
 {
 	std::stringstream OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		OutStream << "#include <Objects" + Objects[i].Path + "/" + Objects[i].Name + ".h>" << std::endl;
+		OutStream << "#include <" << Objects[i].Path << ">" << std::endl;
 	}
-	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_ObjectIncludes.h");
+	ParseFile::WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_ObjectIncludes.h");
 }
 
-void WriteSpawnList(std::vector<Object> Objects, std::string TargetFolder)
+void WriteSpawnList(std::vector<ParseFile::Object> Objects, std::string TargetFolder)
 {
 	std::stringstream OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		uint32_t ID = hash_str_uint32(Objects[i].Name);
-		OutStream << "case " + std::to_string(ID) + ": return (WorldObject*)SpawnObject<" + Objects[i].Name + ">(ObjectTransform, NetID); " << std::endl;
+		OutStream << "case " + std::to_string(Objects[i].Hash) + ": return (WorldObject*)SpawnObject<" + Objects[i].Name + ">(ObjectTransform, NetID); " << std::endl;
 	}
-	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_Spawnlist.h");
+	ParseFile::WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_Spawnlist.h");
 }
 
-void WriteCategoryList(std::vector<Object> Objects, std::string TargetFolder)
+void WriteCategoryList(std::vector<ParseFile::Object> Objects, std::string TargetFolder)
 {
 	std::stringstream OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		uint32_t ID = hash_str_uint32(Objects[i].Name);
-		OutStream << "case " + std::to_string(ID) + ": return " + Objects[i].Name + "::GetCategory();" << std::endl;
+		OutStream << "case " + std::to_string(Objects[i].Hash) + ": return " + Objects[i].Name + "::GetCategory();" << std::endl;
 	}
-	WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_Categories.h");
+	ParseFile::WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_Categories.h");
 }
 
-void WriteHeaderForObject(std::string TargetFolder, Object Object)
-{
-	unsigned int ID = hash_str_uint32(Object.Name);
-	std::stringstream OutStream;
-	std::string UppercaseName = Object.Name;
-	std::transform(Object.Name.begin(), Object.Name.end(), UppercaseName.begin(), ::toupper);
-	OutStream << "#define " << UppercaseName << "_GENERATED(Category) "
-		<< Object.Name << "() : WorldObject(ObjectDescription(\"" << Object.Name << "\", " << std::to_string(ID) << ")) {}\\\n"
-		<< "static std::string GetCategory() { return Category; }\\\n";
-	OutStream << "static uint32_t GetID() { return " << std::to_string(ID) << ";}\n";
-	WriteToFile(OutStream.str(), TargetFolder + "/" + Object.Name + ".h");
-}
-
-void RecursiveSearch(std::string InLoc, std::vector<Object>& Objects, std::string RelativePath = "")
+void RecursiveSearch(std::string InLoc, std::vector<ParseFile::Object>& Objects, std::string RelativePath = "")
 {
 
 	for (const auto& entry : std::filesystem::directory_iterator(InLoc))
@@ -129,17 +68,10 @@ void RecursiveSearch(std::string InLoc, std::vector<Object>& Objects, std::strin
 		}
 		else
 		{
-			std::string Filename = entry.path().string();
-			auto Begin = Filename.find_last_of("/\\");
-			std::string Name = Filename.substr(Begin + 1, Filename.find_last_of(".") - Begin - 1);
-			// Ignore Objects.h header
-			if (Name != "Objects" && Name != "WorldObject")
+			std::vector<ParseFile::Object> NewObjects = ParseFile::ParseFile(entry.path().string());
+			for (auto& i : NewObjects)
 			{
-				auto Ext = Filename.substr(Filename.find_last_of(".") + 1);
-				if (Ext == "h" || Ext == "hpp")
-				{
-					Objects.push_back(Object(Name, RelativePath));
-				}
+				Objects.push_back(i);
 			}
 		}
 	}
@@ -178,27 +110,32 @@ int main(int argc, char** argv)
 
 	if (InLoc.empty())
 	{
-		PARSE_ERROR("In path has not been defined (In=[Path to Code/Objects folder])");
+		PARSE_ERROR("In path has not been defined (in=[Path to Code/Objects folder])");
 	}
 	if (OutLoc.empty())
 	{
-		PARSE_ERROR("Out path has not been defined (Out=[Path where to put the headers])");
+		PARSE_ERROR("Out path has not been defined (out=[Path where to put the headers])");
 	}
 
 	OutLoc.append("/GENERATED");
 	std::filesystem::create_directories(OutLoc);
-	std::vector<Object> Objects;
+	std::vector<ParseFile::Object> Objects;
 	for (const auto& location : InLoc)
 	{
 		RecursiveSearch(location, Objects);
 	}
 
-	WriteIncludeList	(Objects, OutLoc);
-	WriteObjectList		(Objects, OutLoc);
-	WriteSpawnList		(Objects, OutLoc);
-	WriteCategoryList	(Objects, OutLoc);
-	for (unsigned int i = 0; i < Objects.size(); i++)
+	std::vector<ParseFile::Object> WorldObjects;
+	for (ParseFile::Object& i : Objects)
 	{
-		WriteHeaderForObject(OutLoc, Objects[i]);
+		if (i.DerivesFromWorldObject(Objects))
+		{
+			i.WriteGeneratedHeader(OutLoc);
+			WorldObjects.push_back(i);
+		}
 	}
+	WriteIncludeList(WorldObjects, OutLoc);
+	WriteObjectList(WorldObjects, OutLoc);
+	WriteSpawnList(WorldObjects, OutLoc);
+	WriteCategoryList(WorldObjects, OutLoc);
 }

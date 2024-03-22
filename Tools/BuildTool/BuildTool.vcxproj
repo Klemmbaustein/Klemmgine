@@ -223,9 +223,11 @@
   <ItemGroup>
     <ClCompile Include="Code\BuildTool.cpp" />
     <ClCompile Include="Code\Log.cpp" />
+    <ClCompile Include="Code\ParseFile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Code\Log.h" />
+    <ClInclude Include="Code\ParseFile.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
