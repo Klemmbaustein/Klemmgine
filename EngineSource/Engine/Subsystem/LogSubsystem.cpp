@@ -21,7 +21,7 @@ LogSubsystem::LogSubsystem()
 
 	tm CurrentTimeTm;
 
-#if !_WIN32
+#if _WIN32
 	localtime_s(&CurrentTimeTm, &CurrentTime);
 #else
 	CurrentTimeTm = *localtime(&CurrentTime);
