@@ -21,7 +21,11 @@ LogSubsystem::LogSubsystem()
 
 	tm CurrentTimeTm;
 
+#if !_WIN32
 	localtime_s(&CurrentTimeTm, &CurrentTime);
+#else
+	CurrentTimeTm = *localtime(&CurrentTime);
+#endif
 
 	std::strftime(TimeStringBuffer, sizeof(TimeStringBuffer), "%Y-%m-%d %H-%M-%S", &CurrentTimeTm);
 
