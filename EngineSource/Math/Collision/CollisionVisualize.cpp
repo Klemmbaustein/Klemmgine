@@ -7,7 +7,7 @@
 #include <Engine/Application.h>
 #include <Math/Physics/Physics.h>
 #include <Rendering/Graphics.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Engine/Log.h>
 #include <Objects/Components/PhysicsComponent.h>
 

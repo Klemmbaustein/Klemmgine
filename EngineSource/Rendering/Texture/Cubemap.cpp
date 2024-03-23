@@ -1,6 +1,5 @@
 #include "Cubemap.h"
 #include <Engine/File/Save.h>
-#include <Engine/Console.h>
 #include <Engine/Log.h>
 #include <Engine/File/Assets.h>
 #include <filesystem>
@@ -32,9 +31,5 @@ unsigned int Cubemap::LoadCubemapFile(std::string File)
 void Cubemap::UnloadCubemapFile(unsigned int map)
 {
 	glDeleteTextures(1, &map);
-}
-
-void Cubemap::RegisterCommands()
-{
 }
 

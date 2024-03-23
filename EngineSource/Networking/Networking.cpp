@@ -12,7 +12,7 @@
 #include <Networking/Client.h>
 #include "NetworkEvent.h"
 #include "Server.h"
-#include <Engine/Console.h>
+#include <Engine/Subsystem/Console.h>
 #include <Engine/EngineError.h>
 
 namespace Networking
@@ -211,26 +211,26 @@ void Networking::Init()
 #if SERVER
 	InitSockets(DEFAULT_PORT);
 #else
-	Console::RegisterCommand(Console::Command("connect", []() 
+	Console::ConsoleSystem->RegisterCommand(Console::Command("connect", []()
 		{
 			uint16_t Port = DEFAULT_PORT;
 
-			if (Console::CommandArgs().size() > 1)
+			if (Console::ConsoleSystem->CommandArgs().size() > 1)
 			{
-				Port = std::stoi(Console::CommandArgs()[1]);
+				Port = std::stoi(Console::ConsoleSystem->CommandArgs()[1]);
 			}
 
-			Client::ConnectToServer(Console::CommandArgs()[0], Port);
+			Client::ConnectToServer(Console::ConsoleSystem->CommandArgs()[0], Port);
 		}, {Console::Command::Argument("address", NativeType::String), Console::Command::Argument("port", NativeType::Int, true) }));
 #endif
 
 #if !SERVER
-	Console::RegisterCommand(Console::Command("disconnect", []()
+	Console::ConsoleSystem->RegisterCommand(Console::Command("disconnect", []()
 		{
 			Client::Disconnect();
 		}, {}));
 #else
-	Console::RegisterCommand(Console::Command("disconnect", []()
+	Console::ConsoleSystem->RegisterCommand(Console::Command("disconnect", []()
 		{
 			Server::DisconnectPlayer(std::stoi(Console::CommandArgs()[0]));
 		}, { Console::Command::Argument("player_uid", NativeType::Int) }));

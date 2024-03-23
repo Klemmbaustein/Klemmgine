@@ -6,7 +6,7 @@
 #include <iostream>
 #include "Rendering/Camera/Camera.h"
 #include <filesystem>
-#include <Rendering/Utility/ShaderManager.h>
+#include <Rendering/ShaderManager.h>
 #include <Engine/Log.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Stats.h>
@@ -15,6 +15,7 @@
 #include <Rendering/Texture/Material.h>
 #include <Rendering/Mesh/Mesh.h>
 #include <Engine/Application.h>
+#include <Rendering/RenderSubsystem/OcclusionCulling.h>
 
 const extern bool IsInEditor;
 const extern bool EngineDebug;
@@ -84,7 +85,8 @@ Model::~Model()
 	glDeleteBuffers(1, &MatBuffer);
 	if (RunningQuery)
 	{
-		Application::FreeOcclusionQuery(OcclusionQueryIndex);
+		OcclusionCulling* OcclusionManager = static_cast<OcclusionCulling*>(RenderSubsystem::GetSubsystemByName("Occlusion"));
+		OcclusionManager->OcclusionCulling::FreeOcclusionQuery(OcclusionQueryIndex);
 	}
 }
 namespace CSM

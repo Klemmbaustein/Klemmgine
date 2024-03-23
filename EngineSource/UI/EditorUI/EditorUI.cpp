@@ -5,7 +5,7 @@
 #include <filesystem>
 #include "Math/Math.h"
 #include "Math/Collision/Collision.h"
-#include "Engine/Scene.h"
+#include "Engine/Subsystem/Scene.h"
 #include <Engine/EngineProperties.h>
 #include <UI/UIScrollBox.h>	
 #include <UI/EditorUI/UIVectorField.h>
@@ -20,12 +20,12 @@
 #include <atomic>
 #include <thread>
 #include <Engine/Log.h>
-#include <Engine/BackgroundTask.h>
+#include <Engine/Subsystem/BackgroundTask.h>
 #include <Engine/Input.h>
 #include <UI/EditorUI/Popups/DialogBox.h>
-#include <Engine/Console.h>
-#include <CSharp/CSharpInterop.h>
-#include <Rendering/Utility/BakedLighting.h>
+#include <Engine/Subsystem/Console.h>
+#include <Engine/Subsystem/Console.h>
+#include <Rendering/RenderSubsystem/BakedLighting.h>
 #include <Engine/File/Assets.h>
 #include <UI/UIDropdown.h>
 #include <SDL.h>
@@ -165,7 +165,7 @@ void EditorUI::LaunchInEditor()
 
 		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll")
 			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
-			&& CSharp::GetUseCSharp())
+			&& CSharpInterop::GetUseCSharp())
 		{
 			RebuildAssembly();
 		}
@@ -202,8 +202,9 @@ void EditorUI::LaunchInEditor()
 	}
 
 	Log::Print("[Debug]: Starting process: " + CommandLine, Log::LogColor::Blue);
-#if _WIN32
+	int ret = 0;
 	std::string Command;
+#if _WIN32
 	for (int i = 0; i < NumLaunchClients; i++)
 	{
 		Command.append("start /b " + CommandLine);
@@ -213,7 +214,6 @@ void EditorUI::LaunchInEditor()
 		}
 	}
 
-	int ret = 0;
 	if (NumLaunchClients == 1)
 	{
 		PipeProcessToLog(Command, "[Debug]: ");
@@ -228,7 +228,7 @@ void EditorUI::LaunchInEditor()
 		LaunchCommandLine = CommandLine;
 		if (NumLaunchClients == 1)
 		{
-			PipeProcessToLog(Command, true, "[Debug]: ");
+			PipeProcessToLog(LaunchCommandLine, "[Debug]: ");
 }
 		else
 		{
@@ -314,18 +314,16 @@ void EditorUI::OpenScene(std::string NewScene)
 				{
 					SaveCurrentScene(); 
 					ChangedScene = false;
-					Scene::LoadNewScene(EditorSceneToOpen);
+					Scene::LoadNewScene(EditorSceneToOpen, true);
 					Viewport::ViewportInstance->ClearSelectedObjects();
-					Scene::Tick();
 					UpdateAllInstancesOf<ContextMenu>();
 				}),
 
 				EditorPopup::PopupOption("No", []()
 				{
 					ChangedScene = false;
-					Scene::LoadNewScene(EditorSceneToOpen);
+					Scene::LoadNewScene(EditorSceneToOpen, true);
 					Viewport::ViewportInstance->ClearSelectedObjects();
-					Scene::Tick();
 					UpdateAllInstancesOf<ContextMenu>();
 				}),
 
@@ -334,8 +332,7 @@ void EditorUI::OpenScene(std::string NewScene)
 		return;
 	}
 	ChangedScene = false; 
-	Scene::LoadNewScene(NewScene);
-	Scene::Tick();
+	Scene::LoadNewScene(NewScene, true);
 
 	UpdateAllInstancesOf<ContextMenu>();
 }
@@ -454,12 +451,12 @@ EditorUI::EditorUI()
 	Cursors[6] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 	Cursors[7] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 
-	Console::RegisterCommand(Console::Command("build", []() {new std::thread(Build::TryBuildProject, "Build/"); }, {}));
-	Console::RegisterCommand(Console::Command("save", EditorUI::SaveCurrentScene, {}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("build", []() {new std::thread(Build::TryBuildProject, "Build/"); }, {}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("save", EditorUI::SaveCurrentScene, {}));
 #ifdef ENGINE_CSHARP
-	Console::RegisterCommand(Console::Command("reload", EditorUI::RebuildAssembly, {}));
-	Console::RegisterCommand(Console::Command("run", EditorUI::LaunchInEditor, {}));
-	Console::RegisterCommand(Console::Command("toggle_light", []() { EditorUI::SetUseLightMode(!EditorUI::GetUseLightMode()); }, {}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("reload", EditorUI::RebuildAssembly, {}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("run", EditorUI::LaunchInEditor, {}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("toggle_light", []() { EditorUI::SetUseLightMode(!EditorUI::GetUseLightMode()); }, {}));
 
 #endif
 }
@@ -493,7 +490,7 @@ void EditorUI::Tick()
 	if (Editor::CanHotreload == true)
 	{
 		Log::Print("Finished building assembly. Hotreloading .dll file.", Log::LogColor::Yellow);
-		CSharp::ReloadCSharpAssembly();
+		CSharpInterop::CSharpSystem->ReloadCSharpAssembly();
 		for (UICanvas* c : Graphics::UIToRender)
 		{
 			auto Browser = dynamic_cast<ClassesBrowser*>(c);
@@ -707,7 +704,7 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 		std::string CurrentPath = Objects::GetCategoryFromID(o->GetObjectDescription().ID);
 		if (o->GetObjectDescription().ID == CSharpObject::GetID() && static_cast<CSharpObject*>(o)->CS_Obj.ID != 0)
 		{
-			auto Classes = CSharp::GetAllClasses();
+			auto Classes = CSharpInterop::CSharpSystem->GetAllClasses();
 			for (auto& i : Classes)
 			{
 				size_t LastSlash = i.find_last_of("/");

@@ -3,7 +3,7 @@
 #include <Engine/File/Save.h>
 #include <UI/EditorUI/UIVectorField.h>
 #include <Engine/Log.h>
-#include <CSharp/CSharpInterop.h>
+#include <Engine/Subsystem/CSharpInterop.h>
 #include <filesystem>
 #include <UI/UIScrollBox.h>
 #include "Viewport.h"
@@ -239,7 +239,7 @@ SettingsPanel::SettingsPanel(EditorPanel* Parent) : EditorPanel(Parent, "Setting
 	Load();
 
 #if ENGINE_CSHARP
-	if (!CSharp::GetUseCSharp())
+	if (!CSharpInterop::GetUseCSharp())
 	{
 		Toolbar::ToolbarInstance->SetButtonVisibility("Reload C#", false);
 	}

@@ -1,6 +1,6 @@
 #include "CameraComponent.h"
 #include <Engine/Stats.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Engine/Log.h>
 
 void CameraComponent::Begin()

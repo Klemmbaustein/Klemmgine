@@ -8,7 +8,7 @@
 #include <Engine/Build/Pack.h>
 #include <GL/glew.h>
 #include <Math/Vector.h>
-#include <Rendering/Utility/ShaderPreprocessor.h>
+#include <Rendering/ShaderPreprocessor.h>
 #include <glm/mat4x4.hpp>
 #include <filesystem>
 

@@ -1,7 +1,7 @@
 #if EDITOR
 #include "BakeMenu.h"
 #include <UI/EditorUI/EditorUI.h>
-#include <Rendering/Utility/BakedLighting.h>
+#include <Rendering/RenderSubsystem/BakedLighting.h>
 #include <Engine/Utility/FileUtility.h>
 #include <filesystem>
 #include <UI/UIScrollBox.h>

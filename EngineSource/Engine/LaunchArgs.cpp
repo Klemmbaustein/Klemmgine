@@ -1,11 +1,11 @@
-#include <Engine/Console.h>
+#include <Engine/Subsystem/Console.h>
 #include <vector>
 #include <string>
 #include <map>
 #include <Engine/Log.h>
 #include <Engine/OS.h>
 #include <iostream>
-#include <Engine/Scene.h>
+#include <Engine/Subsystem/Scene.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Application.h>
 

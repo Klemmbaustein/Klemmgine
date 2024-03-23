@@ -7,7 +7,7 @@
 #include <Math/Collision/Collision.h>
 
 #include <Engine/Application.h>
-#include <Engine/Console.h>
+#include <Engine/Subsystem/Console.h>
 #include <Engine/Log.h>
 
 namespace Input

@@ -19,6 +19,8 @@
 #include <Jolt/Physics/Collision/CastResult.h>
 #include <Jolt/Physics/Collision/ShapeCast.h>
 
+#include <Engine/Subsystem/PhysicsSubsystem.h>
+
 JPH_SUPPRESS_WARNINGS
 
 using namespace JPH;
@@ -71,7 +73,7 @@ static void TraceImpl(const char* inFMT, ...)
 	vsnprintf(buffer, sizeof(buffer), inFMT, list);
 	va_end(list);
 
-	Log::PrintMultiLine(buffer);
+	PhysicsSubsystem::PhysicsSystem->Print(buffer, Subsystem::ErrorLevel::Error);
 }
 
 #ifndef JPH_ENABLE_ASSERTS
@@ -264,7 +266,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 		MeshShape* Shape = new MeshShape(Settings, MeshResult);
 		if (!MeshResult.IsValid())
 		{
-			Log::PrintMultiLine("Error creating collision shape: " + std::string(MeshResult.GetError()), Log::LogColor::Red);
+			PhysicsSubsystem::PhysicsSystem->Print("Error creating collision shape: " + std::string(MeshResult.GetError()), Subsystem::ErrorLevel::Error);
 			return BodyCreationSettings();
 		}
 

@@ -7,7 +7,7 @@
 #include <UI/UIText.h>
 #include <UI/UIScrollBox.h>
 #include <Rendering/Mesh/Model.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <UI/UIButton.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Application.h>

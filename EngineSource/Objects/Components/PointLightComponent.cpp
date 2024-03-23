@@ -1,6 +1,6 @@
 #include "PointLightComponent.h"
 #include <Engine/Log.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 
 void PointLightComponent::Begin()
 {

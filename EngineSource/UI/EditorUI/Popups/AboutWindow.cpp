@@ -3,7 +3,7 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Log.h>
 #include <Engine/EngineProperties.h>
-#include <CSharp/CSharpInterop.h>
+#include <Engine/Subsystem/CSharpInterop.h>
 #include <UI/UIScrollBox.h>
 #include <unordered_map>
 
@@ -54,7 +54,7 @@ AboutWindow::AboutWindow() : EditorPopup(0, Vector2(0.5f, 0.6f), "About")
 			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  For " + OsString, EditorUI::Text))
 				->SetPadding(0.005f))
 #if ENGINE_CSHARP
-			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], std::string("  C#: ") + (CSharp::GetUseCSharp() ? "Yes" : "Disabled"), EditorUI::Text))
+			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], std::string("  C#: ") + (CSharpInterop::GetUseCSharp() ? "Yes" : "Disabled"), EditorUI::Text))
 				->SetPadding(0.005f))
 #else
 			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  C#: No", EditorUI::Text))

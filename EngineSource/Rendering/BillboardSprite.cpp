@@ -1,7 +1,7 @@
 #if !SERVER
 #include "BillboardSprite.h"
 #include <Rendering/Graphics.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Rendering/VertexBuffer.h>
 #include <Rendering/Shader.h>
 #include <Engine/Log.h>

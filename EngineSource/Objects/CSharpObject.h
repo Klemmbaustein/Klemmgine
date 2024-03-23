@@ -2,7 +2,7 @@
 #pragma once
 #include <GENERATED/CSharpObject.h>
 #include <Objects/WorldObject.h>
-#include <CSharp/CSharpInterop.h>
+#include <Engine/Subsystem/CSharpInterop.h>
 
 /**
 * @brief
@@ -17,7 +17,7 @@ public:
 	CSHARPOBJECT_GENERATED("Default");
 
 	/// Struct containing information about the managed C# class this object manages.
-	CSharp::CSharpWorldObject CS_Obj;
+	CSharpInterop::CSharpWorldObject CS_Obj;
 
 	void Begin() override;
 	void Update() override;
@@ -25,7 +25,7 @@ public:
 
 	void Reload(bool DeleteParameters);
 
-	std::string GetProperty(std::string PropertyName);
+	std::string GetProperty(std::string PropertyName) const;
 	void SetProperty(std::string PropertyName, std::string Value);
 
 

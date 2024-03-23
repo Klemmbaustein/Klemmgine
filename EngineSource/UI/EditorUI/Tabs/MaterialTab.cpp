@@ -8,7 +8,7 @@
 #include <UI/UIText.h>
 #include <UI/UIScrollBox.h>
 #include <Engine/Utility/FileUtility.h>
-#include <Rendering/Utility/ShaderPreprocessor.h>
+#include <Rendering/ShaderPreprocessor.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <Rendering/Texture/Texture.h>
 #include <cmath>

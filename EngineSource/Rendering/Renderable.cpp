@@ -1,15 +1,15 @@
 #include "Renderable.h"
 #include <GL/glew.h>
-#include <Rendering/Utility/CSM.h>
+#include <Rendering/RenderSubsystem/CSM.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Stats.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Rendering/Texture/Texture.h>
-#include "Utility/ShaderManager.h"
-#include <Rendering/Utility/BakedLighting.h>
+#include "ShaderManager.h"
+#include <Rendering/RenderSubsystem/BakedLighting.h>
 #include <Engine/EngineError.h>
 #include <Engine/Log.h>
-#include "Utility/ShaderPreprocessor.h"
+#include "ShaderPreprocessor.h"
 
 Graphics::Sun FullbrightSun =
 {
@@ -68,13 +68,13 @@ ObjectRenderContext::ObjectRenderContext(Material m)
 {
 #if !SERVER
 	this->Mat = m;
-	ContextShader = ReferenceShader("Shaders/" + m.VertexShader, "Shaders/" + m.FragmentShader);
+	ContextShader = ShaderManager::ReferenceShader("Shaders/" + m.VertexShader, "Shaders/" + m.FragmentShader);
 	if (!ContextShader)
 	{
 #if RELEASE
 		ENGINE_ASSERT(ContextShader, "Failed to load shader - " + m.VertexShader + ", " + m.FragmentShader);
 #endif
-		ContextShader = ReferenceShader("Shaders/basic.vert", "Shaders/basic.frag");
+		ContextShader = ShaderManager::ReferenceShader("Shaders/basic.vert", "Shaders/basic.frag");
 
 		m.Uniforms = Preprocessor::ParseGLSL(FileUtil::GetFileContent("Shaders/basic.frag"), "Shaders/").ShaderParams;
 	}
@@ -274,7 +274,7 @@ void ObjectRenderContext::Unload()
 		}
 	}
 	Uniforms.clear();
-	DereferenceShader("Shaders/" + Mat.VertexShader, "Shaders/" + Mat.FragmentShader);
+	ShaderManager::DereferenceShader("Shaders/" + Mat.VertexShader, "Shaders/" + Mat.FragmentShader);
 	ContextShader = nullptr;
 	Mat = Material();
 #endif

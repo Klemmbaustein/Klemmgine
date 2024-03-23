@@ -1,84 +1,90 @@
 #include "Graphics.h"
-#include <Rendering/Utility/Framebuffer.h>
-#include <Rendering/Utility/Bloom.h>
-#include <Rendering/Utility/SSAO.h>
-#include <Rendering/Utility/CSM.h>
 #include <UI/UIBox.h>
-#include <Rendering/Utility/PostProcess.h>
+#include <Rendering/Framebuffer.h>
+#include "RenderSubsystem/PostProcess.h"
+#include "RenderSubsystem/RenderSubsystem.h"
+#include <Engine/Subsystem/Scene.h>
 
-namespace Graphics
+float Graphics::ResolutionScale = 1.0f;
+bool Graphics::RenderShadows = true;
+bool Graphics::SSAO = true;
+bool Graphics::VSync = true;
+bool Graphics::Bloom = true;
+bool Graphics::IsWireframe = false;
+bool Graphics::RenderAntiAlias = true;
+bool Graphics::RenderFullbright = false;
+Graphics::Sun Graphics::WorldSun;
+Graphics::Fog Graphics::WorldFog;
+const int Graphics::MAX_LIGHTS = 8;
+int Graphics::ShadowResolution = 2000;
+std::vector<UICanvas*> Graphics::UIToRender;
+Vector2 Graphics::WindowResolution(1600, 900);
+Vector2 Graphics::RenderResolution = WindowResolution;
+unsigned int Graphics::PCFQuality = 0;
+float Graphics::AspectRatio = 16.0f / 9.0f;
+
+Graphics::Graphics()
 {
-	float ResolutionScale = 1.0f;
-	bool RenderShadows = true;
-	bool SSAO = true;
-	bool VSync = true;
-	bool Bloom = true;
-	bool IsWireframe = false;
-	bool RenderAntiAlias = true;
-	bool RenderFullbright = false;
-	Sun WorldSun;
-	Fog WorldFog;
-	int ShadowResolution = 2000;
-	std::vector<UICanvas*> UIToRender;
-	Vector2 WindowResolution(1600, 900);
-	Vector2 RenderResolution = WindowResolution;
-	unsigned int PCFQuality = 0;
-	float AspectRatio = 16.0f / 9.0f;
-	void SetWindowResolution(Vector2 NewResolution, bool Force)
-	{
-#if !SERVER
-		if (NewResolution * ResolutionScale == RenderResolution && !Force)
-		{
-			return;
-		}
+	Name = "Graphics";
+	Graphics::MainCamera = Scene::DefaultCamera;
+	Graphics::MainFramebuffer = new FramebufferObject();
+	Graphics::MainFramebuffer->FramebufferCamera = Graphics::MainCamera;
+}
 
-		for (FramebufferObject* o : AllFramebuffers)
-		{
-			if (o->UseMainWindowResolution)
-			{
-				o->GetBuffer()->ReInit((unsigned int)(NewResolution.X * ResolutionScale), (int)(NewResolution.Y * ResolutionScale));
-			}
-		}
-		Graphics::MainCamera->ReInit(Graphics::MainCamera->FOV, NewResolution.X, NewResolution.Y, false);
-		AspectRatio = NewResolution.X / NewResolution.Y;
-		WindowResolution = NewResolution;
-		RenderResolution = NewResolution * ResolutionScale;
-		SSAO::ResizeBuffer((unsigned int)(NewResolution.X * ResolutionScale), (unsigned int)(NewResolution.Y * ResolutionScale));
-		Bloom::OnResized();
-		for (PostProcess::Effect* i : PostProcess::GetCurrentEffects())
-		{
-			i->UpdateSize();
-		}
+void Graphics::Update()
+{
 
-		UIBox::ForceUpdateUI();
-#endif
-	}
-	float Gamma = 1;
-	float ChrAbbSize = 0, Vignette = 0.1f;
+}
+
+void Graphics::SetWindowResolution(Vector2 NewResolution, bool Force)
+{
 #if !SERVER
-	Camera* MainCamera;
-	Shader* MainShader;
-	Shader* ShadowShader;
-	Shader* TextShader;
-	Shader* UIShader;
-#endif
-	namespace UI
+	if (NewResolution * ResolutionScale == RenderResolution && !Force)
 	{
-		std::vector<ScrollObject*> ScrollObjects;
+		return;
 	}
-	bool CanRenderText = true;
-	namespace FBO
+
+	for (FramebufferObject* o : AllFramebuffers)
 	{
-		unsigned int SSAOBuffers[3];
-		unsigned int ssaoColorBuffer;
-		unsigned int ssaoFBO;
+		if (o->UseMainWindowResolution)
+		{
+			o->GetBuffer()->ReInit((unsigned int)(NewResolution.X * ResolutionScale), (int)(NewResolution.Y * ResolutionScale));
+		}
 	}
-#if !SERVER
-	FramebufferObject* MainFramebuffer;
-	std::vector<FramebufferObject*> AllFramebuffers;
-	bool Light::operator==(Light b)
+	Graphics::MainCamera->ReInit(Graphics::MainCamera->FOV, NewResolution.X, NewResolution.Y, false);
+	AspectRatio = NewResolution.X / NewResolution.Y;
+	WindowResolution = NewResolution;
+	RenderResolution = NewResolution * ResolutionScale;
+	RenderSubsystem::ResizeAll();
+	for (PostProcess::Effect* i : PostProcess::GetCurrentEffects())
 	{
-		return Position == b.Position && Color == b.Color && Intensity == b.Intensity && Falloff == b.Falloff;
+		i->UpdateSize();
 	}
+
+	UIBox::ForceUpdateUI();
 #endif
 }
+
+float Graphics::Gamma = 1;
+float Graphics::ChrAbbSize = 0, Graphics::Vignette = 0.1f;
+#if !SERVER
+
+Camera* Graphics::MainCamera;
+Shader* Graphics::MainShader;
+Shader* Graphics::TextShader;
+Shader* Graphics::UIShader;
+
+#endif
+
+bool CanRenderText = true;
+
+#if !SERVER
+
+FramebufferObject* Graphics::MainFramebuffer;
+std::vector<FramebufferObject*> Graphics::AllFramebuffers;
+bool Graphics::Light::operator==(Light b)
+{
+	return Position == b.Position && Color == b.Color && Intensity == b.Intensity && Falloff == b.Falloff;
+}
+
+#endif

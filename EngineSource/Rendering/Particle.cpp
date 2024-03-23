@@ -7,7 +7,7 @@
 #include <Engine/Stats.h>
 #include <Math/Math.h>
 #include <Engine/EngineRandom.h>
-#include <Rendering/Utility/ShaderManager.h>
+#include <Rendering/ShaderManager.h>
 #include <fstream>
 #include <filesystem>
 #include <Rendering/Texture/Material.h>

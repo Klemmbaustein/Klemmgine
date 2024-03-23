@@ -6,7 +6,7 @@
 #include <Engine/Application.h>
 #include <fstream>
 #include <thread>
-#include <Engine/BackgroundTask.h>
+#include <Engine/Subsystem/BackgroundTask.h>
 #include <Engine/Log.h>
 #include <UI/EditorUI/ClassesBrowser.h>
 

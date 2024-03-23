@@ -11,7 +11,7 @@
 #include <Rendering/Mesh/Model.h>
 #include <Rendering/Mesh/Mesh.h>
 #include <Rendering/Graphics.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Rendering/Mesh/InstancedModel.h>
 #include <Rendering/Mesh/InstancedMesh.h>
 

@@ -2,7 +2,7 @@
 #include <Rendering/Mesh/Model.h>
 #include <Rendering/Graphics.h>
 #include <Engine/File/Assets.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 
 #if SERVER
 static ModelGenerator::ModelData FallbackModelData;

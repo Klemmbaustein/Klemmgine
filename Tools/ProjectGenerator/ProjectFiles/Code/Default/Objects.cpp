@@ -1,4 +1,3 @@
-#include <Engine/Scene.h>
 #include <GENERATED/GENERATED_ObjectIncludes.h>
 #include <Engine/Log.h>
 

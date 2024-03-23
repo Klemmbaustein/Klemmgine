@@ -1,7 +1,7 @@
 #include "InstancedMeshComponent.h"
 #include <Rendering/Graphics.h>
 #include <Engine/File/Assets.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Rendering/Mesh/InstancedModel.h>
 #include <filesystem>
 #include <Engine/Log.h>

@@ -25,15 +25,15 @@ void CSharpObject::Update()
 		return;
 	}
 
-	CSharp::ExectuteFunctionOnObject(CS_Obj, "UpdateComponents");
+	CSharpInterop::CSharpSystem->ExectuteFunctionOnObject(CS_Obj, "UpdateComponents");
 #if !EDITOR
-	CSharp::ExectuteFunctionOnObject(CS_Obj, "Update");
+	CSharpInterop::CSharpSystem->ExectuteFunctionOnObject(CS_Obj, "Update");
 #endif
 }
 
 void CSharpObject::Destroy()
 {
-	CSharp::DestroyObject(CS_Obj);
+	CSharpInterop::CSharpSystem->DestroyObject(CS_Obj);
 }
 
 void CSharpObject::Reload(bool DeleteParameters)
@@ -46,12 +46,12 @@ void CSharpObject::Reload(bool DeleteParameters)
 	OldCSharpClass = CSharpClass;
 	if (CS_Obj.ID)
 	{
-		CSharp::DestroyObject(CS_Obj);
+		CSharpInterop::CSharpSystem->DestroyObject(CS_Obj);
 	}
-	CS_Obj = CSharp::InstantiateObject(CSharpClass, GetTransform(), this);
+	CS_Obj = CSharpInterop::CSharpSystem->InstantiateObject(CSharpClass, GetTransform(), this);
 	if (CS_Obj.ID)
 	{
-		auto LoadedProperties = StrUtil::SeperateString(CSharp::ExectuteStringFunctionOnObject(CS_Obj, "GetEditorProperties"), ';');
+		auto LoadedProperties = StrUtil::SeperateString(CSharpInterop::CSharpSystem->ExectuteStringFunctionOnObject(CS_Obj, "GetEditorProperties"), ';');
 
 		if (!DeleteParameters)
 		{
@@ -63,7 +63,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 				}
 			}
 		}
-		CSharp::ExectuteFunctionOnObject(CS_Obj, "Begin");
+		CSharpInterop::CSharpSystem->ExectuteFunctionOnObject(CS_Obj, "Begin");
 		size_t it = 1;
 		for (const std::string& i : LoadedProperties)
 		{
@@ -109,9 +109,9 @@ void CSharpObject::Reload(bool DeleteParameters)
 	}
 }
 
-std::string CSharpObject::GetProperty(std::string PropertyName)
+std::string CSharpObject::GetProperty(std::string PropertyName) const
 {
-	return CSharp::GetPropertyOfObject(CS_Obj, PropertyName);
+	return CSharpInterop::CSharpSystem->GetPropertyOfObject(CS_Obj, PropertyName);
 }
 
 void CSharpObject::SetProperty(std::string PropertyName, std::string Value)
@@ -123,7 +123,7 @@ void CSharpObject::SetProperty(std::string PropertyName, std::string Value)
 			i.ValueString = Value;
 		}
 	}
-	CSharp::SetPropertyOfObject(CS_Obj, PropertyName, Value);
+	CSharpInterop::CSharpSystem->SetPropertyOfObject(CS_Obj, PropertyName, Value);
 }
 
 void CSharpObject::OnPropertySet()

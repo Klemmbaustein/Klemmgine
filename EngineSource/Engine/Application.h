@@ -22,6 +22,8 @@ struct ButtonEvent;
 */
 namespace Application
 {
+	extern size_t FrameCount;
+
 	extern std::string StartupSceneOverride;
 
 	/**
@@ -119,8 +121,6 @@ namespace Application
 	std::string GetEditorPath();
 
 	extern std::set<ButtonEvent> ButtonEvents;
-
-	void FreeOcclusionQuery(uint8_t Index);
 
 	/**
 	* @brief

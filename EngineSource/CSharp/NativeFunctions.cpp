@@ -1,11 +1,11 @@
 #ifdef ENGINE_CSHARP
 #include "NativeFunctions.h"
-#include <CSharp/CSharpInterop.h>
+#include <Engine/Subsystem/CSharpInterop.h>
 #include <Engine/EngineError.h>
 #include <Engine/File/Assets.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Log.h>
-#include <Engine/Scene.h>
+#include <Engine/Subsystem/Scene.h>
 #include <Objects/Components/MeshComponent.h>
 #include <Objects/Components/CollisionComponent.h>
 #include <Objects/Components/CameraComponent.h>
@@ -14,9 +14,9 @@
 #include <Objects/CSharpObject.h>
 #include <Rendering/Camera/CameraShake.h>
 #include <Engine/Input.h>
-#include <Sound/Sound.h>
+#include <Engine/Subsystem/Sound.h>
 #include <Math/Collision/Collision.h>
-#include <Engine/Console.h>
+#include <Engine/Subsystem/Console.h>
 #include <UI/UIButton.h>
 #include <UI/Default/UICanvas.h>
 #include <UI/UIBackground.h>
@@ -105,7 +105,7 @@ namespace NativeFunctions
 			c->CreateCapsule(t, Movability, Layers);
 			break;
 		default:
-			CSharp::CSharpLog("Invalid physics component type: " + std::to_string((int)BodyType), CSharp::CS_Log_Runtime, CSharp::CS_Log_Warn);
+			CSharpInterop::CSharpSystem->CSharpLog("Invalid physics component type: " + std::to_string((int)BodyType), CSharpInterop::CS_Log_Runtime, CSharpInterop::CS_Log_Warn);
 			break;
 		}
 		return c;
@@ -248,7 +248,7 @@ namespace NativeFunctions
 		Scene::LoadNewScene(SceneName);
 	}
 
-	static CSharp::CSharpWorldObject NewCSObject(const char* TypeName, Transform ObjectTransform)
+	static CSharpInterop::CSharpWorldObject NewCSObject(const char* TypeName, Transform ObjectTransform)
 	{
 		CSharpObject* NewObject = Objects::SpawnObject<CSharpObject>(ObjectTransform, 0);
 		NewObject->LoadClass(TypeName);
@@ -278,7 +278,7 @@ namespace NativeFunctions
 
 	static Sound::SoundBuffer* LoadSound(const char* File)
 	{
-		return Sound::LoadSound(File);
+		return new Sound::SoundBuffer(File);
 	}
 
 	static void PlaySound(Sound::SoundBuffer* s, float Pitch, float Volume, bool Looping)
@@ -666,7 +666,7 @@ namespace NativeFunctions
 #pragma endregion
 }
 
-#define REGISTER_FUNCTION(func) CSharp::RegisterNativeFunction(# func, (void*)func)
+#define REGISTER_FUNCTION(func) CSharpInterop::CSharpSystem->RegisterNativeFunction(# func, (void*)func)
 
 void NativeFunctions::RegisterNativeFunctions()
 {
@@ -675,7 +675,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	using namespace Application;
 	using namespace Error;
 
-	ENGINE_ASSERT(CSharp::IsAssemblyLoaded(), "Assembly should always be loaded first before registering any native functions.");
+	ENGINE_ASSERT(CSharpInterop::IsAssemblyLoaded(), "Assembly should always be loaded first before registering any native functions.");
 
 	REGISTER_FUNCTION(NewMeshComponent);
 	REGISTER_FUNCTION(NewCollisionComponent);

@@ -21,7 +21,7 @@ namespace Log
 	namespace LogColor
 	{
 		const inline Vector3 White = Vector3(1);
-		const inline Vector3 Gray = Vector3(0.5f);
+		const inline Vector3 Gray = Vector3(0.75f);
 		const inline Vector3 Red = Vector3(1, 0.2f, 0);
 		const inline Vector3 Green = Vector3(0.2f, 1, 0);
 		const inline Vector3 Blue = Vector3(0.5, 0.6f, 1);

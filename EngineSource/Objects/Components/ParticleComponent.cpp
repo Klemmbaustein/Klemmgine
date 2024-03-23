@@ -4,7 +4,7 @@
 #include <Engine/File/Assets.h>
 #include <Rendering/Mesh/Model.h>
 #include <Rendering/Graphics.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Engine/Log.h>
 #include <Rendering/Mesh/Mesh.h>
 

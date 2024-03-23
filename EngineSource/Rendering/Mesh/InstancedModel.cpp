@@ -2,7 +2,7 @@
 #include "InstancedModel.h"
 #include <filesystem>
 #include <fstream>
-#include <Rendering/Utility/ShaderManager.h>
+#include <Rendering/ShaderManager.h>
 #include <Rendering/Mesh/ModelGenerator.h>
 #include <Engine/Log.h>
 #include <Rendering/Graphics.h>

@@ -282,6 +282,7 @@ public:
 	static unsigned int* GetUITextures();
 	static void RedrawUI();
 	static void ClearUI();
+	static void UpdateUI();
 	bool IsHovered();
 	
 	/**
@@ -300,6 +301,8 @@ public:
 	std::vector<UIBox*> GetChildren();
 	void SetRenderOrderIndex(size_t OrderIndex);
 	size_t GetRenderOrderIndex();
+
+	static std::vector<ScrollObject*> ScrollObjects;
 
 protected:
 	bool ShouldBeTicked = true;

@@ -1,10 +1,10 @@
 #if EDITOR
 #pragma once
 #include <UI/EditorUI/Tabs/EditorTab.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Rendering/Particle.h>
 #include <Rendering/Graphics.h>
-#include <Rendering/Utility/ShaderManager.h>
+#include <Rendering/ShaderManager.h>
 #include <Math/Math.h>
 
 class TextRenderer;

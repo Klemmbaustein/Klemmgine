@@ -2,6 +2,7 @@
 #include <Objects/Components/BillboardComponent.h>
 #include <Objects/Components/CollisionComponent.h>
 #include <Engine/Application.h>
+
 void SoundObject::Begin()
 {
 	
@@ -54,7 +55,7 @@ void SoundObject::LoadSound(std::string SoundName)
 		Source.Stop();
 	}
 #if !EDITOR
-	Buffer = Sound::LoadSound(Filename);
+	Buffer = new Sound::SoundBuffer(Filename);
 	if (IsSpatialSound && Buffer)
 	{
 		Source = Sound::PlaySound3D(Buffer, GetTransform().Position, FalloffRange, Pitch, Volume, IsLooping);

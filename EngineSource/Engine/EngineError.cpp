@@ -6,18 +6,35 @@
 #include <Engine/OS.h>
 #include <SDL.h>
 #include <Engine/Stats.h>
+#include <Engine/Subsystem/LogSubsystem.h>
+#include <array>
 
 #if __cpp_lib_stacktrace >= 202011L
 #include <stacktrace>
 #endif
-static void HandleSigSegV(int SignalID)
+
+std::array<const char*, 6> SignalTypes =
 {
-	Error::AssertFailure("Access violation", "Status: " + Debugging::EngineStatus);
+	"SIGABRT",
+	"Math error",
+	"Illegal instruction",
+	"SIGINT",
+	"Access violation",
+	"SIGTERM",
+};
+
+static void HandleSignal(int SignalID)
+{
+	Error::AssertFailure(SignalTypes[SignalID + 1], "Status: " + Debugging::EngineStatus);
 }
 
 void Error::Init()
 {
-	signal(SIGSEGV, HandleSigSegV);
+	signal(SIGABRT, HandleSignal);
+	signal(SIGFPE, HandleSignal);
+	signal(SIGILL, HandleSignal);
+	signal(SIGSEGV, HandleSignal);
+	signal(SIGTERM, HandleSignal);
 }
 
 void Error::AssertFailure(std::string Name, std::string Position)
@@ -31,11 +48,12 @@ void Error::AssertFailure(std::string Name, std::string Position)
 	PrintStackTrace();
 
 #if _WIN32
-	__debugbreak();
+	LogSubsystem::Flush();
+	abort();
 #else
 	throw 0;
 #endif
-	exit(1);
+	abort();
 }
 
 void Error::PrintStackTrace()

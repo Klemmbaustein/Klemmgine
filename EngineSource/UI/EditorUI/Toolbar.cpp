@@ -3,11 +3,10 @@
 #include <Engine/Log.h>
 #include <UI/UIText.h>
 #include <UI/EditorUI/EditorUI.h>
-#include <Engine/Scene.h>
+#include <Engine/Subsystem/Scene.h>
 #include <thread>
 #include <UI/EditorUI/Viewport.h>
 #include <Engine/Build/Build.h>
-#include <CSharp/CSharpInterop.h>
 #include <filesystem>
 #include <UI/EditorUI/SettingsPanel.h>
 #include <UI/EditorUI/Popups/BakeMenu.h>

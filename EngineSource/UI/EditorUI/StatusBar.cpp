@@ -12,11 +12,11 @@
 #include <UI/EditorUI/Popups/BakeMenu.h>
 #include <thread>
 #include "Viewport.h"
-#include <Engine/BackgroundTask.h>
+#include <Engine/Subsystem/BackgroundTask.h>
 #include "SettingsPanel.h"
 #include <Math/Collision/CollisionVisualize.h>
 #include <Engine/Utility/FileUtility.h>
-#include <CSharp/CSharpInterop.h>
+#include <Engine/Subsystem/CSharpInterop.h>
 
 StatusBar* CurrentStatusBar = nullptr;
 
@@ -118,7 +118,7 @@ StatusBar::StatusBar()
 	int Iterator = 0;
 	for (const auto& i : MenuBarItems)
 	{
-		if (i.Name != "C#" || CSharp::GetUseCSharp())
+		if (i.Name != "C#" || CSharpInterop::GetUseCSharp())
 		{
 			UIButton* NewButton = new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, this, Iterator);
 			BarBoxes[0]

@@ -10,7 +10,7 @@
 #if EDITOR
 #include <Engine/Stats.h>
 #include <iostream>
-#include <CSharp/CSharpInterop.h>
+#include <Engine/Subsystem/CSharpInterop.h>
 #include <Engine/Build/Pack.h>
 
 namespace Build
@@ -134,7 +134,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			std::filesystem::copy("bin/Klemmgine-Release", TargetFolder + Project::ProjectName);
 #endif
 #if ENGINE_CSHARP
-			if (CSharp::GetUseCSharp())
+			if (CSharpInterop::GetUseCSharp())
 			{
 				Log::Print("[Build]: Building C# core...");
 				system(("cd " + Application::GetEditorPath() + "/CSharp/Core && dotnet build").c_str());
@@ -182,7 +182,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 					std::string Path = Runtime.substr(Runtime.find_first_of(" ") + 2);
 					Path.pop_back();
 
-					if (VersionNumber.substr(0, VersionNumber.find_first_of(".")) != CSharp::GetNetVersion())
+					if (VersionNumber.substr(0, VersionNumber.find_first_of(".")) != CSharpInterop::GetNetVersion())
 					{
 						continue;
 					}

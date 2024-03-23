@@ -1,6 +1,6 @@
 #pragma once
 #include <Objects/WorldObject.h>
-#include <Sound/Sound.h>
+#include <Engine/Subsystem/Sound.h>
 #include <GENERATED/SoundObject.h>
 
 /**

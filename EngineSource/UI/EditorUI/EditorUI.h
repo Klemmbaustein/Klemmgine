@@ -9,7 +9,7 @@
 #include <UI/EditorUI/EditorPanel.h>
 #include <Engine/TypeEnun.h>
 #include <Objects/WorldObject.h>
-#include <Rendering/Utility/Framebuffer.h>
+#include <Rendering/Framebuffer.h>
 #include <Engine/Build/Build.h>
 
 class EditorUI;

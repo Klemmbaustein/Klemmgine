@@ -5,7 +5,7 @@
 #include <Engine/Log.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/UITextField.h>
-#include <Engine/Console.h>
+#include <Engine/Subsystem/Console.h>
 #include <Engine/Input.h>
 #include <UI/UIText.h>
 

@@ -2,7 +2,7 @@
 #include "Components/Component.h"
 #include <sstream>
 #include <Engine/Log.h>
-#include <Engine/Scene.h>
+#include <Engine/Subsystem/Scene.h>
 #include <Networking/Networking.h>
 #include <Networking/Server.h>
 #include <Networking/Client.h>

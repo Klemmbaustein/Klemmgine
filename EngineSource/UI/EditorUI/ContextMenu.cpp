@@ -8,9 +8,9 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Viewport.h>
 #include <Engine/Utility/FileUtility.h>
-#include <Engine/Scene.h>
+#include <Engine/Subsystem/Scene.h>
 #include <Engine/Log.h>
-#include <Rendering/Utility/BakedLighting.h>
+#include <Rendering/RenderSubsystem/BakedLighting.h>
 #include <Engine/Utility/StringUtility.h>
 #include <Engine/Application.h>
 #include "ObjectList.h"

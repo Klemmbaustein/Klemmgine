@@ -6,7 +6,8 @@
 #include <Rendering/Graphics.h>
 #include <Math/Math.h>
 #include <Engine/Input.h>
-
+#include <UI/Default/UICanvas.h>
+#include <Engine/Stats.h>
 #if EDITOR
 #include <UI/EditorUI/EditorUI.h>
 #endif
@@ -23,6 +24,8 @@ namespace UI
 	unsigned int UIBuffer = 0;
 	unsigned int UITextures[2] = {0, 0};
 }
+
+std::vector<ScrollObject*> UIBox::ScrollObjects;
 
 std::string UIBox::GetAsString()
 {
@@ -165,6 +168,9 @@ void UIBox::ForceUpdateUI()
 
 void UIBox::InitUI()
 {
+	Graphics::TextShader = new Shader("Shaders/UI/text.vert", "Shaders/UI/text.frag");
+	Graphics::UIShader = new Shader("Shaders/UI/uishader.vert", "Shaders/UI/uishader.frag");
+
 	glGenFramebuffers(1, &UI::UIBuffer);
 	// create floating point color buffer
 	glGenTextures(2, UI::UITextures);
@@ -215,6 +221,35 @@ void UIBox::ClearUI()
 	}
 	UI::UIElements.clear();
 	UI::RequiresRedraw = true;
+}
+
+void UIBox::UpdateUI()
+{
+	Debugging::EngineStatus = "Responding to button events";
+	for (ButtonEvent b : Application::ButtonEvents)
+	{
+		if (b.c)
+		{
+			if (b.IsDraggedEvent)
+			{
+				b.c->OnButtonDragged(b.Index);
+			}
+			else
+			{
+				b.c->OnButtonClicked(b.Index);
+			}
+		}
+		if (b.o)
+		{
+			b.o->OnChildClicked(b.Index);
+		}
+	}
+	Application::ButtonEvents.clear();
+	Debugging::EngineStatus = "Ticking (UI)";
+	for (int i = 0; i < Graphics::UIToRender.size(); i++)
+	{
+		Graphics::UIToRender[i]->Tick();
+	}
 }
 
 bool UIBox::IsHovered()
@@ -594,6 +629,7 @@ UIBox* UIBox::SetVerticalAlign(Align NewAlign)
 
 void UIBox::DrawAllUIElements()
 {
+	Debugging::EngineStatus = "Rendering (UI)";
 	UI::NewHoveredBox = nullptr;
 
 	for (UIBox* elem : UI::UIElements)

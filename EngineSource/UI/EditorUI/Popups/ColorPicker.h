@@ -1,7 +1,7 @@
 #if EDITOR
 #pragma once
 #include <UI/EditorUI/Popups/EditorPopup.h>
-#include <Rendering/Utility/ShaderManager.h>
+#include <Rendering/ShaderManager.h>
 #include <UI/UIfwd.h>
 
 class UIVectorField;

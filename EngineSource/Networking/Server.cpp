@@ -32,8 +32,8 @@ void Server::ClearOnPlayerdisconnectedCallbacks()
 #include <Networking/NetworkingInternal.h>
 #include "Networking.h"
 #include <Objects/WorldObject.h>
-#include <Engine/Console.h>
-#include <Engine/Scene.h>
+#include <Engine/Subsystem/Console.h>
+#include <Engine/Subsystem/Scene.h>
 #include <Engine/Utility/FileUtility.h>
 #include <Engine/EngineError.h>
 #include "NetworkEvent.h"
@@ -237,7 +237,7 @@ void Server::SetObjNetOwner(WorldObject* obj, uint64_t NetOwner)
 
 void Server::Init()
 {
-	Console::RegisterCommand(Console::Command("playerlist", []() {
+	Console::ConsoleSystem->RegisterCommand(Console::Command("playerlist", []() {
 		std::string PlayerList;
 		for (auto& i : Clients)
 		{
@@ -249,15 +249,15 @@ void Server::Init()
 		Log::PrintMultiLine(StrUtil::Format("Players connected: (%i):\n%s", Clients.size(), PlayerList.c_str()), Log::LogColor::White, "[Net]: ");
 		}, {}));
 
-	Console::RegisterCommand(Console::Command("quitondisconnect", []() {
+	Console::ConsoleSystem->RegisterCommand(Console::Command("quitondisconnect", []() {
 		ShouldQuitOnPlayerDisconnect = true;
 		}, {}));
 
-	Console::RegisterCommand(Console::Command("tickrate", []() {
+	Console::ConsoleSystem->RegisterCommand(Console::Command("tickrate", []() {
 		TPS::PrintTickStats();
 		}, { }));
 
-	Console::RegisterCommand(Console::Command("serverperf", []() {
+	Console::ConsoleSystem->RegisterCommand(Console::Command("serverperf", []() {
 		TPS::PrintTPS = !TPS::PrintTPS;
 		if (TPS::PrintTPS)
 		{

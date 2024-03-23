@@ -1,5 +1,5 @@
 #pragma once
-#include <Rendering/Utility/ShaderManager.h>
+#include <Rendering/ShaderManager.h>
 #include <Rendering/Graphics.h>
 #include <set>
 #include <Engine/Stats.h>

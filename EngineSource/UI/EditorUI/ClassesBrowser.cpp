@@ -1,6 +1,6 @@
 #if EDITOR
 #include "ClassesBrowser.h"
-#include <CSharp/CSharpInterop.h>
+#include <Engine/Subsystem/CSharpInterop.h>
 #include <Objects/CSharpObject.h>
 #include <UI/EditorUI/Popups/ClassCreator.h>
 #include <UI/EditorUI/EditorUI.h>
@@ -17,7 +17,7 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetEditorUIClasse
 	std::vector<ObjectDescription> AllObjects = Objects::ObjectTypes;
 
 #ifdef ENGINE_CSHARP
-	for (auto& i : CSharp::GetAllClasses())
+	for (auto& i : CSharpInterop::CSharpSystem->GetAllClasses())
 	{
 		ObjectDescription Descr = ObjectDescription(i, CSharpObject::GetID());
 		AllObjects.push_back(Descr);

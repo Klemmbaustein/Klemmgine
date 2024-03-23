@@ -9,7 +9,7 @@
 #include <Engine/Importers/Importer.h>
 #include <Engine/OS.h>
 #include <UI/EditorUI/Tabs/MaterialTab.h>
-#include <Engine/Scene.h>
+#include <Engine/Subsystem/Scene.h>
 #include <UI/EditorUI/Viewport.h>
 #include <UI/EditorUI/Tabs/MeshTab.h>
 #include <UI/EditorUI/Tabs/ParticleEditorTab.h>

@@ -5,15 +5,20 @@
 #include <Engine/Input.h>
 #include <Engine/EngineProperties.h>
 #include <Engine/Log.h>
-#include <Engine/Scene.h>
-#include <Engine/Console.h>
 #include <Engine/EngineError.h>
 #include <Engine/File/Assets.h>
 #include <Engine/Stats.h>
 #include <Engine/Gamepad.h>
-#include <Engine/BackgroundTask.h>
 
-#include <Sound/Sound.h>
+#include <Engine/Subsystem/Console.h>
+#include <Engine/Subsystem/Sound.h>
+#include <Engine/Subsystem/CSharpInterop.h>
+#include <Engine/Subsystem/NetworkSubsystem.h>
+#include <Engine/Subsystem/InputSubsystem.h>
+#include <Engine/Subsystem/PhysicsSubsystem.h>
+#include <Engine/Subsystem/LogSubsystem.h>
+#include <Engine/Subsystem/BackgroundTask.h>
+#include <Engine/Subsystem/Scene.h>
 
 #include <UI/Default/UICanvas.h>
 #include <UI/UIBox.h>
@@ -24,26 +29,17 @@
 
 #include <Rendering/Renderable.h>
 #include <Rendering/Shader.h>
-#include <Rendering/Particle.h>
 #include <Rendering/Camera/CameraShake.h>
-#include <Rendering/Utility/Framebuffer.h>
-#include <Rendering/Utility/CSM.h>
+#include <Rendering/Framebuffer.h>
 #include <Rendering/Mesh/Mesh.h>
-#include <Rendering/Utility/SSAO.h>
-#include <Rendering/Utility/Bloom.h>
-#include <Rendering/Utility/BakedLighting.h>
-#include <Rendering/Texture/Cubemap.h>
 #include <Rendering/Camera/Camera.h>
 #include <Rendering/Camera/FrustumCulling.h>
-#include <Rendering/Graphics.h>
-#include <Rendering/Utility/PostProcess.h>
 #include <Rendering/BillboardSprite.h>
 #include <Rendering/Texture/Texture.h>
 
 #include <Math/Collision/CollisionVisualize.h>
 #include <Math/Collision/Collision.h>
-
-#include <CSharp/CSharpInterop.h>
+#include <Math/Physics/Physics.h>
 
 #include <Networking/Networking.h>
 
@@ -58,8 +54,7 @@
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
-#include <stack>
-#include <Math/Physics/Physics.h>
+#include <Rendering/RenderSubsystem/PostProcess.h>
 
 static Vector2 GetMousePosition()
 {
@@ -80,7 +75,7 @@ static std::string ToAppTitle(std::string Name)
 	ApplicationTitle.append(" Editor, v" + std::string(VERSION_STRING));
 #endif
 #if ENGINE_CSHARP && !RELEASE
-	if (CSharp::GetUseCSharp())
+	if (CSharpInterop::GetUseCSharp())
 	{
 		ApplicationTitle.append(" (C#)");
 	}
@@ -95,12 +90,8 @@ static std::string ToAppTitle(std::string Name)
 
 namespace Application
 {
-	PostProcess::Effect* UIMergeEffect = nullptr;
 	std::string StartupSceneOverride;
-	unsigned int BloomBuffer = 0, AOBuffer = 0;
-	unsigned int MainPostProcessBuffer = 0;
 	bool ShowStartupInfo = true;
-	bool RenderPostProcess = true;
 
 	SDL_Window* Window = nullptr;
 	bool ShouldClose = false;
@@ -125,8 +116,6 @@ namespace Application
 		SDL_MinimizeWindow(Window);
 	}
 	std::set<ButtonEvent> ButtonEvents;
-	Shader* PostProcessShader = nullptr;
-	Shader* ShadowShader = nullptr;
 #if EDITOR
 	EditorUI* EditorInstance = nullptr;
 #endif
@@ -218,28 +207,9 @@ namespace Application
 		return EditorPath;
 	}
 	float LogicTime = 0, RenderTime = 0, SyncTime = 0;
-	std::thread ConsoleThread;
 	size_t FrameCount = 0;
 #if !SERVER
-	PostProcess::Effect* AntiAliasEffect = nullptr;
-	Model* OcclusionCullMesh = nullptr;
-	Shader* CullShader = nullptr;
-	uint8_t NumOcclusionQueries = 0;
-	GLuint OcclusionQueries[256];
-	bool QueriesActive[256];
-	std::stack<Model*> CulledModels;
 #endif
-}
-void Application::FreeOcclusionQuery(uint8_t Index)
-{
-#if !SERVER
-	QueriesActive[Index] = false;
-#endif
-}
-
-namespace Input
-{
-	extern bool Keys[351];
 }
 
 namespace LaunchArgs
@@ -266,107 +236,6 @@ static void GLAPIENTRY MessageCallback(
 	}
 }
 
-#if !SERVER
-static bool RenderOccluded(Model* m, size_t i, FramebufferObject* Buffer)
-{
-	GLuint sampleCount = 0;
-	if (!m || !m->Visible)
-	{
-		return false;
-	}
-
-	if ((m->Size.extents * m->ModelTransform.Scale).Length() > 500.0f
-		|| (!m->IsOcclusionCulled && i != Application::FrameCount % Buffer->Renderables.size())
-		|| !m->ShouldCull)
-	{
-		m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
-		m->IsOcclusionCulled = false;
-		return true;
-	}
-
-	if (m->RunningQuery)
-	{
-		if (!m->IsOcclusionCulled)
-		{
-			m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
-		}
-		return !m->IsOcclusionCulled;
-	}
-	if (m->IsOcclusionCulled)
-	{
-		Application::CulledModels.push(m);
-		return false;
-	}
-
-	GLuint Query = 0;
-	for (uint8_t i = 0; i < 255; i++)
-	{
-		if (!Application::QueriesActive[i])
-		{
-			Application::QueriesActive[i] = true;
-			m->OcclusionQueryIndex = i;
-			Query = Application::OcclusionQueries[i];
-			break;
-		}
-	}
-
-	if (Query == 0)
-	{
-		if (!m->IsOcclusionCulled)
-		{
-			m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
-		}
-		return !m->IsOcclusionCulled;
-	}
-
-	glBeginQuery(GL_ANY_SAMPLES_PASSED, Query);
-	m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
-	glEndQuery(GL_ANY_SAMPLES_PASSED);
-	m->RunningQuery = true;
-	return true;
-}
-
-static void OcclusionCheck(Model* m, size_t i, FramebufferObject* Buffer)
-{
-	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-	glDepthMask(GL_FALSE);
-	GLuint Query = 0;
-	for (uint8_t i = 0; i < 255; i++)
-	{
-		if (!Application::QueriesActive[i])
-		{
-			Application::QueriesActive[i] = true;
-			m->OcclusionQueryIndex = i;
-			Query = Application::OcclusionQueries[i];
-			break;
-		}
-	}
-
-	if (Query == 0)
-	{
-		if (!m->IsOcclusionCulled)
-		{
-			m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
-		}
-		return;
-	}
-
-	glBeginQuery(GL_ANY_SAMPLES_PASSED, Query);
-	Transform t = Transform(
-		m->ModelTransform.Position + Vector3::RotateVector(m->Size.center, m->ModelTransform.Rotation),
-		m->ModelTransform.Rotation,
-		m->Size.extents * m->ModelTransform.Scale
-	);
-	Application::OcclusionCullMesh->ModelTransform = t;
-	Application::OcclusionCullMesh->UpdateTransform();
-	Application::OcclusionCullMesh->SimpleRender(Application::CullShader);
-	
-	glEndQuery(GL_ANY_SAMPLES_PASSED);
-	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-	glDepthMask(GL_TRUE);
-	m->RunningQuery = true;
-}
-#endif
 
 static void TickObjects()
 {
@@ -375,584 +244,6 @@ static void TickObjects()
 		Objects::AllObjects.at(i)->Update();
 		Objects::AllObjects.at(i)->UpdateComponents();
 	}
-#ifdef ENGINE_CSHARP
-	CSharp::RunPerFrameLogic();
-#endif
-}
-
-static void DrawFramebuffer(FramebufferObject* Buffer)
-{
-#if !SERVER
-	if (!Buffer->FramebufferCamera) return;
-
-#if EDITOR
-
-	if (!Application::WindowHasFocus())
-	{
-		return;
-	}
-
-#endif
-
-	Buffer->FramebufferCamera->Update();
-
-	if ((!Buffer->Renderables.size() && !Buffer->ParticleEmitters.size()) || !Buffer->Active)
-	{
-		Buffer->GetBuffer()->Bind();
-		glClearColor(0.f, 0.f, 0.f, 1.f);
-		glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-		return;
-	}
-
-	if (Buffer->PreviousReflectionCubemapName != Buffer->ReflectionCubemapName)
-	{
-		Buffer->PreviousReflectionCubemapName = Buffer->ReflectionCubemapName;
-		if (Buffer->ReflectionCubemap)
-		{
-			Cubemap::UnloadCubemapFile(Buffer->ReflectionCubemap);
-		}
-		if (!Buffer->ReflectionCubemapName.empty())
-		{
-			Buffer->ReflectionCubemap = Cubemap::LoadCubemapFile(Buffer->ReflectionCubemapName);
-		}
-		else
-		{
-			Buffer->ReflectionCubemap = 0;
-		}
-	}
-
-	for (auto* p : Buffer->ParticleEmitters)
-	{
-		p->Update(Buffer->FramebufferCamera);
-	}
-	Debugging::EngineStatus = "Rendering (Framebuffer: Shadows)";
-	FrustumCulling::Active = false;
-	glEnable(GL_CULL_FACE);
-	glDisable(GL_BLEND);
-	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.f, 0.f, 0.f, 1.f);		//Clear color black
-	glViewport(0, 0, Graphics::ShadowResolution, Graphics::ShadowResolution);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	CSM::UpdateMatricesUBO(Buffer->FramebufferCamera);
-
-	if (Graphics::RenderShadows && Graphics::ShadowResolution > 0 && !Graphics::RenderFullbright)
-	{
-		glBindFramebuffer(GL_FRAMEBUFFER, CSM::LightFBO);
-		glClear(GL_DEPTH_BUFFER_BIT);
-		for (int j = 0; j < Buffer->Renderables.size(); j++)
-		{
-			if (Buffer->Renderables[j]->CastShadow)
-				Buffer->Renderables.at(j)->SimpleRender(Application::ShadowShader);
-		}
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	}
-
-	FrustumCulling::Active = false;
-	FrustumCulling::CurrentCameraFrustum = FrustumCulling::createFrustumFromCamera(*Buffer->FramebufferCamera);
-	Buffer->GetBuffer()->Bind();
-	Debugging::EngineStatus = "Rendering (Framebuffer: Main pass)";
-
-	Vector2 BufferResolution = Buffer->UseMainWindowResolution ? Graphics::RenderResolution : Buffer->CustomFramebufferResolution;
-	glViewport(0, 0, (int)BufferResolution.X, (int)BufferResolution.Y);
-	const auto LightSpaceMatrices = CSM::getLightSpaceMatrices(Buffer->FramebufferCamera);
-
-	std::vector<Graphics::Light*> DrawnLights;
-	DrawnLights.reserve(std::min(size_t(8), Buffer->Lights.size()));
-
-	for (auto& Light : Buffer->Lights)
-	{
-		float Distance = Vector3::DistanceSquared(Buffer->FramebufferCamera->Position, Light.Position);
-		if (DrawnLights.size() < Graphics::MAX_LIGHTS)
-		{
-			Light.Distance = Distance;
-			DrawnLights.push_back(&Light);
-		}
-		else
-		{
-			for (Graphics::Light*& i : DrawnLights)
-			{
-				if (Distance < i->Distance)
-				{
-					i = &Light;
-					i->Distance = Distance;
-					break;
-				}
-			}
-		}
-	}
-
-	for (auto& s : Shaders)
-	{
-		Renderable::ApplyDefaultUniformsToShader(s.second.UsedShader, Buffer == Graphics::MainFramebuffer);
-		CSM::BindLightSpaceMatricesToShader(LightSpaceMatrices, s.second.UsedShader);
-
-		for (int i = 0; i < Graphics::MAX_LIGHTS; i++)
-		{
-			std::string CurrentLight = "u_lights[" + std::to_string(i) + "]";
-			if (i < DrawnLights.size())
-			{
-				s.second.UsedShader->SetVector3(CurrentLight + ".Position", DrawnLights[i]->Position);
-				s.second.UsedShader->SetVector3(CurrentLight + ".Color", DrawnLights[i]->Color);
-				s.second.UsedShader->SetFloat(CurrentLight + ".Falloff", DrawnLights[i]->Falloff);
-				s.second.UsedShader->SetFloat(CurrentLight + ".Intensity", DrawnLights[i]->Intensity);
-
-				s.second.UsedShader->SetInt(CurrentLight + ".Active", 1);
-			}
-			else
-			{
-				s.second.UsedShader->SetInt(CurrentLight + ".Active", 0);
-			}
-		}
-	}
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glEnable(GL_CULL_FACE);
-	glClearColor(0, 0, 0, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	if (Graphics::IsWireframe)
-	{
-		glLineWidth(3);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	}
-	// Bind cubemap texture
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_CUBE_MAP, Buffer->ReflectionCubemap);
-	// Main pass
-
-	BakedLighting::BindToTexture();
-	Application::CullShader->Bind();
-	Application::CullShader->SetMat4("u_viewpro", Buffer->FramebufferCamera->getViewProj());
-	size_t i = 0;
-	Buffer->GetBuffer()->Bind();
-	for (auto o : Buffer->Renderables)
-	{
-		Model* m = dynamic_cast<Model*>(o);
-		if (Buffer == Graphics::MainFramebuffer && m && !Graphics::IsWireframe)
-		{
-			RenderOccluded(m, i, Buffer);
-		}
-		else
-		{
-			o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);
-		}
-		i++;
-	}
-	for (size_t i = 0; i < Buffer->Renderables.size(); i++)
-	{
-		Model* m = dynamic_cast<Model*>(Buffer->Renderables[i]);
-		if (!m)
-		{
-			continue;
-		}
-		if (!m->RunningQuery)
-		{
-			continue;
-		}
-		GLuint Query = Application::OcclusionQueries[m->OcclusionQueryIndex];
-		GLuint QueryVal = 0;
-		glGetQueryObjectuiv(Query, GL_QUERY_RESULT_AVAILABLE, &QueryVal);
-		if (!QueryVal)
-		{
-			continue;
-		}
-		glGetQueryObjectuiv(Query, GL_QUERY_RESULT, &QueryVal);
-		m->IsOcclusionCulled = QueryVal == 0 || Graphics::IsWireframe;
-		m->RunningQuery = false;
-		Application::QueriesActive[m->OcclusionQueryIndex] = false;
-	}
-
-	while (!Application::CulledModels.empty())
-	{
-		OcclusionCheck(Application::CulledModels.top(), 0, Buffer);
-		Application::CulledModels.pop();
-	}
-
-	Buffer->GetBuffer()->Bind();
-	// Transparency pass
-	for (auto p : Buffer->ParticleEmitters)
-	{
-		p->Draw(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, true);
-	}
-	Buffer->GetBuffer()->Bind();
-	for (auto o : Buffer->Renderables)
-	{
-		o->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, true);
-	}
-
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
-#endif
-}
-
-static void InitializeShaders()
-{
-#if !SERVER
-	std::cout << "- Initializing Shaders";
-	Graphics::TextShader = new Shader("Shaders/UI/text.vert", "Shaders/UI/text.frag");
-	std::cout << ".";
-	Graphics::UIShader = new Shader("Shaders/UI/uishader.vert", "Shaders/UI/uishader.frag");
-	std::cout << ".";
-	Application::PostProcessShader = new Shader("Shaders/Internal/postprocess.vert", "Shaders/Internal/postprocess.frag");
-	std::cout << ".";
-	Application::ShadowShader = new Shader("Shaders/Internal/shadow.vert", "Shaders/Internal/shadow.frag", "Shaders/Internal/shadow.geom");
-	Graphics::ShadowShader = Application::ShadowShader;
-	std::cout << "." << std::endl;
-#endif
-}
-
-namespace ConsoleInput
-{
-	std::condition_variable cv;
-	std::mutex Mutex;
-	std::deque<std::string> Lines;
-
-	std::thread* ReadConsoleThread;
-	static void ReadConsole()
-	{
-		while (true)
-		{
-			std::string ReadString;
-			std::getline(std::cin, ReadString);
-			std::lock_guard lock{ Mutex };
-			Lines.push_back(std::move(ReadString));
-			cv.notify_one();
-		}
-	}
-}
-
-static void PollInput()
-{
-#if !SERVER
-	Input::IsLMBClicked = false;
-	Input::IsRMBClicked = false;
-	Debugging::EngineStatus = "Reading Input";
-	Input::MouseMovement = Vector2();
-	SDL_Event Event;
-	while (SDL_PollEvent(&Event))
-	{
-		if (Event.type == SDL_QUIT)
-		{
-#if EDITOR
-			Application::EditorInstance->OnLeave(Application::Quit);
-#else
-			Application::Quit();
-#endif
-		}
-		else if (Event.type == SDL_JOYBUTTONDOWN
-			|| Event.type == SDL_JOYBUTTONUP
-			|| Event.type == SDL_JOYAXISMOTION
-			|| Event.type == SDL_JOYHATMOTION) 
-		{
-			Input::HandleGamepadEvent(&Event);
-		}
-		else if (Event.type == SDL_MOUSEMOTION)
-		{
-			Input::MouseMovement += Vector2(Event.motion.xrel / 12.f, -Event.motion.yrel / 12.f);
-		}
-		else if (Event.type == SDL_JOYDEVICEADDED)
-		{
-			Input::AddGamepad(Event.jdevice.which);
-		}
-		else if (Event.type == SDL_KEYDOWN)
-		{
-			if (Event.key.keysym.sym < 128)
-			{
-				Input::Keys[Event.key.keysym.sym] = true;
-			}
-			else
-			{
-				int sym = Event.key.keysym.sym;
-				sym -= 1073741755;
-				if (sym > 0)
-					Input::Keys[sym] = true;
-			}
-			switch (Event.key.keysym.sym)
-			{
-			case SDLK_LEFT:
-				TextInput::TextIndex = std::max(std::min(TextInput::TextIndex - 1, (int)TextInput::Text.size()), 0);
-				break;
-			case  SDLK_RIGHT:
-				TextInput::TextIndex = std::max(std::min(TextInput::TextIndex + 1, (int)TextInput::Text.size()), 0);
-				break;
-			case SDLK_BACKSPACE:
-				if (TextInput::PollForText && TextInput::Text.length() > 0)
-				{
-					if (TextInput::TextIndex == TextInput::Text.size())
-					{
-						TextInput::Text.pop_back();
-					}
-					else if (TextInput::TextIndex > 0)
-					{
-						TextInput::Text.erase((size_t)TextInput::TextIndex - 1, 1);
-					}
-					TextInput::TextIndex = std::max(std::min(TextInput::TextIndex - 1, (int)TextInput::Text.size()), 0);
-				}
-				break;
-			case SDLK_DELETE:
-				if (TextInput::PollForText)
-				{
-					if (TextInput::TextIndex < TextInput::Text.size() && TextInput::TextIndex >= 0)
-					{
-						TextInput::Text.erase(TextInput::TextIndex, 1);
-					}
-				}
-				break;
-			case SDLK_ESCAPE:
-				TextInput::PollForText = false;
-				break;
-			case SDLK_RETURN:
-				TextInput::PollForText = false;
-				break;
-			case SDLK_F11:
-				Application::SetFullScreen(!Application::GetFullScreen());
-				break;
-			case SDLK_v:
-				if (TextInput::PollForText && (Input::IsKeyDown(Input::Key::LCTRL) || Input::IsKeyDown(Input::Key::RCTRL)))
-				{
-					std::string ClipboardText = SDL_GetClipboardText();
-					if (TextInput::TextIndex < TextInput::Text.size())
-					{
-						TextInput::Text.insert(TextInput::TextIndex, ClipboardText);
-					}
-					else
-					{
-						TextInput::Text.append(ClipboardText);
-					}
-					TextInput::TextIndex += (int)ClipboardText.size();
-				}
-				break;
-			}
-		}
-		else if (Event.type == SDL_KEYUP)
-		{
-			std::vector<int> Indices;
-
-			if (Event.key.keysym.sym < 128)
-			{
-				Input::Keys[Event.key.keysym.sym] = false;
-			}
-			else
-			{
-				int sym = Event.key.keysym.sym;
-				sym -= 1073741755;
-				if (sym > 0)
-					Input::Keys[sym] = false;
-			}
-		}
-		else if (Event.type == SDL_WINDOWEVENT)
-		{
-			if (Event.window.event == SDL_WINDOWEVENT_RESIZED)
-			{
-				int w, h;
-				SDL_GetWindowSize(Application::Window, &w, &h);
-				Graphics::SetWindowResolution(Vector2((float)w, (float)h));
-				UIBox::RedrawUI();
-			}
-		}
-		else if (Event.type == SDL_MOUSEBUTTONDOWN)
-		{
-			switch (Event.button.button)
-			{
-			case SDL_BUTTON_RIGHT:
-				Input::IsRMBDown = true;
-				Input::IsRMBClicked = true;
-				TextInput::PollForText = false;
-				break;
-			case SDL_BUTTON_LEFT:
-				Input::IsLMBClicked = true;
-				Input::IsLMBDown = true;
-				break;
-			}
-		}
-		else if (Event.type == SDL_MOUSEBUTTONUP)
-		{
-			switch (Event.button.button)
-			{
-			case SDL_BUTTON_RIGHT:
-				Input::IsRMBDown = false;
-				break;
-			case SDL_BUTTON_LEFT:
-				Input::IsLMBDown = false;
-				break;
-			}
-		}
-		else if (Event.type == SDL_TEXTINPUT)
-		{
-			if (TextInput::PollForText &&
-				!(SDL_GetModState() & KMOD_CTRL &&
-					(Event.text.text[0] == 'c' || Event.text.text[0] == 'C' || Event.text.text[0] == 'v' || Event.text.text[0] == 'V')))
-			{
-				if (Event.text.text[0] >= 32)
-				{
-					if (TextInput::Text.size() < TextInput::TextIndex)
-					{
-						TextInput::TextIndex = (int)TextInput::Text.size();
-					}
-					TextInput::Text.insert(TextInput::TextIndex, std::string(Event.text.text));
-					TextInput::TextIndex += (int)strlen(Event.text.text);
-				}
-			}
-		}
-		else if (Event.type == SDL_MOUSEWHEEL)
-		{
-			Sint32 ScrollDistance = Event.wheel.y;
-			while (ScrollDistance)
-			{
-				for (ScrollObject* s : Graphics::UI::ScrollObjects)
-				{
-					if (Event.wheel.y < 0)
-						s->ScrollUp();
-					else
-						s->ScrollDown();
-				}
-				if (ScrollDistance < 0)
-				{
-					ScrollDistance++;
-				}
-				else
-				{
-					ScrollDistance--;
-				}
-			}
-		}
-	}
-	if (Input::CursorVisible || !Application::WindowHasFocus())
-	{
-		Input::MouseLocation = GetMousePosition();
-		SDL_SetRelativeMouseMode(SDL_FALSE);
-	}
-	else
-	{
-		SDL_SetRelativeMouseMode(SDL_TRUE);
-	}
-	if (!Application::WindowHasFocus())
-	{
-		Input::MouseMovement = 0;
-	}
-#endif
-}
-
-static void DrawPostProcessing()
-{
-#if !SERVER
-	bool ShouldSkip3D = false;
-#if EDITOR
-	if (!Application::WindowHasFocus())
-	{
-		ShouldSkip3D = true;
-	}
-#endif
-	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
-	Application::UIMergeEffect->EffectShader->Bind();
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, UIBox::GetUITextures()[1]);
-	Application::UIMergeEffect->EffectShader->SetInt("u_alpha", 1);
-	Application::UIMergeEffect->EffectShader->SetInt("u_hr", 2);
-	Application::UIMergeEffect->EffectShader->SetInt("u_hrAlpha", 3);
-	unsigned int UIBuffer = Application::UIMergeEffect->Render(UIBox::GetUITextures()[0]);
-
-#if !EDITOR
-	for (const PostProcess::Effect* i : PostProcess::GetCurrentEffects())
-	{
-		if (i->UsedType == PostProcess::EffectType::UI)
-		{
-			UIBuffer = i->Render(UIBuffer);
-		}
-	}
-#endif
-
-	FramebufferObject* DrawnBuffer = CollisionVisualize::GetVisualizeBuffer()
-		? CollisionVisualize::GetVisualizeBuffer()
-		: Graphics::MainFramebuffer;
-
-	if (!ShouldSkip3D)
-	{
-		glViewport(0, 0, (int)Graphics::RenderResolution.X, (int)Graphics::RenderResolution.Y);
-		Application::AOBuffer = SSAO::Render(
-			DrawnBuffer->GetBuffer()->GetTextureID(2),
-			DrawnBuffer->GetBuffer()->GetTextureID(3));
-
-		Application::MainPostProcessBuffer = DrawnBuffer->GetBuffer()->GetTextureID(0);
-
-		if (Application::RenderPostProcess)
-		{
-			if (Graphics::RenderAntiAlias)
-			{
-				Application::MainPostProcessBuffer = Application::AntiAliasEffect->Render(Application::MainPostProcessBuffer);
-			}
-			for (const PostProcess::Effect* i : PostProcess::GetCurrentEffects())
-			{
-				if (i->UsedType == PostProcess::EffectType::World)
-				{
-					Application::MainPostProcessBuffer = i->Render(Application::MainPostProcessBuffer);
-				}
-			}
-		}
-		Application::BloomBuffer = Bloom::BlurFramebuffer(Application::MainPostProcessBuffer);
-	}
-
-	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	Debugging::EngineStatus = "Rendering (Post process: Main)";
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, Application::MainPostProcessBuffer);
-#if EDITOR
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->OutlineBuffer->GetBuffer()->GetTextureID(1));
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, Viewport::ViewportInstance->ArrowsBuffer->GetBuffer()->GetTextureID(0));
-#else
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-#endif
-	glActiveTexture(GL_TEXTURE4);
-	glBindTexture(GL_TEXTURE_2D, Application::BloomBuffer);
-	glActiveTexture(GL_TEXTURE5);
-	glBindTexture(GL_TEXTURE_2D, Application::AOBuffer);
-	glActiveTexture(GL_TEXTURE6);
-	glBindTexture(GL_TEXTURE_2D, DrawnBuffer->GetBuffer()->GetTextureID(1));
-
-	glActiveTexture(GL_TEXTURE7);
-	glBindTexture(GL_TEXTURE_2D, UIBuffer);
-	Application::PostProcessShader->Bind();
-	Application::PostProcessShader->SetFloat("u_gamma", Graphics::Gamma);
-#if EDITOR
-	const Vector2 ViewportPos = (Viewport::ViewportInstance->Position + Viewport::ViewportInstance->Scale * 0.5);
-	Application::PostProcessShader->SetVector2("Position", ViewportPos);
-	const Vector2 ViewportScale = 2;
-	Application::PostProcessShader->SetVector2("Scale", ViewportScale);
-#endif
-	Application::PostProcessShader->SetInt("u_texture", 1);
-	Application::PostProcessShader->SetInt("u_outlines", 2);
-	Application::PostProcessShader->SetInt("u_enginearrows", 3);
-	Application::PostProcessShader->SetInt("u_ssaotexture", 5);
-	Application::PostProcessShader->SetInt("u_depth", 6);
-	Application::PostProcessShader->SetInt("u_hasUITexCoords", 1);
-	Application::PostProcessShader->SetInt("u_ui", 7);
-	Application::PostProcessShader->SetInt("u_uialpha", 8);
-	Application::PostProcessShader->SetFloat("u_time", Stats::Time);
-	Application::PostProcessShader->SetFloat("u_vignette", Graphics::Vignette);
-	Application::PostProcessShader->SetInt("u_bloom", Graphics::Bloom);
-	Application::PostProcessShader->SetInt("u_ssao", Graphics::SSAO);
-	Application::PostProcessShader->SetInt("u_editor", IS_IN_EDITOR);
-	Application::PostProcessShader->SetInt("u_hasWindowBorder", IS_IN_EDITOR && !Application::GetFullScreen());
-	Application::PostProcessShader->SetVector3("u_borderColor", Application::WindowHasFocus() ? Vector3(0.5, 0.5, 1) : 0.5);
-	if (Graphics::Bloom)
-	{
-		glUniform1i(glGetUniformLocation(Application::PostProcessShader->GetShaderID(), "u_bloomtexture"), 4);
-	}
-	glClear(GL_COLOR_BUFFER_BIT);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
-	Application::PostProcessShader->Unbind();
-	glViewport(0, 0, (int)Graphics::RenderResolution.X, (int)Graphics::RenderResolution.Y);
-#endif
 }
 
 static void ApplicationLoop()
@@ -960,10 +251,8 @@ static void ApplicationLoop()
 	const Application::Timer FrameTimer;
 	const Application::Timer LogicTimer;
 #if !SERVER
-	Input::GamepadUpdate();
-	PollInput();
+	Subsystem::UpdateSubsystems();
 	CameraShake::Tick();
-	Sound::Update();
 	Physics::Update();
 #endif
 #if !EDITOR
@@ -972,20 +261,6 @@ static void ApplicationLoop()
 		Networking::Update();
 	}
 #endif
-
-	std::deque<std::string> ConsoleCommands;
-	{
-		std::unique_lock Lock { ConsoleInput::Mutex };
-		if (ConsoleInput::cv.wait_for(Lock, std::chrono::seconds(0), [&] { return !ConsoleInput::Lines.empty(); }))
-		{
-			std::swap(ConsoleInput::Lines, ConsoleCommands);
-		}
-	}
-
-	for (auto& i : ConsoleCommands)
-	{
-		Console::ExecuteConsoleCommand(i);
-	}
 
 	WorldObject::DestroyMarkedObjects();
 	TickObjects();
@@ -996,40 +271,10 @@ static void ApplicationLoop()
 	Debugging::EngineStatus = "Rendering (Framebuffer)";
 	for (FramebufferObject* Buffer : Graphics::AllFramebuffers)
 	{
-		DrawFramebuffer(Buffer);
+		Buffer->Draw();
 	}
-	Debugging::EngineStatus = "Responding to button events";
-	for (ButtonEvent b : Application::ButtonEvents)
-	{
-		if (b.c)
-		{
-			if (b.IsDraggedEvent)
-			{
-				b.c->OnButtonDragged(b.Index);
-			}
-			else
-			{
-				b.c->OnButtonClicked(b.Index);
-			}
-		}
-		if (b.o)
-		{
-			b.o->OnChildClicked(b.Index);
-		}
-	}
-	Application::ButtonEvents.clear();
-	Debugging::EngineStatus = "Ticking (UI)";
-	for (int i = 0; i < Graphics::UIToRender.size(); i++)
-	{
-		Graphics::UIToRender[i]->Tick();
-	}
-
-	Debugging::EngineStatus = "Rendering (UI)";
+	UIBox::UpdateUI();
 	UIBox::DrawAllUIElements();
-	glDisable(GL_BLEND);
-	glDisable(GL_CULL_FACE);
-	glDisable(GL_DEPTH_TEST);
-	DrawPostProcessing();
 	float RenderTime = RenderTimer.Get();
 #if !EDITOR && !RELEASE
 	if (!DebugUI::CurrentDebugUI)
@@ -1037,9 +282,8 @@ static void ApplicationLoop()
 		new DebugUI();
 	}
 #endif
+	PostProcess::PostProcessSystem->Draw();
 #endif
-	BackgroundTask::UpdateTaskStatus();
-	Scene::Tick();
 	const Application::Timer SwapTimer;
 #if !SERVER
 	SDL_GL_SetSwapInterval(0 - Graphics::VSync);
@@ -1077,25 +321,15 @@ static void ApplicationLoop()
 	Stats::Time += Performance::DeltaTime;
 }
 
-int Application::Initialize(int argc, char** argv)
+static void CreateWindow()
 {
-	OS::SetConsoleWindowVisible(true);
-	Assets::ScanForAssets();
-	Application::EditorPath = std::filesystem::current_path().u8string();
-
-	for (int i = 0; i < 322; i++) // Array of keys, should be 'false' in the beginning
-	{
-		Input::Keys[i] = false;
-	}
-
 	std::cout << "Starting..." << std::endl;
 	std::cout << "- Starting SDL2 - ";
 	int SDLReturnValue = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK);
-	Application::Timer StartupTimer;
 	if (SDLReturnValue != 0)
 	{
 		std::cout << "Could not start SDL2 (" << SDL_GetError() << ")\n";
-		return 1;
+		exit(1);
 	}
 	else
 	{
@@ -1129,7 +363,7 @@ int Application::Initialize(int argc, char** argv)
 		SDL_DestroyWindow(Application::Window);
 		std::cout << "\nPress Enter to continue";
 		std::cin.get();
-		return 1;
+		exit(1);
 	}
 	if (!glewIsSupported(OPENGL_MIN_REQUIRED_VERSION))
 	{
@@ -1140,20 +374,38 @@ int Application::Initialize(int argc, char** argv)
 		std::cout << "Press enter to continue";
 		std::cin.get();
 		std::cout << std::endl;
-		return 1;
+		exit(1);
 	}
 	glEnable(GL_DEBUG_OUTPUT);
 	glDebugMessageCallback(MessageCallback, 0);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	std::cout << "GLEW started (No error)" << std::endl;
-
 #endif
-	Console::InitializeConsole();
+}
+
+int Application::Initialize(int argc, char** argv)
+{
+	OS::SetConsoleWindowVisible(true);
+	Assets::ScanForAssets();
+	Application::EditorPath = std::filesystem::current_path().u8string();
+
+	CreateWindow();
+	Application::Timer StartupTimer;
+
 	Error::Init();
+
+	Subsystem::Load(new LogSubsystem());
+	Subsystem::Load(new Console());
+	Subsystem::Load(new InputSubsystem());
+	Subsystem::Load(new Sound());
+	Subsystem::Load(new PhysicsSubsystem());
+	Subsystem::Load(new BackgroundTaskSubsystem());
+	Subsystem::Load(new Scene());
 #if !EDITOR
 	if (Project::UseNetworkFunctions)
 	{
-		Networking::Init();
+		Subsystem::Load(new NetworkSubsystem());
 	}
 #endif
 
@@ -1166,17 +418,8 @@ int Application::Initialize(int argc, char** argv)
 		}
 		LaunchArgs::EvaluateLaunchArguments(LaunchArguments);
 	}
-#if !SERVER
-
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	Sound::Init();
-
-	Graphics::MainCamera = Scene::DefaultCamera;
-	Graphics::MainFramebuffer = new FramebufferObject();
-	Graphics::MainFramebuffer->FramebufferCamera = Graphics::MainCamera;
-#endif
 #if ENGINE_CSHARP
-	CSharp::Init();
+	Subsystem::Load(new CSharpInterop());
 
 #if ENGINE_NO_SOURCE
 	SDL_SetWindowTitle(Window, ToAppTitle(
@@ -1186,48 +429,23 @@ int Application::Initialize(int argc, char** argv)
 	).c_str());
 #endif
 #endif
-	Cubemap::RegisterCommands();
+
 #if !SERVER
-	BakedLighting::Init();
-	Console::RegisterConVar(Console::Variable("post_process", NativeType::Bool, &Application::RenderPostProcess, nullptr));
-	Console::RegisterConVar(Console::Variable("full_bright", NativeType::Bool, &Graphics::RenderFullbright, nullptr));
-	Console::RegisterConVar(Console::Variable("aa_enabled", NativeType::Bool, &Graphics::RenderAntiAlias, []() {
-		Graphics::SetWindowResolution(Graphics::WindowResolution, true);
-		}));
-	Console::RegisterCommand(Console::Command("show_collision", CollisionVisualize::Activate, {}));
-	Console::RegisterCommand(Console::Command("hide_collision", CollisionVisualize::Deactivate, {}));
-	InitializeShaders();
 	UIBox::InitUI();
-	Application::UIMergeEffect = new PostProcess::Effect("Internal/uimerge.frag", PostProcess::EffectType::UI_Internal);
-	Application::AntiAliasEffect = new PostProcess::Effect("Internal/fxaa.frag", PostProcess::EffectType::World_Internal);
-	PostProcess::AddEffect(Application::UIMergeEffect);
-	PostProcess::AddEffect(Application::AntiAliasEffect);
-	CSM::Init();
-	Bloom::Init();
-	SSAO::Init();
 
-	{
-		ModelGenerator::ModelData CullMeshData;
-		CullMeshData.AddElement().MakeCube(2, 0);
-		Application::OcclusionCullMesh = new Model(CullMeshData);
-		Application::OcclusionCullMesh->TwoSided = true;
-		Application::CullShader = ReferenceShader("Shaders/Internal/cull.vert", "Shaders/Internal/cull.frag");
+	RenderSubsystem::LoadRenderSubsystems();
 
-		memset(QueriesActive, 0, sizeof(QueriesActive));
-		glGenQueries(256, Application::OcclusionQueries);
-	}
+	Console::ConsoleSystem->RegisterCommand(Console::Command("show_collision", CollisionVisualize::Activate, {}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("hide_collision", CollisionVisualize::Deactivate, {}));
+
 #endif
-	Physics::Init();
-
-	ConsoleInput::ReadConsoleThread = new std::thread(ConsoleInput::ReadConsole);
 
 	std::string Startup = Project::GetStartupScene();
 	if (!Application::StartupSceneOverride.empty())
 	{
 		Startup = Application::StartupSceneOverride;
 	}
-	Scene::LoadNewScene(Startup);
-	Scene::Tick();
+	Scene::LoadNewScene(Startup, true);
 	Project::OnLaunch();
 
 #if EDITOR
@@ -1248,9 +466,7 @@ int Application::Initialize(int argc, char** argv)
 	{
 		ApplicationLoop();
 	}
-#if !EDITOR
-	Networking::Exit();
-#endif
+	Subsystem::DestroyAll();
 	OS::SetConsoleWindowVisible(true);
 	exit(0);
 }

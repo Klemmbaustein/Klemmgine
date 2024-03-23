@@ -1,5 +1,13 @@
 # Changes
 
+## Version 1.10.0
+
+### Changes
+
+- Improved build tool will now not assume class declarations from header file names but scan header files for class declarations.
+- Added `Subsystem` interfaces.
+- Log files will now be written to disk in WorkingDirectory/Logs/
+
 ## Version 1.9.4
 
 ### Changes

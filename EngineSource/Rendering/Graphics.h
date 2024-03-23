@@ -1,5 +1,6 @@
 #pragma once
 #include <Math/Vector.h>
+#include <Engine/Subsystem/Subsystem.h>
 
 class Renderable;
 class UICanvas;
@@ -8,19 +9,24 @@ struct Shader;
 class ScrollObject;
 class FramebufferObject;
 
-namespace Graphics
+class Graphics : public Subsystem
 {
-	extern float ResolutionScale;
-	extern bool RenderShadows;
-	extern bool SSAO;
-	extern bool VSync;
-	extern bool IsWireframe;
-	extern int ShadowResolution;
-	extern bool Bloom;
-	extern bool RenderFullbright;
-	extern float Gamma;
+public:
+	Graphics();
 
-	constexpr int MAX_LIGHTS = 8;
+	void Update() override;
+
+	static float ResolutionScale;
+	static bool RenderShadows;
+	static bool SSAO;
+	static bool VSync;
+	static bool IsWireframe;
+	static int ShadowResolution;
+	static bool Bloom;
+	static bool RenderFullbright;
+	static float Gamma;
+
+	static const int MAX_LIGHTS;
 
 	struct Fog
 	{
@@ -61,35 +67,24 @@ namespace Graphics
 		bool operator==(Light b);
 	};
 
-	extern Sun WorldSun;
-	extern Fog WorldFog;
-	extern bool RenderAntiAlias;
-	extern std::vector<UICanvas*> UIToRender;
-	extern Vector2 WindowResolution;
-	extern Vector2 RenderResolution;
-	void SetWindowResolution(Vector2 NewResolution, bool Force = false);
-	extern float AspectRatio;
+	static Sun WorldSun;
+	static Fog WorldFog;
+	static bool RenderAntiAlias;
+	static std::vector<UICanvas*> UIToRender;
+	static Vector2 WindowResolution;
+	static Vector2 RenderResolution;
+	static void SetWindowResolution(Vector2 NewResolution, bool Force = false);
+	static float AspectRatio;
 #if !SERVER
-	extern Camera* MainCamera;
-	extern Shader* MainShader;
-	extern Shader* ShadowShader;
-	extern Shader* TextShader;
-	extern Shader* UIShader;
+	static Camera* MainCamera;
+	static Shader* MainShader;
+	static Shader* TextShader;
+	static Shader* UIShader;
 #endif
-	extern float ChrAbbSize, Vignette;
-	extern unsigned int PCFQuality;
+	static float ChrAbbSize, Vignette;
+	static unsigned int PCFQuality;
 #if !SERVER
-	extern FramebufferObject* MainFramebuffer;
-	extern std::vector<FramebufferObject*> AllFramebuffers;
+	static FramebufferObject* MainFramebuffer;
+	static std::vector<FramebufferObject*> AllFramebuffers;
 #endif
-	namespace UI
-	{
-		extern std::vector<ScrollObject*> ScrollObjects;
-	}
-	namespace FBO
-	{
-		extern unsigned int SSAOBuffers[3];
-		extern unsigned int ssaoColorBuffer;
-		extern unsigned int ssaoFBO;
-	}
-}
+};

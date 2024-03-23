@@ -6,8 +6,7 @@
 #include <Engine/Log.h>
 #include <Engine/EngineProperties.h>
 #include <Engine/Application.h>
-#include <Rendering/Utility/CSM.h>
-#include <Engine/Console.h>
+#include <Rendering/RenderSubsystem/CSM.h>
 
 /**
 * @brief

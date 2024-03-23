@@ -9,7 +9,7 @@
 #include <Networking/Client.h>
 #include <Engine/Utility/StringUtility.h>
 #include <Objects/WorldObject.h>
-#include <Engine/Scene.h>
+#include <Engine/Subsystem/Scene.h>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -149,8 +149,7 @@ void Packet::EvaluatePacket()
 		Value.append({ (char)Data[i] });
 	}
 
-	Scene::LoadNewScene(Value);
-	Scene::Tick();
+	Scene::LoadNewScene(Value, true);
 	}
 #endif
 		break;

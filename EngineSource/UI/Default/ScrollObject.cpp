@@ -12,18 +12,18 @@ ScrollObject::ScrollObject(Vector2 Position, Vector2 Scale, float MaxScroll)
 {
 	this->Position = Position;
 	this->Scale = Vector2() - Scale;
-	Graphics::UI::ScrollObjects.push_back(this);
+	UIBox::ScrollObjects.push_back(this);
 	this->MaxScroll = MaxScroll;
 }
 
 ScrollObject::~ScrollObject()
 {
 	int i = 0;
-	for (ScrollObject* s : Graphics::UI::ScrollObjects)
+	for (ScrollObject* s : UIBox::ScrollObjects)
 	{
 		if (s == this)
 		{
-			Graphics::UI::ScrollObjects.erase(Graphics::UI::ScrollObjects.begin() + i);
+			UIBox::ScrollObjects.erase(UIBox::ScrollObjects.begin() + i);
 		}
 		i++;
 	}
