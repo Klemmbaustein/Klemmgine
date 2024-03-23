@@ -169,7 +169,7 @@ namespace CSharp
 #if _WIN32
 		CSharpInterop::CSharpSystem->CSharpLog("Using .net runtime .dll: '" + FileUtil::wstrtostr(buffer) + "'", CSharpInterop::CS_Log_Runtime);
 #else
-		CSharpInterop::CSharpSystem->CSharpLog("Using .net runtime .so: '" + std::string(buffer) + "'", CS_Log_Runtime);
+		CSharpInterop::CSharpSystem->CSharpLog("Using .net runtime .so: '" + std::string(buffer) + "'", CSharpInterop::CS_Log_Runtime);
 #endif
 		// Load hostfxr and get desired exports
 		hostfxr_lib = load_library(buffer);
