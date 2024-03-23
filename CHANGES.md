@@ -91,7 +91,7 @@
 
 ### Changes
 
-- .tar.gz files for Linux builds.
+- `.tar.gz` files for Linux builds.
 - Added UIButton C# bindings.
 - Added UICanvas C# function.
 - Added C# `Engine.Stats.EngineConfig`.
