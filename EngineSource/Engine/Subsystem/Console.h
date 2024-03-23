@@ -5,6 +5,7 @@
 #include <set>
 #include <map>
 #include <thread>
+#include <condition_variable>
 
 #include "Subsystem.h"
 #include <mutex>
