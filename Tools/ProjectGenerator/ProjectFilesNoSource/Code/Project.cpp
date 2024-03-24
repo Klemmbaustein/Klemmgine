@@ -1,5 +1,5 @@
 #include <string>
-#include <CSharp/CSharpInterop.h>
+#include <Engine/Subsystem/CSharpInterop.h>
 
 namespace Project
 {
@@ -11,12 +11,12 @@ namespace Project
 	// This function returns the map that will be loaded when the game is opened.
 	std::string GetStartupScene()
 	{
-		return CSharp::StaticCall<const char*>(CSharp::LoadCSharpFunction("GetStartupSceneInternally", "Engine", "StringDelegate"));
+		return CSharpInterop::StaticCall<const char*>(CSharpInterop::LoadCSharpFunction("GetStartupSceneInternally", "Engine", "StringDelegate"));
 	}
 	
 	// This function will be called on startup.
 	void OnLaunch()
 	{
-		CSharp::StaticCall<const char*>(CSharp::LoadCSharpFunction("OnLaunchInternally", "Engine", "VoidDelegate"));
+		CSharpInterop::StaticCall<const char*>(CSharpInterop::LoadCSharpFunction("OnLaunchInternally", "Engine", "VoidDelegate"));
 	}
 }

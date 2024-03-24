@@ -424,7 +424,7 @@ int Application::Initialize(int argc, char** argv)
 #if ENGINE_NO_SOURCE
 	SDL_SetWindowTitle(Window, ToAppTitle(
 		CSharpInterop::StaticCall<const char*>(
-			CSharp::LoadCSharpFunction("GetNameInternally", "Engine", "StringDelegate")
+			CSharpInterop::LoadCSharpFunction("GetNameInternally", "Engine", "StringDelegate")
 		)
 	).c_str());
 #endif
