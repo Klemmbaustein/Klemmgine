@@ -166,7 +166,7 @@ void UIBackground::Draw()
 	BackgroundShader->SetFloat("u_borderScale", BorderRadius / 20.0f);
 	BackgroundShader->SetFloat("u_aspectratio", Graphics::AspectRatio);
 
-	BackgroundShader->SetInt("u_useTexture", (int)TextureMode);
+	BackgroundShader->SetInt("u_useTexture", (bool)TextureMode);
 	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
 	glDrawBuffers(2, attachments);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
