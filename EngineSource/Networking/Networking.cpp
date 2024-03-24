@@ -232,7 +232,7 @@ void Networking::Init()
 #else
 	Console::ConsoleSystem->RegisterCommand(Console::Command("disconnect", []()
 		{
-			Server::DisconnectPlayer(std::stoi(Console::CommandArgs()[0]));
+			Server::DisconnectPlayer(std::stoi(Console::ConsoleSystem->CommandArgs()[0]));
 		}, { Console::Command::Argument("player_uid", NativeType::Int) }));
 #endif
 #if SERVER

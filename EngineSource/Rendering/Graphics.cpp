@@ -26,9 +26,11 @@ float Graphics::AspectRatio = 16.0f / 9.0f;
 Graphics::Graphics()
 {
 	Name = "Graphics";
+#if !SERVER
 	Graphics::MainCamera = Scene::DefaultCamera;
 	Graphics::MainFramebuffer = new FramebufferObject();
 	Graphics::MainFramebuffer->FramebufferCamera = Graphics::MainCamera;
+#endif
 }
 
 void Graphics::Update()

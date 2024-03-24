@@ -43,7 +43,6 @@ std::vector<Source> CurrentSources;
 std::vector<ALuint> Buffers;
 ALCdevice* CurrentDevice;
 ALCcontext* ALContext;
-Sound* Sound::SoundSystem = nullptr;
 
 std::vector<std::string> GetAvaliableDevices(ALCdevice* device)
 {
@@ -118,7 +117,10 @@ char* loadWAV(const char* fn, int& chan, int& samplerate, int& bps, int& size)
 	return data;
 }
 #endif
+
+Sound* Sound::SoundSystem = nullptr;
 #if !SERVER
+
 void Update3DVolumeOfSound(const Source& CurrentSource, const Vector3& Position)
 {
 	float Distance = (CurrentSource.Position - Position).Length();

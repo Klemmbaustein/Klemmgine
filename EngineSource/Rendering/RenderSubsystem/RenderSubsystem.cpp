@@ -1,3 +1,4 @@
+#if !SERVER
 #include "RenderSubsystem.h"
 #include <Rendering/RenderSubsystem/OcclusionCulling.h>
 #include <Rendering/RenderSubsystem/PostProcess.h>
@@ -37,3 +38,4 @@ void RenderSubsystem::LoadRenderSubsystems()
 	Subsystem::Load(new PostProcess());
 	Subsystem::Load(new BakedLighting());
 }
+#endif

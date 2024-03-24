@@ -397,11 +397,13 @@ int Application::Initialize(int argc, char** argv)
 
 	Subsystem::Load(new LogSubsystem());
 	Subsystem::Load(new Console());
-	Subsystem::Load(new InputSubsystem());
-	Subsystem::Load(new Sound());
 	Subsystem::Load(new PhysicsSubsystem());
 	Subsystem::Load(new BackgroundTaskSubsystem());
 	Subsystem::Load(new Scene());
+#if !SERVER
+	Subsystem::Load(new InputSubsystem());
+	Subsystem::Load(new Sound());
+#endif
 #if !EDITOR
 	if (Project::UseNetworkFunctions)
 	{

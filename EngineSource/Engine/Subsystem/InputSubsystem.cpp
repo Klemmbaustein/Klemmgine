@@ -1,3 +1,4 @@
+#if !SERVER
 #include "InputSubsystem.h"
 #include <Engine/Gamepad.h>
 #include <Engine/Input.h>
@@ -8,6 +9,7 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Utility/StringUtility.h>
 #include <Engine/Log.h>
+#include <cstring>
 
 namespace Input
 {
@@ -293,3 +295,4 @@ void InputSubsystem::PollInput()
 		}
 	}
 }
+#endif
