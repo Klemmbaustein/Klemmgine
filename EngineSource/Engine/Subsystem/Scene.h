@@ -23,6 +23,8 @@ class Scene : public Subsystem
 public:
 	Scene();
 
+	static Scene* SceneSystem;
+
 	static Camera* DefaultCamera;
 
 	/**

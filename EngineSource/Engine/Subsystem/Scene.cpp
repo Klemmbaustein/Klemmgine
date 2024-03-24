@@ -20,7 +20,6 @@
 
 // Old scene files do not save the fog and sun properties
 #define SAVE_FOG_AND_SUN 1
-
 static std::string ReadBinaryStringFromFile(std::ifstream& BinFile)
 {
 	int len = 0;
@@ -43,6 +42,7 @@ static void WriteBinaryStringToFile(std::string str, std::ofstream& BinFile)
 bool Scene::ShouldLoadNewScene = false;
 std::string Scene::NewLoadedScene;
 Camera* Scene::DefaultCamera = new Camera(2.5f, 1600, 900, false);
+Scene* Scene::SceneSystem = nullptr;
 
 std::string Scene::CurrentScene = "Cotent/Untitled";
 void Scene::LoadSceneInternally(std::string FilePath)
@@ -129,8 +129,7 @@ void Scene::LoadSceneInternally(std::string FilePath)
 #if !SERVER
 			BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(FilePath));
 #endif
-
-			Log::Print("Loaded Scene (Scene File is empty)");
+			SceneSystem->Print("Loaded Scene (Scene File is empty)");
 			return;
 		}
 #if SAVE_FOG_AND_SUN
@@ -192,12 +191,12 @@ void Scene::LoadSceneInternally(std::string FilePath)
 #if !SERVER
 		BakedLighting::LoadBakeFile(FileUtil::GetFileNameWithoutExtensionFromPath(FilePath));
 #endif
-		Log::Print(std::string("Loaded Scene (").append(std::to_string(ObjectLength)).append(std::string(" Object(s) Loaded)")));
+		SceneSystem->Print(std::string("Loaded Scene (").append(std::to_string(ObjectLength)).append(std::string(" Object(s) Loaded)")));
 		Input.close();
 	}
 	else
 	{
-		Log::Print("Scene Loading Error: Scene \"" + OriginalString + "\" does not exist");
+		SceneSystem->Print("Scene Loading Error: Scene \"" + OriginalString + "\" does not exist");
 	}
 }
 
@@ -274,7 +273,7 @@ void Scene::LoadSubScene(std::string FilePath)
 
 		if (std::filesystem::is_empty(FilePath))
 		{
-			Log::Print("Loaded Subscene (Scene File is empty)");
+			SceneSystem->Print("Loaded Subscene (Scene File is empty)");
 			return;
 		}
 		int ObjectLength = 0;
@@ -302,7 +301,7 @@ void Scene::LoadSubScene(std::string FilePath)
 				}
 			}
 		}
-		Log::Print(std::string("Loaded Subscene (").append(std::to_string(ObjectLength)).append(std::string(" Object(s) Loaded)")));
+		SceneSystem->Print(std::string("Loaded Subscene (").append(std::to_string(ObjectLength)).append(std::string(" Object(s) Loaded)")));
 		Input.close();
 	}
 }
@@ -310,6 +309,7 @@ void Scene::LoadSubScene(std::string FilePath)
 Scene::Scene()
 {
 	Name = "SceneSys";
+	SceneSystem = this;
 }
 
 void Scene::Update()

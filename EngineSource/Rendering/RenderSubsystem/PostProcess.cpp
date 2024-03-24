@@ -264,8 +264,6 @@ void PostProcess::Draw()
 	PostProcessShader->SetInt("u_bloom", Graphics::Bloom);
 	PostProcessShader->SetInt("u_ssao", Graphics::SSAO);
 	PostProcessShader->SetInt("u_editor", IS_IN_EDITOR);
-	PostProcessShader->SetInt("u_hasWindowBorder", IS_IN_EDITOR && !Application::GetFullScreen());
-	PostProcessShader->SetVector3("u_borderColor", Application::WindowHasFocus() ? Vector3(0.5, 0.5, 1) : 0.5);
 	if (Graphics::Bloom)
 	{
 		PostProcessShader->SetInt("u_bloomtexture", 4);

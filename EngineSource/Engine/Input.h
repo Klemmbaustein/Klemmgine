@@ -580,4 +580,10 @@ namespace TextInput
 	extern bool PollForText;
 	extern std::string Text;
 	extern int TextIndex;
+
+	extern int TextSelectionStart;
+
+	std::string GetSelectedTextString();
+
+	void SetTextIndex(int NewIndex, bool ClearSelection);
 }

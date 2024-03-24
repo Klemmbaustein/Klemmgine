@@ -23,7 +23,6 @@ class UITextField : public UIBackground
 	Vector2 IBeamScale = Vector2(0.001f, 0.03f);
 	bool ShowIBeam = false;
 	Vector3 TextColor = 1;
-	Shader* ButtonShader = nullptr;
 	UICanvas* ParentUI;
 	UIText* TextObject = nullptr;
 	int ButtonIndex;
@@ -32,6 +31,11 @@ class UITextField : public UIBackground
 	float TextSize = 0.5f;
 	void Tick() override;
 	float TextFieldTimer = 0;
+	float DoubleClickTimer = 0;
+	bool Dragging = false;
+
+	Vector2 TextHighlightPos;
+	Vector2 TextHighlightSize;
 public:
 	Vector3 GetColor() const;
 	UITextField* SetColor(Vector3 NewColor);

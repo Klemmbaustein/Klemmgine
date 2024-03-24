@@ -41,5 +41,19 @@ namespace TextInput
 	bool BlockInput = false;
 	bool PollForText = false;
 	std::string Text;
-	int TextIndex = 0u;
+	int TextIndex = 0;
+	int TextSelectionStart = 0;
+	std::string GetSelectedTextString()
+	{
+		int Start = std::min(TextIndex, TextSelectionStart), End = std::max(TextIndex, TextSelectionStart);
+		return Text.substr(Start, End - Start);
+	}
+	void SetTextIndex(int NewIndex, bool ClearSelection)
+	{
+		TextIndex = NewIndex;
+		if (ClearSelection)
+		{
+			TextSelectionStart = TextIndex;
+		}
+	}
 }

@@ -6,10 +6,32 @@
 #include <UI/UIBox.h>
 #include <Rendering/Graphics.h>
 #include <UI/EditorUI/EditorUI.h>
+#include <Engine/Utility/StringUtility.h>
+#include <Engine/Log.h>
 
 namespace Input
 {
 	extern bool Keys[351];
+}
+
+static void MoveTextIndex(int Amount, bool RespectShiftPress = true)
+{
+	TextInput::TextIndex = std::max(std::min(TextInput::TextIndex + Amount, (int)TextInput::Text.size()), 0);
+	if ((!Input::IsKeyDown(Input::Key::LSHIFT) && !Input::IsKeyDown(Input::Key::RSHIFT)) || !RespectShiftPress)
+	{
+		TextInput::TextSelectionStart = TextInput::TextIndex;
+	}
+}
+
+static void DeleteSelection()
+{
+	int Difference = std::abs(TextInput::TextSelectionStart - TextInput::TextIndex);
+
+	TextInput::Text.erase(std::min(TextInput::TextIndex, TextInput::TextSelectionStart), Difference);
+
+	TextInput::TextIndex = std::min(TextInput::TextIndex, TextInput::TextSelectionStart);
+
+	TextInput::TextSelectionStart = TextInput::TextIndex;
 }
 
 InputSubsystem::InputSubsystem()
@@ -89,31 +111,57 @@ void InputSubsystem::PollInput()
 			switch (Event.key.keysym.sym)
 			{
 			case SDLK_LEFT:
-				TextInput::TextIndex = std::max(std::min(TextInput::TextIndex - 1, (int)TextInput::Text.size()), 0);
+				MoveTextIndex(-1);
 				break;
-			case  SDLK_RIGHT:
-				TextInput::TextIndex = std::max(std::min(TextInput::TextIndex + 1, (int)TextInput::Text.size()), 0);
+			case SDLK_RIGHT:
+				MoveTextIndex(1);
 				break;
+			case SDLK_x:
+				if (!TextInput::PollForText || (!Input::IsKeyDown(Input::Key::LCTRL) && !Input::IsKeyDown(Input::Key::RCTRL)))
+					break;
+				SDL_SetClipboardText(TextInput::GetSelectedTextString().c_str());
+				[[fallthrough]];
 			case SDLK_BACKSPACE:
 				if (TextInput::PollForText && TextInput::Text.length() > 0)
 				{
 					if (TextInput::TextIndex == TextInput::Text.size())
 					{
-						TextInput::Text.pop_back();
+						int Difference = std::abs(TextInput::TextSelectionStart - TextInput::TextIndex);
+
+						for (int i = 0; i < Difference; i++)
+						{
+							TextInput::Text.pop_back();
+						}
+
+						if (Difference == 0)
+						{
+							TextInput::Text.pop_back();
+						}
 					}
-					else if (TextInput::TextIndex > 0)
+					else if (TextInput::TextIndex > 0 || TextInput::TextSelectionStart > 0)
 					{
-						TextInput::Text.erase((size_t)TextInput::TextIndex - 1, 1);
+						if (TextInput::TextSelectionStart == TextInput::TextIndex)
+						{
+							TextInput::Text.erase(--TextInput::TextIndex, 1);
+						}
+						else
+						{
+							DeleteSelection();
+						}
 					}
-					TextInput::TextIndex = std::max(std::min(TextInput::TextIndex - 1, (int)TextInput::Text.size()), 0);
+					TextInput::SetTextIndex(std::max(std::min(TextInput::TextIndex, (int)TextInput::Text.size()), 0), true);
 				}
 				break;
 			case SDLK_DELETE:
-				if (TextInput::PollForText)
+				if (TextInput::PollForText && TextInput::TextIndex < TextInput::Text.size() && TextInput::TextIndex >= 0)
 				{
-					if (TextInput::TextIndex < TextInput::Text.size() && TextInput::TextIndex >= 0)
+					if (TextInput::TextSelectionStart == TextInput::TextIndex)
 					{
 						TextInput::Text.erase(TextInput::TextIndex, 1);
+					}
+					else
+					{
+						DeleteSelection();
 					}
 				}
 				break;
@@ -126,9 +174,16 @@ void InputSubsystem::PollInput()
 			case SDLK_F11:
 				Application::SetFullScreen(!Application::GetFullScreen());
 				break;
+			case SDLK_c:
+				if (TextInput::PollForText && (Input::IsKeyDown(Input::Key::LCTRL) || Input::IsKeyDown(Input::Key::RCTRL)))
+				{
+					SDL_SetClipboardText(TextInput::GetSelectedTextString().c_str());
+				}
+				break;
 			case SDLK_v:
 				if (TextInput::PollForText && (Input::IsKeyDown(Input::Key::LCTRL) || Input::IsKeyDown(Input::Key::RCTRL)))
 				{
+					DeleteSelection();
 					std::string ClipboardText = SDL_GetClipboardText();
 					if (TextInput::TextIndex < TextInput::Text.size())
 					{
@@ -138,7 +193,7 @@ void InputSubsystem::PollInput()
 					{
 						TextInput::Text.append(ClipboardText);
 					}
-					TextInput::TextIndex += (int)ClipboardText.size();
+					MoveTextIndex((int)ClipboardText.size(), false);
 				}
 				break;
 			}
@@ -208,8 +263,9 @@ void InputSubsystem::PollInput()
 					{
 						TextInput::TextIndex = (int)TextInput::Text.size();
 					}
+					DeleteSelection();
 					TextInput::Text.insert(TextInput::TextIndex, std::string(Event.text.text));
-					TextInput::TextIndex += (int)strlen(Event.text.text);
+					MoveTextIndex((int)strlen(Event.text.text), false);
 				}
 			}
 		}

@@ -16,13 +16,13 @@ struct VertexBuffer;
  */
 class UIBackground : public UIBox
 {
-	Shader* BackgroundShader = nullptr;
 	void ScrollTick(Shader* UsedShader);
 	void MakeGLBuffers(bool InvertTextureCoordinates = false);
 	// 0 = none, 1 = texture, 2 texture that should be unloaded with the box
 	uint8_t TextureMode = 0;
 	unsigned int TextureID = 0;
 protected:
+	Shader* BackgroundShader = nullptr;
 	Vector3 Color;
 	VertexBuffer* BoxVertexBuffer = nullptr;
 	Vector3 ColorMultiplier = 1;

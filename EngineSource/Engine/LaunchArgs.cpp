@@ -83,6 +83,14 @@ namespace LaunchArgs
 		}
 		Application::SetEditorPath(AdditionalArgs[0]);
 	}
+
+	static void LogVerbose(std::vector<std::string> AdditionalArgs)
+	{
+		if (AdditionalArgs.size())
+			Log::Print("Unexpected arguments in -nostartupinfo", Log::LogColor::Yellow);
+		Subsystem::SetSysemLogVerbose(true);
+	}
+
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
 	{
 		std::pair("neverhideconsole", &NeverHideConsole),
@@ -93,6 +101,7 @@ namespace LaunchArgs
 		std::pair("fullscreen", &FullScreen),
 		std::pair("nostartupinfo", &NoStartupInfo),
 		std::pair("connect", &Connect),
+		std::pair("verbose", &LogVerbose),
 #if !RELEASE
 		std::pair("editorPath", &EditorPath),
 #endif

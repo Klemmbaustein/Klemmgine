@@ -7,8 +7,11 @@ class Subsystem
 protected:
 	static std::vector<Subsystem*> LoadedSystems;
 	std::string Prefix;
-
+	static bool IsVerbose;
 public:
+
+	static void SetSysemLogVerbose(bool NewIsVerbose);
+
 	const char* Name = "sys";
 	const char* SystemType = "";
 	

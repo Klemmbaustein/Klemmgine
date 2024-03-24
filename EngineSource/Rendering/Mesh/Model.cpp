@@ -85,7 +85,7 @@ Model::~Model()
 	glDeleteBuffers(1, &MatBuffer);
 	if (RunningQuery)
 	{
-		OcclusionCulling* OcclusionManager = static_cast<OcclusionCulling*>(RenderSubsystem::GetSubsystemByName("Occlusion"));
+		OcclusionCulling* OcclusionManager = static_cast<OcclusionCulling*>(RenderSubsystem::GetSubsystemByName("Occlude"));
 		OcclusionManager->OcclusionCulling::FreeOcclusionQuery(OcclusionQueryIndex);
 	}
 }

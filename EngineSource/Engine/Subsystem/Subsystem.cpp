@@ -1,8 +1,16 @@
 #include "Subsystem.h"
 #include <Engine/Log.h>
 #include <array>
+#include <cstring>
+#include <Engine/Stats.h>
 
 std::vector<Subsystem*> Subsystem::LoadedSystems;
+bool Subsystem::IsVerbose = false;
+
+void Subsystem::SetSysemLogVerbose(bool NewIsVerbose)
+{
+	IsVerbose = NewIsVerbose;
+}
 
 Subsystem::Subsystem()
 {
@@ -27,12 +35,16 @@ std::array<Vector3, 4> LogLevelColors =
 
 void Subsystem::Print(std::string Msg, ErrorLevel MsgErrLvl)
 {
+	if (MsgErrLvl == ErrorLevel::Note && !IsVerbose)
+	{
+		return;
+	}
 	if (Prefix.empty())
 	{
 		std::string ResizedName = Name;
 		ResizedName.resize(8, ' ');
 
-		if (std::strlen(SystemType))
+		if (strlen(SystemType))
 		{
 			Prefix = "[" + std::string(SystemType) + "]: [" + ResizedName + "]: ";
 		}
@@ -78,6 +90,7 @@ void Subsystem::UpdateSubsystems()
 {
 	for (Subsystem* System : LoadedSystems)
 	{
+		Debugging::EngineStatus = "Updating subsystem: " + std::string(System->Name);
 		System->Update();
 	}
 }
