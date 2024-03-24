@@ -82,13 +82,14 @@ public:
 	void Update() override;
 
 private:
+#if _WIN32
 	static std::condition_variable ConsoleConditionVariable;
 	static std::mutex ConsoleReadMutex;
 	static std::deque<std::string> ConsoleLines;
 
 	std::thread ReadConsoleThread;
 	static void ReadConsole();
-
+#endif
 
 	std::map<std::string, Variable> ConVars;
 	std::map<std::string, Command> Commands;

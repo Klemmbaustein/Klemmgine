@@ -173,9 +173,10 @@ void SettingsPanel::OnResized()
 
 void SettingsPanel::OnButtonClicked(int Index)
 {
-	if (Index < 1000)
+	if (Index < -1000)
 	{
 		HandlePanelButtons(Index);
+		return;
 	}
 	if (Index >= 0)
 	{

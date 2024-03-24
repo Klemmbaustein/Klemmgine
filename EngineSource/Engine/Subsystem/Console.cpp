@@ -17,9 +17,11 @@
 #include <iostream>
 
 Console* Console::ConsoleSystem = nullptr;
+#if _WIN32
 std::condition_variable Console::ConsoleConditionVariable;
 std::mutex Console::ConsoleReadMutex;
 std::deque<std::string> Console::ConsoleLines;
+#endif
 
 std::vector<std::string> Console::SeperateToStringArray(const std::string& InString)
 {
@@ -307,12 +309,16 @@ Console::Console()
 			Graphics::SetWindowResolution(Application::GetWindowSize()); 
 		}));
 
+#if _WIN32
 	ReadConsoleThread = std::thread(ReadConsole);
+#endif
 }
 
 Console::~Console()
 {
+#if _WIN32
 	ReadConsoleThread.detach();
+#endif
 	ConVars.clear();
 	Commands.clear();
 }
@@ -550,6 +556,8 @@ void Console::PrintArguments(std::vector<Command::Argument> args, ErrorLevel Sev
 
 void Console::Update()
 {
+	// On linux this seems to cause issues where the application completely feezes
+#if _WIN32
 	std::deque<std::string> ConsoleCommands;
 	{
 		std::unique_lock Lock{ ConsoleReadMutex };
@@ -563,6 +571,7 @@ void Console::Update()
 	{
 		Console::ExecuteConsoleCommand(i);
 	}
+#endif
 }
 
 Console::Command::Argument::Argument(std::string Name, NativeType::NativeType NativeType, bool Optional)
@@ -580,6 +589,7 @@ Console::Variable::Variable(std::string Name, NativeType::NativeType NativeType,
 	this->OnSet = OnSet;
 }
 
+#if _WIN32
 void Console::ReadConsole()
 {
 	while (true)
@@ -591,6 +601,7 @@ void Console::ReadConsole()
 		ConsoleConditionVariable.notify_one();
 	}
 }
+#endif
 
 NativeType::NativeType Console::GetDataTypeFromString(const std::string& str)
 {
