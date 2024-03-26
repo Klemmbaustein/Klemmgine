@@ -25,7 +25,9 @@ void Physics::AddBody(PhysicsBody* Body)
 void Physics::RemoveBody(PhysicsBody* Body)
 {
 	PHYSICS_SYSTEM::RemoveBody(Body);
+#if !SERVER
 	CollisionVisualize::OnBodyRemoved();
+#endif
 }
 
 Physics::HitResult Physics::RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<WorldObject*> ObjectsToIgnore)

@@ -16,5 +16,7 @@ PhysicsSubsystem::PhysicsSubsystem()
 void PhysicsSubsystem::Update()
 {
 	Physics::Update();
+#if !SERVER
 	CollisionVisualize::Update();
+#endif
 }
