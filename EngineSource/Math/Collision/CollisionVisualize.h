@@ -8,6 +8,8 @@ namespace CollisionVisualize
 	void Activate();
 	void Deactivate();
 
+	void OnBodyRemoved();
+
 	void Update();
 
 	FramebufferObject* GetVisualizeBuffer();

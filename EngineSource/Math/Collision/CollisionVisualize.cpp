@@ -24,6 +24,8 @@ namespace CollisionVisualize
 	std::vector<VisualizeModel> Models;
 
 	size_t LastObjectsSize = 0;
+
+	bool RemovedBody = false;
 }
 
 void CollisionVisualize::Activate()
@@ -57,6 +59,10 @@ void CollisionVisualize::Activate()
 			{
 				Body = static_cast<Physics::PhysicsBody*>(StaticCollider->Collider);
 
+				if (Body == nullptr)
+				{
+					return;
+				}
 
 				if (Body->Type == Physics::PhysicsBody::BodyType::Mesh)
 				{
@@ -70,7 +76,8 @@ void CollisionVisualize::Activate()
 
 				MeshData.TwoSided = true;
 				MeshData.CastShadow = false;
-				MeshTransform = Transform(Body->GetPosition(), Body->GetRotation().DegreesToRadians(), Body->BodyTransform.Scale);
+				Vector3 Rotation = Body->GetRotation();
+				MeshTransform = Transform(Body->GetPosition(), Vector3(Rotation.Z, -Rotation.Y, Rotation.X).DegreesToRadians(), Body->BodyTransform.Scale);
 
 			}
 			PhysicsComponent* DynamicCollider = dynamic_cast<PhysicsComponent*>(c);
@@ -82,7 +89,9 @@ void CollisionVisualize::Activate()
 
 				Body = static_cast<Physics::PhysicsBody*>(DynamicCollider->PhysicsBodyPtr);
 
-				MeshTransform = Transform(Body->GetPosition(), Body->GetRotation().DegreesToRadians(), Body->BodyTransform.Scale);
+				Vector3 Rotation = Body->GetRotation();
+
+				MeshTransform = Transform(Body->GetPosition(), Vector3(Rotation.Z, -Rotation.Y, Rotation.X).DegreesToRadians(), Body->BodyTransform.Scale);
 
 				switch (Body->Type)
 				{
@@ -97,7 +106,7 @@ void CollisionVisualize::Activate()
 				case Physics::PhysicsBody::BodyType::Capsule:
 					MeshData.LoadModelFromFile(Application::GetEditorPath() + "/EditorContent/Models/Sphere.jsm");
 					{
-						float diff = (MeshTransform.Scale.Y - MeshTransform.Scale.X) * 45;
+						float diff = (MeshTransform.Scale.Y - MeshTransform.Scale.X) * 50;
 
 						for (auto& i : MeshData.Elements[0].Vertices)
 						{
@@ -111,7 +120,7 @@ void CollisionVisualize::Activate()
 							}
 						}
 					}
-					MeshTransform.Scale = MeshTransform.Scale.X / 3;
+					MeshTransform.Scale = MeshTransform.Scale.X * 0.8f;
 					break;
 				default:
 					break;
@@ -176,6 +185,14 @@ void CollisionVisualize::Deactivate()
 	}
 }
 
+void CollisionVisualize::OnBodyRemoved()
+{
+	if (GetIsActive())
+	{
+		RemovedBody = true;
+	}
+}
+
 void CollisionVisualize::Update()
 {
 	if (!GetIsActive())
@@ -183,15 +200,24 @@ void CollisionVisualize::Update()
 		return;
 	}
 
+	if (RemovedBody)
+	{
+		RemovedBody = false;
+		Activate();
+		return;
+	}
+
 	if (LastObjectsSize != Objects::AllObjects.size())
 	{
-		Activate();
+		OnBodyRemoved();
 		return;
 	}
 
 	for (auto& i : Models)
 	{
-		Transform New = Transform(i.Body->GetPosition(), -i.Body->GetRotation().DegreesToRadians(), i.Body->BodyTransform.Scale);
+		Vector3 Rotation = i.Body->GetRotation();
+
+		Transform New = Transform(i.Body->GetPosition(), Vector3(Rotation.Z, -Rotation.Y, Rotation.X).DegreesToRadians(), i.Body->BodyTransform.Scale);
 		if (i.Dynamic)
 		{
 			New.Scale = i.ModelObj->ModelTransform.Scale;

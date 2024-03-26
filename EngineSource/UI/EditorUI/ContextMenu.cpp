@@ -132,7 +132,6 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 		{
 			BackgroundBox->AddChild(NewElement);
 			ContextButtons.push_back(NewElement);
-			ContextSettings.push_back(Element);
 		}
 		return;
 	}
@@ -170,7 +169,6 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 			ContextButtons.push_back(NewElement);
 		}
 	}
-	ContextSettings.push_back(Element);
 }
 
 void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject* ContextObject, std::string Name)

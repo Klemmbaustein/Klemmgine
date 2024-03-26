@@ -39,7 +39,6 @@
 
 #include <Math/Collision/CollisionVisualize.h>
 #include <Math/Collision/Collision.h>
-#include <Math/Physics/Physics.h>
 
 #include <Networking/Networking.h>
 
@@ -253,7 +252,6 @@ static void ApplicationLoop()
 #if !SERVER
 	Subsystem::UpdateSubsystems();
 	CameraShake::Tick();
-	Physics::Update();
 #endif
 #if !EDITOR
 	if (Project::UseNetworkFunctions)
@@ -267,7 +265,6 @@ static void ApplicationLoop()
 	float LogicTime = LogicTimer.Get();
 	const Application::Timer RenderTimer;
 #if !SERVER
-	CollisionVisualize::Update();
 	Debugging::EngineStatus = "Rendering (Framebuffer)";
 	for (FramebufferObject* Buffer : Graphics::AllFramebuffers)
 	{

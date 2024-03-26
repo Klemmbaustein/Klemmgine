@@ -341,12 +341,6 @@ void WorldObject::DestroyMarkedObjects()
 			}
 		}
 #endif
-		o->Destroy();
-		for (Component* LoopComponent : o->GetComponents())
-		{
-			LoopComponent->Destroy();
-			delete LoopComponent;
-		}
 		for (int j = 0; j < Objects::AllObjects.size(); j++)
 		{
 			if (Objects::AllObjects[j] == o)
@@ -354,6 +348,13 @@ void WorldObject::DestroyMarkedObjects()
 				Objects::AllObjects.erase(Objects::AllObjects.begin() + j);
 				break;
 			}
+		}
+
+		o->Destroy();
+		for (Component* LoopComponent : o->GetComponents())
+		{
+			LoopComponent->Destroy();
+			delete LoopComponent;
 		}
 		delete o;
 	}

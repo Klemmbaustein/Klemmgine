@@ -21,7 +21,7 @@ void UITextField::Tick()
 		TextObject->WrapDistance = 1;
 	}
 	ColorMultiplier = 1.f;
-	if (UI::HoveredBox == this)
+	if (UI::HoveredBox == this || Dragging)
 	{
 		size_t Nearest = TextObject->GetNearestLetterAtLocation(Input::MouseLocation);
 		if (!IsHovered)
@@ -32,7 +32,7 @@ void UITextField::Tick()
 		ColorMultiplier = 0.8f;
 
 		// Double click selects all
-		if (Input::IsLMBClicked && IsEdited && DoubleClickTimer < 0.5f && TextInput::TextIndex == Nearest)
+		if (Input::IsLMBClicked && IsEdited && DoubleClickTimer < 0.25f && TextInput::TextIndex == Nearest)
 		{
 			TextInput::TextSelectionStart = 0;
 			TextInput::TextIndex = (int)TextInput::Text.size();

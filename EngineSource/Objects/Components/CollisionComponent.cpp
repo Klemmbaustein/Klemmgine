@@ -6,6 +6,8 @@ void CollisionComponent::Destroy()
 {
 	Physics::MeshBody* m = static_cast<Physics::MeshBody*>(Collider);
 
+	Collider = nullptr;
+
 	Physics::RemoveBody(m);
 
 	delete m;

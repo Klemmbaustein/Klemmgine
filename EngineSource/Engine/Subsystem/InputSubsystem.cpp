@@ -51,22 +51,19 @@ void InputSubsystem::Update()
 	Input::IsRMBClicked = false;
 	Input::MouseMovement = Vector2();
 
+	PollInput();
 	if (Input::CursorVisible || !Application::WindowHasFocus())
 	{
 		SDL_SetRelativeMouseMode(SDL_FALSE);
+		Input::MouseMovement = 0;
+		Input::MouseLocation = Application::GetCursorPosition();
 	}
 	else
 	{
 		SDL_SetRelativeMouseMode(SDL_TRUE);
 	}
-	if (!Application::WindowHasFocus())
-	{
-		Input::MouseMovement = 0;
-	}
 
-	PollInput();
 	Input::GamepadUpdate();
-	Input::MouseLocation = Application::GetCursorPosition();
 }
 
 void InputSubsystem::PollInput()

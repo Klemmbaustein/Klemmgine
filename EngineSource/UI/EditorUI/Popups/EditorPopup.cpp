@@ -21,6 +21,28 @@ void EditorPopup::SetOptions(std::vector<PopupOption> NewOptions)
 	}
 }
 
+bool EditorPopup::IsHoveringAnyPopup()
+{
+	if (!UI::HoveredBox)
+	{
+		return false;
+	}
+
+	for (UICanvas* i : Graphics::UIToRender)
+	{
+		EditorPopup* Popup = dynamic_cast<EditorPopup*>(i);
+		if (!Popup)
+		{
+			continue;
+		}
+		if (UI::HoveredBox->IsChildOf(Popup->RootBox))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 EditorPopup::EditorPopup(Vector2 Position, Vector2 Scale, std::string Name)
 {
 	Position = Position - Scale / 2;

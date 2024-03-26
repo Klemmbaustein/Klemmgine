@@ -3,6 +3,7 @@
 #include <Engine/EngineError.h>
 #include <Objects/WorldObject.h>
 #include <iostream>
+#include <Math/Collision/CollisionVisualize.h>
 
 #define PHYSICS_SYSTEM JoltPhysics
 
@@ -24,6 +25,7 @@ void Physics::AddBody(PhysicsBody* Body)
 void Physics::RemoveBody(PhysicsBody* Body)
 {
 	PHYSICS_SYSTEM::RemoveBody(Body);
+	CollisionVisualize::OnBodyRemoved();
 }
 
 Physics::HitResult Physics::RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<WorldObject*> ObjectsToIgnore)

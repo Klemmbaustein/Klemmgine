@@ -447,8 +447,7 @@ void MaterialTab::UpdateModel()
 	}
 
 	ModelGenerator::ModelData m;
-	m.Elements.push_back(ModelGenerator::ModelData::Element());
-	auto& elem = m.Elements[m.Elements.size() - 1];
+	auto& elem = m.AddElement();
 	elem.MakeCube(30, 0);
 	elem.ElemMaterial = Filepath;
 	elem.GenerateNormals();

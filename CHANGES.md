@@ -1,5 +1,12 @@
 # Changes
 
+## Version 1.10.1
+
+### Fixes
+
+- Fixed crashes on Linux.
+- Many small stability improvements.
+
 ## Version 1.10.0
 
 ### Changes

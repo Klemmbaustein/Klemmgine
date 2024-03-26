@@ -30,9 +30,13 @@ void PhysicsComponent::Update()
 
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 
-	Transform ComponentTransform = Component::GetWorldTransform();
-	Body->SetPosition(ComponentTransform.Position);
-	Body->SetRotation(ComponentTransform.Rotation);
+	if (Body->ColliderMovability == Physics::MotionType::Static)
+	{
+
+		Transform ComponentTransform = Component::GetWorldTransform();
+		Body->SetPosition(ComponentTransform.Position);
+		Body->SetRotation(ComponentTransform.Rotation);
+	}
 }
 
 

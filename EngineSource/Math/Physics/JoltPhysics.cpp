@@ -222,7 +222,7 @@ BodyCreationSettings CreateJoltShapeFromBody(Physics::PhysicsBody* Body)
 	case PhysicsBody::BodyType::Capsule:
 	{
 		CapsuleBody* CapsulePtr = static_cast<CapsuleBody*>(Body);
-		CapsuleShapeSettings Settings = CapsuleShapeSettings(1, 1);
+		CapsuleShapeSettings Settings = CapsuleShapeSettings(Body->BodyTransform.Scale.X, Body->BodyTransform.Scale.Y);
 		Shape::ShapeResult r;
 		return BodyCreationSettings(new CapsuleShape(Settings, r),
 			ToJPHVec3(Body->BodyTransform.Position),
@@ -378,7 +378,7 @@ Vector3 JoltPhysics::GetBodyRotation(Physics::PhysicsBody* Body)
 
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
 	Vec3 vec = JoltBodyInterface->GetRotation(Info->ID).GetEulerAngles();
-	return Vector3(-vec.GetX(), -vec.GetY(), -vec.GetZ()).RadiansToDegrees();
+	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
 }
 
 Vector3 JoltPhysics::GetBodyVelocity(Physics::PhysicsBody* Body)
@@ -390,7 +390,7 @@ Vector3 JoltPhysics::GetBodyVelocity(Physics::PhysicsBody* Body)
 
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
 	Vec3 vec = JoltBodyInterface->GetLinearVelocity(Info->ID);
-	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX());
+	return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
 
 Vector3 JoltPhysics::GetBodyAngularVelocity(Physics::PhysicsBody* Body)

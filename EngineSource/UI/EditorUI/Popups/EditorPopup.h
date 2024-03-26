@@ -22,6 +22,8 @@ protected:
 	UIBackground* PopupBackground = nullptr;
 	UIBackground* OptionsList = nullptr;
 public:
+
+	static bool IsHoveringAnyPopup();
 	EditorPopup(Vector2 Position, Vector2 Scale, std::string Name);
 	virtual ~EditorPopup();
 

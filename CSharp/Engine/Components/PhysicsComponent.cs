@@ -57,7 +57,6 @@ public class PhysicsComponent : ObjectComponent
 		Collision.PhysicsMotionType Movability,
 		Collision.Layer CollisionLayers)
 	{
-		Log.Print(Parent.GetName());
 		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewPhysicsComponent", typeof(NewPhysicsComponentDelegate),
 			[
 			Parent.NativePtr,

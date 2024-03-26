@@ -4,6 +4,7 @@
 #include <Engine/Input.h>
 #include <Engine/Log.h>
 #include <UI/EditorUI/EditorUI.h>
+#include <UI/EditorUI/Popups/EditorPopup.h>
 #include <UI/UIText.h>
 #include <UI/UIScrollBox.h>
 #include <Engine/Application.h>
@@ -228,34 +229,38 @@ bool EditorPanel::TickPanelInternal()
 	{
 		return true;
 	}
-	if (Math::NearlyEqual(Position.X + PanelMainBackground->GetUsedSize().X, Input::MouseLocation.X, 0.01f)
-		&& Math::IsPointIn2DBox(Vector2(-1, Position.Y), Vector2(1, Position.Y + PanelMainBackground->GetUsedSize().Y), Input::MouseLocation)
-		&& !Dragged
-		&& Parent
-		&& Parent->ChildrenAlign == ChildrenType::Horizontal)
 
+	if (!EditorPopup::IsHoveringAnyPopup())
 	{
-		EditorUI::CurrentCursor = EditorUI::CursorType::Resize_WE;
-		if (Input::IsLMBClicked)
+		if (Math::NearlyEqual(Position.X + PanelMainBackground->GetUsedSize().X, Input::MouseLocation.X, 0.005f)
+			&& Math::IsPointIn2DBox(Vector2(-1, Position.Y), Vector2(1, Position.Y + PanelMainBackground->GetUsedSize().Y), Input::MouseLocation)
+			&& !Dragged
+			&& Parent
+			&& Parent->ChildrenAlign == ChildrenType::Horizontal)
+
 		{
-			StartPosition = Input::MouseLocation.X;
-			Dragged = this;
-			IsDraggingHorizontal = true;
+			EditorUI::CurrentCursor = EditorUI::CursorType::Resize_WE;
+			if (Input::IsLMBClicked)
+			{
+				StartPosition = Input::MouseLocation.X;
+				Dragged = this;
+				IsDraggingHorizontal = true;
+			}
 		}
-	}
 
-	if (Math::NearlyEqual(Position.Y + PanelMainBackground->GetUsedSize().Y, Input::MouseLocation.Y, 0.01f)
-		&& Math::IsPointIn2DBox(Vector2(Position.X, -1), Vector2(Position.X + PanelMainBackground->GetUsedSize().X, 1), Input::MouseLocation)
-		&& !Dragged
-		&& Parent
-		&& Parent->ChildrenAlign == ChildrenType::Vertical)
-	{
-		EditorUI::CurrentCursor = EditorUI::CursorType::Resize_NS;
-		if (Input::IsLMBClicked)
+		if (Math::NearlyEqual(Position.Y + PanelMainBackground->GetUsedSize().Y, Input::MouseLocation.Y, 0.005f)
+			&& Math::IsPointIn2DBox(Vector2(Position.X, -1), Vector2(Position.X + PanelMainBackground->GetUsedSize().X, 1), Input::MouseLocation)
+			&& !Dragged
+			&& Parent
+			&& Parent->ChildrenAlign == ChildrenType::Vertical)
 		{
-			StartPosition = Input::MouseLocation.Y;
-			Dragged = this;
-			IsDraggingHorizontal = false;
+			EditorUI::CurrentCursor = EditorUI::CursorType::Resize_NS;
+			if (Input::IsLMBClicked)
+			{
+				StartPosition = Input::MouseLocation.Y;
+				Dragged = this;
+				IsDraggingHorizontal = false;
+			}
 		}
 	}
 
