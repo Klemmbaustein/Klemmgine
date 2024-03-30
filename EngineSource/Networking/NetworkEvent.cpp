@@ -72,7 +72,6 @@ void NetworkEvent::TriggerNetworkEvent(std::string Name, std::vector<std::string
 	{
 		e.Object = UINT64_MAX;
 	}
-	Log::Print(Name);
 	SentEvents.push_back(e);
 	SendEvent(e);
 }
