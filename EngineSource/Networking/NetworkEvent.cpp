@@ -172,7 +172,6 @@ void NetworkEvent::HandleEventAccept(Packet* Data)
 	{
 		if (SentEvents[i].EventID == EventID)
 		{
-			Log::Print("RECEIVED EVENT: " + SentEvents[i].Name);
 			SentEvents.erase(SentEvents.begin() + i);
 			break;
 		}
