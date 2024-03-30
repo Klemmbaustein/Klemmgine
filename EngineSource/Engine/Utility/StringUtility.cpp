@@ -28,7 +28,10 @@ std::string StrUtil::Format(std::string Format, ...)
 	vsprintf(buf, Format.c_str(), va);
 #endif
 	va_end(va);
-	return buf;
+
+	std::string StrBuffer = buf;
+	delete[] buf;
+	return StrBuffer;
 }
 
 

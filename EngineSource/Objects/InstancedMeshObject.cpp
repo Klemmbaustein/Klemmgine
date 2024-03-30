@@ -83,6 +83,6 @@ std::string InstancedMeshObject::Serialize()
 	return std::string();
 }
 
-void InstancedMeshObject::Deserialize(std::string SerializedObject)
+void InstancedMeshObject::DeSerialize(std::string SerializedObject)
 {
 }

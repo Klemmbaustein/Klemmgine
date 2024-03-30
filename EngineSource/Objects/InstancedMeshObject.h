@@ -21,7 +21,7 @@ public:
 	INSTANCEDMESHOBJECT_GENERATED("Default/Mesh")
 
 	virtual std::string Serialize() override;
-	virtual void Deserialize(std::string SerializedObject) override;
+	virtual void DeSerialize(std::string SerializedObject) override;
 protected:
 	bool Initialized = true, SoonInitialized = true;
 	int Amount = 50;

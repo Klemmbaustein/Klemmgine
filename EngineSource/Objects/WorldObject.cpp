@@ -163,7 +163,7 @@ void WorldObject::Detach(Component* C)
 	}
 }
 
-void WorldObject::Deserialize(std::string SerializedObject)
+void WorldObject::DeSerialize(std::string SerializedObject)
 {
 }
 

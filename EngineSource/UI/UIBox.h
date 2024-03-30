@@ -46,9 +46,8 @@ public:
 
 	/**
 	* @brief
-	* Describes the border of an Engine.UI.UIBox.
+	* Describes the border of a UIBox.
 	*/
-
 	enum class BorderType
 	{
 		/// No border.
@@ -153,11 +152,12 @@ public:
 	 * | Horizontal Align: Default          |  | Horizontal Align: Centered         |
 	 * |____________________________________|  |____________________________________|
 	 * 
+	 * ```
 	 * @return
 	 * A reference to this %UIBox.
-	 * ```
 	 */
 	UIBox* SetHorizontalAlign(Align NewAlign);
+
 	/**
 	 * @brief
 	 * Sets the horizontal align for all children.
@@ -165,7 +165,7 @@ public:
 	 * Notes:
 	 * - The default vertical align is Align.Reverse, not Align.Default.
 	 * - **Align::Reverse aligns boxes from the top down (from 1 to -1)** while Align.Default aligns boxes from the bottom up (from -1 to 1)
-	 *   The reason for this is that this corresponds to the way horizotal align works.
+	 *   The reason for this is that this corresponds to the way horizontal align works.
 	 *   (Default is from -1 to 1 - left to right, Reverse 1 to -1, right to left)
 	 * 
 	 * ```

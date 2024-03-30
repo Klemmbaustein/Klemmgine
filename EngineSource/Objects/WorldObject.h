@@ -237,7 +237,7 @@ public:
 	}
 	virtual std::string Serialize();
 	void Detach(Component* C);
-	virtual void Deserialize(std::string SerializedObject);
+	virtual void DeSerialize(std::string SerializedObject);
 	virtual void OnPropertySet();
 	std::string GetPropertiesAsString();
 	void LoadProperties(std::string in);

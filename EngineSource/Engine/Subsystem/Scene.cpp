@@ -179,7 +179,7 @@ void Scene::LoadSceneInternally(std::string FilePath)
 				WorldObject* NewObject = Objects::SpawnObjectFromID(ID, Transform1);
 				if (NewObject)
 				{
-					NewObject->Deserialize(Path);
+					NewObject->DeSerialize(Path);
 					NewObject->Name = Name;
 					NewObject->LoadProperties(desc);
 					NewObject->OnPropertySet();
@@ -293,7 +293,7 @@ void Scene::LoadSubScene(std::string FilePath)
 				WorldObject* NewObject = Objects::SpawnObjectFromID(ID, Transform1);
 				if (NewObject)
 				{
-					NewObject->Deserialize(Path);
+					NewObject->DeSerialize(Path);
 					NewObject->Name = Name;
 					NewObject->LoadProperties(desc);
 					NewObject->OnPropertySet();

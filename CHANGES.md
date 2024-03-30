@@ -1,5 +1,12 @@
 # Changes
 
+## Version 1.10.2
+
+### Fixes
+
+- Fixed leaking the formatted string in StrUtil::Format().
+- Networking stability improvements.
+
 ## Version 1.10.1
 
 ### Fixes

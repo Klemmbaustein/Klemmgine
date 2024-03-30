@@ -266,7 +266,7 @@ void Viewport::Tick()
 			{
 				WorldObject* o = Objects::SpawnObjectFromID(i->GetObjectDescription().ID, i->GetTransform());
 				o->Name = i->Name;
-				o->Deserialize(i->Serialize());
+				o->DeSerialize(i->Serialize());
 				o->LoadProperties(i->GetPropertiesAsString());
 				o->OnPropertySet();
 				o->IsSelected = true;

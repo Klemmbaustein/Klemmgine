@@ -7,6 +7,7 @@
 #include "Server.h"
 #include <unordered_set>
 #include <Objects/WorldObject.h>
+#include <Engine/Utility/StringUtility.h>
 
 namespace NetworkEvent
 {
@@ -43,6 +44,10 @@ namespace NetworkEvent
 			{
 				IP = Client->IP;
 			}
+			else
+			{
+				return;
+			}
 		}
 		p.Send(IP);
 	}
@@ -67,6 +72,7 @@ void NetworkEvent::TriggerNetworkEvent(std::string Name, std::vector<std::string
 	{
 		e.Object = UINT64_MAX;
 	}
+	Log::Print(Name);
 	SentEvents.push_back(e);
 	SendEvent(e);
 }
@@ -93,15 +99,7 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 		}
 		Value.append({ (char)Data->Data[i] });
 	}
-	std::vector<std::string> Values;
-	size_t Last = 0;
-	do
-	{
-		size_t PrevLast = Last;
-		Last = Value.find_first_of(";", PrevLast) + 1;
-		Values.push_back(Value.substr(PrevLast, Last - 1));
-	} while (Last != std::string::npos + 1);
-
+	std::vector<std::string> Values = StrUtil::SeperateString(Value, ';');
 	if (Values.empty())
 	{
 		return;
@@ -121,8 +119,17 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 		if (!Target)
 		{
 			// TODO: Handle missing objects by requesting it from the server
+			Log::Print("[Net]: Unknown object: " + std::to_string(ObjID), Log::LogColor::Yellow);
 			return;
 		}
+
+#if SERVER
+		if (Server::GetClientInfoFromIP(Data->FromAddr)->ID == Target->NetID)
+		{
+			return;
+		}
+#endif
+
 #if !SERVER
 		if (Networking::IPEqual(Client::GetCurrentServerAddr(), Data->FromAddr))
 		{
@@ -136,9 +143,16 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 
 		for (const auto& i : Target->NetEvents)
 		{
+#if SERVER
+			if (i.NativeType != WorldObject::NetEvent::EventType::Server)
+			{
+				continue;
+			}
+#endif
 			if (i.Name == Name)
 			{
 				(Target->*i.Function)(Values);
+				break;
 			}
 		}
 	}
@@ -153,10 +167,12 @@ void NetworkEvent::HandleEventAccept(Packet* Data)
 
 	uint64_t EventID = 0;
 	Data->Read(EventID);
+
 	for (size_t i = 0; i < SentEvents.size(); i++)
 	{
 		if (SentEvents[i].EventID == EventID)
 		{
+			Log::Print("RECEIVED EVENT: " + SentEvents[i].Name);
 			SentEvents.erase(SentEvents.begin() + i);
 			break;
 		}
