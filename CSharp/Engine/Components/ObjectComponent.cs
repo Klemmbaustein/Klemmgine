@@ -99,7 +99,7 @@ public abstract class ObjectComponent
 	public void SetRelativeScale(Vector3 NewScale)
 	{
 		Transform NewTransform = GetRelativeTransform();
-		NewTransform.Position = NewScale;
+		NewTransform.Scale = NewScale;
 		SetRelativeTransform(NewTransform);
 	}
 
