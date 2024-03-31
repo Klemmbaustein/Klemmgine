@@ -114,9 +114,9 @@ class SettingsPanel : public EditorPanel
 			{
 				Graphics::VSync = std::stoi(NewValue);
 			}),
-			SettingsCategory::Setting("Display:Resolution scale", NativeType::Float, "1", [](std::string NewValue)
+			SettingsCategory::Setting("Display:Resolution scale %", NativeType::Int, "100", [](std::string NewValue)
 			{
-				Graphics::ResolutionScale = std::stof(NewValue);
+				Graphics::ResolutionScale = (float)std::stoi(NewValue) / 100.0f;
 				Graphics::SetWindowResolution(Graphics::WindowResolution);
 			}),
 			}

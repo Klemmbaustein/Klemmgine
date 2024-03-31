@@ -42,13 +42,8 @@ InstancedModel::~InstancedModel()
 		delete m;
 	}
 	Meshes.clear();
-}
-namespace CSM
-{
-	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane);
-	extern std::vector<unsigned int> ShadowMaps;
-	const float cameraFarPlane = 700;
-	extern std::vector<float> shadowCascadeLevels;
+	if (MatBuffer != -1)
+		glDeleteBuffers(1, &MatBuffer);
 }
 
 void InstancedModel::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass)

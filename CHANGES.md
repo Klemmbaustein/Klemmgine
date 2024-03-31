@@ -1,5 +1,16 @@
 # Changes
 
+## Version 1.10.3
+
+### Changes
+
+- Exposed camera FOV functions to C#.
+
+### Fixes
+
+- Fixed issues where sometimes a scene wouldn't auto-save when running it.
+- Fixed a memory leak with instanced meshes.
+
 ## Version 1.10.2
 
 ### Fixes
@@ -35,7 +46,7 @@
 
 - Fixed issues with more than 8 lights at once.
 - Fixed an issue with shadows in framebuffers that aren't the main one.
-- Fixed an issue with boolean editor properties.
+- Fixed an issue with Boolean editor properties.
 - Fixed an issue with occlusion culling with meshes that have a center position that isn't 0.
 
 ## Version 1.9.3
@@ -49,7 +60,7 @@
 - Fixed a crash related to lists in object properties.
 - Fixed a crash with the physics system in certain conditions.
 - Fixed scaling for some shape types for collision visualization.
-- Fixed glitchy behaviour of MoveComponent when colliding with multiple polygons at once.
+- Fixed glitchy behavior of MoveComponent when colliding with multiple polygons at once.
 - Fixed sound falloff being too abrupt.
 
 ## Version 1.9.2
@@ -91,7 +102,7 @@
 - Completely rewrote MoveComponent.
 
 ### Fixes
-- Fixed an issue where release builds on linux would fail to load any C# assembly.
+- Fixed an issue where release builds on Linux would fail to load any C# assembly.
 
 ## Version 1.8.2
 

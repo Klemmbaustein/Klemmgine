@@ -16,7 +16,6 @@ class EditorUI;
 class UIVectorField;
 class UITextField;
 struct SDL_Cursor;
-extern bool ChangedScene;
 
 /**
 * @defgroup Editor
@@ -76,6 +75,7 @@ public:
 	static void SetUseLightMode(bool NewLightMode);
 	static int NumLaunchClients;
 	static bool LaunchWithServer;
+	static bool ChangedScene;
 
 	/**
 	* @brief

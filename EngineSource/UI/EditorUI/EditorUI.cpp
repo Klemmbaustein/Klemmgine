@@ -125,7 +125,7 @@ namespace UI
 	extern std::vector<UIBox*> UIElements;
 }
 
-bool ChangedScene = false;
+bool EditorUI::ChangedScene = false;
 bool EditorUI::IsBakingScene = false;
 std::string EditorUI::LaunchInEditorArgs;
 bool EditorUI::LaunchWithServer = false;
@@ -568,9 +568,9 @@ void EditorUI::Tick()
 		}
 	}
 
-	if ((Input::IsKeyDown(Input::Key::LCTRL) && Input::IsKeyDown(Input::Key::s)) || ShouldSave)
+	if ((Input::IsKeyDown(Input::Key::LCTRL) && Input::IsKeyDown(Input::Key::s) && !Input::IsRMBDown) || ShouldSave)
 	{
-		if (!Input::IsRMBDown && ChangedScene && !Editor::IsSavingScene)
+		if (ChangedScene)
 		{
 			SaveCurrentScene();
 			ShouldSave = false;
@@ -659,7 +659,7 @@ void EditorUI::LoadEditorTextures()
 		"CSharpClass.png",			//22 -> CSharp class icon
 		"WindowX.png",				//23 -> Window X icon
 		"WindowResize.png",			//24 -> Window Resize icon
-		"WindowResize2.png",		//25 -> Window Fulscreen Resize icon
+		"WindowResize2.png",		//25 -> Window Fullscreen Resize icon
 		"WindowMin.png",			//26 -> Window Minimize icon
 		"Lighting.png"				//27 -> Lightmap icon	
 	};
@@ -700,7 +700,7 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 			SceneList = &ObjectList[ObjectList.size() - 1];
 		}
 
-		// Seperate the Object's category into multiple strings
+		// Separate the Object's category into multiple strings
 		std::string CurrentPath = Objects::GetCategoryFromID(o->GetObjectDescription().ID);
 		if (o->GetObjectDescription().ID == CSharpObject::GetID() && static_cast<CSharpObject*>(o)->CS_Obj.ID != 0)
 		{

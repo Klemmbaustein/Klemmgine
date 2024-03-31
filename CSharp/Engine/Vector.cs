@@ -62,6 +62,15 @@ public struct Vector3
 			Y.ToString("f", Culture),
 			Z.ToString("f", Culture));
 	}
+
+	public static Vector3 operator+(Vector3 val)
+	{
+		return new Vector3(+val.X, +val.Y, +val.Z);
+	}
+	public static Vector3 operator-(Vector3 val)
+	{
+		return new Vector3(-val.X, -val.Y, -val.Z);
+	}
 	public static Vector3 operator+(Vector3 a, Vector3 b)
 	{
 		return new Vector3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);

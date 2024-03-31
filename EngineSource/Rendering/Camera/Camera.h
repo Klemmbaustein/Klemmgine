@@ -41,11 +41,11 @@ public:
 
 	void MoveRight(float amount)
 	{
-		Translate(Vector3::Cross(lookAt, up).Normalize() * amount);
+		Translate(Vector3::Cross(lookAt, Up).Normalize() * amount);
 	}
 	void MoveUp(float Amount)
 	{
-		Translate(up * Amount);
+		Translate(Vector3(0, 1, 0) * Amount);
 	}
 
 	virtual void Translate(Vector3 V)
@@ -58,7 +58,7 @@ public:
 		return Projection;
 	}
 
-	void ReInit(float FOV, float Width, float Heigth, bool Ortho = false);
+	void ReInit(float FOV, float Width, float Height, bool Ortho = false);
 
 	Vector3 ForwardVectorFromScreenPosition(float x, float y);
 
@@ -86,9 +86,8 @@ public:
 	float FOV;
 
 protected:
-	Vector3 up = glm::vec3(0);
-
 	glm::mat4 Projection = glm::mat4(0);
 	glm::mat4 View = glm::mat4(0);
 	glm::mat4 ViewProj = glm::mat4(0);
 };
+

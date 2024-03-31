@@ -40,8 +40,13 @@ void CameraComponent::Destroy()
 void CameraComponent::SetFOV(float FOV)
 {
 #if !SERVER
-	ComponentCamera.ReInit((FOV / 180) * 3.14159f * 2, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
+	ComponentCamera.ReInit(glm::radians(FOV) * 2, Graphics::WindowResolution.X, Graphics::WindowResolution.Y, false);
 #endif
+}
+
+float CameraComponent::GetFOV() const
+{
+	return glm::degrees(ComponentCamera.FOV) / 2;
 }
 
 CameraComponent::CameraComponent()

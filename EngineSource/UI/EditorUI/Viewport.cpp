@@ -91,6 +91,7 @@ void Viewport::OnItemDropped(DroppedItem Item)
 		Point = hit.ImpactPoint;
 	}
 
+
 	if (Item.TypeID == CSharpObject::GetID())
 	{
 		auto Obj = Objects::SpawnObject<CSharpObject>(Transform(Point, 0, 1));
@@ -99,11 +100,13 @@ void Viewport::OnItemDropped(DroppedItem Item)
 			Obj->LoadClass(Item.Path);
 		}
 		Obj->IsSelected = true;
+		EditorUI::ChangedScene = true;
 		return;
 	}
 	else if (!std::filesystem::exists(Item.Path))
 	{
 		Objects::SpawnObjectFromID(Item.TypeID, Transform(Point, 0, 1))->IsSelected = true;
+		EditorUI::ChangedScene = true;
 		return;
 	}
 
@@ -116,6 +119,7 @@ void Viewport::OnItemDropped(DroppedItem Item)
 		Obj->LoadFromFile(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
 		Obj->Name = FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path);
 		Obj->IsSelected = true;
+		EditorUI::ChangedScene = true;
 	}
 
 	if (Ext == "jspart")
@@ -123,11 +127,13 @@ void Viewport::OnItemDropped(DroppedItem Item)
 		auto Obj = Objects::SpawnObject<ParticleObject>(Transform(Point, 0, 1));
 		Obj->LoadParticle(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
 		Obj->IsSelected = true;
+		EditorUI::ChangedScene = true;
 	}
 
 	if (Ext == "jscn")
 	{
 		EditorUI::OpenScene(Item.Path);
+		EditorUI::ChangedScene = true;
 	}
 
 	if (Ext == "wav")
@@ -135,6 +141,7 @@ void Viewport::OnItemDropped(DroppedItem Item)
 		auto Obj = Objects::SpawnObject<SoundObject>(Transform(Point, 0, 1));
 		Obj->LoadSound(FileUtil::GetFileNameWithoutExtensionFromPath(Item.Path));
 		Obj->IsSelected = true;
+		EditorUI::ChangedScene = true;
 	}
 }
 
@@ -230,12 +237,12 @@ void Viewport::Tick()
 			if (Objects::AllObjects.at(i)->IsSelected)
 			{
 				Objects::DestroyObject(Objects::AllObjects[i]);
-				ChangedScene = true;
+				EditorUI::ChangedScene = true;
 			}
 		}
 	}
 
-	SetName(ChangedScene ? "Viewport*" : "Viewport");
+	SetName(EditorUI::ChangedScene ? "Viewport*" : "Viewport");
 
 	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Position + (Scale * 0.5));
 	Vector3 Rotation = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
@@ -274,7 +281,7 @@ void Viewport::Tick()
 			}
 			ClearSelectedObjects();
 			EditorUI::SelectedObjects = CopiedObjects;
-			ChangedScene = true;
+			EditorUI::ChangedScene = true;
 		}
 	}
 	else
@@ -460,7 +467,7 @@ void Viewport::Tick()
 				Objects::AllObjects.at(i)->SetTransform(Objects::AllObjects.at(i)->GetTransform() + Transform(TransformToAdd, Vector3(), Vector3(1)));
 			}
 		}
-		ChangedScene = true;
+		EditorUI::ChangedScene = true;
 	}
 
 }

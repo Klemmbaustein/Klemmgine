@@ -493,7 +493,7 @@ void ContextMenu::OnButtonClicked(int Index)
 		{
 			EditorUI::SelectedObjects[0]->OnPropertySet();
 		}
-		ChangedScene = true;
+		EditorUI::ChangedScene = true;
 		OnResized();
 	}
 }

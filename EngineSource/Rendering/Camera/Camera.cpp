@@ -2,15 +2,14 @@
 #include <Rendering/Camera/CameraShake.h>
 #include <iostream>
 
-Camera::Camera(float FOV, float Width, float Heigth, bool Ortho)
+Camera::Camera(float FOV, float Width, float Height, bool Ortho)
 {
 	this->FOV = FOV;
 	if (Ortho)
 		Projection = glm::ortho(-FOV, FOV, -FOV, FOV, -FOV, FOV);
 	else
-		Projection = glm::perspective(FOV / 2, Width / Heigth, NearPlane, FarPlane);
+		Projection = glm::perspective(FOV / 2, Width / Height, NearPlane, FarPlane);
 	View = glm::mat4(1);
-	up = glm::vec3(0.0f, 1.0f, 0.0f);
 	yaw = -90.0f;
 	pitch = 0.0f;
 	OnMouseMoved(0.0f, 0.0f);
@@ -25,27 +24,22 @@ void Camera::OnMouseMoved(float xRel, float yRel)
 
 void Camera::UpdateRotation()
 {
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	Vector3 EffectiveRotation = Vector3(pitch, yaw, 0) + CameraShake::CameraShakeTranslation;
+	Vector3 EffectiveRotation = Vector3(pitch, yaw, roll) + CameraShake::CameraShakeTranslation;
 
 	Vector3 front;
 	front.X = cos(glm::radians(EffectiveRotation.X)) * cos(glm::radians(EffectiveRotation.Y));
 	front.Y = sin(glm::radians(EffectiveRotation.X));
 	front.Z = cos(glm::radians(EffectiveRotation.X)) * sin(glm::radians(EffectiveRotation.Y));
 
+	Up = Vector3::GetUpVector(EffectiveRotation);
 	lookAt = front.Normalize();
-	Right = Vector3::Cross(front, up).Normalize();
-	Up = Vector3::Cross(Right, front).Normalize();
+	Right = Vector3::Cross(front, Up).Normalize();
 }
 
 void Camera::Update()
 {
-	View = glm::lookAt((glm::vec3)Position, (glm::vec3)Position + (glm::vec3)lookAt, (glm::vec3)up);
-	View = glm::rotate(View, glm::radians(roll), (glm::vec3)Position + (glm::vec3)up);
+	View = glm::lookAt((glm::vec3)Position, (glm::vec3)Position + (glm::vec3)lookAt, (glm::vec3)Up);
+	View = glm::rotate(View, glm::radians(roll), (glm::vec3)Position + (glm::vec3)Up);
 
 	ViewProj = Projection * View;
 	Rotation = Vector3(pitch, yaw, roll);

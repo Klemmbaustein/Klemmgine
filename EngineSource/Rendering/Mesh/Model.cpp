@@ -17,10 +17,6 @@
 #include <Engine/Application.h>
 #include <Rendering/RenderSubsystem/OcclusionCulling.h>
 
-const extern bool IsInEditor;
-const extern bool EngineDebug;
-
-
 Model::Model(std::string Filename)
 {
 	if (std::filesystem::exists(Filename))
@@ -88,13 +84,6 @@ Model::~Model()
 		OcclusionCulling* OcclusionManager = static_cast<OcclusionCulling*>(RenderSubsystem::GetSubsystemByName("Occlude"));
 		OcclusionManager->OcclusionCulling::FreeOcclusionQuery(OcclusionQueryIndex);
 	}
-}
-namespace CSM
-{
-	glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane);
-	extern std::vector<unsigned int> ShadowMaps;
-	const float cameraFarPlane = 700;
-	extern std::vector<float> shadowCascadeLevels;
 }
 
 void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass)

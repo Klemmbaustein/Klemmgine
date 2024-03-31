@@ -223,6 +223,16 @@ namespace NativeFunctions
 		Cam->Use();
 	}
 
+	static void SetCameraFOV(CameraComponent* Cam, float NewFOV)
+	{
+		Cam->SetFOV(NewFOV);
+	}
+
+	static float GetCameraFOV(CameraComponent* Cam)
+	{
+		return Cam->GetFOV();
+	}
+
 	static void DestroyComponent(Component* c, WorldObject* Parent)
 	{
 		Parent->Detach(c);
@@ -696,6 +706,8 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(GetComponentTransform);
 
 	REGISTER_FUNCTION(UseCamera);
+	REGISTER_FUNCTION(SetCameraFOV);
+	REGISTER_FUNCTION(GetCameraFOV);
 	REGISTER_FUNCTION(MovementComponentAddMovementInput);
 	REGISTER_FUNCTION(MovementComponentJump);
 	REGISTER_FUNCTION(PhysicsComponentGetTransform);

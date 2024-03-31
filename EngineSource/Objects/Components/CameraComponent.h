@@ -11,6 +11,7 @@ public:
 	virtual void Destroy() override;
 
 	void SetFOV(float FOV);
+	float GetFOV() const;
 	CameraComponent();
 
 	// Will only work in-game. In the editor, this does nothing.
