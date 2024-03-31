@@ -46,18 +46,20 @@ void Graphics::SetWindowResolution(Vector2 NewResolution, bool Force)
 		return;
 	}
 
-	for (FramebufferObject* o : AllFramebuffers)
-	{
-		if (o->UseMainWindowResolution)
-		{
-			o->GetBuffer()->ReInit((unsigned int)(NewResolution.X * ResolutionScale), (int)(NewResolution.Y * ResolutionScale));
-		}
-	}
 	Graphics::MainCamera->ReInit(Graphics::MainCamera->FOV, NewResolution.X, NewResolution.Y, false);
 	AspectRatio = NewResolution.X / NewResolution.Y;
 	WindowResolution = NewResolution;
 	RenderResolution = NewResolution * ResolutionScale;
 	RenderSubsystem::ResizeAll();
+
+	for (FramebufferObject* o : AllFramebuffers)
+	{
+		if (o->UseMainWindowResolution)
+		{
+			o->GetBuffer()->ReInit((unsigned int)RenderResolution.X, (unsigned int)(RenderResolution.Y));
+		}
+	}
+
 	for (PostProcess::Effect* i : PostProcess::GetCurrentEffects())
 	{
 		i->UpdateSize();

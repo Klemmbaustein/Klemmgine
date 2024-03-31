@@ -17,7 +17,7 @@
 FramebufferObject::FramebufferObject()
 {
 	buf = new Framebuffer();
-	buf->ReInit((int)(Graphics::WindowResolution.X), (int)(Graphics::WindowResolution.Y));
+	buf->ReInit((int)(Graphics::RenderResolution.X), (int)(Graphics::RenderResolution.Y));
 	Graphics::AllFramebuffers.push_back(this);
 }
 
