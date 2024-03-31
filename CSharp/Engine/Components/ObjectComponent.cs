@@ -79,7 +79,7 @@ public abstract class ObjectComponent
 	public void SetRelativeRotation(Vector3 NewRotation)
 	{
 		Transform NewTransform = GetRelativeTransform();
-		NewTransform.Position = NewRotation;
+		NewTransform.Rotation = NewRotation;
 		SetRelativeTransform(NewTransform);
 	}
 
@@ -99,7 +99,7 @@ public abstract class ObjectComponent
 	public void SetRelativeScale(Vector3 NewScale)
 	{
 		Transform NewTransform = GetRelativeTransform();
-		NewTransform.Position = NewScale;
+		NewTransform.Scale = NewScale;
 		SetRelativeTransform(NewTransform);
 	}
 
