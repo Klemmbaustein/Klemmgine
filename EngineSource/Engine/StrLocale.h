@@ -4,7 +4,7 @@
 
 namespace Locale
 {
-	std::string GetLocalisedString(std::string Name);
+	std::string GetLocalizedString(std::string Name);
 
 	void SetLocale(std::string Name);
 	std::string GetLocale();

@@ -166,7 +166,7 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 				delete (Vector3*)Uniforms[i].Content;
 				break;
 			case NativeType::Float:
-				delete (float*)Uniforms[UniformIndex].Content;
+				delete (float*)Uniforms[i].Content;
 				break;
 			case NativeType::GL_Texture:
 				delete (unsigned int*)Uniforms[i].Content;

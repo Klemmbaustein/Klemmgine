@@ -1,8 +1,8 @@
 // Default material parameters:
 string VertexShader = basic.vert
-string FragmentShader = Editor/grid.frag
-int UseShadowCutout = 0
-int IsTranslucent = 1
+string FragmentShader = "Editor/grid.frag"
+bool UseShadowCutout = 0
+bool IsTranslucent = 1
 
 // Material specific parameters:
-vector3 u_color = 1 1 1
+vector3 u_color = <1 1 1>

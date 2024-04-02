@@ -47,7 +47,7 @@
     <ClCompile Include="Engine\EngineError.cpp" />
     <ClCompile Include="Engine\EngineRandom.cpp" />
     <ClCompile Include="Engine\File\Assets.cpp" />
-    <ClCompile Include="Engine\File\Save.cpp" />
+    <ClCompile Include="Engine\File\SaveData.cpp" />
     <ClCompile Include="Engine\Importers\Importer.cpp" />
     <ClCompile Include="Engine\Importers\ModelConverter.cpp" />
     <ClCompile Include="Engine\Input.cpp" />
@@ -172,7 +172,7 @@
     <ClInclude Include="Engine\EngineProperties.h" />
     <ClInclude Include="Engine\EngineRandom.h" />
     <ClInclude Include="Engine\File\Assets.h" />
-    <ClInclude Include="Engine\File\Save.h" />
+    <ClInclude Include="Engine\File\SaveData.h" />
     <ClInclude Include="Engine\Importers\Importer.h" />
     <ClInclude Include="Engine\Importers\ModelConverter.h" />
     <ClInclude Include="Engine\Input.h" />

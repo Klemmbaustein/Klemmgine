@@ -14,6 +14,8 @@
 #include <Rendering/Framebuffer.h>
 #include <Rendering/Mesh/InstancedModel.h>
 #include <Rendering/Mesh/InstancedMesh.h>
+#include <Engine/File/SaveData.h>
+#include "Texture.h"
 
 void Material::SetPredefinedMaterialValue(std::string Value, char* ptr, std::string Name)
 {
@@ -71,125 +73,80 @@ Ensure that all of your models have a material assigned.");
 #endif
 	}
 
-	Material OutMaterial;
-	OutMaterial.Name = File;
-	std::ifstream In = std::ifstream(File);
-	
-	char CurrentBuff[100];
+	SaveData MaterialData = SaveData(File, "", false, false);
 
-	//iterate through all lines which (hopefully) contain save values
-	while (!In.eof())
+	Material Out;
+
+	for (auto& i : MaterialData.GetAllFields())
 	{
-
-		NativeType::NativeType CurrentType = NativeType::Null;
-		std::string CurrentName = "";
-		std::string Value = "";
-
-		std::string CurrentLine;
-		In.getline(CurrentBuff, 100);
-		CurrentLine = CurrentBuff;
-
-		if (CurrentLine.substr(0, 2) == "//")
-			continue;
-
-
-		std::stringstream CurrentLineStream = std::stringstream(CurrentLine);
-
-		//if the current line is empty, we ignore it
-		if (!CurrentLine.empty())
+		if (i.Name == "VertexShader")
 		{
+			Out.VertexShader = i.Data;
+			continue;
+		}
+		if (i.Name == "FragmentShader")
+		{
+			Out.FragmentShader = i.Data;
+			continue;
+		}
 
-			std::string NativeType;
-			CurrentLineStream >> NativeType;
-			for (unsigned int i = 0; i < 8; i++)
-			{
-				if (NativeType::TypeStrings[i] == NativeType)
-				{
-					CurrentType = (NativeType::NativeType)((int)i);
-				}
-			}
-			if (CurrentType == NativeType::Null)
-			{
-				Log::Print("Error reading material: " + NativeType + " is not a valid type (" + CurrentLine + ")", Vector3(1, 0, 0));
-				return Material();
-			}
-			std::string Equals;
+		if (i.Name == "UseShadowCutout")
+		{
+			Out.UseShadowCutout = i.AsBool();
+			continue;
+		}
+		if (i.Name == "IsTranslucent")
+		{
+			Out.IsTranslucent = i.AsBool();
+			continue;
+		}
 
-			CurrentLineStream >> CurrentName;
-			CurrentLineStream >> Equals;
-
-			if (Equals != "=")
+		if (i.Type == NativeType::GL_Texture)
+		{
+			if (i.Data.empty())
 			{
-				Log::Print("Error reading material: expected = sign (" + CurrentLine + ")", Vector3(1, 0, 0));
-				return Material();
-			}
-			//the rest of the stream is the value of the save item
-			while (!CurrentLineStream.eof())
-			{
-				std::string ValueToAppend;
-				CurrentLineStream >> ValueToAppend;
-				Value.append(ValueToAppend + " ");
-			}
-			const auto strBegin = Value.find_first_not_of(" ");
-
-			const auto strEnd = Value.find_last_not_of(" ");
-			const auto strRange = strEnd - strBegin + 1;
-
-			if (strRange > 0 && strBegin != std::string::npos)
-			{
-				Value = Value.substr(strBegin, strRange);
-			}
-			else
-			{
-				Value = "";
-			}
-			std::map<std::string, char*> PredifinedValues =
-			{
-				std::pair("UseShadowCutout", (char*)&OutMaterial.UseShadowCutout),
-				std::pair("IsTranslucent", (char*)&OutMaterial.IsTranslucent),
-			};
-
-			if (PredifinedValues.contains(CurrentName))
-			{
-				SetPredefinedMaterialValue(Value, PredifinedValues[CurrentName], CurrentName);
-			}
-			else if (CurrentName == "VertexShader")
-			{
-				OutMaterial.VertexShader = Value;
-			}
-			else if (CurrentName == "FragmentShader")
-			{
-				OutMaterial.FragmentShader = Value;
-			}
-			else
-			{
-				OutMaterial.Uniforms.push_back(Param(CurrentName, CurrentType, Value, ""));
+				Texture::TextureInfo Info;
+				Info.File = i.At("File").AsString();
+				Info.Filtering = (Texture::TextureFiltering)i.At("Filtering").AsInt();
+				Info.Wrap = (Texture::TextureWrap)i.At("Wrap").AsInt();
+				i.Data = Texture::CreateTextureInfoString(Info);
 			}
 		}
+
+		Param p = Param(i.Name, i.Type, i.Data);
+		Out.Uniforms.push_back(p);
 	}
-	In.close();
-	return OutMaterial;
+
+	return Out;
 }
 
 void Material::SaveMaterialFile(std::string Path, Material m)
 {
-	std::ofstream Out = std::ofstream(Path);
+	SaveData MaterialData = SaveData(Path, "", false);
+	MaterialData.ClearFields();
 
-	Out << "// Default material parameters:\n";
-	Out << "string VertexShader = " << m.VertexShader << "\n";
-	Out << "string FragmentShader = " << m.FragmentShader << "\n";
-	Out << "int UseShadowCutout = " << std::to_string(m.UseShadowCutout) << "\n";
-	Out << "int IsTranslucent = " << std::to_string(m.IsTranslucent) << "\n";
-	Out << "// Material specific parameters:\n";
+	MaterialData.SetField(SaveData::Field(NativeType::String, "VertexShader", m.VertexShader));
+	MaterialData.SetField(SaveData::Field(NativeType::String, "FragmentShader", m.FragmentShader));
+	MaterialData.SetField(SaveData::Field(NativeType::Bool, "UseShadowCutout", std::to_string(m.UseShadowCutout)));
+	MaterialData.SetField(SaveData::Field(NativeType::Bool, "IsTranslucent", std::to_string(m.UseShadowCutout)));
 
-	for (const auto& Uniform : m.Uniforms)
+	for (auto& i : m.Uniforms)
 	{
-		if (Uniform.NativeType >= 0 && !Uniform.UniformName.empty())
+		if (i.NativeType == NativeType::GL_Texture)
 		{
-			Out << NativeType::TypeStrings.at(Uniform.NativeType) << " " << Uniform.UniformName << " = " << Uniform.Value << "\n";
+			Texture::TextureInfo Info = Texture::ParseTextureInfoString(i.Value);
+			SaveData::Field Field = SaveData::Field(NativeType::GL_Texture, i.UniformName, "");
+			Field.Children =
+			{
+				SaveData::Field(NativeType::String, "File", Info.File),
+				SaveData::Field(NativeType::Int, "Filtering", std::to_string(int(Info.Filtering))),
+				SaveData::Field(NativeType::Int, "Wrap", std::to_string(int(Info.Wrap)))
+			};
+			MaterialData.SetField(Field);
+			continue;
 		}
+		MaterialData.SetField(SaveData::Field(i.NativeType, i.UniformName, i.Value));
 	}
-	Out.close();
 }
 
 #if !SERVER

@@ -45,11 +45,11 @@ public class PhysicsComponent : ObjectComponent
 		int Length);
 
 	private delegate Collision.HitResponse CollisionCheckDelegate(
-	IntPtr NativePtr,
-	Transform Where,
-	Collision.Layer Layers,
-	[MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] IntPtr[] ComponentsToIgnore,
-	int Length);
+		IntPtr NativePtr,
+		Transform Where,
+		Collision.Layer Layers,
+		[MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)] IntPtr[] ComponentsToIgnore,
+		int Length);
 
 
 	private void CreateColliderOfType(BodyType Type,
@@ -85,22 +85,23 @@ public class PhysicsComponent : ObjectComponent
 		NativeFunction.CallNativeFunction("PhysicsComponentSetScale", typeof(SetVector3Delegate), [NativePtr, NewScale]);
 	}
 
-	/// Sets the velocity of the physics body.
-	public void SetVelocity(Vector3 NewVelocity)
-	{
-		NativeFunction.CallNativeFunction("PhysicsComponentSetVelocity", typeof(SetVector3Delegate), [NativePtr, NewVelocity]);
-	}
-
 	/// Sets the angular velocity of the physics body.
 	public void SetAngularVelocity(Vector3 NewVelocity)
 	{
 		NativeFunction.CallNativeFunction("PhysicsComponentSetAngularVelocity", typeof(SetVector3Delegate), [NativePtr, NewVelocity]);
 	}
 
-	/// Gets the velocity of the physics body.
-	public Vector3 GetVelocity()
+	/// The velocity of the physics body.
+	public Vector3 Velocity 
 	{
-		return (Vector3)NativeFunction.CallNativeFunction("PhysicsComponentGetVelocity", typeof(GetVector3Delegate), [NativePtr]);
+		get
+		{
+			return (Vector3)NativeFunction.CallNativeFunction("PhysicsComponentGetVelocity", typeof(GetVector3Delegate), [NativePtr]);
+		}
+		set
+		{
+			NativeFunction.CallNativeFunction("PhysicsComponentSetVelocity", typeof(SetVector3Delegate), [NativePtr, value]);
+		}
 	}
 
 	/// Gets the angular velocity of the physics body.
@@ -232,7 +233,7 @@ public class PhysicsComponent : ObjectComponent
 	* @param ObjectsToIgnore
 	* These objects shouldn't be considered for the query.
 	*/
-	public Collision.HitResponse PhysicsComponentCollisionCheck(Transform Where, Collision.Layer Layers, WorldObject[] ObjectsToIgnore = null)
+	public Collision.HitResponse CollisionCheck(Transform Where, Collision.Layer Layers, WorldObject[] ObjectsToIgnore = null)
 	{
 		IntPtr[] ComponentPtrs;
 		if (ObjectsToIgnore == null)

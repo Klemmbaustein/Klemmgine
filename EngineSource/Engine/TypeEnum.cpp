@@ -11,4 +11,5 @@ std::vector<std::string> NativeType::TypeStrings =
 	"byte",
 	"bool",
 	"rotation",
+	"object"
 };

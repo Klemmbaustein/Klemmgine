@@ -33,84 +33,86 @@ public abstract class ObjectComponent
 
 	public virtual void OnAttached() { }
 
-	public Transform GetRelativeTransform()
+	/**
+	 * @brief
+	 * The native RelativeTransform value of the component.
+	 */
+	public Transform RelativeTransform
 	{
-		if (NativePtr == 0)
+		get
 		{
-			return new Transform();
+			if (NativePtr == 0)
+			{
+				return new Transform();
+			}
+
+			return (Transform)NativeFunction.CallNativeFunction("GetComponentTransform", typeof(GetTransformDelegate), [NativePtr]);
 		}
-
-		return (Transform)NativeFunction.CallNativeFunction("GetComponentTransform", typeof(GetTransformDelegate), [ NativePtr ]);
-	}
-
-	/**
-	 * @brief
-	 * Gets the native RelativeTransform.Position value of the component.
-	 */
-	public Vector3 GetRelativePosition()
-	{
-		return GetRelativeTransform().Position;
-	}
-
-	/**
-	 * @brief
-	 * Sets the native RelativeTransform.Position value of the component.
-	 */
-	public void SetRelativePosition(Vector3 NewPosition)
-	{
-		Transform NewTransform = GetRelativeTransform();
-		NewTransform.Position = NewPosition;
-		SetRelativeTransform(NewTransform);
-	}
-
-	/**
-	 * @brief
-	 * Gets the native RelativeTransform.Rotation value of the component.
-	 */
-	public Vector3 GetRelativeRotation()
-	{
-		return GetRelativeTransform().Rotation;
-	}
-
-	/**
-	 * @brief
-	 * Sets the native RelativeTransform.Rotation value of the component.
-	 */
-	public void SetRelativeRotation(Vector3 NewRotation)
-	{
-		Transform NewTransform = GetRelativeTransform();
-		NewTransform.Rotation = NewRotation;
-		SetRelativeTransform(NewTransform);
-	}
-
-	/**
-	 * @brief
-	 * Gets the native Transform.Scale value of the component.
-	 */
-	public Vector3 GetRelativeScale()
-	{
-		return GetRelativeTransform().Scale;
-	}
-
-	/**
-	 * @brief
-	 * Sets the native Transform.Scale value of the component.
-	 */
-	public void SetRelativeScale(Vector3 NewScale)
-	{
-		Transform NewTransform = GetRelativeTransform();
-		NewTransform.Scale = NewScale;
-		SetRelativeTransform(NewTransform);
-	}
-
-	public void SetRelativeTransform(Transform t)
-	{
-		if (NativePtr == 0)
+		set
 		{
-			return;
-		}
+			if (NativePtr == 0)
+			{
+				return;
+			}
 
-		NativeFunction.CallNativeFunction("SetComponentTransform", typeof(SetTransformDelegate), [ NativePtr, t ]);
+			NativeFunction.CallNativeFunction("SetComponentTransform", typeof(SetTransformDelegate), [NativePtr, value]);
+
+		}
+	}
+
+	/**
+	 * @brief
+	 * The native RelativeTransform.Position value of the component.
+	 */
+	public Vector3 RelativePosition
+	{
+		get
+		{
+			return RelativeTransform.Position;
+		}
+		set
+		{
+			Transform NewTransform = RelativeTransform;
+			NewTransform.Position = value;
+			RelativeTransform = NewTransform;
+
+		}
+	}
+
+	/**
+	 * @brief
+	 * The native RelativeTransform.Rotation value of the component.
+	 */
+	public Vector3 RelativeRotation
+	{
+		get
+		{
+			return RelativeTransform.Rotation;
+		}
+		set
+		{
+			Transform NewTransform = RelativeTransform;
+			NewTransform.Rotation = value;
+			RelativeTransform = NewTransform;
+		}
+	}
+
+	/**
+	 * @brief
+	 * The native RelativeTransform.Scale value of the component.
+	 */
+	public Vector3 RelativeScale
+	{
+		get
+		{
+			return RelativeTransform.Scale;
+		}
+		set
+		{
+			Transform NewTransform = RelativeTransform;
+			NewTransform.Scale = value;
+			RelativeTransform = NewTransform;
+		}
 	}
 
 	public abstract void Tick();

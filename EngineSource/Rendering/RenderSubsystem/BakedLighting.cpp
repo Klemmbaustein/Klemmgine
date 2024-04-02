@@ -37,7 +37,7 @@ int64_t BakedLighting::GetLightTextureSize()
 	return LightmapResolution;
 }
 
-constexpr uint8_t BKDAT_FILE_VERSION = 1;
+constexpr uint8_t BKDAT_FILE_VERSION = 2;
 
 #if EDITOR
 
@@ -210,16 +210,10 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 	for (int i = 0; i < 1; i++)
 	{
 		r = Bake::BakeLine(StartPos, StartPos
-			+ (Bake::SunDirection
-				+ glm::vec3(
-					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f,
-					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f,
-					std::fmod((float)std::rand() / 100.0f, 2.0f) - 1.0f)
-				* 0.025f)
-			* TraceDistance, false);
-		LightInt += r.Hit ? 1 - std::min(r.Distance * TraceDistance / 12.0f, 1.0f) : 1;
+			+ (Bake::SunDirection) * TraceDistance, false);
+		LightInt += r.Hit ? 1 - std::min(r.Distance * TraceDistance / 10.0f, 1.0f) : 1;
 	}
-	LightInt /= 1.0f;
+	LightInt /= 1;
 
 	return std::min((LightInt / 2.0f + TotalLightIntensity / 4.0f), 1.0f);
 }
@@ -393,13 +387,15 @@ void BakedLighting::BakeCurrentSceneToFile()
 		}
 
 
-		std::ofstream OutFile = std::ofstream(BakFile);
+		std::ofstream OutFile = std::ofstream(BakFile, std::ios::out | std::ios::binary);
 
-		OutFile << (int)BKDAT_FILE_VERSION;
+
+		uint8_t FileVersion = BKDAT_FILE_VERSION;
+		OutFile.write((char*)&FileVersion, sizeof(FileVersion));
 		struct RLEelem
 		{
 			std::byte Value = std::byte(1);
-			size_t Length = 0;
+			uint8_t Length = 0;
 		};
 
 		RLEelem Current;
@@ -409,6 +405,8 @@ void BakedLighting::BakeCurrentSceneToFile()
 		for (size_t i = 0; i < LightmapResolution * LightmapResolution * LightmapResolution * NUM_CHANNELS; i++)
 		{
 			std::byte CurrentVal = Bake::Texture[i];
+
+			// If the new value is different than the other one, start a new RLE element.
 			if (Current.Value != CurrentVal)
 			{
 				if (Current.Length != 0)
@@ -418,23 +416,30 @@ void BakedLighting::BakeCurrentSceneToFile()
 				Current.Value = CurrentVal;
 				Current.Length = 0;
 			}
+
 			Current.Length++;
+
+			// Don't write an RLE element with a size longer than the maximum size.
+			if (Current.Length == UINT8_MAX)
+			{
+				Elements.push_back(Current);
+				Current.Length = 0;
+			}
 		}
 
 		size_t ElemsSize = Elements.size();
-		OutFile << " " << ElemsSize << " " << LightmapResolution << std::endl;
-		OutFile << Bake::BakeScale.ToString() << std::endl;
+		OutFile.write((char*)&ElemsSize, sizeof(ElemsSize));
+		OutFile.write((char*)&LightmapResolution, sizeof(LightmapResolution));
+		OutFile.write((char*)&Bake::BakeScale, sizeof(Bake::BakeScale));
 
 		size_t TotalLength = 0;
 
 		BakeLog("Compressed lightmap with " + std::to_string(ElemsSize) + " RLE elements.");
 		for (auto& i : Elements)
 		{
-			std::byte Val = i.Value;
-			size_t Length = i.Length;
-			TotalLength += Length;
-			OutFile << Length << " ";
-			OutFile << (int)Val << std::endl;
+			TotalLength += i.Length;
+			OutFile.write((char*)&i.Length, sizeof(i.Length));
+			OutFile.write((char*)&i.Value, sizeof(i.Value));
 		}
 
 		BakeLog("Encoded voxels: " + std::to_string(TotalLength));
@@ -507,11 +512,11 @@ void BakedLighting::LoadBakeFile(std::string BakeFile)
 		return;
 	}
 
-	std::ifstream InFile = std::ifstream(File);
+	std::ifstream InFile = std::ifstream(File, std::ios::binary | std::ios::in);
 
-	int FileVer = 0;
+	uint8_t FileVer = 0;
 	BakeSystem->Print("Loading lightmap: " + File);
-	InFile >> FileVer;
+	InFile.read((char*)&FileVer, sizeof(FileVer));
 	if (BKDAT_FILE_VERSION != FileVer)
 	{
 		BakeSystem->Print("File version mismatch of bkdat file. Supported version: " + std::to_string(BKDAT_FILE_VERSION) + ", Loaded version: " + std::to_string(FileVer), ErrorLevel::Warn);
@@ -520,27 +525,20 @@ void BakedLighting::LoadBakeFile(std::string BakeFile)
 
 
 	size_t FileLength = 0;
-	InFile >> FileLength;
-	InFile >> LightmapResolution;
-	size_t Iterator = 0;
+	InFile.read((char*)&FileLength, sizeof(FileLength));
+	InFile.read((char*)&LightmapResolution, sizeof(LightmapResolution));
 
-	float ScaleX, ScaleY, ScaleZ;
-
-	InFile >> ScaleX;
-	InFile >> ScaleY;
-	InFile >> ScaleZ;
-
-	LightmapScale = Vector3(ScaleX, ScaleY, ScaleZ);
+	InFile.read((char*)&LightmapScale, sizeof(LightmapScale));
 
 	uint8_t* Texture = new uint8_t[LightmapResolution * LightmapResolution * LightmapResolution * NUM_CHANNELS * 2]();
 
-
+	size_t Iterator = 0; 
 	for (size_t i = 0; i < FileLength; i++)
 	{
-		int Value = 0;
-		size_t Length = 0;
-		InFile >> Length;
-		InFile >> Value;
+		uint8_t Value = 0;
+		uint8_t Length = 0;
+		InFile.read((char*)&Length, sizeof(Length));
+		InFile.read((char*)&Value, sizeof(Value));
 		for (size_t i = 0; i < Length; i++)
 		{
 			Texture[Iterator] = Value;

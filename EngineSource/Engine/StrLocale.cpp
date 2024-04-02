@@ -1,5 +1,5 @@
 #include "StrLocale.h"
-#include <Engine/File/Save.h>
+#include <Engine/File/SaveData.h>
 #include <filesystem>
 #include <Engine/Log.h>
 
@@ -11,10 +11,10 @@ namespace Locale
 	static const std::string LocalePath = "Locale/";
 #endif
 	static std::string CurrentLocale = "EN";
-	static SaveGame LocaleFile = SaveGame(LocalePath + CurrentLocale, "loc", false, false);
+	static SaveData LocaleFile = SaveData(LocalePath + CurrentLocale, "loc", false, false);
 }
 
-std::string Locale::GetLocalisedString(std::string Name)
+std::string Locale::GetLocalizedString(std::string Name)
 {
 	return LocaleFile.GetString(Name);
 }
@@ -29,7 +29,7 @@ void Locale::SetLocale(std::string Name)
 		return;
 	}
 	Log::Print("Setting locale to \"" + Name + "\" (" + LocalePath + Name + ".loc)");
-	LocaleFile = SaveGame(Path, "loc", false, false);
+	LocaleFile = SaveData(Path, "loc", false, false);
 }
 
 std::string Locale::GetLocale()

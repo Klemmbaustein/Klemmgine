@@ -10,10 +10,10 @@
 #include <Engine/EngineError.h>
 
 float CSM::CSMDistance = 1;
-const float CSM::cameraFarPlane = 400.f;
-std::vector<float> CSM::shadowCascadeLevels{ cameraFarPlane / 12.f, cameraFarPlane / 4.f, cameraFarPlane / 1.5f, cameraFarPlane / 1.f };
+const float CSM::cameraFarPlane = 250.f;
+std::vector<float> CSM::shadowCascadeLevels{ cameraFarPlane / 9.f, cameraFarPlane / 3.f, cameraFarPlane / 1.0f };
 unsigned int CSM::LightFBO = 0;
-int CSM::Cascades = 4;
+int CSM::Cascades = 3;
 unsigned int CSM::ShadowMaps = 0;
 unsigned int CSM::matricesUBO = 0;
 Shader* CSM::ShadowShader = nullptr;

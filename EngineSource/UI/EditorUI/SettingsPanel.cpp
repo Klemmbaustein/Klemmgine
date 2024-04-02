@@ -1,6 +1,6 @@
 #if EDITOR
 #include "SettingsPanel.h"
-#include <Engine/File/Save.h>
+#include <Engine/File/SaveData.h>
 #include <UI/EditorUI/UIVectorField.h>
 #include <Engine/Log.h>
 #include <Engine/Subsystem/CSharpInterop.h>
@@ -191,7 +191,15 @@ void SettingsPanel::OnButtonClicked(int Index)
 		{
 		case NativeType::Bool:
 		{
-			bool Val = (bool)std::stoi(Setting.Value);
+			bool Val = false;
+			try
+			{
+				Val = (bool)std::stoi(Setting.Value);
+			}
+			catch (std::exception)
+			{
+
+			}
 			Setting.Value = std::to_string(!Val);
 		}
 			break;
@@ -252,11 +260,11 @@ SettingsPanel::SettingsPanel(EditorPanel* Parent) : EditorPanel(Parent, "Setting
 
 void SettingsPanel::Load()
 {
-	SaveGame Pref = SaveGame(Application::GetEditorPath() + "/EditorContent/Config/EditorPrefs", "pref", false);
-	SaveGame Proj = SaveGame(Build::GetProjectBuildName(), "keproj", false);
+	SaveData Pref = SaveData(Application::GetEditorPath() + "/EditorContent/Config/EditorPrefs", "pref", false);
+	SaveData Proj = SaveData(Build::GetProjectBuildName(), "keproj", false);
 	for (auto& cat : Preferences)
 	{
-		SaveGame& UsedSave = cat.Name == "Project specific" ? Proj : Pref;
+		SaveData& UsedSave = cat.Name == "Project specific" ? Proj : Pref;
 		for (auto& i : cat.Settings)
 		{
 			std::string NameCopy = i.Name;
@@ -269,10 +277,16 @@ void SettingsPanel::Load()
 				}
 				NameCopy[Space] = '_';
 			}
-			if (UsedSave.GetProperty(NameCopy).NativeType != NativeType::Null)
+			if (UsedSave.HasField(NameCopy))
 			{
-				i.Value = UsedSave.GetProperty(NameCopy).Value;
-				i.OnChanged(i.Value);
+				i.Value = UsedSave.GetField(NameCopy).Data;
+				try
+				{
+					i.OnChanged(i.Value);
+				}
+				catch (std::exception)
+				{
+				}
 			}
 		}
 	}
@@ -281,11 +295,11 @@ void SettingsPanel::Load()
 void SettingsPanel::Save()
 {
 	std::filesystem::create_directories(Application::GetEditorPath() + "/EditorContent/Config");
-	SaveGame Pref = SaveGame(Application::GetEditorPath() + "/EditorContent/Config/EditorPrefs", "pref", false);
-	SaveGame Proj = SaveGame(Build::GetProjectBuildName(), "keproj", false);
+	SaveData Pref = SaveData(Application::GetEditorPath() + "/EditorContent/Config/EditorPrefs", "pref", false);
+	SaveData Proj = SaveData(Build::GetProjectBuildName(), "keproj", false);
 	for (auto& cat : Preferences)
 	{
-		SaveGame& UsedSave = cat.Name == "Project specific" ? Proj : Pref;
+		SaveData& UsedSave = cat.Name == "Project specific" ? Proj : Pref;
 		for (auto i : cat.Settings)
 		{
 			while (true)
@@ -297,7 +311,7 @@ void SettingsPanel::Save()
 				}
 				i.Name[Space] = '_';
 			}
-			UsedSave.SetProperty(SaveGame::SaveProperty(i.Name, i.Value, i.NativeType));
+			UsedSave.SetField(SaveData::Field(i.NativeType, i.Name, i.Value));
 		}
 	}
 }

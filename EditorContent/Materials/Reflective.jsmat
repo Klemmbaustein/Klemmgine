@@ -6,9 +6,9 @@ int UseShadowCutout = 0
 int IsTranslucent = 0
 
 // Material specific parameters:
-vector3 u_diffuse = 0.5 0.5 0.5
+vector3 u_diffuse = <0.5 0.5 0.5>
 float u_specularSize = 15
 float u_specularStrength = 10
 bool u_ssao_reverse = 1
-vector3 u_emissive = 0 0 0
+vector3 u_emissive = <0 0 0>
 bool u_useTexture = 0

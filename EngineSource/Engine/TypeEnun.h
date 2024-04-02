@@ -40,6 +40,8 @@ namespace NativeType
 		Bool = 7,
 		/// Vector3. A UIVectorField will display 'P', 'Y' 'R' (Pitch, Yaw, Roll) instead of 'X', 'Y', 'Z' when editing a Vector3Color.
 		Vector3Rotation = 8,
+		/// Object. For .kesv serialization.
+		Object = 9,
 		/// List modifier. Bitwise or this with any other value in this enum to make it a list.
 		List = 0b10000000
 	};

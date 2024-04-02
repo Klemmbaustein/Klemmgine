@@ -128,7 +128,7 @@ namespace Engine
 			Static = 0,
 			/// PhysicsBody is only movable using velocities only, does not respond to forces.
 			Kinematic = 1,
-			/// Physicsbody is fully movable.
+			/// PhysicsBody is fully movable.
 			Dynamic = 2,
 		}
 

@@ -11,7 +11,7 @@
 #include <Engine/Stats.h>
 #include <Objects/CSharpObject.h>
 #include <Engine/Build/Build.h>
-#include <Engine/File/Save.h>
+#include <Engine/File/SaveData.h>
 #include <Engine/Subsystem/Console.h>
 #include <Engine/OS.h>
 #include <Engine/Application.h>
@@ -317,14 +317,14 @@ bool CSharpInterop::GetUseCSharp()
 #if RELEASE
 		UseCSharp = std::filesystem::exists("bin/CSharp");
 #else
-		SaveGame g = SaveGame(Build::GetProjectBuildName(), "keproj", false);
+		SaveData g = SaveData(Build::GetProjectBuildName(), "keproj", false);
 		if (g.SaveGameIsNew())
 		{
 			UseCSharp = true;
 		}
 		else
 		{
-			UseCSharp = g.GetProperty("C#:Use_C#_in_project_(Requires_restart)").Value == "1";
+			UseCSharp = g.GetBool("C#:Use_C#_in_project_(Requires_restart)");
 		}
 #endif
 		return UseCSharp;

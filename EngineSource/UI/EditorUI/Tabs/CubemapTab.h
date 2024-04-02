@@ -35,7 +35,7 @@ protected:
 	std::vector<std::string> Cubenames = { "right", "left", "up", "down", "front", "back" };
 
 	std::vector<UITextField*> SideFields;
-	SaveGame* SaveFile = nullptr;
+	SaveData* SaveFile = nullptr;
 	void UpdatePreviewModel();
 	FramebufferObject* PreviewBuffer = nullptr;
 	Model* PreviewModel = nullptr;

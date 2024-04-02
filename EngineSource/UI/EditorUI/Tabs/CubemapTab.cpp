@@ -76,7 +76,7 @@ void CubemapTab::Load(std::string File)
 		TabName->SetText("Cubemap: " + FileUtil::GetFileNameWithoutExtensionFromPath(File));
 		delete SaveFile;
 		InitialName = File;
-		SaveFile = new SaveGame(InitialName.substr(0, InitialName.size() - 4), "cbm", false);
+		SaveFile = new SaveData(InitialName.substr(0, InitialName.size() - 4), "cbm", false);
 
 		UpdatePreviewModel();
 	}
@@ -93,7 +93,7 @@ void CubemapTab::Save()
 	try
 	{
 		delete SaveFile;
-		SaveFile = new SaveGame(InitialName.substr(0, InitialName.size() - 4), "cbm", false);
+		SaveFile = new SaveData(InitialName.substr(0, InitialName.size() - 4), "cbm", false);
 	}
 	catch (std::exception& e)
 	{
@@ -108,7 +108,7 @@ void CubemapTab::Generate()
 	for (size_t i = 0; i < Cubenames.size(); i++)
 	{
 		UITextField* text = new UITextField(0, 0.2f, this, 0, Renderer);
-		text->SetText(SaveFile->GetProperty(Cubenames[i]).Value);
+		text->SetText(SaveFile->GetField(Cubenames[i]).Value);
 		text->SetMinSize(Vector2(0.2f, 0.05f));
 		text->SetPadding(0);
 		text->SetBorder(UIBox::BorderType::Rounded, 0.5f);
@@ -128,7 +128,7 @@ void CubemapTab::OnButtonClicked(int Index)
 	case 0:
 		for (size_t i = 0; i < SideFields.size(); i++)
 		{
-			SaveFile->SetProperty(SaveGame::SaveProperty(Cubenames[i], SideFields[i]->GetText(), Type::String));
+			SaveFile->SetField(SaveData::SaveProperty(Cubenames[i], SideFields[i]->GetText(), Type::String));
 		}
 		Generate();
 		break;

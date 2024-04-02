@@ -1,5 +1,14 @@
 # Changes
 
+## Version 1.10.4
+
+### Changes
+
+- Rewritten save format parser.
+- Changed some getters/setters to properties in C#.
+- Lightmap format is now binary instead of text-based.
+
+
 ## Version 1.10.3
 
 ### Changes
@@ -11,6 +20,7 @@
 - Fixed issues where sometimes a scene wouldn't auto-save when running it.
 - Fixed a memory leak with instanced meshes.
 
+
 ## Version 1.10.2
 
 ### Fixes
@@ -18,12 +28,14 @@
 - Fixed leaking the formatted string in StrUtil::Format().
 - Networking stability improvements.
 
+
 ## Version 1.10.1
 
 ### Fixes
 
 - Fixed crashes on Linux.
 - Many small stability improvements.
+
 
 ## Version 1.10.0
 
@@ -33,6 +45,7 @@
 - Added `Subsystem` interfaces.
 - Log files will now be written to disk in WorkingDirectory/Logs/
 - Improvements to text fields.
+
 
 ## Version 1.9.4
 
@@ -49,6 +62,7 @@
 - Fixed an issue with Boolean editor properties.
 - Fixed an issue with occlusion culling with meshes that have a center position that isn't 0.
 
+
 ## Version 1.9.3
 
 ### Changes
@@ -62,6 +76,7 @@
 - Fixed scaling for some shape types for collision visualization.
 - Fixed glitchy behavior of MoveComponent when colliding with multiple polygons at once.
 - Fixed sound falloff being too abrupt.
+
 
 ## Version 1.9.2
 
@@ -81,6 +96,7 @@
 - Fixed a crash when a MeshComponent has no mesh loaded.
 - Fixed a crash when reloading the C# assembly.
 
+
 ## Version 1.9.1
 
 ### Changes
@@ -93,6 +109,7 @@
 
 - Fixed some dialogs not appearing.
 
+
 ## Version 1.9.0
 
 ### Changes
@@ -104,6 +121,7 @@
 ### Fixes
 - Fixed an issue where release builds on Linux would fail to load any C# assembly.
 
+
 ## Version 1.8.2
 
 ### Fixes
@@ -112,6 +130,7 @@
 - Fixed an issue with public EditorProperties.
 - Fixed an issue where C# UICanvases would be garbage collected.
 - Fixed some incomplete/incorrect documentation.
+
 
 ## Version 1.8.1
 
@@ -128,6 +147,7 @@
 - Multiple small fixes to the editor.
 - Linux builds can now properly create releases.
 
+
 ## Version 1.8.0
 
 ### Changes
@@ -143,11 +163,13 @@
 - Upgrade to new KlemmBuild version.
 - Added `setup.sh` for Linux builds.
 
+
 ## Version 1.7.2
 
 ### Fixes
 
 - Fixed a crash with the server.
+
 
 ## Version 1.7.1
 
