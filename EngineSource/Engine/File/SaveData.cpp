@@ -22,7 +22,10 @@ SaveData::SaveData(std::string SaveName, std::string Extension, bool InSaveFolde
 	}
 	else
 	{
-		SaveName.append("." + Extension);
+		if (!Extension.empty())
+		{
+			SaveName.append("." + Extension);
+		}
 	}
 
 	bool FileIsNew = !std::filesystem::exists(SaveName) || std::filesystem::is_empty(SaveName);
