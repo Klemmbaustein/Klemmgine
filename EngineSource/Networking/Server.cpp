@@ -65,7 +65,7 @@ namespace Server
 		}
 	}
 	static ClientInfo* ServerClient = new ClientInfo();
-	void ClientInfo::SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform) const
+	void ClientInfo::SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform, std::string ObjProperties) const
 	{
 		Packet p;
 		p.Write((uint8_t)Packet::PacketType::SpawnObject);
@@ -73,6 +73,7 @@ namespace Server
 		p.Write(NetID);
 		p.Write(NetOwner);
 		p.Write(SpawnTransform);
+		p.AppendStringToData(ObjProperties);
 		p.Send(IP);
 
 	}
@@ -144,7 +145,7 @@ void Server::OnConnectRequestReceived(Packet p)
 	{
 		if (i->GetIsReplicated())
 		{
-			NewClient.SendClientSpawnRequest(i->GetObjectDescription().ID, i->NetID, i->NetOwner, i->GetTransform());
+			NewClient.SendClientSpawnRequest(i->GetObjectDescription().ID, i->NetID, i->NetOwner, i->GetTransform(), i->GetPropertiesAsString());
 		}
 	}
 
@@ -200,11 +201,11 @@ void Server::DisconnectPlayer(uint64_t UID)
 	Log::Print("[Net]: Could not disconnect player with uid " + std::to_string(UID) + " because that uid does not exist.");
 }
 
-void Server::SpawnObject(int32_t ObjID, uint64_t NetID, Transform SpawnTransform)
+void Server::SpawnObject(int32_t ObjID, uint64_t NetID, Transform SpawnTransform, std::string ObjProperties)
 {
 	for (auto& i : Clients)
 	{
-		i.SendClientSpawnRequest(ObjID, NetID, Networking::ServerID, SpawnTransform);
+		i.SendClientSpawnRequest(ObjID, NetID, Networking::ServerID, SpawnTransform, ObjProperties);
 	}
 }
 

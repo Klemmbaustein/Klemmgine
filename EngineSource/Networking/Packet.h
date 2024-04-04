@@ -43,6 +43,8 @@ struct Packet
 		StreamPos += sizeof(T);
 	}
 
+	std::string ReadString();
+
 	template<typename T>
 	void Write(T WriteData)
 	{

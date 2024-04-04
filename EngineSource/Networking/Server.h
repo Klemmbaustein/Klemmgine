@@ -13,7 +13,7 @@ namespace Server
 		void* IP = nullptr;
 		uint64_t ID = 0;
 
-		void SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform) const;
+		void SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform, std::string ObjProperties) const;
 		void SendServerTravelRequest(std::string SceneName) const;
 	};
 
@@ -27,7 +27,7 @@ namespace Server
 	void OnConnectRequestReceived(Packet p);
 	void DisconnectPlayer(void* IP);
 	void DisconnectPlayer(uint64_t UID);
-	void SpawnObject(int32_t ObjID, uint64_t NetID, Transform SpawnTransform);
+	void SpawnObject(int32_t ObjID, uint64_t NetID, Transform SpawnTransform, std::string ObjProperties);
 
 	void HandleDestroyObject(WorldObject* o);
 

@@ -60,17 +60,8 @@ void Packet::EvaluatePacket()
 
 		uint64_t ObjID = 0;
 		Read(ObjID);
-		std::string Value;
-		for (size_t i = 1 + sizeof(ObjID); i < Data.size(); i++)
-		{
-			if (Data[i] == 0)
-			{
-				break;
-			}
-			Value.append({ (char)Data[i] });
-		}
 
-		auto Values = StrUtil::SeperateString(Value, ';');
+		auto Values = StrUtil::SeperateString(ReadString(), ';');
 
 		for (auto& i : Values)
 		{
@@ -128,7 +119,10 @@ void Packet::EvaluatePacket()
 					Log::LogColor::Gray);
 			}
 		}
-		Objects::SpawnObjectFromID(ObjTypeID, SpawnTransform, ObjNetID)->NetOwner = ObjOwnerID;
+		auto obj = Objects::SpawnObjectFromID(ObjTypeID, SpawnTransform, ObjNetID);
+		obj->NetOwner = ObjOwnerID;
+		obj->LoadProperties(ReadString());
+		obj->OnPropertySet();
 	}
 #endif
 	break;
@@ -139,17 +133,8 @@ void Packet::EvaluatePacket()
 	{
 		return;
 	}
-	std::string Value;
-	for (size_t i = 1; i < Data.size(); i++)
-	{
-		if (Data[i] == 0)
-		{
-			break;
-		}
-		Value.append({ (char)Data[i] });
-	}
 
-	Scene::LoadNewScene(Value, true);
+	Scene::LoadNewScene(ReadString(), true);
 	}
 #endif
 		break;
@@ -273,6 +258,21 @@ void Packet::Init()
 		printf("Could not allocate packet\n");
 		exit(2);
 	}
+}
+
+std::string Packet::ReadString()
+{
+	std::string Value;
+	while (StreamPos < Data.size())
+	{
+		if (Data[StreamPos] == 0)
+		{
+			break;
+		}
+		Value.push_back((char)Data[StreamPos]);
+		StreamPos++;
+	}
+	return Value;
 }
 
 void Packet::SetReceivePackets(bool NewRecv)

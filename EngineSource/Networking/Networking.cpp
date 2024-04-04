@@ -291,7 +291,7 @@ WorldObject* Networking::SpawnReplicatedObjectFromID(uint32_t ID, Transform Posi
 	WorldObject* obj = Objects::SpawnObjectFromID(ID, Position, NetIDCounter);
 	obj->NetOwner = UINT64_MAX;
 #if SERVER
-	Server::SpawnObject(ID, NetIDCounter, Position);
+	Server::SpawnObject(ID, NetIDCounter, Position, obj->GetPropertiesAsString());
 #endif
 	NetIDCounter++;
 	return obj;
