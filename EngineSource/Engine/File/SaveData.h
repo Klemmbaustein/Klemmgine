@@ -32,7 +32,7 @@ struct SaveData
 
 	SaveData();
 	SaveData(std::string SaveName, std::string Extension = "kesv", bool InSaveFolder = true, bool ShouldSaveOnClose = true);
-	static SaveData ParseString(const std::string& Str);
+	static SaveData ParseString(std::string Str);
 
 	std::string SerializeString() const;
 

@@ -47,7 +47,7 @@ SaveData::SaveData(std::string SaveName, std::string Extension, bool InSaveFolde
 	IsNew = FileIsNew;
 }
 
-SaveData SaveData::ParseString(const std::string& Str)
+SaveData SaveData::ParseString(std::string Str)
 {
 	SaveData OutData;
 	std::string CurrentString;
@@ -61,6 +61,7 @@ SaveData SaveData::ParseString(const std::string& Str)
 
 	char Last = 0;
 	bool InComment = false;
+	Str.append(" ");
 
 	for (char c : Str)
 	{

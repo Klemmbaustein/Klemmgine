@@ -2,8 +2,8 @@
 
 string VertexShader = basic.vert
 string FragmentShader = basic.frag
-int UseShadowCutout = 0
-int IsTranslucent = 0
+bool UseShadowCutout = 0
+bool IsTranslucent = 0
 
 // Material specific parameters:
 vector3 u_diffuse = <0.5 0.5 0.5>
