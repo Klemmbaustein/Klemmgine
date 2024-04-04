@@ -81,12 +81,12 @@ Ensure that all of your models have a material assigned.");
 	{
 		if (i.Name == "VertexShader")
 		{
-			Out.VertexShader = i.Data;
+			Out.VertexShader = i.AsString();
 			continue;
 		}
 		if (i.Name == "FragmentShader")
 		{
-			Out.FragmentShader = i.Data;
+			Out.FragmentShader = i.AsString();
 			continue;
 		}
 
