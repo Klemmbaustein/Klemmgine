@@ -4,6 +4,7 @@
 #include <Engine/Log.h>
 #include <sstream>
 #include <iostream>
+#include <Engine/Utility/FileUtility.h>
 
 SaveData::SaveData()
 {
@@ -323,6 +324,14 @@ SaveData::~SaveData()
 
 void SaveData::SaveToFile(std::string File) const
 {
+	size_t Last =  File.find_last_of("/\\");
+
+	std::string Dir = File.substr(0, Last);
+
+	if (!Dir.empty() && Last != std::string::npos)
+	{
+		std::filesystem::create_directories(Dir);
+	}
 	std::ofstream OutFile = std::ofstream(File, std::ios::out);
 	OutFile.exceptions(std::ios::failbit | std::ios::badbit);
 	OutFile << SerializeString();
