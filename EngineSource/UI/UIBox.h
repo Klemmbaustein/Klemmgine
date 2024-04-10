@@ -304,6 +304,17 @@ public:
 
 	static std::vector<ScrollObject*> ScrollObjects;
 
+	struct RedrawBox
+	{
+		Vector2 Min;
+		Vector2 Max;
+
+		static bool IsBoxOverlapping(const RedrawBox& BoxA, const RedrawBox& BoxB);
+	};
+
+	void RedrawElement();
+	static void RedrawArea(RedrawBox Box);
+
 protected:
 	bool ShouldBeTicked = true;
 	bool TryFill = false;
@@ -314,7 +325,7 @@ protected:
 	void UpdateHoveredState();
 	
 	Vector2 Position;
-	Vector2 OffsetPosition;
+	Vector2 OffsetPosition = NAN;
 	Vector2 MaxSize = Vector2(2, 2);
 	Vector2 MinSize = Vector2(0, 0);
 
@@ -330,12 +341,14 @@ protected:
 	void UpdateScale();
 	void UpdatePosition();
 private:
+	void SetOffsetPosition(Vector2 NewPos);
 	float GetVerticalOffset();
 	float GetHorizontalOffset();
 	Vector2 GetLeftRightPadding(UIBox* Target);
-	void DrawThisAndChildren();
+	void DrawThisAndChildren(RedrawBox Area);
 	Orientation ChildrenOrientation = Orientation::Horizontal;
 	bool PrevIsVisible = true;
+	static std::vector<RedrawBox> RedrawBoxes;
 };
 
 namespace UI

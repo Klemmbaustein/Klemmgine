@@ -101,7 +101,11 @@ void UIScrollBox::Tick()
 		ScrollBarBackground->SetMinSize(Vector2(0.015f, GetUsedSize().Y));
 		ScrollBarBackground->SetPosition(OffsetPosition + Vector2(Size.X - ScrollBarBackground->GetUsedSize().X, 0));
 
-		float ScrollPercentage = ScrollClass.Percentage / ScrollClass.MaxScroll;
+		float ScrollPercentage = 0;
+		if (ScrollClass.MaxScroll != 0)
+		{
+			ScrollPercentage = ScrollClass.Percentage / ScrollClass.MaxScroll;
+		}
 
 		if (DesiredMaxScroll <= Size.Y)
 		{
@@ -127,7 +131,12 @@ void UIScrollBox::Tick()
 			}
 			else
 			{
-				ScrollClass.Percentage = std::min(std::max(MousePos - DraggingDelta, 0.0f), 1.0f) * ScrollClass.MaxScroll;
+				float NewPercentage = std::min(std::max(MousePos - DraggingDelta, 0.0f), 1.0f) * ScrollClass.MaxScroll;
+				if (NewPercentage != ScrollClass.Percentage)
+				{
+					ScrollClass.Percentage = NewPercentage;
+					RedrawElement();
+				}
 			}
 			IsDragging = true;
 			IsDraggingScrollBox = true;

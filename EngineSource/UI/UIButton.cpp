@@ -34,12 +34,12 @@ void UIButton::Tick()
 	ColorMultiplier = 1.0f;
 	if (UI::HoveredBox == this && !IsHovered)
 	{
-		RedrawUI();
+		RedrawElement();
 		IsHovered = true;
 	}
 	if (IsHovered && UI::HoveredBox != this)
 	{
-		RedrawUI();
+		RedrawElement();
 		IsHovered = false;
 	}
 	if (CurrentScrollObject != nullptr)
@@ -54,7 +54,7 @@ void UIButton::Tick()
 	if (IsPressed && UI::HoveredBox != this && !UIScrollBox::IsDraggingScrollBox)
 	{
 		IsPressed = false;
-		RedrawUI();
+		RedrawElement();
 		if (CanBeDragged && ParentUI)
 		{
 			Application::ButtonEvents.insert(ButtonEvent(nullptr, ParentUI, ButtonIndex, true));
@@ -69,7 +69,7 @@ void UIButton::Tick()
 			ColorMultiplier = 0.5f;
 			if (!IsPressed)
 			{
-				RedrawUI();
+				RedrawElement();
 				IsPressed = true;
 			}
 		}
@@ -77,7 +77,7 @@ void UIButton::Tick()
 		{
 			OnClicked();
 			IsPressed = false;
-			RedrawUI();
+			RedrawElement();
 		}
 	}
 }

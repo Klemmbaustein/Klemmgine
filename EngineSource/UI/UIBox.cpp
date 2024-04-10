@@ -26,6 +26,7 @@ namespace UI
 }
 
 std::vector<ScrollObject*> UIBox::ScrollObjects;
+std::vector<UIBox::RedrawBox> UIBox::RedrawBoxes;
 
 std::string UIBox::GetAsString()
 {
@@ -94,6 +95,7 @@ UIBox::~UIBox()
 	UI::ElementsToUpdate.erase(this);
 	if (Parent)
 	{
+		Parent->RedrawElement();
 		for (int i = 0; i < Parent->Children.size(); i++)
 		{
 			if (Parent->Children[i] == this)
@@ -101,6 +103,10 @@ UIBox::~UIBox()
 				Parent->Children.erase(Parent->Children.begin() + i--);
 			}
 		}
+	}
+	else
+	{
+		RedrawElement();
 	}
 }
 
@@ -197,6 +203,7 @@ void UIBox::InitUI()
 			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, UI::UITextures[i], 0
 		);
 	}
+	RedrawUI();
 }
 
 unsigned int* UIBox::GetUITextures()
@@ -205,7 +212,10 @@ unsigned int* UIBox::GetUITextures()
 }
 void UIBox::RedrawUI()
 {
-	UI::RequiresRedraw = true;
+	RedrawArea(RedrawBox{
+		.Min = -1,
+		.Max = 1,
+		});
 }
 
 void UIBox::ClearUI()
@@ -333,6 +343,10 @@ UIBox* UIBox::SetPosition(Vector2 NewPosition)
 
 Vector2 UIBox::GetPosition()
 {
+	if (CurrentScrollObject)
+	{
+		return OffsetPosition + Vector2(0, CurrentScrollObject->Percentage);
+	}
 	return OffsetPosition;
 }
 
@@ -401,6 +415,72 @@ bool UIBox::GetTryFill()
 {
 	return TryFill;
 }
+	
+static UIBox::RedrawBox CombineBoxes(const UIBox::RedrawBox& BoxA, const UIBox::RedrawBox& BoxB)
+{
+	return UIBox::RedrawBox{
+		.Min = Vector2::Min(BoxA.Min, BoxB.Min),
+		.Max = Vector2::Max(BoxA.Max, BoxB.Max),
+	};
+}
+
+void UIBox::RedrawElement()
+{
+	RedrawArea(RedrawBox{
+		.Min = GetPosition(),
+		.Max = GetPosition() + GetUsedSize(),
+	});
+}
+
+void UIBox::RedrawArea(RedrawBox Box)
+{
+	// Do nto redraw the element if it's position has not yet been initialized.
+	// It will be redrawn once the position has been set anyways.
+	if (std::isnan(Box.Min.X) || std::isnan(Box.Min.Y)
+		|| std::isnan(Box.Max.X) || std::isnan(Box.Max.Y))
+	{
+		return;
+	}
+
+	UI::RequiresRedraw = true;
+	RedrawBox* CurrentBox = &Box;
+	size_t CurrentBoxIndex = SIZE_MAX;
+
+	if (RedrawBoxes.size() > 8)
+	{
+		RedrawBoxes.clear();
+		RedrawUI();
+	}
+
+	for (size_t i = 0; i < RedrawBoxes.size(); i++)
+	{
+		RedrawBox& IteratedBox = RedrawBoxes[i];
+
+		if (IteratedBox.Min == Box.Min && IteratedBox.Max == Box.Max)
+		{
+			return;
+		}
+
+		if (RedrawBox::IsBoxOverlapping(*CurrentBox, IteratedBox))
+		{
+			// If 2 overlapping redraw areas are given, we combine them to avoid redrawing the same area twice.
+			IteratedBox = CombineBoxes(*CurrentBox, IteratedBox);
+
+			if (CurrentBoxIndex != SIZE_MAX)
+			{
+				RedrawBoxes.erase(RedrawBoxes.begin() + CurrentBoxIndex);
+				i--;
+			}
+			CurrentBox = &IteratedBox;
+			CurrentBoxIndex = i;
+		}
+	}
+
+	if (CurrentBoxIndex == SIZE_MAX)
+	{
+		RedrawBoxes.push_back(Box);
+	}
+}
 
 void UIBox::Update()
 {
@@ -451,23 +531,23 @@ void UIBox::UpdateScale()
 	{
 		c->UpdateScale();
 	}
-	Size = 0;
+	Vector2 NewSize = 0;
 	for (auto c : Children)
 	{
 		if (ChildrenOrientation == Orientation::Horizontal)
 		{
-			Size.X += c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y;
+			NewSize.X += c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y;
 			if (!c->TryFill)
 			{
-				Size.Y = std::max(Size.Y, c->Size.Y + c->UpPadding + c->DownPadding);
+				NewSize.Y = std::max(NewSize.Y, c->Size.Y + c->UpPadding + c->DownPadding);
 			}
 		}
 		else
 		{
-			Size.Y += c->Size.Y + c->UpPadding + c->DownPadding;
+			NewSize.Y += c->Size.Y + c->UpPadding + c->DownPadding;
 			if (!c->TryFill)
 			{
-				Size.X = std::max(Size.X, c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y);
+				NewSize.X = std::max(NewSize.X, c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y);
 			}
 		}
 	}
@@ -476,11 +556,11 @@ void UIBox::UpdateScale()
 	{
 		if (Parent->ChildrenOrientation == Orientation::Horizontal)
 		{
-			Size.Y = Parent->Size.Y - (UpPadding + DownPadding);
+			NewSize.Y = Parent->Size.Y - (UpPadding + DownPadding);
 		}
 		else
 		{
-			Size.X = Parent->Size.X - (GetLeftRightPadding(this).X + GetLeftRightPadding(this).Y);
+			NewSize.X = Parent->Size.X - (GetLeftRightPadding(this).X + GetLeftRightPadding(this).Y);
 		}
 	}
 
@@ -492,8 +572,16 @@ void UIBox::UpdateScale()
 		AdjustedMinSize.X /= Graphics::AspectRatio;
 		AdjustedMaxSize.X /= Graphics::AspectRatio;
 	}
+	NewSize = NewSize.Clamp(AdjustedMinSize, AdjustedMaxSize);
 
-	Size = Size.Clamp(AdjustedMinSize, AdjustedMaxSize);
+	if (NewSize != Size)
+	{
+		RedrawArea(RedrawBox{
+			.Min = GetPosition(),
+			.Max = GetPosition() + Vector2::Max(Size, NewSize),
+			});
+		Size = NewSize;
+	}
 	for (auto c : Children)
 	{
 		c->UpdateScale();
@@ -506,7 +594,7 @@ void UIBox::UpdatePosition()
 
 	if (!Parent)
 	{
-		OffsetPosition = Position;
+		SetOffsetPosition(Position);
 	}
 	
 	Align PrimaryAlign = ChildrenOrientation == Orientation::Horizontal ? HorizontalBoxAlign : VerticalBoxAlign;
@@ -531,12 +619,12 @@ void UIBox::UpdatePosition()
 		{
 			if (ChildrenOrientation == Orientation::Horizontal)
 			{
-				c->OffsetPosition = OffsetPosition + Vector2(Size.X / 2 - ChildrenSize / 2 + GetLeftRightPadding(c).X, c->GetVerticalOffset());
+				c->SetOffsetPosition(OffsetPosition + Vector2(Size.X / 2 - ChildrenSize / 2 + GetLeftRightPadding(c).X, c->GetVerticalOffset()));
 				Offset += c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y;
 			}
 			else
 			{
-				c->OffsetPosition = OffsetPosition + Vector2(c->GetHorizontalOffset(), Size.Y / 2 - ChildrenSize / 2 + c->DownPadding);
+				c->SetOffsetPosition(OffsetPosition + Vector2(c->GetHorizontalOffset(), Size.Y / 2 - ChildrenSize / 2 + c->DownPadding));
 				Offset += c->Size.Y + c->DownPadding + c->UpPadding;
 			}
 		}
@@ -546,11 +634,11 @@ void UIBox::UpdatePosition()
 			{	
 				if (PrimaryAlign == Align::Reverse)
 				{
-					c->OffsetPosition = OffsetPosition + Vector2(Size.X - Offset - c->Size.X - GetLeftRightPadding(c).Y, c->GetVerticalOffset());
+					c->SetOffsetPosition(OffsetPosition + Vector2(Size.X - Offset - c->Size.X - GetLeftRightPadding(c).Y, c->GetVerticalOffset()));
 				}
 				else
 				{
-					c->OffsetPosition = OffsetPosition + Vector2(Offset + GetLeftRightPadding(c).X, c->GetVerticalOffset());
+					c->SetOffsetPosition(OffsetPosition + Vector2(Offset + GetLeftRightPadding(c).X, c->GetVerticalOffset()));
 				}
 				Offset += c->Size.X + GetLeftRightPadding(c).X + GetLeftRightPadding(c).Y;
 			}
@@ -558,11 +646,11 @@ void UIBox::UpdatePosition()
 			{
 				if (PrimaryAlign == Align::Reverse)
 				{
-					c->OffsetPosition = OffsetPosition + Vector2(c->GetHorizontalOffset(), Size.Y - Offset - c->Size.Y - c->UpPadding);
+					c->SetOffsetPosition(OffsetPosition + Vector2(c->GetHorizontalOffset(), Size.Y - Offset - c->Size.Y - c->UpPadding));
 				}
 				else
 				{
-					c->OffsetPosition = OffsetPosition + Vector2(c->GetHorizontalOffset(), Offset + c->DownPadding);
+					c->SetOffsetPosition(OffsetPosition + Vector2(c->GetHorizontalOffset(), Offset + c->DownPadding));
 				}
 				Offset += c->Size.Y + c->DownPadding + c->UpPadding;
 			}
@@ -577,8 +665,6 @@ void UIBox::UpdatePosition()
 
 void UIBox::InvalidateLayout()
 {
-	UI::RequiresRedraw = true;
-
 	if (Parent)
 	{
 		Parent->InvalidateLayout();
@@ -636,8 +722,8 @@ void UIBox::DrawAllUIElements()
 	{
 		if (elem->IsVisible != elem->PrevIsVisible)
 		{
-			UI::RequiresRedraw = true;
 			elem->PrevIsVisible = elem->IsVisible;
+			elem->RedrawElement();
 		}
 		if (!elem->Parent)
 		{
@@ -652,29 +738,79 @@ void UIBox::DrawAllUIElements()
 			elem->Tick();
 		}
 	}
-	if (UI::RequiresRedraw)
+	
+	if (!UI::ElementsToUpdate.empty())
 	{
-		UI::RequiresRedraw = false;
 		for (UIBox* elem : UI::ElementsToUpdate)
 		{
 			elem->UpdateSelfAndChildren();
 		}
 		UI::ElementsToUpdate.clear();
+	}
+
+	if (UI::RequiresRedraw)
+	{
+		UI::RequiresRedraw = false;
 		glViewport(0, 0, (size_t)Graphics::WindowResolution.X, (size_t)Graphics::WindowResolution.Y);
 		glEnable(GL_BLEND);
 		glDisable(GL_DEPTH_TEST);
+		glEnable(GL_SCISSOR_TEST);
 		glBindFramebuffer(GL_FRAMEBUFFER, UI::UIBuffer);
 		glClearColor(0, 0, 0, 0);
-		glClear(GL_COLOR_BUFFER_BIT);
-		for (UIBox* elem : UI::UIElements)
+		for (auto& i : RedrawBoxes)
 		{
-			if (!elem->Parent)
+			i.Min = i.Min.Clamp(-1, 1);
+			i.Max = i.Max.Clamp(-1, 1);
+
+			Vector2 Pos = (i.Min / 2 + 0.5f) * Graphics::WindowResolution;
+			Vector2 Res = (i.Max - i.Min) / 2 * Graphics::WindowResolution;
+			glScissor((size_t)Pos.X, (size_t)Pos.Y, (size_t)Res.X + 2, (size_t)Res.Y + 2);
+			glClear(GL_COLOR_BUFFER_BIT);
+			for (UIBox* elem : UI::UIElements)
 			{
-				elem->DrawThisAndChildren();
+				if (!elem->Parent)
+				{
+					elem->DrawThisAndChildren(i);
+				}
 			}
 		}
+		RedrawBoxes.clear();
+		glDisable(GL_SCISSOR_TEST);
 		glClearColor(0, 0, 0, 1);
+		glScissor(0, 0, (size_t)Graphics::WindowResolution.X, (size_t)Graphics::WindowResolution.Y);
 		glViewport(0, 0, (size_t)Graphics::WindowResolution.X, (size_t)Graphics::WindowResolution.Y);
+	}
+}
+
+void UIBox::SetOffsetPosition(Vector2 NewPos)
+{
+	if (NewPos != OffsetPosition)
+	{
+		Vector2 ScreenPos = GetPosition();
+		OffsetPosition = NewPos;
+		Vector2 NewScreenPos = GetPosition();
+		if (std::isnan(ScreenPos.X) || std::isnan(ScreenPos.Y))
+		{
+			ScreenPos = NewScreenPos;
+		}
+
+		RedrawBox Area = RedrawBox{
+			.Min = Vector2::Min(ScreenPos, NewScreenPos),
+			.Max = Vector2::Max(ScreenPos, NewScreenPos) + GetUsedSize(),
+		};
+
+		if (CurrentScrollObject)
+		{
+			if (!RedrawBox::IsBoxOverlapping(Area, RedrawBox{
+				.Min = CurrentScrollObject->Position,
+				.Max = CurrentScrollObject->Position - CurrentScrollObject->Scale
+				}))
+			{
+				return;
+			}
+		}
+
+		RedrawArea(Area);
 	}
 }
 
@@ -717,7 +853,7 @@ Vector2 UIBox::GetLeftRightPadding(UIBox* Target)
 	return Vector2(Target->LeftPadding, Target->RightPadding) / Graphics::AspectRatio;
 }
 
-void UIBox::DrawThisAndChildren()
+void UIBox::DrawThisAndChildren(RedrawBox Area)
 {
 	for (auto c : Children)
 	{
@@ -725,10 +861,17 @@ void UIBox::DrawThisAndChildren()
 	}
 	if (IsVisible)
 	{
-		Draw();
+		if (RedrawBox::IsBoxOverlapping(Area, RedrawBox{
+			.Min = GetPosition(),
+			.Max = GetPosition() + Size
+			}))
+		{
+			Draw();
+		}
+
 		for (auto c : Children)
 		{
-			c->DrawThisAndChildren();
+			c->DrawThisAndChildren(Area);
 		}
 	}
 }
@@ -757,4 +900,11 @@ namespace UI
 	UIBox* HoveredBox = nullptr;
 	UIBox* NewHoveredBox = nullptr;
 }
+
+bool UIBox::RedrawBox::IsBoxOverlapping(const RedrawBox& BoxA, const RedrawBox& BoxB)
+{
+	return (BoxA.Min.X <= BoxB.Max.X && BoxA.Max.X >= BoxB.Min.X) &&
+		(BoxA.Min.Y <= BoxB.Max.Y && BoxA.Max.Y >= BoxB.Min.Y);
+}
+
 #endif

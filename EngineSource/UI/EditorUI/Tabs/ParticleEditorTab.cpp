@@ -148,7 +148,7 @@ void ParticleEditorTab::Tick()
 	PreviewBackground->SetUseTexture(true, PreviewBuffer->GetTextureID());
 	if (PreviewBackground->IsVisibleInHierarchy())
 	{
-		UIBox::RedrawUI();
+		PreviewBackground->RedrawElement();
 	}
 }
 

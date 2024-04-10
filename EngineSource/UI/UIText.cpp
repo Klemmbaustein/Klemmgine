@@ -38,7 +38,7 @@ UIText* UIText::SetOpacity(float NewOpacity)
 	if (Opacity != NewOpacity)
 	{
 		Opacity = NewOpacity;
-		RedrawUI();
+		RedrawElement();
 	}
 	return this;
 }
@@ -100,11 +100,12 @@ void UIText::SetText(ColoredText NewText)
 			if (s.X < Distance)
 			{
 				Update();
-				RedrawUI();
+				RedrawElement();
 				return;
 			}
 		}
 		InvalidateLayout();
+		RedrawElement();
 	}
 }
 

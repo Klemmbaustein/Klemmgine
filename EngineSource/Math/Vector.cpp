@@ -141,6 +141,20 @@ Vector2 Vector2::Clamp(Vector2 Min, Vector2 Max) const
 	return Vector2(NewX, NewY);
 }
 
+Vector2 Vector2::Min(Vector2 A, Vector2 B)
+{
+	float NewX = std::min(A.X, B.X);
+	float NewY = std::min(A.Y, B.Y);
+	return Vector2(NewX, NewY);
+}
+
+Vector2 Vector2::Max(Vector2 A, Vector2 B)
+{
+	float NewX = std::max(A.X, B.X);
+	float NewY = std::max(A.Y, B.Y);
+	return Vector2(NewX, NewY);
+}
+
 float Vector3::Length() const
 {
 	return sqrt(X * X + Y * Y + Z * Z);

@@ -71,7 +71,7 @@ void MeshTab::Tick()
 		if (CameraTransform != PreviousCameraTransform && PanelMainBackground->IsVisible)
 		{
 			CameraTransform = PreviousCameraTransform;
-			UIBox::RedrawUI();
+			PreviewWindow->RedrawUI();
 		}
 	}
 	catch (std::exception& e)

@@ -7,6 +7,7 @@
 #include <Engine/Log.h>
 #include <Rendering/Graphics.h>
 #include <Rendering/Texture/Texture.h>
+#include <Engine/Input.h>
 
 void UIBackground::ScrollTick(Shader* UsedShader)
 {
@@ -65,7 +66,7 @@ UIBackground* UIBackground::SetOpacity(float NewOpacity)
 	if (NewOpacity != Opacity)
 	{
 		Opacity = NewOpacity;
-		RedrawUI();
+		RedrawElement();
 	}
 	return this;
 }
@@ -80,7 +81,7 @@ void UIBackground::SetColor(Vector3 NewColor)
 	if (NewColor != Color)
 	{
 		Color = Vector3::Clamp(NewColor, 0, 1);
-		RedrawUI();
+		RedrawElement();
 	}
 }
 
@@ -105,7 +106,7 @@ UIBackground* UIBackground::SetUseTexture(bool UseTexture, unsigned int TextureI
 	{
 		this->TextureMode = UseTexture ? 1 : 0;
 		this->TextureID = TextureID;
-		RedrawUI();
+		RedrawElement();
 	}
 
 	return this;
@@ -123,7 +124,7 @@ UIBackground* UIBackground::SetUseTexture(bool UseTexture, std::string TextureNa
 	{
 		TextureMode = 0;
 	}
-	RedrawUI();
+	RedrawElement();
 
 	return this;
 }
@@ -158,9 +159,9 @@ void UIBackground::Draw()
 	glBindTexture(GL_TEXTURE_2D, TextureID);
 	BoxVertexBuffer->Bind();
 	ScrollTick(BackgroundShader);
-	glUniform1i(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_texture"), 0);
+	BackgroundShader->SetInt("u_texture", 0);
 	BackgroundShader->SetVector4("u_color", Vector4(Color.X * ColorMultiplier.X, Color.Y * ColorMultiplier.Y, Color.Z * ColorMultiplier.Z, 1.f));
-	glUniform4f(glGetUniformLocation(BackgroundShader->GetShaderID(), "u_transform"), OffsetPosition.X, OffsetPosition.Y, Size.X, Size.Y);
+	BackgroundShader->SetVector4("u_transform", Vector4(OffsetPosition.X, OffsetPosition.Y, Size.X, Size.Y));
 	BackgroundShader->SetFloat("u_opacity", Opacity);
 	BackgroundShader->SetInt("u_borderType", (int)BoxBorder);
 	BackgroundShader->SetFloat("u_borderScale", BorderRadius / 20.0f);

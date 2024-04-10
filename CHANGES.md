@@ -1,5 +1,11 @@
 # Changes
 
+## Version 1.10.5
+
+## Changes
+
+- UI performance improvements.
+
 
 ## Version 1.10.4
 

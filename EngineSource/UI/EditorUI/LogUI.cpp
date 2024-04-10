@@ -97,12 +97,11 @@ void LogUI::Tick()
 		if (LogTexts.size())
 		{
 			// Update positions of everything first
-			UIBox::DrawAllUIElements();
+			LogScrollBox->UpdateSelfAndChildren();
 
 			float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
 			LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.025f, 0.0f);
 			LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025f, 0.0f));
-			UIBox::RedrawUI();
 		}
 	}
 }

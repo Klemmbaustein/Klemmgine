@@ -220,7 +220,6 @@ void InputSubsystem::PollInput()
 				int w, h;
 				SDL_GetWindowSize(Application::Window, &w, &h);
 				Graphics::SetWindowResolution(Vector2((float)w, (float)h));
-				UIBox::RedrawUI();
 			}
 		}
 		else if (Event.type == SDL_MOUSEBUTTONDOWN)

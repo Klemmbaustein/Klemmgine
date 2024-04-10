@@ -56,7 +56,6 @@ void CubemapTab::Tick()
 		if (CameraTransform != PreviousCameraTransform && TabBackground->IsVisible)
 		{
 			CameraTransform = PreviousCameraTransform;
-			UIBox::RedrawUI();
 		}
 	}
 	catch (std::exception& e)

@@ -26,7 +26,7 @@ void UITextField::Tick()
 		size_t Nearest = TextObject->GetNearestLetterAtLocation(Input::MouseLocation);
 		if (!IsHovered)
 		{
-			RedrawUI();
+			RedrawElement();
 		}
 		IsHovered = true;
 		ColorMultiplier = 0.8f;
@@ -50,14 +50,14 @@ void UITextField::Tick()
 			IsEdited = true;
 			if (!IsPressed)
 			{
-				RedrawUI();
+				RedrawElement();
 				IsPressed = true;
 			}
 		}
 		else if (IsPressed && !Dragging)
 		{
 			IsPressed = false;
-			RedrawUI();
+			RedrawElement();
 		}
 	}
 	else
@@ -69,7 +69,7 @@ void UITextField::Tick()
 		if (IsHovered)
 		{
 			IsHovered = false;
-			RedrawUI();
+			RedrawElement();
 		}
 	}
 
@@ -88,7 +88,7 @@ void UITextField::Tick()
 			{
 				Application::ButtonEvents.insert(ButtonEvent(ParentOverride ? ParentOverride : Parent, nullptr, ButtonIndex));
 			}
-			RedrawUI();
+			RedrawElement();
 		}
 		if (!IsHovered && Input::IsLMBDown && !Dragging)
 		{
@@ -99,7 +99,7 @@ void UITextField::Tick()
 			{
 				Application::ButtonEvents.insert(ButtonEvent(ParentOverride ? ParentOverride : Parent, nullptr, ButtonIndex));
 			}
-			RedrawUI();
+			RedrawElement();
 		}
 	}
 	std::string RendererdText = EnteredText;
@@ -114,11 +114,11 @@ void UITextField::Tick()
 			TextFieldTimer = 0;
 			IBeamPosition = EditedTextPos;
 			IBeamScale = Vector2(2.0f / Graphics::WindowResolution.X, 0.075f * TextSize);
-			UIBox::RedrawUI();
+			RedrawElement();
 		}
 		if (!ShowIBeam)
 		{
-			UIBox::RedrawUI();
+			RedrawElement();
 		}
 		ShowIBeam = true;
 	}
@@ -126,7 +126,7 @@ void UITextField::Tick()
 	{
 		if (ShowIBeam)
 		{
-			UIBox::RedrawUI();
+			RedrawElement();
 		}
 		ShowIBeam = false;
 	}
@@ -153,7 +153,7 @@ UITextField* UITextField::SetColor(Vector3 NewColor)
 	if (NewColor != Color)
 	{
 		Color = NewColor;
-		RedrawUI();
+		RedrawElement();
 	}
 	return this;
 }
@@ -176,7 +176,7 @@ void UITextField::Edit()
 	TextInput::Text = EnteredText;
 	IsPressed = false;
 	TextInput::SetTextIndex((int)TextInput::Text.size(), true);
-	RedrawUI();
+	RedrawElement();
 }
 
 UITextField* UITextField::SetText(std::string NewText)

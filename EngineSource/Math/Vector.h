@@ -66,6 +66,8 @@ struct Vector2
 	* Clamps the value between Min and Max.
 	*/
 	Vector2 Clamp(Vector2 Min, Vector2 Max) const;
+	static Vector2 Min(Vector2 A, Vector2 B);
+	static Vector2 Max(Vector2 A, Vector2 B);
 };
 
 /**

@@ -142,7 +142,7 @@ void MaterialTab::Tick()
 		RedrawFrames--;
 		if (RedrawFrames == 0)
 		{
-			UIBox::RedrawUI();
+			PreviewWindow->RedrawElement();
 		}
 	}
 }

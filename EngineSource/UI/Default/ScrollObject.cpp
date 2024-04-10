@@ -43,7 +43,10 @@ void ScrollObject::ScrollUp()
 	{
 		Percentage = MaxScroll;
 	}
-	UIBox::RedrawUI();
+	UIBox::RedrawArea(UIBox::RedrawBox{
+		.Min = Position,
+		.Max = Position - Scale,
+		});
 }
 
 void ScrollObject::ScrollDown()
@@ -58,6 +61,10 @@ void ScrollObject::ScrollDown()
 	}
 	if (Percentage < 0)
 		Percentage = 0;
-	UIBox::RedrawUI();
+
+	UIBox::RedrawArea(UIBox::RedrawBox{
+		.Min = Position,
+		.Max = Position - Scale,
+		});
 }
 #endif

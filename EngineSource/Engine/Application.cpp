@@ -153,7 +153,6 @@ namespace Application
 		int w, h;
 		SDL_GetWindowSize(Window, &w, &h);
 		Graphics::SetWindowResolution(Vector2((float)w, (float)h));
-		UIBox::RedrawUI();
 #endif
 #endif
 	}
