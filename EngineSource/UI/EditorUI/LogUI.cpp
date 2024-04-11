@@ -94,7 +94,7 @@ void LogUI::Tick()
 			LogTexts.push_back((new UIText(LogTextSize, LogMessages.at(i).Color, Text, EditorUI::MonoText)));
 			LogScrollBox->AddChild(LogTexts.at(LogTexts.size() - 1)
 				->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative)
-				->SetPadding(-0.001f));
+				->SetPadding(-0.001f, i == LogMessages.size() - 1 ? 0.015f : -0.001f, 0.001f, 0.001f));
 		}
 		// If NewLogTexts is emtpy too, we skip calculating scroll related stuff.
 		if (LogTexts.size())
