@@ -4,7 +4,7 @@
 
 ## Changes
 
-- UI performance improvements.
+- UI performance improvements. Only the neccesary areas of the screen will be redrawn.
 
 
 ## Version 1.10.4

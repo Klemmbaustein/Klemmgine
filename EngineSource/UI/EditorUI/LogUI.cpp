@@ -40,10 +40,12 @@ void LogUI::OnResized()
 	UpdateLogBoxSize();
 	if (LogTexts.size())
 	{
-		float Offset = (Parent && Parent->ChildrenAlign == ChildrenType::Tabs) ? 0.025f : 0.05f;
+		// Update positions of everything first
+		LogScrollBox->UpdateSelfAndChildren();
+		LogScrollBox->Tick();
+
 		float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
-		LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + Offset, 0.0f);
-		LogScrollBox->SetMaxScroll(std::max(TextDifference + Offset, 0.0f));
+		LogScrollBox->GetScrollObject()->Percentage = LogScrollBox->GetScrollObject()->MaxScroll;
 
 		for (UIText* i : LogTexts)
 		{
@@ -70,7 +72,8 @@ void LogUI::Tick()
 {
 	TickPanel();
 	auto LogMessages = Log::GetMessages();
-	if (LogMessages.size() != PrevLogLength || (LogMessages.size() && PrevAmount != LogMessages.at(LogMessages.size() - 1).Amount))
+	if (LogMessages.size() != PrevLogLength
+	 || (LogMessages.size() && PrevAmount != LogMessages.at(LogMessages.size() - 1).Amount))
 	{
 		PanelMainBackground->UpdateSelfAndChildren();
 		PrevLogLength = LogMessages.size();
@@ -98,10 +101,10 @@ void LogUI::Tick()
 		{
 			// Update positions of everything first
 			LogScrollBox->UpdateSelfAndChildren();
+			LogScrollBox->Tick();
 
 			float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
-			LogScrollBox->GetScrollObject()->Percentage = std::max(TextDifference + 0.025f, 0.0f);
-			LogScrollBox->SetMaxScroll(std::max(TextDifference + 0.025f, 0.0f));
+			LogScrollBox->GetScrollObject()->Percentage = LogScrollBox->GetScrollObject()->MaxScroll;
 		}
 	}
 }

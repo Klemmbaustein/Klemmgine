@@ -2,6 +2,7 @@
 #pragma once
 #include <Math/Vector.h>
 #include <set>
+#include <cmath>
 #include <UI/Default/ScrollObject.h>
 
 class UIScrollBox;
