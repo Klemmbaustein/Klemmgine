@@ -76,7 +76,7 @@ Ensure that all of your models have a material assigned.");
 	SaveData MaterialData = SaveData(File, "", false, false);
 
 	Material Out;
-
+	Out.Name = File;
 	for (auto& i : MaterialData.GetAllFields())
 	{
 		if (i.Name == "VertexShader")
@@ -160,6 +160,7 @@ void Material::ReloadMaterial(std::string MaterialPath)
 		{
 			for (Mesh* i : RenderableModel->Meshes)
 			{
+				std::cout << i->RenderContext.Mat.Name << std::endl;
 				if (i->RenderContext.Mat.Name == MaterialPath)
 				{
 					i->RenderContext = ObjectRenderContext(NewMaterial);

@@ -171,7 +171,6 @@ void ColorPicker::Tick()
 {
 	if (DeleteSoon)
 	{
-
 		ColorPtr->SetValue(SelectedColor);
 		ColorPtr->SendNotifyEvent();
 		delete this;
@@ -232,6 +231,7 @@ void ColorPicker::OnButtonClicked(int Index)
 		return;
 	}
 }
+
 void ColorPicker::GenerateRGBDisplay()
 {
 	RGBBox->DeleteChildren();
@@ -253,7 +253,10 @@ void ColorPicker::GenerateRGBDisplay()
 				->AddChild(RGBTexts[i]
 					->SetPadding(0.01f, 0.01f, 0, 0)));
 	}
+	ColorPickerBackgrounds[0]->RedrawElement();
+	ColorPickerBackgrounds[1]->RedrawElement();
 }
+
 ColorPicker::~ColorPicker()
 {
 	for (auto i : ColorPickerShaders)

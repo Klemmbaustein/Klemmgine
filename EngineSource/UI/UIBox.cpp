@@ -759,7 +759,8 @@ void UIBox::DrawAllUIElements()
 		glClearColor(0, 0, 0, 0);
 		for (auto& i : RedrawBoxes)
 		{
-			i.Max += 2 / Graphics::WindowResolution;
+			i.Max += 3 / Graphics::WindowResolution;
+			i.Min = i.Min - 3 / Graphics::WindowResolution;
 
 			i.Min = i.Min.Clamp(-1, 1);
 			i.Max = i.Max.Clamp(-1, 1);
