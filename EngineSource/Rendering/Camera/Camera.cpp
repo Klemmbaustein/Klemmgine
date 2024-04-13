@@ -38,8 +38,9 @@ void Camera::UpdateRotation()
 
 void Camera::Update()
 {
-	View = glm::lookAt((glm::vec3)Position, (glm::vec3)Position + (glm::vec3)lookAt, (glm::vec3)Up);
-	View = glm::rotate(View, glm::radians(roll), (glm::vec3)Position + (glm::vec3)Up);
+	View = glm::lookAt(glm::vec3(0), (glm::vec3)lookAt, (glm::vec3)Up);
+	View = glm::rotate(View, glm::radians(roll), (glm::vec3)lookAt);
+	View = glm::translate(View, -(glm::vec3)Position);
 
 	ViewProj = Projection * View;
 	Rotation = Vector3(pitch, yaw, roll);
