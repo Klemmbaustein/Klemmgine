@@ -759,12 +759,16 @@ void UIBox::DrawAllUIElements()
 		glClearColor(0, 0, 0, 0);
 		for (auto& i : RedrawBoxes)
 		{
+			i.Max += 2 / Graphics::WindowResolution;
+
 			i.Min = i.Min.Clamp(-1, 1);
 			i.Max = i.Max.Clamp(-1, 1);
 
 			Vector2 Pos = (i.Min / 2 + 0.5f) * Graphics::WindowResolution;
 			Vector2 Res = (i.Max - i.Min) / 2 * Graphics::WindowResolution;
-			glScissor((size_t)Pos.X, (size_t)Pos.Y, (size_t)Res.X + 2, (size_t)Res.Y + 2);
+
+
+			glScissor((GLsizei)Pos.X, (GLsizei)Pos.Y, std::min((GLsizei)Res.X, (GLsizei)Graphics::WindowResolution.X), std::min((GLsizei)Res.Y, (GLsizei)Graphics::WindowResolution.Y));
 			glClear(GL_COLOR_BUFFER_BIT);
 			for (UIBox* elem : UI::UIElements)
 			{

@@ -8,8 +8,10 @@
 #include <Engine/Subsystem/Console.h>
 #include <Engine/Input.h>
 #include <UI/UIText.h>
+#include <Engine/Application.h>
 
 static float LogTextSize = 0.38f;
+static std::vector<UIBox*> LogElements;
 
 void LogUI::UpdateLogBoxSize()
 {
@@ -40,17 +42,38 @@ void LogUI::OnResized()
 	UpdateLogBoxSize();
 	if (LogTexts.size())
 	{
+		for (UIText* i : LogTexts)
+		{
+			i->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative);
+		}
+		ResetScroll();
+	}
+}
+
+void LogUI::PrintUIElement(UIBox* Element)
+{
+	auto AllLogs = EditorUI::GetAllInstancesOf<LogUI>();
+
+	for (LogUI* i : AllLogs)
+	{
+		i->Tick();
+		i->LogScrollBox->AddChild(Element);
+		return;
+	}
+	LogElements.push_back(Element);
+}
+
+void LogUI::ResetScroll()
+{
+	if (LogTexts.size())
+	{
 		// Update positions of everything first
 		LogScrollBox->UpdateSelfAndChildren();
 		LogScrollBox->Tick();
 
 		float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
 		LogScrollBox->GetScrollObject()->Percentage = LogScrollBox->GetScrollObject()->MaxScroll;
-
-		for (UIText* i : LogTexts)
-		{
-			i->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative);
-		}
+		LogScrollBox->RedrawElement();
 	}
 }
 
@@ -72,40 +95,49 @@ void LogUI::Tick()
 {
 	TickPanel();
 	auto LogMessages = Log::GetMessages();
-	if (LogMessages.size() != PrevLogLength
-	 || (LogMessages.size() && PrevAmount != LogMessages.at(LogMessages.size() - 1).Amount))
+	if (LogMessages.size() != PrevLogLength)
 	{
-		PanelMainBackground->UpdateSelfAndChildren();
-		PrevLogLength = LogMessages.size();
-		float PrevPos = 0;
-		if (LogMessages.size())
+		if (!LogTexts.empty())
 		{
-			PrevAmount = LogMessages.at(LogMessages.size() - 1).Amount;
+			LogTexts[LogTexts.size() - 1]->SetPadding(-0.001f, -0.001f, 0.001f, 0.001f);
 		}
-		LogTexts.clear();
-		LogScrollBox->DeleteChildren();
-		for (size_t i = 0; i < LogMessages.size(); i++)
+
+		for (; PrevLogLength < LogMessages.size(); PrevLogLength++)
 		{
-			std::string Text = LogMessages.at(i).Text;
-			if (LogMessages.at(i).Amount >= 1)
+			std::string Text = LogMessages.at(PrevLogLength).Text;
+			if (LogMessages.at(PrevLogLength).Amount >= 1)
 			{
-				Text.append(" (x" + std::to_string(LogMessages.at(i).Amount + 1) + ")");
+				Text.append(" (x" + std::to_string(LogMessages.at(PrevLogLength).Amount + 1) + ")");
 			}
-			LogTexts.push_back((new UIText(LogTextSize, LogMessages.at(i).Color, Text, EditorUI::MonoText)));
+			LogTexts.push_back((new UIText(LogTextSize, LogMessages.at(PrevLogLength).Color, Text, EditorUI::MonoText)));
+
 			LogScrollBox->AddChild(LogTexts.at(LogTexts.size() - 1)
 				->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative)
-				->SetPadding(-0.001f, i == LogMessages.size() - 1 ? 0.015f : -0.001f, 0.001f, 0.001f));
+				->SetPadding(-0.001f, PrevLogLength == LogMessages.size() - 1 ? 0.015f : -0.001f, 0.001f, 0.001f));
+			PrevAmount = LogMessages.at(LogMessages.size() - 1).Amount;
 		}
-		// If NewLogTexts is emtpy too, we skip calculating scroll related stuff.
-		if (LogTexts.size())
-		{
-			// Update positions of everything first
-			LogScrollBox->UpdateSelfAndChildren();
-			LogScrollBox->Tick();
 
-			float TextDifference = LogScrollBox->GetPosition().Y - LogTexts.at(LogTexts.size() - 1)->GetPosition().Y;
-			LogScrollBox->GetScrollObject()->Percentage = LogScrollBox->GetScrollObject()->MaxScroll;
+		if (!LogElements.empty())
+		{
+			for (auto& i : LogElements)
+			{
+				PrintUIElement(i);
+			}
+			LogElements.clear();
 		}
+
+		ResetScroll();
+	}
+	else if (!LogMessages.empty() && PrevAmount != LogMessages.at(LogMessages.size() - 1).Amount)
+	{
+		size_t Last = LogMessages.size() - 1;
+		std::string Text = LogMessages.at(Last).Text;
+		if (LogMessages.at(Last).Amount >= 1)
+		{
+			Text.append(" (x" + std::to_string(LogMessages.at(Last).Amount + 1) + ")");
+		}
+		LogTexts[Last]->SetText(Text);
+		PrevAmount = LogMessages.at(Last).Amount;
 	}
 }
 #endif

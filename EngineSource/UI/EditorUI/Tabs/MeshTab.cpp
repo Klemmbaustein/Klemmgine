@@ -63,20 +63,20 @@ MeshTab::MeshTab(EditorPanel* Parent, std::string File) : EditorTab(Parent, "Mod
 
 void MeshTab::Tick()
 {
-	try
+	PreviewBuffer->FramebufferCamera = PreviewCamera;
+	PreviewWindow->SetUseTexture(true, PreviewBuffer->GetTextureID());
+	Transform PreviousCameraTransform;
+	if (CameraTransform != PreviousCameraTransform && PanelMainBackground->IsVisible)
 	{
-		PreviewBuffer->FramebufferCamera = PreviewCamera;
-		PreviewWindow->SetUseTexture(true, PreviewBuffer->GetTextureID());
-		Transform PreviousCameraTransform;
-		if (CameraTransform != PreviousCameraTransform && PanelMainBackground->IsVisible)
-		{
-			CameraTransform = PreviousCameraTransform;
-			PreviewWindow->RedrawUI();
-		}
+		CameraTransform = PreviousCameraTransform;
 	}
-	catch (std::exception& e)
+	if (RedrawFrames)
 	{
-		Log::Print(e.what());
+		RedrawFrames--;
+		if (RedrawFrames == 0)
+		{
+			PreviewWindow->RedrawElement();
+		}
 	}
 }
 
@@ -241,5 +241,6 @@ void MeshTab::UpdatePreviewModel()
 	PreviewBuffer->ClearContent();
 	PreviewBuffer->UseWith(PreviewModel);
 	PreviewModel->UpdateTransform();
+	RedrawFrames = 3;
 }
 #endif

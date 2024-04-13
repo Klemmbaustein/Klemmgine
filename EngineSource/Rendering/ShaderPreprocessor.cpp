@@ -115,7 +115,6 @@ Preprocessor::ProcessedShader Preprocessor::ParseGLSL(const std::string& Code, s
 				throw "ShaderParseError";
 			}
 			NativeType::NativeType ParamType = GLSLTypes[NextWord];
-			//Params.push_back(Material::Param(CurrentLine.str(), ));
 			std::string Name;
 			CurrentLine >> Name;
 			StrUtil::ReplaceChar(Name, ';', "");

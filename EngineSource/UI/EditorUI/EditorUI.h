@@ -87,13 +87,25 @@ public:
 	template<typename T>
 	static void UpdateAllInstancesOf()
 	{
+		auto All = GetAllInstancesOf<T>();
+		for (T* c : All)
+		{
+			c->OnResized();
+		}
+	}
+
+	template<typename T>
+	static std::vector<T*> GetAllInstancesOf()
+	{
+		std::vector<T*> All;
 		for (UICanvas* c : Graphics::UIToRender)
 		{
 			if (dynamic_cast<T*>(c))
 			{
-				static_cast<T*>(c)->OnResized();
+				All.push_back(static_cast<T*>(c));
 			}
 		}
+		return All;
 	}
 
 	/**

@@ -1,5 +1,12 @@
 # Changes
 
+## Version 1.10.6
+
+## Fixes
+
+- Fixed some isssues that appeared with 1.10.5
+
+
 ## Version 1.10.5
 
 ## Changes

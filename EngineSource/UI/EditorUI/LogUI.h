@@ -20,6 +20,9 @@ public:
 	LogUI(EditorPanel* Parent);
 	void OnResized() override;
 
+	static void PrintUIElement(UIBox* Element);
+	void ResetScroll();
+
 	UITextField* LogPrompt = nullptr;
 	UIScrollBox* LogScrollBox;
 	size_t PrevLogLength = 0;

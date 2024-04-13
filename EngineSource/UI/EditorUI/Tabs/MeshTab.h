@@ -24,6 +24,7 @@ public:
 	virtual ~MeshTab();
 	virtual void OnResized() override;
 protected:
+	int RedrawFrames = 0;
 	void UpdatePreviewModel();
 	Model* PreviewModel = nullptr;
 	ModelGenerator::ModelData ModelData;

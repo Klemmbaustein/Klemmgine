@@ -186,6 +186,7 @@ void MaterialTab::Load(std::string File)
 		}
 
 		GenerateUI();
+		GenerateMaterialProperties();
 	}
 	catch (std::exception& e)
 	{
@@ -439,6 +440,7 @@ void MaterialTab::UpdateModel()
 {
 	Save();
 	PreviewBuffer->ClearContent();
+	PreviewBuffer->Active = true;
 	PreviewModel = nullptr;
 
 	if (!std::filesystem::exists(Filepath))
@@ -457,7 +459,7 @@ void MaterialTab::UpdateModel()
 	PreviewModel->ModelTransform.Rotation.X = Math::PI_F;
 	PreviewBuffer->UseWith(PreviewModel);
 	PreviewModel->UpdateTransform();
-	RedrawFrames = 2;
+	RedrawFrames = 3;
 }
 
 #endif
