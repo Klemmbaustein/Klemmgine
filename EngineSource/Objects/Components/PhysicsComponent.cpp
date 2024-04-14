@@ -12,7 +12,7 @@ void PhysicsComponent::Destroy()
 	if (Body)
 	{
 		SetActive(true);
-		Physics::RemoveBody(Body);
+		Physics::RemoveBody(Body, true);
 		delete Body;
 	}
 }
@@ -31,9 +31,8 @@ void PhysicsComponent::Update()
 
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 
-	if (Body->ColliderMovability == Physics::MotionType::Static)
+	if (Body->ColliderMovability == Physics::MotionType::Static && Active)
 	{
-
 		Transform ComponentTransform = Component::GetWorldTransform();
 		Body->SetPosition(ComponentTransform.Position);
 		Body->SetRotation(ComponentTransform.Rotation);
@@ -213,7 +212,7 @@ void PhysicsComponent::SetActive(bool NewActive)
 	}
 	else
 	{
-		Physics::RemoveBody(Body);
+		Physics::RemoveBody(Body, false);
 	}
 	Active = NewActive;
 }

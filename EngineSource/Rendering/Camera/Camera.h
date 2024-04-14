@@ -5,8 +5,8 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtx/matrix_decompose.hpp"
 
-constexpr float NearPlane = 0.5f;
-constexpr float FarPlane = 10000.f;
+constexpr inline float NearPlane = 0.5f;
+constexpr inline float FarPlane = 10000.f;
 
 class Camera
 {

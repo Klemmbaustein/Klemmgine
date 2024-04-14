@@ -25,7 +25,7 @@ std::array<const char*, 6> SignalTypes =
 
 static void HandleSignal(int SignalID)
 {
-	Error::AssertFailure(SignalTypes[SignalID + 1], "Status: " + Debugging::EngineStatus);
+	Error::AssertFailure("Crash", "Status: " + Debugging::EngineStatus);
 }
 
 void Error::Init()

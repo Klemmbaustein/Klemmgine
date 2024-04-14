@@ -40,6 +40,7 @@ public:
 	bool MeshCastShadow = true;
 
 	bool MeshCastStaticShadow = true;
+	std::vector<std::string> MaterialNames;
 protected:
 	CollisionComponent* MeshCollision = nullptr;
 
@@ -47,5 +48,4 @@ protected:
 	MeshComponent* Mesh = nullptr;
 	std::string PreviousFilename;
 	std::string Filename;
-	std::vector<std::string> MaterialNames;
 };

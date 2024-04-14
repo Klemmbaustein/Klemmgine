@@ -8,7 +8,7 @@ void CollisionComponent::Destroy()
 
 	Collider = nullptr;
 
-	Physics::RemoveBody(m);
+	Physics::RemoveBody(m, true);
 
 	delete m;
 }

@@ -339,7 +339,7 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 	Body->PhysicsSystemBody = &Bodies[BodyID];
 }
 
-void JoltPhysics::RemoveBody(Physics::PhysicsBody* Body)
+void JoltPhysics::RemoveBody(Physics::PhysicsBody* Body, bool Destroy)
 {
 	if (!Body->PhysicsSystemBody)
 	{
@@ -348,7 +348,10 @@ void JoltPhysics::RemoveBody(Physics::PhysicsBody* Body)
 
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
 	JoltBodyInterface->RemoveBody(Info->ID);
-	JoltBodyInterface->DestroyBody(Info->ID);
+	if (Destroy)
+	{
+		JoltBodyInterface->DestroyBody(Info->ID);
+	}
 	Bodies.erase(Info->ID);
 	Info->ID = BodyID();
 }

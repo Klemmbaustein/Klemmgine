@@ -316,7 +316,7 @@ namespace Physics
 	};
 
 	void AddBody(PhysicsBody* Body);
-	void RemoveBody(PhysicsBody* Body);
+	void RemoveBody(PhysicsBody* Body, bool Destroy);
 
 	HitResult RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<WorldObject*> ObjectsToIgnore = {});
 }

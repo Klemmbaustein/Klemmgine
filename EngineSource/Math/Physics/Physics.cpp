@@ -22,9 +22,9 @@ void Physics::AddBody(PhysicsBody* Body)
 	PHYSICS_SYSTEM::RegisterBody(Body);
 }
 
-void Physics::RemoveBody(PhysicsBody* Body)
+void Physics::RemoveBody(PhysicsBody* Body, bool Destroy)
 {
-	PHYSICS_SYSTEM::RemoveBody(Body);
+	PHYSICS_SYSTEM::RemoveBody(Body, Destroy);
 #if !SERVER
 	CollisionVisualize::OnBodyRemoved();
 #endif

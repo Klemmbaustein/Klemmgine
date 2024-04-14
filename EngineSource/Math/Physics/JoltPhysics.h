@@ -17,7 +17,7 @@ namespace JoltPhysics
 	void Init();
 
 	void RegisterBody(Physics::PhysicsBody* Body);
-	void RemoveBody(Physics::PhysicsBody* Body);
+	void RemoveBody(Physics::PhysicsBody* Body, bool Destroy);
 	void CreateShape(Physics::PhysicsBody* Body);
 
 	Vector3 GetBodyPosition(Physics::PhysicsBody* Body);
