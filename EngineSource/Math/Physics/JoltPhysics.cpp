@@ -350,6 +350,7 @@ void JoltPhysics::RemoveBody(Physics::PhysicsBody* Body)
 	JoltBodyInterface->RemoveBody(Info->ID);
 	JoltBodyInterface->DestroyBody(Info->ID);
 	Bodies.erase(Info->ID);
+	Info->ID = BodyID();
 }
 
 void JoltPhysics::CreateShape(Physics::PhysicsBody* Body)
