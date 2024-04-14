@@ -611,7 +611,7 @@ void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position
 	}
 
 	Dropdown->UpdateSelfAndChildren();
-	Dropdown->SetPosition((Dropdown->GetPosition() - Vector2(0, Dropdown->GetUsedSize().Y))
+	Dropdown->SetPosition((Dropdown->GetPosition() - Vector2(0, Dropdown->GetUsedSize().Y * 4))
 		.Clamp(Vector2(-1, -1), Vector2(1 - Dropdown->GetUsedSize().X, 1 - Dropdown->GetUsedSize().Y)));
 }
 

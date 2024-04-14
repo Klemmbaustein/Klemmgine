@@ -23,8 +23,8 @@ namespace SSAO_Impl
 	unsigned int ssaoFBO = 0;
 	unsigned int ssaoColorBuffer = 0;
 	unsigned int ssaoBlurFBO = 0, ssaoColorBufferBlur = 0;
-	float ResolutionDivider = 1.5;
-	unsigned int Samples = 16;
+	float ResolutionDivider = 1.5f;
+	unsigned int Samples = 12;
 	unsigned int SSAOTexture = 0;
 }
 
@@ -88,7 +88,7 @@ unsigned int SSAO::Render(unsigned int NormalBuffer, unsigned int PositionBuffer
 	AOShader->Bind();
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "FullScreen"), 1);
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "kernelSize"), Samples);
-	glUniform1f(glGetUniformLocation(AOShader->GetShaderID(), "radius"), 35);
+	glUniform1f(glGetUniformLocation(AOShader->GetShaderID(), "radius"), 15);
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "gPosition"), 0);
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "gNormal"), 1);
 	glUniform1f(glGetUniformLocation(AOShader->GetShaderID(), "ResDiv"), ResolutionDivider);

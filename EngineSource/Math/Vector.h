@@ -258,10 +258,13 @@ struct Vector3
 	* @param t
 	* The Transform that should be applied to vec.
 	* 
+	* @param Degrees
+	* True if the transform position is in degrees, false if not.
+	* 
 	* @return
 	* Returns Vec, but translated by the transform t.
 	*/
-	static Vector3 TranslateVector(Vector3 Vec, Transform t);
+	static Vector3 TranslateVector(Vector3 Vec, Transform t, bool Degrees = false);
 
 	/**
 	* @brief

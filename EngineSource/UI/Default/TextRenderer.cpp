@@ -102,7 +102,7 @@ constexpr int FONT_MAX_UNICODE_CHARS = 700;
 size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale)
 {
 	float originalScale = Scale;
-	Scale *= 2.5f;
+	Scale *= 5.0f;
 	std::wstring TextString = GetUnicodeString(TextSegment::CombineToString(Text));
 	TextString.append(L" ");
 	float MaxHeight = 0.0f;
@@ -233,7 +233,14 @@ TextRenderer::TextRenderer(std::string filename)
 		{
 			for (int itw = 0; itw < w; itw++)
 			{
-				GlypthBitmap[(ith + ycoord) * FONT_BITMAP_WIDTH + (xcoord + itw)] = bmp[ith * w + itw];
+				int Index = (ith + ycoord) * FONT_BITMAP_WIDTH + (xcoord + itw);
+
+				if (Index > FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH)
+				{
+					break;
+				}
+
+				GlypthBitmap[Index] = bmp[ith * w + itw];
 			}
 		}
 		maxH = std::max(maxH, h);
@@ -281,7 +288,7 @@ TextRenderer::TextRenderer(std::string filename)
 Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, float LengthBeforeWrap)
 {
 	float originalScale = Scale;
-	Scale *= 2.5f;
+	Scale *= 5.0f;
 	FontVertex* vData = fontVertexBufferData;
 	float x = 0.f, y = CharacterSize;
 	float MaxX = 0.0f;
@@ -335,7 +342,7 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 
 Vector2 TextRenderer::GetLetterPosition(ColoredText Text, size_t Index, float Scale, bool Wrapped, float LengthBeforeWrap)
 {
-	Scale *= 2.5f;
+	Scale *= 5.0f;
 	float x = 0.f, y = CharacterSize;
 	size_t Wraps = 0;
 	size_t it = 0;
@@ -415,7 +422,7 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(FontVertex), (const void*)offsetof(FontVertex, color));
 	glBindVertexArray(0);
 
-	Scale *= 2.5f;
+	Scale *= 5.0f;
 	Pos.X = Pos.X * 450 * Graphics::AspectRatio;
 	Pos.Y = Pos.Y * -450;
 	glBindVertexArray(newVAO);

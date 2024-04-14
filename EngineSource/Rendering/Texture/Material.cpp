@@ -128,7 +128,7 @@ void Material::SaveMaterialFile(std::string Path, Material m)
 	MaterialData.SetField(SaveData::Field(NativeType::String, "VertexShader", m.VertexShader));
 	MaterialData.SetField(SaveData::Field(NativeType::String, "FragmentShader", m.FragmentShader));
 	MaterialData.SetField(SaveData::Field(NativeType::Bool, "UseShadowCutout", std::to_string(m.UseShadowCutout)));
-	MaterialData.SetField(SaveData::Field(NativeType::Bool, "IsTranslucent", std::to_string(m.UseShadowCutout)));
+	MaterialData.SetField(SaveData::Field(NativeType::Bool, "IsTranslucent", std::to_string(m.IsTranslucent)));
 
 	for (auto& i : m.Uniforms)
 	{
@@ -160,7 +160,6 @@ void Material::ReloadMaterial(std::string MaterialPath)
 		{
 			for (Mesh* i : RenderableModel->Meshes)
 			{
-				std::cout << i->RenderContext.Mat.Name << std::endl;
 				if (i->RenderContext.Mat.Name == MaterialPath)
 				{
 					i->RenderContext = ObjectRenderContext(NewMaterial);

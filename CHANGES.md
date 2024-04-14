@@ -1,5 +1,14 @@
 # Changes
 
+## Version 1.10.7
+
+## Fixes
+
+- Fixed some bad/incorrect math related to rotations.
+- Fixed an issue where materials wouldn't be saved correctly.
+- Fixed a `GL_INVALID_VALUE` error with UI rendering.
+
+
 ## Version 1.10.6
 
 ## Fixes

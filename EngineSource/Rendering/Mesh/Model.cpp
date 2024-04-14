@@ -169,6 +169,7 @@ void Model::SimpleRender(Shader* UsedShader)
 		glUniformMatrix4fv(glGetUniformLocation(UsedShader->GetShaderID(), "u_model"), 1, GL_FALSE, &MatModel[0][0]);
 		for (Mesh* m : Meshes)
 		{
+			if (m->RenderContext.Mat.IsTranslucent) continue;
 			m->SimpleRender(UsedShader);
 			Performance::DrawCalls++;
 		}

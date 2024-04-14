@@ -6,7 +6,7 @@
 
 void UIText::Tick()
 {
-	Vector2 NewMin = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, WrapDistance);
+	Vector2 NewMin = Renderer->GetTextSize(RenderedText, TextSize, Wrap, WrapDistance);
 	if (TextWidthOverride > 0)
 	{
 		NewMin.X = std::max(MinSize.X, TextWidthOverride);
@@ -94,7 +94,7 @@ void UIText::SetText(ColoredText NewText)
 			{
 				Distance /= Graphics::AspectRatio;
 			}
-			Vector2 s = Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, Distance)
+			Vector2 s = Renderer->GetTextSize(RenderedText, TextSize, Wrap, Distance)
 				/ (15.0f * 60.0f);
 
 			if (s.X < Distance)
@@ -111,7 +111,7 @@ void UIText::SetText(ColoredText NewText)
 
 size_t UIText::GetNearestLetterAtLocation(Vector2 Position)
 {
-	size_t Depth = Renderer->GetCharacterIndexADistance(RenderedText, Position.X - OffsetPosition.X, TextSize * 2);
+	size_t Depth = Renderer->GetCharacterIndexADistance(RenderedText, Position.X - OffsetPosition.X, TextSize);
 	return Depth;
 }
 
@@ -151,7 +151,7 @@ Vector2 UIText::GetLetterLocation(size_t Index)
 	return Renderer->GetLetterPosition(
 		RenderedText,
 		Index,
-		TextSize * 2,
+		TextSize,
 		Wrap,
 		WrapDistance
 	) + OffsetPosition;
@@ -181,13 +181,13 @@ void UIText::Update()
 		{
 			Distance /= Graphics::AspectRatio;
 		}
-		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
-			TextSize * 2, Color, Opacity, Distance);
+		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / (27 / Renderer->CharacterSize)),
+			TextSize, Color, Opacity, Distance);
 	}
 	else
 	{
-		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / 20),
-			TextSize * 2, Color, Opacity, 999);
+		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / (27 / Renderer->CharacterSize)),
+			TextSize, Color, Opacity, 999);
 	}
 }
 
@@ -202,6 +202,6 @@ Vector2 UIText::GetUsedSize()
 	{
 		Distance /= Graphics::AspectRatio;
 	}
-	return Renderer->GetTextSize(RenderedText, TextSize * 2, Wrap, WrapDistance);
+	return Renderer->GetTextSize(RenderedText, TextSize, Wrap, WrapDistance);
 }
 #endif

@@ -316,6 +316,8 @@ public:
 	void RedrawElement();
 	static void RedrawArea(RedrawBox Box);
 
+	UIBox* GetParent();
+
 protected:
 	bool ShouldBeTicked = true;
 	bool TryFill = false;

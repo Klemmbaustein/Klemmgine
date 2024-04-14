@@ -15,7 +15,7 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 	auto Hits = CollisionBody->ShapeCast(
 		Transform(Pos, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X)),
 		Pos + Direction.Normalize() * Distance,
-		Physics::Layer::Static,
+		CollideStatic ? Physics::Layer::Static : Physics::Layer::Dynamic,
 		{ GetParent() }
 	);
 
@@ -74,7 +74,7 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 		auto Hits = CollisionBody->ShapeCast(
 			Transform(TestPos, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X)),
 			TestPos + NewDir,
-			Physics::Layer::Static,
+			CollideStatic ? Physics::Layer::Static : Physics::Layer::Dynamic,
 			{ GetParent() }
 		);
 
@@ -141,7 +141,7 @@ void MoveComponent::Begin()
 		0,
 		ColliderSize,
 		Physics::MotionType::Static,
-		Physics::Layer::Static,
+		CollideStatic ? Physics::Layer::Static : Physics::Layer::Dynamic,
 		this);
 
 	CollisionBodyPtr = CollisionBody;
@@ -210,7 +210,7 @@ void MoveComponent::Update()
 	InputDirection = 0;
 
 	CollisionBody->BodyTransform = Transform(WorldTransform.Position, 0, Vector3(ColliderSize.X, ColliderSize.Y, ColliderSize.X));
-	auto Hits = CollisionBody->CollisionTest(Physics::Layer::Static, { GetParent() });
+	auto Hits = CollisionBody->CollisionTest(CollideStatic ? Physics::Layer::Static : Physics::Layer::Dynamic, { GetParent() });
 	for (auto& h : Hits)
 	{
 		GetParent()->GetTransform().Position += h.Normal * h.Depth;

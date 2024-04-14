@@ -49,7 +49,7 @@ inline static Vec4 ToJPHVec4(const glm::vec4& Vec)
 inline static Quat ToJPHQuat(Vector3 Rot)
 {
 	Rot = Rot.DegreesToRadians();
-	return Quat::sEulerAngles(Vec3(Rot.Z, -Rot.Y, Rot.X));
+	return Quat::sEulerAngles(Vec3(Rot.X, Rot.Y, Rot.Z));
 }
 
 struct PhysicsBodyInfo
@@ -378,7 +378,7 @@ Vector3 JoltPhysics::GetBodyRotation(Physics::PhysicsBody* Body)
 
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
 	Vec3 vec = JoltBodyInterface->GetRotation(Info->ID).GetEulerAngles();
-	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
+	return Vector3(vec.GetX(), vec.GetY(), vec.GetZ()).RadiansToDegrees();
 }
 
 Vector3 JoltPhysics::GetBodyVelocity(Physics::PhysicsBody* Body)
@@ -402,7 +402,7 @@ Vector3 JoltPhysics::GetBodyAngularVelocity(Physics::PhysicsBody* Body)
 
 	PhysicsBodyInfo* Info = static_cast<PhysicsBodyInfo*>(Body->PhysicsSystemBody);
 	Vec3 vec = JoltBodyInterface->GetAngularVelocity(Info->ID);
-	return Vector3(vec.GetZ(), -vec.GetY(), vec.GetX()).RadiansToDegrees();
+	return Vector3(vec.GetX(), vec.GetY(), vec.GetZ()).RadiansToDegrees();
 }
 
 void JoltPhysics::SetBodyPosition(Physics::PhysicsBody* Body, Vector3 NewPosition)

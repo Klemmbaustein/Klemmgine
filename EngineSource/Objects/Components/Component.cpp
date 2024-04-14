@@ -20,9 +20,8 @@ WorldObject* Component::GetParent()
 
 Transform Component::GetWorldTransform()
 {
-	Vector3 InvertedRotation = (GetParent()->GetTransform().Rotation + RelativeTransform.Rotation);
-	InvertedRotation = Vector3(-InvertedRotation.Z, InvertedRotation.Y, -InvertedRotation.X);
-	return Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform()),
-		Vector3() - InvertedRotation.DegreesToRadians(),
+	Vector3 Rot = (GetParent()->GetTransform().Rotation + RelativeTransform.Rotation);
+	return Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform(), true),
+		Rot.DegreesToRadians(),
 		RelativeTransform.Scale * GetParent()->GetTransform().Scale);
 }

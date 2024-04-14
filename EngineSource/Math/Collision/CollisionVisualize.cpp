@@ -217,7 +217,7 @@ void CollisionVisualize::Update()
 	{
 		Vector3 Rotation = i.Body->GetRotation();
 
-		Transform New = Transform(i.Body->GetPosition(), Vector3(Rotation.Z, -Rotation.Y, Rotation.X).DegreesToRadians(), i.Body->BodyTransform.Scale);
+		Transform New = Transform(i.Body->GetPosition(), Vector3(Rotation.X, Rotation.Y, Rotation.Z).DegreesToRadians(), i.Body->BodyTransform.Scale);
 		if (i.Dynamic)
 		{
 			New.Scale = i.ModelObj->ModelTransform.Scale;

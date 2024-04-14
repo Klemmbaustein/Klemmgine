@@ -369,8 +369,12 @@ Vector3 Vector3::RotateVector(Vector3 Vec, Vector3 Rot)
 	return glm::vec3(Transform(0, Rot, 1).ToMatrix() * glm::vec4((glm::vec3)Vec, 1));
 }
 
-Vector3 Vector3::TranslateVector(Vector3 Vec, Transform Transform)
+Vector3 Vector3::TranslateVector(Vector3 Vec, Transform Transform, bool Degrees)
 {
+	if (Degrees)
+	{
+		Transform.Rotation = Transform.Rotation.DegreesToRadians();
+	}
 	return glm::vec3(Transform.ToMatrix() * glm::vec4((glm::vec3)Vec, 1));
 }
 

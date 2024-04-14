@@ -15,6 +15,8 @@ class MoveComponent : public Component
 	bool Jumping = false;
 	void* CollisionBodyPtr = nullptr;
 public:
+	bool CollideStatic = true;
+
 	// Tries to move the object in the given direction.
 	// If "TryAdjust" is "true", it will try to adjust the object's position to one that is more valid.
 	Vector3 TryMove(Vector3 Direction, Vector3 InitialDireciton, Vector3 Pos, bool GravityPass, int Depth = 0);

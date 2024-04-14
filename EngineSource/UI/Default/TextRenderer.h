@@ -38,10 +38,10 @@ private:
 	unsigned int fontTexture;
 	unsigned int fontVao;
 	unsigned int fontVertexBufferId;
-	float CharacterSize = 0;
 	FontVertex* fontVertexBufferData = 0;
 	uint32_t fontVertexBufferCapacity;
 public:
+	float CharacterSize = 0;
 	struct Glyph
 	{
 		Vector2 Size;

@@ -44,12 +44,14 @@ void MaterialTab::OnButtonClicked(int Index)
 	else if (Index == -5)
 	{
 		LoadedMaterial.IsTranslucent = !LoadedMaterial.IsTranslucent;
-		GenerateMaterialProperties();
+		Save();
+		Load(Filepath);
 	}
 	else if (Index == -6)
 	{
 		LoadedMaterial.UseShadowCutout = !LoadedMaterial.UseShadowCutout;
-		GenerateMaterialProperties();
+		Save();
+		Load(Filepath);
 	}
 	else if (Index >= 0)
 	{

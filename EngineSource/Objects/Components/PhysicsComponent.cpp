@@ -11,6 +11,7 @@ void PhysicsComponent::Destroy()
 	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(PhysicsBodyPtr);
 	if (Body)
 	{
+		SetActive(true);
 		Physics::RemoveBody(Body);
 		delete Body;
 	}
