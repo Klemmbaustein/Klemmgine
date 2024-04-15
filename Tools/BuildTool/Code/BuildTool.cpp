@@ -75,10 +75,9 @@ void RecursiveSearch(std::string InLoc, std::vector<ParseFile::Object>& Objects,
 		}
 		else
 		{
-			std::vector<ParseFile::Object> NewObjects = ParseFile::ParseFile(entry.path().string());
+			std::vector<ParseFile::Object> NewObjects = ParseFile::ParseFile(std::filesystem::canonical(entry).string());
 			for (auto& i : NewObjects)
 			{
-				i.Path = RelativePath + "/" + entry.path().filename().string();
 				Objects.push_back(i);
 			}
 		}
@@ -130,7 +129,7 @@ int main(int argc, char** argv)
 	std::vector<ParseFile::Object> Objects;
 	for (const auto& location : InLoc)
 	{
-		RecursiveSearch(location, Objects, location);
+		RecursiveSearch(location, Objects);
 	}
 
 	std::vector<ParseFile::Object> WorldObjects;

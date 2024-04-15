@@ -30,8 +30,8 @@ ProjectGenerator
 ./Tools/bin/BuildTool
 .vscode
 Tools/bin/BuildTool
-Tools/BuildTool/Output/GENERATED
 obj/
 *.tlog
 *.log
 *.obj
+Tools/BuildTool/Output/GENERATED/*
