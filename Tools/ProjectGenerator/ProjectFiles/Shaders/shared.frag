@@ -215,9 +215,8 @@ vec3 GetLightingNormal(vec3 color, float specularstrength, float specularsize, v
 		{
 			vec3 pointLightDir = (u_lights[i].Position - v_position);
 			float LightingIntensity = max(dot(normal, normalize(pointLightDir)), 0);
-			vec3 newLightColor = vec3((u_lights[i].Falloff * 100) - (length(pointLightDir) * length(pointLightDir))) / (u_lights[i].Falloff * 20);
-			newLightColor = pow(newLightColor, vec3(4));
-			newLightColor *= u_lights[i].Color * u_lights[i].Intensity * LightingIntensity / 300.0;
+			vec3 newLightColor = vec3((u_lights[i].Falloff * 100) - (length(pointLightDir) * length(pointLightDir))) / (u_lights[i].Falloff);
+			newLightColor *= (u_lights[i].Color * u_lights[i].Intensity * LightingIntensity) / 200.0;
 			newLightColor = max(newLightColor, 0);
 			lightingColor += newLightColor;
 		}
