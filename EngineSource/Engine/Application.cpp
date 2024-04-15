@@ -382,12 +382,12 @@ static void CreateWindow()
 
 int Application::Initialize(int argc, char** argv)
 {
+	Application::Timer StartupTimer;
 	OS::SetConsoleWindowVisible(true);
 	Assets::ScanForAssets();
 	Application::EditorPath = std::filesystem::current_path().u8string();
 
 	CreateWindow();
-	Application::Timer StartupTimer;
 
 	Error::Init();
 

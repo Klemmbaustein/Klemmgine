@@ -76,13 +76,12 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 
 			for (const auto& entry : std::filesystem::directory_iterator(TargetFolder))
 				std::filesystem::remove_all(entry.path());
-			std::filesystem::create_directories(TargetFolder + "bin");
 			Debugging::EngineStatus = "Build: Copying .dll files";
 			Log::Print("[Build]: Copying .dll files");
 #if _WIN32
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
 			std::filesystem::copy("SDL2_net.dll", TargetFolder + "SDL2_net.dll");
-			std::filesystem::copy("bin/OpenAL32.dll", TargetFolder + "bin/OpenAL32.dll");
+			std::filesystem::copy("bin/OpenAL32.dll", TargetFolder + "/OpenAL32.dll");
 #ifdef ENGINE_CSHARP
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
 #endif
@@ -136,6 +135,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 #if ENGINE_CSHARP
 			if (CSharpInterop::GetUseCSharp())
 			{
+				std::filesystem::create_directories(TargetFolder + "bin");
 				Log::Print("[Build]: Building C# core...");
 				system(("cd " + Application::GetEditorPath() + "/CSharp/Core && dotnet build").c_str());
 				system(("cd " + Application::GetEditorPath() + "/CSharp/Engine && dotnet build").c_str());
