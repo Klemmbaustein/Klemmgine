@@ -23,8 +23,16 @@ std::array<const char*, 6> SignalTypes =
 	"SIGTERM",
 };
 
+static bool Failed = false;
+
 static void HandleSignal(int SignalID)
 {
+	if (Failed)
+	{
+		return;
+	}
+	Failed = true;
+
 	Error::AssertFailure("Crash", "Status: " + Debugging::EngineStatus);
 }
 
