@@ -28,7 +28,14 @@ void WriteIncludeList(std::vector<ParseFile::Object> Objects, std::string Target
 	std::stringstream OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		OutStream << "#include <" << Objects[i].Path << ">" << std::endl;
+		std::string Path = Objects[i].Path;
+
+		if (Path.substr(0, 2) == "./")
+		{
+			Path = Path.substr(2);
+		}
+
+		OutStream << "#include <" << Path << ">" << std::endl;
 	}
 	ParseFile::WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_ObjectIncludes.h");
 }
@@ -71,6 +78,7 @@ void RecursiveSearch(std::string InLoc, std::vector<ParseFile::Object>& Objects,
 			std::vector<ParseFile::Object> NewObjects = ParseFile::ParseFile(entry.path().string());
 			for (auto& i : NewObjects)
 			{
+				i.Path = RelativePath + "/" + entry.path().filename().string();
 				Objects.push_back(i);
 			}
 		}
@@ -122,7 +130,7 @@ int main(int argc, char** argv)
 	std::vector<ParseFile::Object> Objects;
 	for (const auto& location : InLoc)
 	{
-		RecursiveSearch(location, Objects);
+		RecursiveSearch(location, Objects, location);
 	}
 
 	std::vector<ParseFile::Object> WorldObjects;
