@@ -451,7 +451,7 @@ EditorUI::EditorUI()
 	Cursors[6] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_SIZEALL);
 	Cursors[7] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 
-	Console::ConsoleSystem->RegisterCommand(Console::Command("build", []() {new std::thread(Build::TryBuildProject, "Build/"); }, {}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("build", []() {new std::thread(Build::TryBuildProject, "GameBuild/"); }, {}));
 	Console::ConsoleSystem->RegisterCommand(Console::Command("save", EditorUI::SaveCurrentScene, {}));
 #ifdef ENGINE_CSHARP
 	Console::ConsoleSystem->RegisterCommand(Console::Command("reload", EditorUI::RebuildAssembly, {}));

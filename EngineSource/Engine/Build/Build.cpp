@@ -17,7 +17,7 @@ namespace Build
 {
 	std::string GetSystemCommandReturnValue(const std::string& command)
 	{
-		std::system((command + " > temp.txt").c_str());
+		int retval = system((command + " > temp.txt").c_str());
 
 		std::ifstream ifs("temp.txt");
 		std::string ret{ std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>() };
@@ -77,18 +77,13 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			for (const auto& entry : std::filesystem::directory_iterator(TargetFolder))
 				std::filesystem::remove_all(entry.path());
 			Debugging::EngineStatus = "Build: Copying .dll files";
-			Log::Print("[Build]: Copying .dll files");
+			Log::Print("[Build]: Copying binary files");
 #if _WIN32
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
 			std::filesystem::copy("SDL2_net.dll", TargetFolder + "SDL2_net.dll");
 			std::filesystem::copy("bin/OpenAL32.dll", TargetFolder + "/OpenAL32.dll");
 #ifdef ENGINE_CSHARP
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
-#endif
-#else
-			std::filesystem::copy("bin/libSDL2_net.so", TargetFolder + "/libSDL2_net.so");
-#ifdef ENGINE_CSHARP
-			std::filesystem::copy("bin/libnethost.so", TargetFolder + "/libnethost.so");
 #endif
 #endif
 			Debugging::EngineStatus = "Build: Creating folders";
@@ -126,26 +121,44 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			}
 #endif
 #else
+			int ret = 0;
 #if !ENGINE_NO_SOURCE
 			Log::Print("[Build]: Running KlemmBuild...");
-			system("KlemmBuild -DRelease");
+			ret = system("KlemmBuild -DRelease");
+			
+			if (ret)
+			{
+				Log::Print("[Build]: Compile failed", Log::LogColor::Red);
+				return "";
+			}
+
+			for (auto& i : std::filesystem::directory_iterator("bin/Release"))
+			{
+				std::filesystem::copy(
+					i,
+					TargetFolder + "/" + i.path().filename().string(),
+					std::filesystem::copy_options::overwrite_existing
+				);
+			}
+			std::filesystem::rename(TargetFolder + "/Klemmgine-Release", TargetFolder + "/" + Project::ProjectName);
+#else
+			std::filesystem::copy("bin/Release/Klemmgine-Release", TargetFolder + Project::ProjectName);
 #endif
-			std::filesystem::copy("bin/Klemmgine-Release", TargetFolder + Project::ProjectName);
 #endif
 #if ENGINE_CSHARP
 			if (CSharpInterop::GetUseCSharp())
 			{
 				std::filesystem::create_directories(TargetFolder + "bin");
 				Log::Print("[Build]: Building C# core...");
-				system(("cd " + Application::GetEditorPath() + "/CSharp/Core && dotnet build").c_str());
-				system(("cd " + Application::GetEditorPath() + "/CSharp/Engine && dotnet build").c_str());
+				ret = system(("cd " + Application::GetEditorPath() + "/CSharp/Core && dotnet build").c_str());
+				ret = system(("cd " + Application::GetEditorPath() + "/CSharp/Engine && dotnet build").c_str());
 
 				std::filesystem::create_directories(TargetFolder + "/bin/CSharp/Core");
 				std::filesystem::create_directories(TargetFolder + "/bin/CSharp/Engine");
 				std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Core/Build", TargetFolder + "/bin/CSharp/Core");
 				std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build", TargetFolder + "/bin/CSharp/Engine");
 				Log::Print("[Build]: Building game C# assembly...");
-				system("cd Scripts && dotnet build");
+				ret = system("cd Scripts && dotnet build");
 
 				std::filesystem::copy("CSharp/Build/", TargetFolder + "/bin/CSharp");
 

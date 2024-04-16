@@ -19,14 +19,22 @@ cmake -S . -B Build/ || fail
 cd Build
 make -j 4 SDL2_net || fail
 cd ../../assimp/
-cmake CMakeLists.txt || fail
+cmake CMakeLists.txt -DCMAKE_BUILD_TYPE=Release || fail
 make -j 4 assimp || fail
 cd ../JoltPhysics/Build
 # With GCC, JoltPhysics fails to compile with warnings as error due to some uninitialized variables.
 cmake -S . -B Linux_Distribution/ -DCMAKE_BUILD_TYPE=Distribution -DINTERPROCEDURAL_OPTIMIZATION=OFF -DGENERATE_DEBUG_SYMBOLS=OFF || fail
 cd Linux_Distribution
 make -j 4 Jolt || fail
-cd  ../../../..
+cd  ../../../openal-soft
+cmake -S . -B Build/ -DCMAKE_BUILD_TYPE=Release || fail
+cd Build
+make -j 4 || fail
+cd ../../glew-cmake
+cmake -S . -B Build/ -DCMAKE_BUILD_TYPE=Release || fail
+cd Build
+make -j 4 || fail
+cd ../../..
 
 if [ "$is_ci" != 1 ]; then
 	KlemmBuild engine.kbld -DGenerator || fail

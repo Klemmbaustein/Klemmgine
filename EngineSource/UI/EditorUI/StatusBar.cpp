@@ -48,7 +48,7 @@ static std::vector<MenuBarItem> MenuBarItems =
 					Application::EditorInstance->OpenScene(File);
 				}),
 			MenuBarEntry("Save", []() { Application::EditorInstance->SaveCurrentScene(); }, true),
-			MenuBarEntry("Build Project", []() { new BackgroundTask([]() {Build::TryBuildProject("Build/"); }); }, true),
+			MenuBarEntry("Build Project", []() { new BackgroundTask([]() {Build::TryBuildProject("GameBuild/"); }); }, true),
 			MenuBarEntry("Exit", []() { Application::Quit(); })
 		}),
 	MenuBarItem("Edit",

@@ -28,7 +28,11 @@
 #else
       "debug": false,
 #endif
+#if !RELEASE
       "outputPath": "bin",
+#else
+      "outputPath": "bin/Release",
+#endif
       "includes": [
         "Code",
         "../../EngineSource",
@@ -55,10 +59,12 @@
         "SDL2",
         "GL",
         "dl",
+#if !Release
         "../../Dependencies/assimp/bin/assimp",
+#endif
         "../../Dependencies/JoltPhysics/Build/Linux_Distribution/Jolt",
         "dl",
-        "libGLEW.a",
+        "../../Dependencies/glew-cmake/Build/lib/glew",
         "../../Dependencies/openal-soft/Build/openal",
         "../../CSharp/lib/nethost"
       ],
