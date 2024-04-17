@@ -1,5 +1,13 @@
 # Changes
 
+## Version 1.10.8
+
+## Fixes
+
+- Renamed game build output folder to `GameBuild`
+- Improved how builds on linux work.
+
+
 ## Version 1.10.7
 
 ## Fixes
