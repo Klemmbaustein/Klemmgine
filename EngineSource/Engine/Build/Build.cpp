@@ -69,6 +69,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 	{
 		if (std::filesystem::exists(TargetFolder))
 		{
+			int ret = 0;
 			Log::Print("[Build]: -- Starting build --");
 			const auto DirectoryCopyOptions = std::filesystem::copy_options::recursive;
 			Debugging::EngineStatus = "[Build]: Clearing folder";
@@ -121,7 +122,6 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			}
 #endif
 #else
-			int ret = 0;
 #if !ENGINE_NO_SOURCE
 			Log::Print("[Build]: Running KlemmBuild...");
 			ret = system("KlemmBuild -DRelease");
