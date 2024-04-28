@@ -87,6 +87,7 @@ class SettingsPanel : public EditorPanel
 			SettingsCategory::Setting("Graphics:Shadows", NativeType::Bool, "1", [](std::string NewValue)
 			{
 				Graphics::RenderShadows = std::stoi(NewValue);
+				CSM::ReInit();
 			}),
 			SettingsCategory::Setting("Graphics:Shadow Resolution", NativeType::Int, "2000", [](std::string NewValue)
 			{
