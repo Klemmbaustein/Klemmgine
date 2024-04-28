@@ -254,13 +254,13 @@ void BakedLighting::BakeCurrentSceneToFile()
 			NewMesh.MeshData = dynamic_cast<MeshComponent*>(c)->GetModelData();
 			if (!NewMesh.MeshData.CastShadow)
 				continue;
-			Vector3 InvertedRotation = (i->GetTransform().Rotation + c->RelativeTransform.Rotation);
-			InvertedRotation = Vector3(-InvertedRotation.Z, InvertedRotation.Y, -InvertedRotation.X);
-			Transform ModelTransform = (Transform(Vector3::TranslateVector(c->RelativeTransform.Position, i->GetTransform()),
-				Vector3() - InvertedRotation.DegreesToRadians(),
-				c->RelativeTransform.Scale * 0.025f * i->GetTransform().Scale));
 
-			glm::mat4 ModelMatrix = ModelTransform.ToMatrix();
+			Vector3 Rotation = (c->GetParent()->GetTransform().Rotation + c->RelativeTransform.Rotation);
+			Transform t = Transform(Vector3::TranslateVector(c->RelativeTransform.Position, c->GetParent()->GetTransform()),
+				Rotation.DegreesToRadians(),
+				c->RelativeTransform.Scale * c->GetParent()->GetTransform().Scale * 0.025f);
+
+			glm::mat4 ModelMatrix = t.ToMatrix();
 			for (ModelGenerator::ModelData::Element& elem : NewMesh.MeshData.Elements)
 			{
 				for (Vertex& vert : elem.Vertices)
@@ -268,7 +268,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 					vert.Position = ModelMatrix * glm::vec4(vert.Position, 1);
 				}
 			}
-			NewMesh.MeshTransform = ModelTransform;
+			NewMesh.MeshTransform = t;
 			Bake::Meshes.push_back(NewMesh);
 		}
 	}

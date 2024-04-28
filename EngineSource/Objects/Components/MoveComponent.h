@@ -19,7 +19,7 @@ public:
 
 	// Tries to move the object in the given direction.
 	// If "TryAdjust" is "true", it will try to adjust the object's position to one that is more valid.
-	Vector3 TryMove(Vector3 Direction, Vector3 InitialDireciton, Vector3 Pos, bool GravityPass, int Depth = 0);
+	Vector3 TryMove(Vector3 Direction, Vector3 InitialDirection, Vector3 Pos, bool GravityPass, int Depth = 0);
 	Vector2 ColliderSize = Vector2(1.0f, 1.0f);
 	// Returns true if the object is touching the ground, false if not.
 	bool GetIsOnGround() const;

@@ -103,8 +103,8 @@ void UITextField::Tick()
 		}
 	}
 	std::string RendererdText = EnteredText;
-	TextFieldTimer += Performance::DeltaTime;
-	DoubleClickTimer += Performance::DeltaTime;
+	TextFieldTimer += Stats::DeltaTime;
+	DoubleClickTimer += Stats::DeltaTime;
 	Vector2 EditedTextPos = IsEdited ? TextObject->GetLetterLocation(TextInput::TextIndex) : 0;
 
 	if (fmod(TextFieldTimer, 1) < 0.5f && IsEdited)

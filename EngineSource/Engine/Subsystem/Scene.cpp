@@ -82,7 +82,7 @@ void Scene::LoadSceneInternally(std::string FilePath)
 			Objects::AllObjects.at(i)->IsSelected = false;
 		}
 		TextInput::PollForText = false;
-		Debugging::EngineStatus = "Loading Scene";
+		Stats::EngineStatus = "Loading Scene";
 		for (int i = 0; i < Objects::AllObjects.size(); i++)
 		{
 			if (Objects::AllObjects[i] != nullptr)
@@ -202,7 +202,7 @@ void Scene::LoadSceneInternally(std::string FilePath)
 
 void Scene::SaveSceneAs(std::string FilePath, bool Subscene)
 {
-	Debugging::EngineStatus = "Saving Scene";
+	Stats::EngineStatus = "Saving Scene";
 	std::ofstream Output(FilePath + (Subscene ? ".subscn" : ".jscn"), std::ios::out | std::ios::binary);
 	std::vector<WorldObject*> SavedObjects;
 	for (WorldObject* o : Objects::AllObjects)
@@ -264,7 +264,7 @@ void Scene::LoadSubScene(std::string FilePath)
 	}
 	Editor::IsInSubscene = true;
 	TextInput::PollForText = false;
-	Debugging::EngineStatus = "Loading Subscene";
+	Stats::EngineStatus = "Loading Subscene";
 	if (std::filesystem::exists(FilePath))
 	{
 		std::ifstream Input(FilePath, std::ios::in | std::ios::binary);

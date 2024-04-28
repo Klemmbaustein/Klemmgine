@@ -218,7 +218,7 @@ void PostProcess::Draw()
 	glViewport(0, 0, (int)Graphics::WindowResolution.X, (int)Graphics::WindowResolution.Y);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	Debugging::EngineStatus = "Rendering (Post process: Main)";
+	Stats::EngineStatus = "Rendering (Post process: Main)";
 
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, MainPostProcessBuffer);

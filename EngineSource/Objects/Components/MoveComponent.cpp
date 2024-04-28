@@ -6,7 +6,7 @@
 
 #define GET_COLLISION_PTR() Physics::CapsuleBody* CollisionBody = static_cast<Physics::CapsuleBody*>(CollisionBodyPtr)
 
-Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vector3 Pos, bool GravityPass, int Depth)
+Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDirection, Vector3 Pos, bool GravityPass, int Depth)
 {
 	GET_COLLISION_PTR();
 
@@ -111,18 +111,18 @@ Vector3 MoveComponent::TryMove(Vector3 Direction, Vector3 InitialDireciton, Vect
 
 		float Scale = 1 - Vector3::Dot(
 		Vector3(HitNormal.X, 0, HitNormal.Z).Normalize(),
-			Vector3(-InitialDireciton.X, 0, -InitialDireciton.Z).Normalize()
+			Vector3(-InitialDirection.X, 0, -InitialDirection.Z).Normalize()
 		);
 		LeftOver = LeftOver * Scale;
 	}
 
 	if (!GravityPass)
 	{
-		SnapToSurface += HitNormal * Performance::DeltaTime * (HitStep ? 5.0f : 1.0f);
+		SnapToSurface += HitNormal * Stats::DeltaTime * (HitStep ? 5.0f : 1.0f);
 	}
 
 
-	return SnapToSurface + TryMove(LeftOver, InitialDireciton, Pos + SnapToSurface, GravityPass, Depth + 1);
+	return SnapToSurface + TryMove(LeftOver, InitialDirection, Pos + SnapToSurface, GravityPass, Depth + 1);
 }
 
 bool MoveComponent::GetIsOnGround() const
@@ -169,7 +169,7 @@ void MoveComponent::Update()
 
 	float AccelModifier = GroundedTimer ? 1 : AirAccelMultiplier;
 
-	MovementVelocity += Vector2(InputDirection.X, InputDirection.Z) * Performance::DeltaTime * Acceleration * AccelModifier;
+	MovementVelocity += Vector2(InputDirection.X, InputDirection.Z) * Stats::DeltaTime * Acceleration * AccelModifier;
 
 	float InputLength = InputDirection.Length();
 	float MovementLength = MovementVelocity.Length();
@@ -182,24 +182,24 @@ void MoveComponent::Update()
 		}
 		else
 		{
-			MovementLength = std::max(MovementLength - Deceleration * Performance::DeltaTime * AccelModifier, 0.0f);
+			MovementLength = std::max(MovementLength - Deceleration * Stats::DeltaTime * AccelModifier, 0.0f);
 			MovementVelocity = MovementVelocity.Normalize() * MovementLength;
 		}
 	}
 
-	Vector3 MoveDir = Vector3(MovementVelocity.X, 0, MovementVelocity.Y).ProjectToPlane(0, GroundNormal) * Performance::DeltaTime;
+	Vector3 MoveDir = Vector3(MovementVelocity.X, 0, MovementVelocity.Y).ProjectToPlane(0, GroundNormal) * Stats::DeltaTime;
 	GetParent()->GetTransform().Position += TryMove(MoveDir, MoveDir, WorldTransform.Position, false);
 
-	LastMoveSuccessful = MoveDir.Length() / Performance::DeltaTime > 0.1f;
+	LastMoveSuccessful = MoveDir.Length() / Stats::DeltaTime > 0.1f;
 
-	MoveDir = Vector3(0, (std::min(VerticalVelocity, -5.0f) + (Jumping ? JumpHeight : 0)) * Performance::DeltaTime, 0);
+	MoveDir = Vector3(0, (std::min(VerticalVelocity, -5.0f) + (Jumping ? JumpHeight : 0)) * Stats::DeltaTime, 0);
 	Vector3 GravityMovement = TryMove(MoveDir, MoveDir, WorldTransform.Position, true);
 
 	GetParent()->GetTransform().Position += GravityMovement;
 
 	if (GroundedTimer == 0)
 	{
-		VerticalVelocity -= Performance::DeltaTime * Gravity;
+		VerticalVelocity -= Stats::DeltaTime * Gravity;
 	}
 	else
 	{

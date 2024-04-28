@@ -236,7 +236,7 @@ void UIBox::ClearUI()
 
 void UIBox::UpdateUI()
 {
-	Debugging::EngineStatus = "Responding to button events";
+	Stats::EngineStatus = "Responding to button events";
 	for (ButtonEvent b : Application::ButtonEvents)
 	{
 		if (b.c)
@@ -256,7 +256,7 @@ void UIBox::UpdateUI()
 		}
 	}
 	Application::ButtonEvents.clear();
-	Debugging::EngineStatus = "Ticking (UI)";
+	Stats::EngineStatus = "Ticking (UI)";
 	for (int i = 0; i < Graphics::UIToRender.size(); i++)
 	{
 		Graphics::UIToRender[i]->Tick();
@@ -721,7 +721,7 @@ UIBox* UIBox::SetVerticalAlign(Align NewAlign)
 
 void UIBox::DrawAllUIElements()
 {
-	Debugging::EngineStatus = "Rendering (UI)";
+	Stats::EngineStatus = "Rendering (UI)";
 	UI::NewHoveredBox = nullptr;
 
 	for (UIBox* elem : UI::UIElements)

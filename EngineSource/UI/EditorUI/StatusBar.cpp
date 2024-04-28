@@ -194,7 +194,7 @@ void StatusBar::Tick()
 	}
 	StatusBackground->SetColor(EditorUI::UIColors[0] * 0.75f);
 	DisplayedFPS++;
-	FPSUpdateTimer += Performance::DeltaTime;
+	FPSUpdateTimer += Stats::DeltaTime;
 	if ((Input::IsLMBDown && MenuBarDropdown && !MenuBarDropdown->IsHovered()) || Input::IsRMBDown)
 	{
 		for (UIButton* i : MenuBarButtons)

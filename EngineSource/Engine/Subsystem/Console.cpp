@@ -257,8 +257,8 @@ Console::Console()
 
 	RegisterCommand(Command("stats", []()
 		{
-			ConsoleSystem->Print("FPS: " + std::to_string(1.f / Performance::DeltaTime) + ", Delta: " + std::to_string(Performance::DeltaTime));
-			ConsoleSystem->Print("Drawcalls: " + std::to_string(Performance::DrawCalls));
+			ConsoleSystem->Print("FPS: " + std::to_string(1.f / Stats::DeltaTime) + ", Delta: " + std::to_string(Stats::DeltaTime));
+			ConsoleSystem->Print("Drawcalls: " + std::to_string(Stats::DrawCalls));
 		}, {}));
 
 	RegisterCommand(Command("locate", []()
@@ -303,7 +303,7 @@ Console::Console()
 	RegisterConVar(Variable("wireframe", NativeType::Bool, &Graphics::IsWireframe, nullptr));
 	RegisterConVar(Variable("vignette", NativeType::Float, &Graphics::Vignette, nullptr));
 	RegisterConVar(Variable("vsync", NativeType::Bool, &Graphics::VSync, nullptr));
-	RegisterConVar(Variable("timescale", NativeType::Float, &Performance::TimeMultiplier, nullptr));
+	RegisterConVar(Variable("timescale", NativeType::Float, &Stats::TimeMultiplier, nullptr));
 	RegisterConVar(Variable("resolution_scale", NativeType::Float, &Graphics::ResolutionScale, []() 
 		{
 			Graphics::SetWindowResolution(Application::GetWindowSize()); 

@@ -389,27 +389,27 @@ void Viewport::Tick()
 
 		if (Input::IsKeyDown(Input::Key::w))
 		{
-			Graphics::MainCamera->MoveForward(Performance::DeltaTime * MovementSpeed);
+			Graphics::MainCamera->MoveForward(Stats::DeltaTime * MovementSpeed);
 		}
 		if (Input::IsKeyDown(Input::Key::s))
 		{
-			Graphics::MainCamera->MoveForward(Performance::DeltaTime * -MovementSpeed);
+			Graphics::MainCamera->MoveForward(Stats::DeltaTime * -MovementSpeed);
 		}
 		if (Input::IsKeyDown(Input::Key::d))
 		{
-			Graphics::MainCamera->MoveRight(Performance::DeltaTime * MovementSpeed);
+			Graphics::MainCamera->MoveRight(Stats::DeltaTime * MovementSpeed);
 		}
 		if (Input::IsKeyDown(Input::Key::a))
 		{
-			Graphics::MainCamera->MoveRight(Performance::DeltaTime * -MovementSpeed);
+			Graphics::MainCamera->MoveRight(Stats::DeltaTime * -MovementSpeed);
 		}
 		if (Input::IsKeyDown(Input::Key::e))
 		{
-			Graphics::MainCamera->MoveUp(Performance::DeltaTime * MovementSpeed);
+			Graphics::MainCamera->MoveUp(Stats::DeltaTime * MovementSpeed);
 		}
 		if (Input::IsKeyDown(Input::Key::q))
 		{
-			Graphics::MainCamera->MoveUp(Performance::DeltaTime * -MovementSpeed);
+			Graphics::MainCamera->MoveUp(Stats::DeltaTime * -MovementSpeed);
 		}
 	}
 	else

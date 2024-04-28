@@ -90,7 +90,7 @@ void Subsystem::UpdateSubsystems()
 {
 	for (Subsystem* System : LoadedSystems)
 	{
-		Debugging::EngineStatus = "Updating subsystem: " + std::string(System->Name);
+		Stats::EngineStatus = "Updating subsystem: " + std::string(System->Name);
 		System->Update();
 	}
 }

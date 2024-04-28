@@ -116,7 +116,7 @@ void Model::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyP
 			glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_viewpro"), 1, GL_FALSE, &WorldCamera->getViewProj()[0][0]);
 			glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_view"), 1, GL_FALSE, &WorldCamera->getView()[0][0]);
 			Meshes.at(i)->Render(CurrentShader, MainFrameBuffer);
-			Performance::DrawCalls++;
+			Stats::DrawCalls++;
 		}
 	}
 }
@@ -171,7 +171,7 @@ void Model::SimpleRender(Shader* UsedShader)
 		{
 			if (m->RenderContext.Mat.IsTranslucent) continue;
 			m->SimpleRender(UsedShader);
-			Performance::DrawCalls++;
+			Stats::DrawCalls++;
 		}
 	}
 }

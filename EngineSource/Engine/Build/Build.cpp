@@ -72,12 +72,12 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			int ret = 0;
 			Log::Print("[Build]: -- Starting build --");
 			const auto DirectoryCopyOptions = std::filesystem::copy_options::recursive;
-			Debugging::EngineStatus = "[Build]: Clearing folder";
+			Stats::EngineStatus = "[Build]: Clearing folder";
 			Log::Print("[Build]: Clearing folder");
 
 			for (const auto& entry : std::filesystem::directory_iterator(TargetFolder))
 				std::filesystem::remove_all(entry.path());
-			Debugging::EngineStatus = "Build: Copying .dll files";
+			Stats::EngineStatus = "Build: Copying .dll files";
 			Log::Print("[Build]: Copying binary files");
 #if _WIN32
 			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
@@ -87,16 +87,16 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
 #endif
 #endif
-			Debugging::EngineStatus = "Build: Creating folders";
+			Stats::EngineStatus = "Build: Creating folders";
 			Log::Print("[Build]: Creating folders");
 
 			std::filesystem::create_directories(TargetFolder + "/Assets/Content");
 
-			Debugging::EngineStatus = "Build: Packaging shaders";
+			Stats::EngineStatus = "Build: Packaging shaders";
 			Log::Print("[Build]: Packaging shaders");
 			Pack::SaveFolderToPack("Shaders/", TargetFolder + "/Assets/shaders.pack");
 
-			Debugging::EngineStatus = "Build: Copying assets";
+			Stats::EngineStatus = "Build: Copying assets";
 			Log::Print("[Build]: Copying assets");
 			std::filesystem::copy("Content/", TargetFolder + "Assets/Content", DirectoryCopyOptions);
 			std::filesystem::copy("Fonts", TargetFolder + "Assets/");
@@ -104,7 +104,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			{
 				std::filesystem::copy("Locale", TargetFolder + "Assets/Locale");
 			}
-			Debugging::EngineStatus = "Building C++ solution";
+			Stats::EngineStatus = "Building C++ solution";
 #if _WIN32
 
 #if ENGINE_NO_SOURCE

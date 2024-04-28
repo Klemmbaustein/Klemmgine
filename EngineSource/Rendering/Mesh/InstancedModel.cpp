@@ -70,7 +70,7 @@ void InstancedModel::Render(Camera* WorldCamera, bool MainFrameBuffer, bool Tran
 		glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_viewpro"), 1, GL_FALSE, &WorldCamera->getViewProj()[0][0]);
 		glUniformMatrix4fv(glGetUniformLocation(CurrentShader->GetShaderID(), "u_view"), 1, GL_FALSE, &WorldCamera->getView()[0][0]);
 		Meshes.at(i)->Render(CurrentShader, MainFrameBuffer);
-		Performance::DrawCalls++;
+		Stats::DrawCalls++;
 	}
 }
 
@@ -148,6 +148,6 @@ void InstancedModel::SimpleRender(Shader* UsedShader)
 	{
 		m->SimpleRender(UsedShader);
 	}
-	Performance::DrawCalls++;
+	Stats::DrawCalls++;
 }
 #endif

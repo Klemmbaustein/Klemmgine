@@ -116,7 +116,8 @@ void MeshComponent::UpdateTransform()
 		Vector3 InvertedRotation = (GetParent()->GetTransform().Rotation + RelativeTransform.Rotation);
 		InvertedRotation = Vector3(InvertedRotation.Z, InvertedRotation.Y, InvertedRotation.X);
 		MeshModel->ModelTransform = Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform()),
-			Vector3() - InvertedRotation,
+			// Todo: Fix
+			-InvertedRotation,
 			RelativeTransform.Scale * GetParent()->GetTransform().Scale);
 		MeshModel->UpdateTransform();
 	}

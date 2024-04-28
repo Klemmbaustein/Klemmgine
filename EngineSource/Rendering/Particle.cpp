@@ -236,7 +236,7 @@ void Particles::ParticleEmitter::Update(Camera* MainCamera)
 	IsActive = false;
 	for (unsigned int i = 0; i < ParticleElements.size(); i++)
 	{
-		SpawnDelays[i] -= Performance::DeltaTime;
+		SpawnDelays[i] -= Stats::DeltaTime;
 		if (SpawnDelays[i] < 0.0f)
 		{
 			if (ParticleElements[i].SpawnDelay == 0)
@@ -266,9 +266,9 @@ void Particles::ParticleEmitter::Update(Camera* MainCamera)
 		std::vector<ParticleInstance> ParticlesToDelete;
 		for (auto& p : ParticleInstances[elem])
 		{
-			p.Position += p.Velocity * Performance::DeltaTime;
-			p.Velocity += p.Force * Performance::DeltaTime;
-			p.LifeTime -= Performance::DeltaTime;
+			p.Position += p.Velocity * Stats::DeltaTime;
+			p.Velocity += p.Force * Stats::DeltaTime;
+			p.LifeTime -= Stats::DeltaTime;
 			if (p.LifeTime < 0.f)
 			{
 				ParticlesToDelete.push_back(p);

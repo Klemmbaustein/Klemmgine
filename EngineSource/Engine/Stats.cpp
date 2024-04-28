@@ -11,23 +11,13 @@ const bool IsInEditor = IS_IN_EDITOR;
 const bool EngineDebug = ENGINE_DEBUG;
 
 
-namespace Performance
+namespace Stats
 {
 	float DeltaTime;
 	float FPS;
 	float TimeMultiplier = 1;
 	unsigned int DrawCalls = 0;
-}
-
-
-namespace Stats
-{
 	float Time = 0;
-}
-
-
-namespace Debugging
-{
 	std::string EngineStatus;
 }
 

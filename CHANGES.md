@@ -1,5 +1,15 @@
 # Changes
 
+## Version 1.10.9
+
+## Changes
+
+- Merged some namespaces into the `Stats` namespace.
+
+## Fixes
+
+- Fixed the error handler crashing.
+
 ## Version 1.10.8
 
 ## Fixes

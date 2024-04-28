@@ -267,7 +267,7 @@ void Networking::Update()
 {
 #if !SERVER
 	float TickInterval = 1.0f / (float)TICK_RATE;
-	TickTimer += Performance::DeltaTime;
+	TickTimer += Stats::DeltaTime;
 	if (TickTimer > TickInterval)
 	{
 		Gametick += (uint64_t)(TickTimer / TickInterval);

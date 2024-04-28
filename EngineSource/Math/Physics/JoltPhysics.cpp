@@ -479,7 +479,7 @@ void JoltPhysics::SetBodyAngularVelocity(Physics::PhysicsBody* Body, Vector3 New
 void JoltPhysics::Update()
 {
 #if !EDITOR
-	System->Update(Performance::DeltaTime, 1, TempAllocator, JobSystem);
+	System->Update(Stats::DeltaTime, 1, TempAllocator, JobSystem);
 #endif
 }
 

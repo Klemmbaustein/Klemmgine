@@ -114,7 +114,7 @@ void FramebufferObject::Draw()
 	{
 		p->Update(FramebufferCamera);
 	}
-	Debugging::EngineStatus = "Rendering (Framebuffer: Shadows)";
+	Stats::EngineStatus = "Rendering (Framebuffer: Shadows)";
 	FrustumCulling::Active = false;
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
@@ -139,7 +139,7 @@ void FramebufferObject::Draw()
 	FrustumCulling::Active = false;
 	FrustumCulling::CurrentCameraFrustum = FrustumCulling::createFrustumFromCamera(*FramebufferCamera);
 	GetBuffer()->Bind();
-	Debugging::EngineStatus = "Rendering (Framebuffer: Main pass)";
+	Stats::EngineStatus = "Rendering (Framebuffer: Main pass)";
 
 	Vector2 BufferResolution = UseMainWindowResolution ? Graphics::RenderResolution : CustomFramebufferResolution;
 	glViewport(0, 0, (int)BufferResolution.X, (int)BufferResolution.Y);

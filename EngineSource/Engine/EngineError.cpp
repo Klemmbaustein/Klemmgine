@@ -8,19 +8,20 @@
 #include <Engine/Stats.h>
 #include <Engine/Subsystem/LogSubsystem.h>
 #include <array>
+#include <map>
 
 #if __cpp_lib_stacktrace >= 202011L
 #include <stacktrace>
 #endif
 
-std::array<const char*, 6> SignalTypes =
+std::map<int, const char*> SignalTypes =
 {
-	"SIGABRT",
-	"Math error",
-	"Illegal instruction",
-	"SIGINT",
-	"Access violation",
-	"SIGTERM",
+	{SIGABRT, "SIGABRT"},
+	{SIGFPE, "Math error"},
+	{SIGILL, "Illegal instruction"},
+	{SIGINT, "SIGINT"},
+	{SIGSEGV, "Access violation"},
+	{SIGTERM, "SIGTERM"},
 };
 
 static bool Failed = false;
@@ -33,7 +34,7 @@ static void HandleSignal(int SignalID)
 	}
 	Failed = true;
 
-	Error::AssertFailure("Crash", "Status: " + Debugging::EngineStatus);
+	Error::AssertFailure(SignalTypes[SignalID], Stats::EngineStatus);
 }
 
 void Error::Init()
@@ -55,12 +56,7 @@ void Error::AssertFailure(std::string Name, std::string Position)
 
 	PrintStackTrace();
 
-#if _WIN32
 	LogSubsystem::Flush();
-	abort();
-#else
-	throw 0;
-#endif
 	abort();
 }
 

@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-namespace Performance
+namespace Stats
 {
 	extern float DeltaTime;
 	extern float FPS;
@@ -24,7 +24,7 @@ namespace Engine
 	extern std::string VersionString;
 }
 
-namespace Debugging
+namespace Stats
 {
 	extern std::string EngineStatus;
 }

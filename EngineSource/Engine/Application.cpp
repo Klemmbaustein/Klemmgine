@@ -229,14 +229,15 @@ static void GLAPIENTRY MessageCallback(
 		|| type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR
 		|| type == GL_DEBUG_TYPE_PORTABILITY)
 	{
-		Log::Print(std::string(message)  + " - " + Debugging::EngineStatus, Log::LogColor::Red);
+		Log::Print(std::string(message)  + " - " + Stats::EngineStatus, Log::LogColor::Red);
 		SDL_Delay(5);
 	}
 }
 
 
-static void TickObjects()
+static void UpdateObjects()
 {
+	Stats::EngineStatus = "Updating objects";
 	for (size_t i = 0; i < Objects::AllObjects.size(); i++)
 	{
 		Objects::AllObjects.at(i)->Update();
@@ -260,11 +261,11 @@ static void ApplicationLoop()
 #endif
 
 	WorldObject::DestroyMarkedObjects();
-	TickObjects();
+	UpdateObjects();
 	float LogicTime = LogicTimer.Get();
 	const Application::Timer RenderTimer;
 #if !SERVER
-	Debugging::EngineStatus = "Rendering (Framebuffer)";
+	Stats::EngineStatus = "Rendering (Framebuffer)";
 	for (FramebufferObject* Buffer : Graphics::AllFramebuffers)
 	{
 		Buffer->Draw();
@@ -293,28 +294,28 @@ static void ApplicationLoop()
 	Application::SyncTime = SwapTimer.Get();
 	Application::FrameCount++;
 
-	Performance::DeltaTime = FrameTimer.Get();
-	Performance::DeltaTime *= Performance::TimeMultiplier;
-	Performance::FPS = 1 / Performance::DeltaTime;
-	Performance::DeltaTime = std::min(Performance::DeltaTime, 0.1f);
-	Performance::DrawCalls = 0u;
+	Stats::DeltaTime = FrameTimer.Get();
+	Stats::DeltaTime *= Stats::TimeMultiplier;
+	Stats::FPS = 1 / Stats::DeltaTime;
+	Stats::DeltaTime = std::min(Stats::DeltaTime, 0.1f);
+	Stats::DrawCalls = 0u;
 
 #if EDITOR
 	if (!Application::WindowHasFocus())
 	{
-		SDL_Delay(100 - (Uint32)(Performance::DeltaTime * 1000));
+		SDL_Delay(100 - (Uint32)(Stats::DeltaTime * 1000));
 	}
 #endif
 #if SERVER
-	if (Networking::GetTickRate() > Performance::DeltaTime)
+	if (Networking::GetTickRate() > Stats::DeltaTime)
 	{
 		SDL_Delay((Uint32)(1000.0f
-			* 1.0f / (float)Networking::GetTickRate() - Performance::DeltaTime));
+			* 1.0f / (float)Networking::GetTickRate() - Stats::DeltaTime));
 	}
 
-	Performance::DeltaTime = std::max(Performance::DeltaTime, 1.0f / (float)Networking::GetTickRate());
+	Stats::DeltaTime = std::max(Stats::DeltaTime, 1.0f / (float)Networking::GetTickRate());
 #endif
-	Stats::Time += Performance::DeltaTime;
+	Stats::Time += Stats::DeltaTime;
 }
 
 static void CreateWindow()

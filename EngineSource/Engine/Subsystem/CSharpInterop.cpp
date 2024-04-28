@@ -298,7 +298,7 @@ void CSharpInterop::Update()
 		return;
 	}
 
-	CSharpInterop::StaticCall<void, float>(SetDeltaFunction, Performance::DeltaTime);
+	CSharpInterop::StaticCall<void, float>(SetDeltaFunction, Stats::DeltaTime);
 }
 
 std::vector<std::string> CSharpInterop::GetAllClasses()

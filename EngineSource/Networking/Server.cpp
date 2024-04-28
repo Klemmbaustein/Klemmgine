@@ -60,7 +60,7 @@ namespace Server
 				+ ". Target: "
 				+ std::to_string(Networking::GetTickRate())
 				+ ". Delta time: "
-				+ std::to_string(100.0f * Performance::DeltaTime)
+				+ std::to_string(100.0f * Stats::DeltaTime)
 				+ "ms", Log::LogColor::Gray);
 		}
 	}
@@ -279,7 +279,7 @@ bool Server::IsServer()
 void Server::Update()
 {
 	TPS::NewTicksPerSecond++;
-	if (TPS::PerSecondTimer.Get() > 1.0f + Performance::DeltaTime)
+	if (TPS::PerSecondTimer.Get() > 1.0f + Stats::DeltaTime)
 	{
 		TPS::PerSecondTimer.Reset();
 		TPS::TicksPerSecond = TPS::NewTicksPerSecond;
