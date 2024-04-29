@@ -27,7 +27,7 @@ cmake -S . -B Linux_Distribution/ -DCMAKE_BUILD_TYPE=Distribution -DINTERPROCEDU
 cd Linux_Distribution
 make -j 4 Jolt || fail
 cd  ../../../openal-soft
-cmake -S . -B Build/ -DCMAKE_BUILD_TYPE=Release || fail
+cmake -S . -B Build/ -DCMAKE_BUILD_TYPE=Release -DALSOFT_BACKEND_SNDIO=OFF || fail
 cd Build
 make -j 4 || fail
 cd ../../glew-cmake

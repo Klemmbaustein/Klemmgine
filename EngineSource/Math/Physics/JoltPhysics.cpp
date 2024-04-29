@@ -32,6 +32,7 @@ using namespace JPH::literals;
 #include <Engine/Log.h>
 #include <Engine/Stats.h>
 #include <Math/Math.h>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/quaternion.hpp>
 #include <Objects/Components/Component.h>
 #include <glm/mat4x4.hpp>

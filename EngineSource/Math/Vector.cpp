@@ -4,12 +4,13 @@
 #include <iomanip>
 #include <sstream>
 #include <Math/Math.h>
+#include <Engine/EngineError.h>
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glm/gtx/euler_angles.hpp>
 #include "glm/glm.hpp"
 #include "glm/ext.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include <Engine/EngineError.h>
 
 Vector3 operator+(Vector3 a, Vector3 b)
 {

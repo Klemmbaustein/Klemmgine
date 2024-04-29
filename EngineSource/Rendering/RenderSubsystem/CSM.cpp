@@ -155,7 +155,7 @@ glm::mat4 CSM::getLightSpaceMatrix(const float nearPlane, const float farPlane, 
 	{
 		center += glm::vec3(v);
 	}
-	center /= corners.size();
+	center /= (float)corners.size();
 	float SnapSize = farPlane / 5;
 
 	center = Vector3::SnapToGrid(center, SnapSize);

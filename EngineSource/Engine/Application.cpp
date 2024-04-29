@@ -354,9 +354,10 @@ static void CreateWindow()
 	SDL_SetWindowResizable(Application::Window, SDL_TRUE);
 
 	std::cout << "- Starting GLEW - ";
-	if (glewInit() != GLEW_OK)
+	auto GlewStatus = glewContextInit();
+	if (GlewStatus != GLEW_OK)
 	{
-		std::cout << "GLEW Init Error:\n" << glewGetErrorString(glewInit());
+		std::cout << "GLEW Init Error:\n" << glewGetErrorString(GlewStatus);
 		SDL_DestroyWindow(Application::Window);
 		std::cout << "\nPress Enter to continue";
 		std::cin.get();

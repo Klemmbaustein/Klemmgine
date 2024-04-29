@@ -3,7 +3,6 @@
 #include "glm/ext.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
-#include "glm/gtx/matrix_decompose.hpp"
 
 constexpr inline float NearPlane = 0.5f;
 constexpr inline float FarPlane = 10000.f;
