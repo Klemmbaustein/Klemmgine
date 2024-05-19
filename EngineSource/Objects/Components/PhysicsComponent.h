@@ -12,7 +12,6 @@
 class PhysicsComponent : public Component
 {
 public:
-	bool Attached = true;
 	void Begin() override;
 	virtual void Destroy() override;
 	virtual void Update() override;
@@ -57,7 +56,7 @@ public:
 	void CreateCapsule(Transform RelativeTransform, Physics::MotionType CapsuleMovability, Physics::Layer CollisionLayers = Physics::Layer::Dynamic);
 	
 	/// Gets the transform of the simulated physics body, in world space.
-	Transform GetBodyWorldTransform();
+	Transform GetBodyWorldTransform() const;
 
 	/// Sets the position of the physics body, in world space.
 	void SetPosition(Vector3 NewPosition);
@@ -67,9 +66,9 @@ public:
 	void SetScale(Vector3 NewScale);
 
 	/// Gets the velocity of the physics body.
-	Vector3 GetVelocity();
+	Vector3 GetVelocity() const;
 	/// Gets the angular velocity of the physics body.
-	Vector3 GetAngularVelocity();
+	Vector3 GetAngularVelocity() const;
 
 	/// Sets the velocity of the physics body.
 	void SetVelocity(Vector3 NewVelocity);

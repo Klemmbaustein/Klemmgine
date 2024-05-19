@@ -14,10 +14,10 @@ namespace FrustumCulling
 		Frustum frustum;
 		const float halfVSide = zFar * tanf(fovY * .5f);
 		const float halfHSide = halfVSide * aspect;
-		const glm::vec3 frontMultFar = zFar * cam.lookAt;
+		const glm::vec3 frontMultFar = zFar * cam.LookAt;
 
-		frustum.nearFace = { cam.Position + zNear * cam.lookAt, cam.lookAt };
-		frustum.farFace = { cam.Position + frontMultFar, Vector3() - cam.lookAt};
+		frustum.nearFace = { cam.Position + zNear * cam.LookAt, cam.LookAt };
+		frustum.farFace = { cam.Position + frontMultFar, Vector3() - cam.LookAt};
 		frustum.rightFace = { cam.Position, Vector3::Cross(cam.Up, frontMultFar + cam.Right * halfHSide) };
 		frustum.leftFace = { cam.Position, Vector3::Cross(frontMultFar - cam.Right * halfHSide, cam.Up) };
 		frustum.topFace = { cam.Position, Vector3::Cross(cam.Right, frontMultFar - cam.Up * halfVSide) };

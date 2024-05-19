@@ -35,12 +35,12 @@ public:
 
 	void MoveForward(float amount)
 	{
-		Translate(lookAt.Normalize() * amount);
+		Translate(LookAt.Normalize() * amount);
 	}
 
 	void MoveRight(float amount)
 	{
-		Translate(Vector3::Cross(lookAt, Up).Normalize() * amount);
+		Translate(Vector3::Cross(LookAt, Up).Normalize() * amount);
 	}
 	void MoveUp(float Amount)
 	{
@@ -59,7 +59,7 @@ public:
 
 	void ReInit(float FOV, float Width, float Height, bool Ortho = false);
 
-	Vector3 ForwardVectorFromScreenPosition(float x, float y);
+	Vector3 ForwardVectorFromScreenPosition(float x, float y) const;
 
 	void SetView(glm::mat4 NewView)
 	{
@@ -68,17 +68,17 @@ public:
 
 	void SetRotation(Vector3 Rotation)
 	{
-		pitch = Rotation.X;
-		yaw = Rotation.Y;
-		roll = Rotation.Z;
+		Pitch = Rotation.X;
+		Yaw = Rotation.Y;
+		Roll = Rotation.Z;
 	}
 
 	float mouseSensitivity = 0.25;
-	Vector3 lookAt = Vector3(0);
+	Vector3 LookAt = Vector3(0);
 	Vector3 Rotation = 0;
-	float yaw = 0;
-	float pitch = 0;
-	float roll = 0;
+	float Yaw = 0;
+	float Pitch = 0;
+	float Roll = 0;
 	Vector3 Position = Vector3(0.f);
 	Vector3 Right = Vector3(0);
 	Vector3 Up = Vector3(0);

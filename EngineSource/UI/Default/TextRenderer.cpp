@@ -243,6 +243,7 @@ TextRenderer::TextRenderer(std::string filename)
 				GlypthBitmap[Index] = bmp[ith * w + itw];
 			}
 		}
+		free(bmp);
 		maxH = std::max(maxH, h);
 		xcoord += w + FONT_BITMAP_PADDING;
 		LoadedGlyphs.push_back(New);

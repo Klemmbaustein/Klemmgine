@@ -112,8 +112,8 @@ MaterialTab::MaterialTab(EditorPanel* Parent, std::string File) : EditorTab(Pare
 		PreviewBuffer->UseMainWindowResolution = true;
 		PreviewCamera = new Camera(1.7f, 1600, 900);
 		PreviewCamera->Position = Vector3(-6, 8, 6);
-		PreviewCamera->yaw = -45;
-		PreviewCamera->pitch = -45;
+		PreviewCamera->Yaw = -45;
+		PreviewCamera->Pitch = -45;
 		PreviewBuffer->FramebufferCamera = PreviewCamera;
 
 		UpdateModel();

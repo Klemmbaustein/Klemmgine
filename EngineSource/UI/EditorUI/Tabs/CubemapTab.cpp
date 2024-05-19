@@ -27,7 +27,7 @@ CubemapTab::CubemapTab(Vector3* UIColors, TextRenderer* Renderer) : EditorTab(UI
 		PreviewBuffer->UseMainWindowResolution = true;
 		Camera* Cam = new Camera(2, 1600, 900);
 		Cam->Position = glm::vec3(15, 0, 40);
-		Cam->yaw = 90;
+		Cam->Yaw = 90;
 		PreviewBuffer->FramebufferCamera = Cam;
 	}
 	TabBackground->AddChild(TabName);

@@ -775,7 +775,12 @@ void UIBox::DrawAllUIElements()
 			Vector2 Res = (i.Max - i.Min) / 2 * Graphics::WindowResolution;
 
 
-			glScissor((GLsizei)Pos.X, (GLsizei)Pos.Y, std::clamp((GLsizei)Res.X, 0, (GLsizei)Graphics::WindowResolution.X), std::clamp((GLsizei)Res.Y, 0, (GLsizei)Graphics::WindowResolution.Y));
+			glScissor(
+				(GLsizei)Pos.X,
+				(GLsizei)Pos.Y,
+				std::clamp((GLsizei)Res.X, 0, (GLsizei)Graphics::WindowResolution.X),
+				std::clamp((GLsizei)Res.Y, 0, (GLsizei)Graphics::WindowResolution.Y)
+			);
 			glClear(GL_COLOR_BUFFER_BIT);
 			for (UIBox* elem : UI::UIElements)
 			{

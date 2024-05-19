@@ -509,6 +509,7 @@ void BakedLighting::LoadBakeFile(std::string BakeFile)
 	if (!std::filesystem::exists(File))
 	{
 		BakeSystem->Print("Could not find .bkdat file: " + BakeFile);
+		LoadEmpty();
 		return;
 	}
 

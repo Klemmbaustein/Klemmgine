@@ -62,6 +62,7 @@ EditorPopup::EditorPopup(Vector2 Position, Vector2 Scale, std::string Name)
 			->SetMinSize(Scale - Vector2(0, 0.1f))
 			->SetPadding(0))
 		->AddChild(OptionsList
+			->SetHorizontalAlign(UIBox::Align::Reverse)
 			->SetPadding(0));
 
 	RootBox->HasMouseCollision = true;

@@ -24,7 +24,7 @@ void PhysicsComponent::Update()
 		return;
 	}
 
-	if (!Attached)
+	if (!GetParent())
 	{
 		return;
 	}
@@ -109,7 +109,7 @@ void PhysicsComponent::CreateCapsule(Transform RelativeTransform, Physics::Motio
 	SetActive(true);
 }
 
-Transform PhysicsComponent::GetBodyWorldTransform()
+Transform PhysicsComponent::GetBodyWorldTransform() const
 {
 	if (!PhysicsBodyPtr)
 	{
@@ -159,7 +159,7 @@ void PhysicsComponent::SetScale(Vector3 NewScale)
 
 }
 
-Vector3 PhysicsComponent::GetVelocity()
+Vector3 PhysicsComponent::GetVelocity() const
 {
 	if (!PhysicsBodyPtr)
 	{
@@ -169,7 +169,7 @@ Vector3 PhysicsComponent::GetVelocity()
 	return Body->GetVelocity();
 }
 
-Vector3 PhysicsComponent::GetAngularVelocity()
+Vector3 PhysicsComponent::GetAngularVelocity() const
 {
 	if (!PhysicsBodyPtr)
 	{
