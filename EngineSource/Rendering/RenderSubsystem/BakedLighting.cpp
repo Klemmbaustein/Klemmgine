@@ -193,7 +193,7 @@ float BakedLighting::GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float 
 		glm::vec3 pointLightDir = (i.Position - StartPos);
 		float dist = length(pointLightDir);
 		float NewIntensity = std::pow(std::max((i.Falloff * 10.0f) - dist, 0.0f) / (i.Falloff * 10.0f), 16.0f) * i.Intensity * 32.0f;
-		if (NewIntensity > 0.5f)
+		if (NewIntensity > 0.25f)
 		{
 			r = Bake::BakeLine(i.Position, StartPos, true);
 			if (r.Distance && r.Distance < 0.9f)

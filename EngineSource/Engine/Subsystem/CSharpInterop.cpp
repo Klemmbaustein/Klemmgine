@@ -349,12 +349,12 @@ void CSharpInterop::RegisterNativeFunction(std::string Name, void* Function)
 	StaticCall<void, const char*, void*>(RegisterNativeFunctionPtr, Name.c_str(), Function);
 }
 
-void CSharpInterop::ExectuteFunctionOnObject(CSharpWorldObject Object, std::string FunctionName)
+void CSharpInterop::ExecuteFunctionOnObject(CSharpWorldObject Object, std::string FunctionName)
 {
 	StaticCall<void, int32_t, const char*>(ExecuteOnObjectFunction, Object.ID, FunctionName.c_str());
 }
 
-std::string CSharpInterop::ExectuteStringFunctionOnObject(CSharpWorldObject Object, std::string FunctionName)
+std::string CSharpInterop::ExecuteStringFunctionOnObject(CSharpWorldObject Object, std::string FunctionName)
 {
 	return StaticCall<const char*, int32_t, const char*>(ExecuteStringOnObjectFunction, Object.ID, FunctionName.c_str());
 }

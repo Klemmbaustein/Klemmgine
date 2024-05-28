@@ -72,8 +72,8 @@ public:
 	void CSharpLog(std::string Msg, CSharpLogType NativeType, CSharpLogSev Severity = CS_Log_Info);
 	void RegisterNativeFunction(std::string Name, void* Function);
 
-	void ExectuteFunctionOnObject(CSharpWorldObject Object, std::string FunctionName);
-	std::string ExectuteStringFunctionOnObject(CSharpWorldObject Object, std::string FunctionName);
+	void ExecuteFunctionOnObject(CSharpWorldObject Object, std::string FunctionName);
+	std::string ExecuteStringFunctionOnObject(CSharpWorldObject Object, std::string FunctionName);
 
 	std::string GetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName);
 	void SetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName, std::string Value);

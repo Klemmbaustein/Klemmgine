@@ -213,6 +213,46 @@ namespace NativeFunctions
 		Target->Jump();
 	}
 
+	static void MoveComponentSetMoveSpeed(MoveComponent* Target, float Value)
+	{
+		Target->MaxSpeed = Value;
+	}
+
+	static void MoveComponentSetAcceleration(MoveComponent* Target, float Value)
+	{
+		Target->Acceleration = Value;
+	}
+
+	static void MoveComponentSetDeceleration(MoveComponent* Target, float Value)
+	{
+		Target->Deceleration = Value;
+	}
+
+	static void MoveComponentSetGravity(MoveComponent* Target, float Value)
+	{
+		Target->Gravity = Value;
+	}
+
+	static void MoveComponentSetJumpHeight(MoveComponent* Target, float Value)
+	{
+		Target->JumpHeight = Value;
+	}
+
+	static void MoveComponentSetAirAccel(MoveComponent* Target, float Value)
+	{
+		Target->AirAccelMultiplier = Value;
+	}
+
+	static Vector3 MoveComponentGetVelocity(MoveComponent* Target)
+	{
+		return Target->GetVelocity();
+	}
+
+	static bool MoveComponentIsOnGround(MoveComponent* Target)
+	{
+		return Target->GetIsOnGround();
+	}
+
 	static void MovementComponentAddMovementInput(Vector3 Direction, MoveComponent* Target)
 	{
 		Target->AddMovementInput(Direction);
@@ -710,6 +750,14 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(GetCameraFOV);
 	REGISTER_FUNCTION(MovementComponentAddMovementInput);
 	REGISTER_FUNCTION(MovementComponentJump);
+	REGISTER_FUNCTION(MoveComponentSetAcceleration);
+	REGISTER_FUNCTION(MoveComponentSetDeceleration);
+	REGISTER_FUNCTION(MoveComponentGetVelocity);
+	REGISTER_FUNCTION(MoveComponentIsOnGround);
+	REGISTER_FUNCTION(MoveComponentSetGravity);
+	REGISTER_FUNCTION(MoveComponentSetMoveSpeed);
+	REGISTER_FUNCTION(MoveComponentSetJumpHeight);
+	REGISTER_FUNCTION(MoveComponentSetAirAccel);
 	REGISTER_FUNCTION(PhysicsComponentGetTransform);
 	REGISTER_FUNCTION(PhysicsComponentGetVelocity);
 	REGISTER_FUNCTION(PhysicsComponentGetAngularVelocity);

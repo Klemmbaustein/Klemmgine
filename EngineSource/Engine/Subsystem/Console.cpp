@@ -556,7 +556,7 @@ void Console::PrintArguments(std::vector<Command::Argument> args, ErrorLevel Sev
 
 void Console::Update()
 {
-	// On linux this seems to cause issues where the application completely feezes
+	// On linux this seems to cause issues where the application completely freezes
 #if _WIN32
 	std::deque<std::string> ConsoleCommands;
 	{
@@ -567,8 +567,11 @@ void Console::Update()
 		}
 	}
 
+
 	for (auto& i : ConsoleCommands)
 	{
+		std::cout << i << std::endl;
+
 		Console::ExecuteConsoleCommand(i);
 	}
 #endif

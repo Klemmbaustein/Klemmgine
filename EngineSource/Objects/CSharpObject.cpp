@@ -25,9 +25,9 @@ void CSharpObject::Update()
 		return;
 	}
 
-	CSharpInterop::CSharpSystem->ExectuteFunctionOnObject(CS_Obj, "UpdateComponents");
+	CSharpInterop::CSharpSystem->ExecuteFunctionOnObject(CS_Obj, "UpdateComponents");
 #if !EDITOR
-	CSharpInterop::CSharpSystem->ExectuteFunctionOnObject(CS_Obj, "Update");
+	CSharpInterop::CSharpSystem->ExecuteFunctionOnObject(CS_Obj, "Update");
 #endif
 }
 
@@ -51,7 +51,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 	CS_Obj = CSharpInterop::CSharpSystem->InstantiateObject(CSharpClass, GetTransform(), this);
 	if (CS_Obj.ID)
 	{
-		auto LoadedProperties = StrUtil::SeperateString(CSharpInterop::CSharpSystem->ExectuteStringFunctionOnObject(CS_Obj, "GetEditorProperties"), ';');
+		auto LoadedProperties = StrUtil::SeperateString(CSharpInterop::CSharpSystem->ExecuteStringFunctionOnObject(CS_Obj, "GetEditorProperties"), ';');
 
 		if (!DeleteParameters)
 		{
@@ -63,7 +63,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 				}
 			}
 		}
-		CSharpInterop::CSharpSystem->ExectuteFunctionOnObject(CS_Obj, "Begin");
+		CSharpInterop::CSharpSystem->ExecuteFunctionOnObject(CS_Obj, "Begin");
 		size_t it = 1;
 		for (const std::string& i : LoadedProperties)
 		{

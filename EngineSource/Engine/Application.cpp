@@ -249,8 +249,8 @@ static void ApplicationLoop()
 {
 	const Application::Timer FrameTimer;
 	const Application::Timer LogicTimer;
-#if !SERVER
 	Subsystem::UpdateSubsystems();
+#if !SERVER
 	CameraShake::Tick();
 #endif
 #if !EDITOR

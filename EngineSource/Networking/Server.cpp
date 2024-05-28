@@ -106,7 +106,7 @@ namespace Server
 
 		if (ShouldQuitOnPlayerDisconnect && Clients.empty())
 		{
-			exit(0);
+			Application::Quit();
 		}
 	}
 }
