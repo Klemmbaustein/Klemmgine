@@ -1,6 +1,6 @@
 #pragma once
 #include <UI/UIBackground.h>
-#include <UI/Default/UICanvas.h>
+#include <UI/UICanvas.h>
 
 class TextRenderer;
 class UIText;
@@ -46,7 +46,7 @@ public:
 	* @brief
 	* Takes keyboard focus to let the user input text.
 	* 
-	* This functions the same as clickin on the field.
+	* This functions the same as clicking on the field.
 	*/
 	void Edit();
 	bool GetIsEdited() const { return IsEdited; }

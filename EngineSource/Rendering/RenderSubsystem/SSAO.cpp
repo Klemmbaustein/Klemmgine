@@ -15,11 +15,10 @@
 namespace SSAO_Impl
 {
 	std::uniform_real_distribution<float> randomFloats(0.0, 1.0); // random floats between [0.0, 1.0]
-	std::default_random_engine generator;
 	std::vector<glm::vec3> ssaoKernel;
 	std::vector<glm::vec3> ssaoNoise;
 	Shader* AOShader = nullptr;
-	unsigned int noiseTexture = 0;
+	unsigned int NoiseTexture = 0;
 	unsigned int ssaoFBO = 0;
 	unsigned int ssaoColorBuffer = 0;
 	unsigned int ssaoBlurFBO = 0, ssaoColorBufferBlur = 0;
@@ -31,16 +30,18 @@ namespace SSAO_Impl
 SSAO::SSAO()
 {
 	using namespace SSAO_Impl;
+	std::default_random_engine ssaoRandom;
+
 	Name = "SSAO";
 	for (unsigned int i = 0; i < Samples; ++i)
 	{
 		glm::vec3 sample(
-			randomFloats(generator) * 2.0 - 1.0,
-			randomFloats(generator) * 2.0 - 1.0,
-			randomFloats(generator)
+			randomFloats(ssaoRandom) * 2.0 - 1.0,
+			randomFloats(ssaoRandom) * 2.0 - 1.0,
+			randomFloats(ssaoRandom)
 		);
 		sample = glm::normalize(sample);
-		sample *= randomFloats(generator);
+		sample *= randomFloats(ssaoRandom);
 		float scale = (float)i / Samples;
 		scale = std::lerp(0.1f, 1.0f, scale * scale);
 		sample *= scale;
@@ -49,14 +50,14 @@ SSAO::SSAO()
 	for (unsigned int i = 0; i < 16; ++i)
 	{
 		glm::vec3 noise(
-			randomFloats(generator) * 2.0 - 1.0,
-			randomFloats(generator) * 2.0 - 1.0,
+			randomFloats(ssaoRandom) * 2.0 - 1.0,
+			randomFloats(ssaoRandom) * 2.0 - 1.0,
 			0.0f);
 		ssaoNoise.push_back(noise);
 	}
 
-	glGenTextures(1, &noiseTexture);
-	glBindTexture(GL_TEXTURE_2D, noiseTexture);
+	glGenTextures(1, &NoiseTexture);
+	glBindTexture(GL_TEXTURE_2D, NoiseTexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, 4, 4, 0, GL_RGB, GL_FLOAT, &ssaoNoise[0]);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -84,7 +85,7 @@ unsigned int SSAO::Render(unsigned int NormalBuffer, unsigned int PositionBuffer
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, NormalBuffer);
 	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, noiseTexture);
+	glBindTexture(GL_TEXTURE_2D, NoiseTexture);
 	AOShader->Bind();
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "FullScreen"), 1);
 	glUniform1i(glGetUniformLocation(AOShader->GetShaderID(), "kernelSize"), Samples);

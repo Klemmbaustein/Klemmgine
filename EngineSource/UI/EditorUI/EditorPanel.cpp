@@ -9,6 +9,7 @@
 #include <UI/UIScrollBox.h>
 #include <Engine/Application.h>
 #include <Engine/EngineError.h>
+#include "EditorDropdown.h"
 
 bool EditorPanel::IsDraggingHorizontal = true;
 float EditorPanel::StartPosition = 0.0f;
@@ -200,16 +201,16 @@ bool EditorPanel::TickPanelInternal()
 
 	if (Input::IsRMBClicked && UI::HoveredBox && (UI::HoveredBox->IsChildOf(TabList) || (Parent && UI::HoveredBox->IsChildOf(Parent->TabList))))
 	{
-		std::vector<EditorUI::DropdownItem> OptionsList;
+		std::vector<EditorDropdown::DropdownItem> OptionsList;
 		if (Parent && Parent->Children.size() > 1 && Parent->ChildrenAlign == ChildrenType::Vertical)
 		{
-			OptionsList.push_back(EditorUI::DropdownItem(Collapsed ? "Expand" : "Collapse", []() {
+			OptionsList.push_back(EditorDropdown::DropdownItem(Collapsed ? "Expand" : "Collapse", []() {
 				DropdownPanel->Collapse();
 				}));
 		}
 		if (CanBeClosed)
 		{
-			OptionsList.push_back(EditorUI::DropdownItem("Close", []() {
+			OptionsList.push_back(EditorDropdown::DropdownItem("Close", []() {
 				delete DropdownPanel;
 				DropdownPanel = nullptr; 
 				}));
@@ -218,7 +219,7 @@ bool EditorPanel::TickPanelInternal()
 		if (!OptionsList.empty())
 		{
 			DropdownPanel = this;
-			Application::EditorInstance->ShowDropdownMenu(
+			new EditorDropdown(
 				{
 					OptionsList
 				}, Input::MouseLocation);

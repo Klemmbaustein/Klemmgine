@@ -444,6 +444,9 @@ void BakedLighting::BakeCurrentSceneToFile()
 
 		BakeLog("Encoded voxels: " + std::to_string(TotalLength));
 
+		BakeSystem->Print("Finished baking lightmap for " + Scene::CurrentScene);
+		BakeSystem->Print(" -> " + BakFile);
+
 		delete[] Bake::Texture;
 		Bake::Meshes.clear();
 		BakedLighting::FinishedBaking = true;

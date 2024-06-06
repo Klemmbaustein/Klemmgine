@@ -20,22 +20,13 @@
 #include <Engine/Subsystem/BackgroundTask.h>
 #include <Engine/Subsystem/Scene.h>
 
-#include <UI/Default/UICanvas.h>
 #include <UI/UIBox.h>
-#include <UI/Default/TextRenderer.h>
 #include <UI/EditorUI/EditorUI.h>
-#include <UI/EditorUI/Viewport.h>
 #include <UI/Debug/DebugUI.h>
 
-#include <Rendering/Renderable.h>
-#include <Rendering/Shader.h>
 #include <Rendering/Camera/CameraShake.h>
 #include <Rendering/Framebuffer.h>
-#include <Rendering/Mesh/Mesh.h>
 #include <Rendering/Camera/Camera.h>
-#include <Rendering/Camera/FrustumCulling.h>
-#include <Rendering/BillboardSprite.h>
-#include <Rendering/Texture/Texture.h>
 
 #include <Math/Collision/CollisionVisualize.h>
 #include <Math/Collision/Collision.h>
@@ -50,6 +41,7 @@
 #include <iostream>
 #include <thread>
 #include <deque>
+#include <cstdint>
 #include <mutex>
 #include <chrono>
 #include <condition_variable>
@@ -274,9 +266,9 @@ static void ApplicationLoop()
 	UIBox::DrawAllUIElements();
 	float RenderTime = RenderTimer.Get();
 #if !EDITOR && !RELEASE
-	if (!DebugUI::CurrentDebugUI)
+	if (!Debug::DebugUI::CurrentDebugUI)
 	{
-		new DebugUI();
+		new Debug::DebugUI();
 	}
 #endif
 	PostProcess::PostProcessSystem->Draw();
@@ -449,8 +441,7 @@ int Application::Initialize(int argc, char** argv)
 	Project::OnLaunch();
 
 #if EDITOR
-	// Initialize EditorUI
-	Application::EditorInstance = new EditorUI();
+	Subsystem::Load(new EditorUI());
 #endif
 
 	Log::Print("Finished loading. (" + std::to_string(StartupTimer.Get()) + " seconds)", Vector3(1.f, 0.75, 0.f));

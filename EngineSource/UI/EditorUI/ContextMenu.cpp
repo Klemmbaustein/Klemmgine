@@ -38,26 +38,26 @@ UITextField* ContextMenu::GenerateTextField(std::string Content, int Index)
 
 void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index)
 {
-	auto SeperatorBorder = new UIButton(UIBox::Orientation::Horizontal, 0, 0.5f, this, Index);
+	auto SeparatorBorder = new UIButton(UIBox::Orientation::Horizontal, 0, 0.5f, this, Index);
 
 	std::string Prefix = ContextObject ? "OBJ_CAT_" : "SCN_";
 
-	auto SeperatorArrow = new UIBackground(UIBox::Orientation::Horizontal, Vector2(0), EditorUI::UIColors[2], 0.035f);
-	SeperatorArrow->SetPadding(0, 0, 0.005f, 0);
-	SeperatorArrow->SetUseTexture(true,
+	auto SeparatorArrow = new UIBackground(UIBox::Orientation::Horizontal, Vector2(0), EditorUI::UIColors[2], 0.035f);
+	SeparatorArrow->SetPadding(0, 0, 0.005f, 0);
+	SeparatorArrow->SetUseTexture(true,
 		Application::EditorInstance->CollapsedItems.contains(Prefix + Name) ? Application::EditorInstance->Textures[14] : Application::EditorInstance->Textures[13])
 		->SetSizeMode(UIBox::SizeMode::PixelRelative);
-	SeperatorBorder
+	SeparatorBorder
 		->SetVerticalAlign(UIBox::Align::Centered)
-		->AddChild(SeperatorArrow);
+		->AddChild(SeparatorArrow);
 	StrUtil::ReplaceChar(Name, '\n', "");
-	auto SeperatorText = new UIText(0.45f, EditorUI::UIColors[2], Name, EditorUI::Text);
-	SeperatorText->SetPadding(0.005f);
-	SeperatorBorder->SetPadding(0.015f, 0, 0, 0);
-	SeperatorBorder->SetMinSize(Vector2(Scale.X, 0));
-	SeperatorBorder->SetOpacity(0);
-	BackgroundBox->AddChild(SeperatorBorder);
-	SeperatorBorder->AddChild(SeperatorText);
+	auto SeparatorText = new UIText(0.45f, EditorUI::UIColors[2], Name, EditorUI::Text);
+	SeparatorText->SetPadding(0.005f);
+	SeparatorBorder->SetPadding(0.015f, 0, 0, 0);
+	SeparatorBorder->SetMinSize(Vector2(Scale.X, 0));
+	SeparatorBorder->SetOpacity(0);
+	BackgroundBox->AddChild(SeparatorBorder);
+	SeparatorBorder->AddChild(SeparatorText);
 	BackgroundBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], Vector2(Scale.X - 0.005f, 2.0f / Graphics::WindowResolution.Y)))
 		->SetPadding(0, 0.005f, 0.0025f, 0));
 	ContextCategories.push_back(Name);
@@ -136,7 +136,7 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 		return;
 	}
 	return;
-	auto Elements = StrUtil::SeperateString(Value, '\r');
+	auto Elements = StrUtil::SeparateString(Value, '\r');
 	for (auto& i : Elements)
 	{
 		switch (Element.NativeType & ~NativeType::List)
@@ -338,7 +338,7 @@ void ContextMenu::OnButtonClicked(int Index)
 
 				if (ContextSettings[IteratedElement].NativeType & NativeType::List)
 				{
-					auto arr = StrUtil::SeperateString(obj->GetProperty(Element.Name), '\r');
+					auto arr = StrUtil::SeparateString(obj->GetProperty(Element.Name), '\r');
 					std::string Value;
 					for (auto& arrElem : arr)
 					{

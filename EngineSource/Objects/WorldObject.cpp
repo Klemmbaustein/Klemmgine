@@ -270,8 +270,8 @@ void WorldObject::LoadProperties(std::string in)
 					continue;
 				}
 				{
-					std::string CSharpSeperator = "@csharp";
-					if (CurrentProperty.Name.substr(0, CSharpSeperator.size()) == CSharpSeperator)
+					std::string CSharpSeparator = "@csharp";
+					if (CurrentProperty.Name.substr(0, CSharpSeparator.size()) == CSharpSeparator)
 					{
 						Property p = Property(CurrentProperty.Name, CurrentProperty.NativeType, nullptr);
 						p.PType = Property::PropertyType::CSharpProperty;

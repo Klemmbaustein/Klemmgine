@@ -21,29 +21,29 @@ namespace Texture
 		TextureInfo T;
 
 		int it = 0;
-		size_t LastSeperator = TextureInfoString.find_first_of(";");
+		size_t LastSeparator = TextureInfoString.find_first_of(";");
 
 		do
 		{
 			switch (it++)
 			{
 			case 0:
-				T.File = TextureInfoString.substr(0, LastSeperator);
+				T.File = TextureInfoString.substr(0, LastSeparator);
 				break;
 			case 1:
-				T.Filtering = (TextureFiltering)std::stoi(TextureInfoString.substr(0, LastSeperator));
+				T.Filtering = (TextureFiltering)std::stoi(TextureInfoString.substr(0, LastSeparator));
 				break;
 			case 2:
-				T.Wrap = (TextureWrap)std::stoi(TextureInfoString.substr(0, LastSeperator));
+				T.Wrap = (TextureWrap)std::stoi(TextureInfoString.substr(0, LastSeparator));
 				break;
 			default:
 				return T;
 			}
-			if (LastSeperator != std::string::npos)
+			if (LastSeparator != std::string::npos)
 			{
-				TextureInfoString = TextureInfoString.substr(LastSeperator + 1);
+				TextureInfoString = TextureInfoString.substr(LastSeparator + 1);
 			}
-		} while ((LastSeperator = TextureInfoString.find_first_of(";")) != std::string::npos);
+		} while ((LastSeparator = TextureInfoString.find_first_of(";")) != std::string::npos);
 
 		return T;
 	}
@@ -170,7 +170,6 @@ namespace Texture
 				Files[i] = NewFile;
 				continue;
 			}
-			//Log::Print("Error: Couldn't find " + Files[i], Log::LogColor::Red);
 		}
 		unsigned int textureID;
 		glGenTextures(1, &textureID);

@@ -40,9 +40,9 @@ For shaders, I recommend [this Visual Studio extension](https://marketplace.visu
 
   The required workloads are:
 
-  - Desktop developement with C++
+  - Desktop development with C++
 
-  - Desktop developement with C#
+  - Desktop development with C#
 
 - #### How to build
 
@@ -80,7 +80,7 @@ For shaders, I recommend [this Visual Studio extension](https://marketplace.visu
 
 - #### Requirements:
   
-  - The SDL2, OpenAL and GLEW developement libraries.
+  - The SDL2, OpenAL and GLEW development libraries.
     
     With apt: 
     ```sh

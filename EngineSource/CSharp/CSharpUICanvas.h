@@ -1,5 +1,5 @@
 #pragma once
-#include <UI/Default/UICanvas.h>
+#include <UI/UICanvas.h>
 
 class CSharpUICanvas : public UICanvas
 {

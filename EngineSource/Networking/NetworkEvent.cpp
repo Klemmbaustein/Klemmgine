@@ -98,7 +98,7 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 		}
 		Value.append({ (char)Data->Data[i] });
 	}
-	std::vector<std::string> Values = StrUtil::SeperateString(Value, ';');
+	std::vector<std::string> Values = StrUtil::SeparateString(Value, ';');
 	if (Values.empty())
 	{
 		return;

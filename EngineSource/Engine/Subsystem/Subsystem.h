@@ -10,7 +10,7 @@ protected:
 	static bool IsVerbose;
 public:
 
-	static void SetSysemLogVerbose(bool NewIsVerbose);
+	static void SetSystemLogVerbose(bool NewIsVerbose);
 
 	const char* Name = "sys";
 	const char* SystemType = "";

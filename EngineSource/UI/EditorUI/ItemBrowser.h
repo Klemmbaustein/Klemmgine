@@ -3,8 +3,7 @@
 #include <UI/EditorUI/EditorPanel.h>
 #include <UI/UIfwd.h>
 #include <Objects/WorldObject.h>
-#include <UI/EditorUI/EditorUI.h>
-
+#include <UI/EditorUI/EditorDropdown.h>
 
 /**
 * @brief
@@ -18,7 +17,7 @@ class ItemBrowser : public EditorPanel
 {
 	UITextField* PathField = nullptr;
 	bool RMBDown = false;
-	UIBackground* SeperatorLine = nullptr;
+	UIBackground* SeparatorLine = nullptr;
 	UIBox* TopBox = nullptr;
 protected:
 	static ItemBrowser* DropdownBrowser;
@@ -47,8 +46,8 @@ public:
 		bool Openable = true;
 	};
 
-	std::vector<EditorUI::DropdownItem> DefaultDropdown;
-	std::vector<EditorUI::DropdownItem> ContextOptions;
+	std::vector<EditorDropdown::DropdownItem> DefaultDropdown;
+	std::vector<EditorDropdown::DropdownItem> ContextOptions;
 
 	std::string EmptyText = "No items";
 	/**

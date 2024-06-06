@@ -88,7 +88,7 @@ namespace LaunchArgs
 	{
 		if (AdditionalArgs.size())
 			Log::Print("Unexpected arguments in -nostartupinfo", Log::LogColor::Yellow);
-		Subsystem::SetSysemLogVerbose(true);
+		Subsystem::SetSystemLogVerbose(true);
 	}
 
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =

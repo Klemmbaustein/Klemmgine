@@ -51,7 +51,7 @@ void CSharpObject::Reload(bool DeleteParameters)
 	CS_Obj = CSharpInterop::CSharpSystem->InstantiateObject(CSharpClass, GetTransform(), this);
 	if (CS_Obj.ID)
 	{
-		auto LoadedProperties = StrUtil::SeperateString(CSharpInterop::CSharpSystem->ExecuteStringFunctionOnObject(CS_Obj, "GetEditorProperties"), ';');
+		auto LoadedProperties = StrUtil::SeparateString(CSharpInterop::CSharpSystem->ExecuteStringFunctionOnObject(CS_Obj, "GetEditorProperties"), ';');
 
 		if (!DeleteParameters)
 		{

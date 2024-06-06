@@ -1,7 +1,7 @@
 #pragma once
 #if EDITOR
 #include "UI/UIBackground.h"
-#include "UI/Default/UICanvas.h"
+#include "UI/UICanvas.h"
 #include <UI/UIfwd.h>
 
 /**

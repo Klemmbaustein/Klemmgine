@@ -4,7 +4,7 @@
 #include <sstream>
 #include <Engine/Log.h>
 #include <Engine/Subsystem/Sound.h>
-#include <UI/Default/UICanvas.h>
+#include <UI/UICanvas.h>
 #include <Engine/File/Assets.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Stats.h>
@@ -44,7 +44,7 @@ std::string Scene::NewLoadedScene;
 Camera* Scene::DefaultCamera = new Camera(2.5f, 1600, 900, false);
 Scene* Scene::SceneSystem = nullptr;
 
-std::string Scene::CurrentScene = "Cotent/Untitled";
+std::string Scene::CurrentScene = "Content/Untitled";
 void Scene::LoadSceneInternally(std::string FilePath)
 {
 	CurrentScene = FilePath;
@@ -91,6 +91,7 @@ void Scene::LoadSceneInternally(std::string FilePath)
 			}
 		}
 		WorldObject::DestroyMarkedObjects();
+		BakedLighting::LoadEmpty();
 
 		Objects::AllObjects.clear();
 #if !SERVER

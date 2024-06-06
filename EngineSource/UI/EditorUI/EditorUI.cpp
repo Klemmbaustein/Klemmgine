@@ -42,6 +42,8 @@ std::vector<unsigned int> EditorUI::Textures;
 std::vector<WorldObject*> EditorUI::SelectedObjects;
 EditorUI::CursorType EditorUI::CurrentCursor = CursorType::Default;
 
+// TODO: Move run-in-editor and C# hotreload stuff into subsystems. (for prettier logging and cleaner code)
+
 Vector3 EditorUI::UIColors[NumUIColors] =
 {
 	Vector3(0.125f, 0.125f, 0.13f),	// Default background
@@ -286,13 +288,13 @@ void EditorUI::SaveCurrentScene()
 {
 	if (Scene::CurrentScene.empty())
 	{
-		Log::Print("Saving scene \"Untitled\"", Vector3(0.3f, 0.4f, 1));
+		Application::EditorInstance->Print("Saving scene \"Untitled\"");
 		Scene::SaveSceneAs("Content/Untitled");
 		Scene::CurrentScene = "Content/Untitled";
 	}
 	else
 	{
-		Log::Print("Saving scene \"" + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene) + "\"", Vector3(0.3f, 0.4f, 1));
+		Application::EditorInstance->Print("Saving scene \"" + FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene) + "\"");
 		Scene::SaveSceneAs(Scene::CurrentScene);
 	}
 	ChangedScene = false;
@@ -368,7 +370,7 @@ void EditorUI::SetUseLightMode(bool NewLightMode)
 		}
 		std::swap(Application::EditorInstance->UIColors, Editor::NewUIColors);
 		Editor::LightMode = NewLightMode;
-		Log::Print("Toggled light mode", Log::LogColor::Yellow);
+		Application::EditorInstance->Print("Toggled light mode", Subsystem::ErrorLevel::Warn);
 	}
 	UIBox::ForceUpdateUI();
 }
@@ -409,6 +411,7 @@ void EditorUI::CreateFile(std::string Path, std::string Name, std::string Ext)
 EditorUI::EditorUI()
 {
 	Application::EditorInstance = this;
+	Name = "UISystem";
 	Text = new TextRenderer(Application::GetEditorPath() + "/EditorContent/EditorFont.ttf");
 	MonoText = new TextRenderer(Application::GetEditorPath() + "/EditorContent/EditorMonospace.ttf");
 	Input::CursorVisible = true;
@@ -461,6 +464,10 @@ EditorUI::EditorUI()
 #endif
 }
 
+EditorUI::~EditorUI()
+{
+}
+
 void(*QuitFunction)();
 
 void EditorUI::OnLeave(void(*ReturnF)())
@@ -475,7 +482,6 @@ void EditorUI::OnLeave(void(*ReturnF)())
 				EditorPopup::PopupOption("No", ReturnF),
 				EditorPopup::PopupOption("Cancel", nullptr)
 			});
-		
 	}
 	else
 	{
@@ -483,13 +489,13 @@ void EditorUI::OnLeave(void(*ReturnF)())
 	}
 }
 
-void EditorUI::Tick()
+void EditorUI::Update()
 {
 	EditorPanel::TickPanels();
 #ifdef ENGINE_CSHARP
 	if (Editor::CanHotreload == true)
 	{
-		Log::Print("Finished building assembly. Hotreloading .dll file.", Log::LogColor::Yellow);
+		Application::EditorInstance->Print("Finished building assembly. Hotreloading .dll file.", Subsystem::ErrorLevel::Info);
 		CSharpInterop::CSharpSystem->ReloadCSharpAssembly();
 		for (UICanvas* c : Graphics::UIToRender)
 		{
@@ -552,12 +558,6 @@ void EditorUI::Tick()
 	}
 	CurrentCursor = CursorType::Default;
 
-	if (Input::IsLMBDown && Dropdown && !Dropdown->IsHovered())
-	{
-		delete Dropdown;
-		Dropdown = nullptr;
-	}
-
 	if (DraggedItem)
 	{
 		DraggedItem->SetPosition(Input::MouseLocation - DraggedItem->GetUsedSize() / 2);
@@ -581,38 +581,6 @@ void EditorUI::Tick()
 	{
 		Editor::IsSavingScene = false;
 	}
-}
-
-void EditorUI::ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position)
-{
-	if (Dropdown)
-	{
-		delete Dropdown;
-	}
-	CurrentDropdown = Menu;
-	Dropdown = new UIBox(UIBox::Orientation::Vertical, Position);
-	auto Background = new UIBackground(UIBox::Orientation::Vertical, 0, Vector3::Lerp(EditorUI::UIColors[0], EditorUI::UIColors[2], 0.5f), 0);
-	Dropdown->AddChild(Background
-		->SetPadding(0));
-
-	for (size_t i = 0; i < Menu.size(); i++)
-	{
-		float PaddingSize = 2.0f / Graphics::WindowResolution.Y;
-		bool Upper = i == 0;
-		bool Lower = i == Menu.size() - 1 || Menu[i].Seperator;
-
-		float Horizontal = 2.0f / Graphics::WindowResolution.X;
-
-		Background->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 1.5f, this, (int)i))
-			->SetPadding(PaddingSize * (float)Upper, PaddingSize * (float)Lower, Horizontal, Horizontal)
-			->SetMinSize(Vector2(0.15f, 0))
-			->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Menu[i].Title, EditorUI::Text))
-				->SetPadding(0.005f)));
-	}
-
-	Dropdown->UpdateSelfAndChildren();
-	Dropdown->SetPosition((Dropdown->GetPosition() - Vector2(0, Dropdown->GetUsedSize().Y * 4))
-		.Clamp(Vector2(-1, -1), Vector2(1 - Dropdown->GetUsedSize().X, 1 - Dropdown->GetUsedSize().Y)));
 }
 
 void EditorUI::OnObjectSelected()
@@ -778,19 +746,6 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 		ListIndex++;
 	}
 	return ObjectList;
-}
-
-void EditorUI::OnButtonClicked(int Index)
-{
-	if (Index >= 0)
-	{
-		if (CurrentDropdown[Index].OnPressed)
-		{
-			CurrentDropdown[Index].OnPressed();
-		}
-		delete Dropdown;
-		Dropdown = nullptr;
-	}
 }
 
 void EditorUI::BakeScene()

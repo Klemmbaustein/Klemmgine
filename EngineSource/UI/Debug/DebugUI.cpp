@@ -14,6 +14,7 @@ namespace Input
 {
 	extern bool BlockInputConsole;
 }
+using namespace Debug;
 
 DebugUI* DebugUI::CurrentDebugUI = nullptr;
 
@@ -38,6 +39,12 @@ DebugUI::DebugUI()
 	LogBackground = new UIBackground(UIBox::Orientation::Vertical, Vector2(-1, -0.94f), 0.05f, Vector2(2, 0.8f));
 	LogBackground->SetOpacity(0.9f);
 	LogBackground->SetVerticalAlign(UIBox::Align::Default);
+
+	AutoComplete = new ConsoleAutoComplete(Text, 0.6f);
+
+	CompleteBackground = new UIBackground(UIBox::Orientation::Vertical, Vector2(-1, -0.94f), 0, Vector2(2, 0.0f));
+
+	CompleteBackground->SetOpacity(0.95f);
 }
 
 bool DebugUI::ConsoleReadInput(Input::Key KeyCode)
@@ -53,6 +60,15 @@ bool DebugUI::ConsoleReadInput(Input::Key KeyCode)
 
 void DebugUI::Tick()
 {
+
+	if (LogPrompt->GetText() != LastCommand)
+	{
+		LastCommand = LogPrompt->GetText();
+
+		AutoComplete->RenderToBox(CompleteBackground, AutoComplete->GetRecommendations(LastCommand));
+	}
+
+
 	auto LogMessages = Log::GetMessages();
 	if (StatsRedrawTimer >= 1)
 	{
@@ -66,7 +82,6 @@ void DebugUI::Tick()
 
 		DebugTexts[2]->SetText(DeltaString);
 		DebugTexts[3]->SetText("DrawCalls: " + std::to_string(Stats::DrawCalls));
-		//DebugTexts[4]->SetText("CollisonMeshes: " + std::to_string(Collision::CollisionBoxes.size()));
 		StatsRedrawTimer = 0;
 		FPS = 0;
 	}
@@ -101,6 +116,8 @@ void DebugUI::Tick()
 DebugUI::~DebugUI()
 {
 	CurrentDebugUI = nullptr;
+	delete AutoComplete;
+	delete CompleteBackground;
 	delete Text;
 }
 void DebugUI::OnButtonClicked(int Index)

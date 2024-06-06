@@ -7,6 +7,7 @@
 #include <Engine/Input.h>
 #include <Engine/Utility/FileUtility.h>
 #include <UI/EditorUI/Popups/RenameBox.h>
+#include <UI/EditorUI/EditorUI.h>
 
 static ItemBrowser::BrowserItem DropdownItem;
 static ItemBrowser::BrowserItem DraggedItem;
@@ -21,9 +22,9 @@ ItemBrowser::ItemBrowser(EditorPanel* Parent, std::string Name) : EditorPanel(Pa
 		->SetTryFill(true)
 		->SetPadding(0));
 
-	SeperatorLine = new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, Vector2(0, 6.0f / Graphics::WindowResolution.Y));
+	SeparatorLine = new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, Vector2(0, 6.0f / Graphics::WindowResolution.Y));
 
-	PanelMainBackground->AddChild(SeperatorLine
+	PanelMainBackground->AddChild(SeparatorLine
 		->SetPadding(0, 0, 0.005f, 0.005f)
 		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
 		->SetTryFill(true));
@@ -36,7 +37,7 @@ ItemBrowser::ItemBrowser(EditorPanel* Parent, std::string Name) : EditorPanel(Pa
 
 void ItemBrowser::OnResized()
 {
-	SeperatorLine->SetColor(EditorUI::UIColors[0] * 0.75);
+	SeparatorLine->SetColor(EditorUI::UIColors[0] * 0.75);
 	GenerateAssetList();
 	GenerateTopBox();
 }
@@ -96,7 +97,7 @@ void ItemBrowser::Tick()
 
 	if (Input::IsRMBDown && !RMBDown && UI::HoveredBox == BrowserScrollBox)
 	{
-		Application::EditorInstance->ShowDropdownMenu(DefaultDropdown, Input::MouseLocation);
+		new EditorDropdown(DefaultDropdown, Input::MouseLocation);
 	}
 	else if (Input::IsRMBDown && !RMBDown && dynamic_cast<UIButton*>(UI::HoveredBox) && UI::HoveredBox->IsChildOf(PanelMainBackground))
 	{
@@ -115,21 +116,21 @@ void ItemBrowser::Tick()
 			return;
 		}
 
-		std::vector<EditorUI::DropdownItem> Items = ContextOptions;
+		std::vector<EditorDropdown::DropdownItem> Items = ContextOptions;
 
 		DropdownItem = LoadedItems[ButtonIndex];
 		DropdownBrowser = this;
 		if (DropdownItem.Openable)
 		{
-			Items.push_back(EditorUI::DropdownItem("Open", []() { DropdownBrowser->OnItemClicked(DropdownItem); }));
+			Items.push_back(EditorDropdown::DropdownItem("Open", []() { DropdownBrowser->OnItemClicked(DropdownItem); }));
 		}
 		if (DropdownItem.Renameable)
 		{
-			Items.push_back(EditorUI::DropdownItem("Rename", []() { new RenameBox(DropdownItem.Path); }));
+			Items.push_back(EditorDropdown::DropdownItem("Rename", []() { new RenameBox(DropdownItem.Path); }));
 		}
 		if (DropdownItem.CanCopy)
 		{
-			Items.push_back(EditorUI::DropdownItem("Copy", []() 
+			Items.push_back(EditorDropdown::DropdownItem("Copy", []()
 				{
 					std::filesystem::copy(
 						DropdownItem.Path,
@@ -140,7 +141,7 @@ void ItemBrowser::Tick()
 		}
 		if (DropdownItem.Deleteable)
 		{
-			Items.push_back(EditorUI::DropdownItem("Delete", []() 
+			Items.push_back(EditorDropdown::DropdownItem("Delete", []()
 				{ 
 					DropdownBrowser->DeleteItem(DropdownItem);
 					DropdownBrowser->OnPathChanged();
@@ -149,7 +150,7 @@ void ItemBrowser::Tick()
 
 		if (!Items.empty())
 		{
-			Application::EditorInstance->ShowDropdownMenu(Items, Input::MouseLocation);
+			new EditorDropdown(Items, Input::MouseLocation);
 		}
 	}
 

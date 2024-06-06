@@ -23,7 +23,7 @@ std::mutex Console::ConsoleReadMutex;
 std::deque<std::string> Console::ConsoleLines;
 #endif
 
-std::vector<std::string> Console::SeperateToStringArray(const std::string& InString)
+std::vector<std::string> Console::SeparateToStringArray(const std::string& InString)
 {
 	std::stringstream InFile; InFile << InString << " ";
 	std::string CurrentWord;
@@ -73,7 +73,7 @@ std::vector<std::string> Console::SeperateToStringArray(const std::string& InStr
 			CurrentWord.clear();
 			continue;
 		}
-		else if (ConsoleSystem->Seperators.contains(CurrentChar[0]))
+		else if (ConsoleSystem->Separators.contains(CurrentChar[0]))
 		{
 			if (CurrentWord.empty())
 			{
@@ -183,7 +183,7 @@ Console::Console()
 		}, { Command::Argument("info_type", NativeType::String, true) }));
 
 
-	RegisterCommand(Command("listpack",
+	RegisterCommand(Command("list_pack",
 		[]() {
 			std::string Pack = ConsoleSystem->CommandArgs()[0];
 			auto Result = Pack::GetPackContents(Pack);
@@ -197,7 +197,7 @@ Console::Console()
 				ConsoleSystem->Print("Pack File is emtpy");
 				return;
 			}
-			for (int i = 0; i < Result.size(); i += 2)
+			for (size_t i = 0; i < Result.size(); i += 2)
 			{
 				std::string LogString = Result[i].FileName + " (" + std::to_string(Result[i].Content.size()) + " bytes)";
 				if (Result.size() > (size_t)i + 1)
@@ -245,7 +245,7 @@ Console::Console()
 		ConsoleSystem->Print("Help: " + CommandString + " is not a registered command.", ErrorLevel::Error);
 		}, { Command::Argument("command", NativeType::String) }));
 
-	RegisterCommand(Command("getcommands", []() {
+	RegisterCommand(Command("get_commands", []() {
 		for (auto& i : ConsoleSystem->Commands)
 		{
 			ConsoleSystem->Print(i.first);
@@ -278,9 +278,9 @@ Console::Console()
 			}
 
 			ConsoleSystem->Print(LogMessage);
-		}, { Command::Argument("file", NativeType::String), Command::Argument("displayFetchTime", NativeType::Bool, true) }));
+		}, { Command::Argument("file", NativeType::String), Command::Argument("print_search_time", NativeType::Bool, true) }));
 
-	RegisterCommand(Command("assetdmp", []()
+	RegisterCommand(Command("asset_dump", []()
 		{
 			for (auto& i : Assets::Assets)
 			{
@@ -288,7 +288,7 @@ Console::Console()
 			}
 		}, {  }));
 
-	RegisterCommand(Command("getclass", []()
+	RegisterCommand(Command("get_class", []()
 		{
 			for (const auto& i : Objects::ObjectTypes)
 			{
@@ -325,7 +325,7 @@ Console::~Console()
 
 bool Console::ExecuteConsoleCommand(std::string Command)
 {
-	std::vector<std::string> CommandVec = SeperateToStringArray(Command);
+	std::vector<std::string> CommandVec = SeparateToStringArray(Command);
 	if (!CommandVec.size())
 	{
 		return false;
@@ -367,13 +367,13 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 	{
 		if (CommandVec.size() == 2)
 		{
-			ConsoleSystem->Print("Expected assignement.", ErrorLevel::Error);
+			ConsoleSystem->Print("Expected assignment.", ErrorLevel::Error);
 			return false;
 		}
 
 		if (CommandVec.size() > 3)
 		{
-			ConsoleSystem->Print("Too many arguments. Expected one for assignement.", ErrorLevel::Error);
+			ConsoleSystem->Print("Too many arguments. Expected one for assignment.", ErrorLevel::Error);
 			return false;
 		}
 

@@ -18,7 +18,7 @@
 #include <Math/Collision/Collision.h>
 #include <Engine/Subsystem/Console.h>
 #include <UI/UIButton.h>
-#include <UI/Default/UICanvas.h>
+#include <UI/UICanvas.h>
 #include <UI/UIBackground.h>
 #include <UI/UIText.h>
 #include <Engine/Gamepad.h>

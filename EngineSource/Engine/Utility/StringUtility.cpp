@@ -1,5 +1,6 @@
 #include "StringUtility.h"
 #include <cstdarg>
+#include <iostream>
 
 void StrUtil::ReplaceChar(std::string& Target, char A, std::string b)
 {
@@ -19,18 +20,28 @@ void StrUtil::ReplaceChar(std::string& Target, char A, std::string b)
 
 std::string StrUtil::Format(std::string Format, ...)
 {
-	char* buf = new char[Format.size() + 250ull]();
+	int Size = (int)Format.size() + 2, NewSize = Size;
+	int Returned = 0;
+	char* Buffer = nullptr;
 	va_list va;
 	va_start(va, Format);
-#if _WIN32
-	vsprintf_s(buf, Format.size() + 250, Format.c_str(), va);
-#else
-	vsprintf(buf, Format.c_str(), va);
-#endif
+	do
+	{
+		Size = NewSize;
+		if (Buffer)
+		{
+			delete[] Buffer;
+		}
+		Buffer = new char[Size]();
+		Returned = vsnprintf(Buffer, Format.size() + 250, Format.c_str(), va);
+		NewSize = Returned;
+
+	} while (Returned > Size);
+
 	va_end(va);
 
-	std::string StrBuffer = buf;
-	delete[] buf;
+	std::string StrBuffer = Buffer;
+	delete[] Buffer;
 	return StrBuffer;
 }
 
@@ -45,7 +56,7 @@ std::string StrUtil::VectorToString(std::vector<char> In)
 	return Out;
 }
 
-std::vector<std::string> StrUtil::SeperateString(std::string Value, char Sep)
+std::vector<std::string> StrUtil::SeparateString(std::string Value, char Sep)
 {
 	std::vector<std::string> Values;
 

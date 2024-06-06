@@ -7,7 +7,7 @@
 std::vector<Subsystem*> Subsystem::LoadedSystems;
 bool Subsystem::IsVerbose = false;
 
-void Subsystem::SetSysemLogVerbose(bool NewIsVerbose)
+void Subsystem::SetSystemLogVerbose(bool NewIsVerbose)
 {
 	IsVerbose = NewIsVerbose;
 }

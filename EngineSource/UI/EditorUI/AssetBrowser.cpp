@@ -4,6 +4,7 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Utility/FileUtility.h>
 #include <Engine/Utility/StringUtility.h>
+#include <UI/EditorUI/EditorDropdown.h>
 #include <Engine/Log.h>
 #include <Engine/Importers/ModelConverter.h>
 #include <Engine/Importers/Importer.h>
@@ -156,7 +157,7 @@ AssetBrowser::AssetBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Assets")
 {
 	DefaultDropdown =
 	{
-		EditorUI::DropdownItem("Import file", []()
+		EditorDropdown::DropdownItem("Import file", []()
 			{
 			std::string file = OS::ShowOpenFileDialog();
 			if (std::filesystem::exists(file))
@@ -173,27 +174,27 @@ AssetBrowser::AssetBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Assets")
 			UpdateAll();
 			}, true),
 
-		EditorUI::DropdownItem("New folder", []() 
+		EditorDropdown::DropdownItem("New folder", []() 
 			{ 
 				std::filesystem::create_directories(*CurrentPath + "/Folder");
 				UpdateAll();
 			}),
-		EditorUI::DropdownItem("New material", []()
+		EditorDropdown::DropdownItem("New material", []()
 			{
 				EditorUI::CreateFile(*CurrentPath, "Material", "jsmat");
 				UpdateAll();
 			}),
-		EditorUI::DropdownItem("New scene", []()
+		EditorDropdown::DropdownItem("New scene", []()
 			{
 				EditorUI::CreateFile(*CurrentPath, "Scene", "jscn");
 				UpdateAll();
 			}),
-				EditorUI::DropdownItem("New particle", []()
+		EditorDropdown::DropdownItem("New particle", []()
 			{
 				EditorUI::CreateFile(*CurrentPath, "Particle", "jspart");
 				UpdateAll();
 			}, true),
-		EditorUI::DropdownItem("Open in file explorer", []()
+		EditorDropdown::DropdownItem("Open in file explorer", []()
 			{
 #if _WIN32
 				std::string Path = *CurrentPath;

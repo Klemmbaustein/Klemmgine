@@ -6,7 +6,7 @@
 #include <Rendering/Graphics.h>
 #include <Math/Math.h>
 #include <Engine/Input.h>
-#include <UI/Default/UICanvas.h>
+#include <UI/UICanvas.h>
 #include <algorithm>
 #include <Engine/Stats.h>
 #if EDITOR

@@ -1,7 +1,7 @@
 #if !SERVER
 #pragma once
 #include <UI/UIBox.h>
-#include <UI/Default/UICanvas.h>
+#include <UI/UICanvas.h>
 #include <UI/UIBackground.h>
 
 /**

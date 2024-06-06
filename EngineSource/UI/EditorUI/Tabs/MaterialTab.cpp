@@ -237,10 +237,10 @@ void MaterialTab::GenerateUI()
 	{
 		auto ParamBox = new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0]);
 
-		size_t CategorySeperator = i.Description.find_first_of("#");
+		size_t CategorySeparator = i.Description.find_first_of("#");
 
-		std::string Category = i.Description.substr(0, CategorySeperator - 1);
-		std::string Description = i.Description.substr(CategorySeperator + 1);
+		std::string Category = i.Description.substr(0, CategorySeparator - 1);
+		std::string Description = i.Description.substr(CategorySeparator + 1);
 
 		auto TextBox = (new UIBox(UIBox::Orientation::Vertical, 0));
 

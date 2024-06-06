@@ -61,7 +61,7 @@ void Packet::EvaluatePacket()
 		uint64_t ObjID = 0;
 		Read(ObjID);
 
-		auto Values = StrUtil::SeperateString(ReadString(), ';');
+		auto Values = StrUtil::SeparateString(ReadString(), ';');
 
 		for (auto& i : Values)
 		{

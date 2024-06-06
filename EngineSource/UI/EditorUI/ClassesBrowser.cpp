@@ -158,11 +158,11 @@ ClassesBrowser::ClassesBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Class
 {
 	DefaultDropdown =
 	{
-		EditorUI::DropdownItem("New C# class", []()
+		EditorDropdown::DropdownItem("New C# class", []()
 			{
 				new ClassCreator();
 			}),
-		EditorUI::DropdownItem("Open Solution", []()
+		EditorDropdown::DropdownItem("Open Solution", []()
 			{
 				OS::OpenFile(Build::GetProjectBuildName() + ".sln");
 			}, true)

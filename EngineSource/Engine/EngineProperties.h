@@ -16,7 +16,7 @@ namespace Project
 	void OnLaunch();
 	extern const char* ProjectName;
 }
-#define VERSION_STRING "1.10.9"
+#define VERSION_STRING "1.10.10"
 #define OPENGL_MIN_REQUIRED_VERSION "GL_VERSION_4_2"
 
 /**
@@ -47,13 +47,13 @@ namespace Project
 * #### Windows:
 * 
 * - Visual Studio with the following Workloads is required:
-*   - Desktop developement with C++
-*   - Desktop developement with C#
+*   - Desktop development with C++
+*   - Desktop development with C#
 * 
 * #### Linux
 * 
 * - Install [KlemmBuild](https://github.com/Klemmbaustein/KlemmBuild).
-* - Install SDL2, GLEW and OpenAL developement libraries.
+* - Install SDL2, GLEW and OpenAL development libraries.
 *   With `apt`, this would be:
 * 
 *   ```
@@ -73,7 +73,7 @@ namespace Project
 * ```
 * 
 * In the engine directory, run setup.ps1
-* using the Visual Studio Developer Powershell. This will build the engine and it's dependencies.
+* using the Visual Studio Developer PowerShell. This will build the engine and it's dependencies.
 * 
 * ```pwsh
 * .\setup.ps1

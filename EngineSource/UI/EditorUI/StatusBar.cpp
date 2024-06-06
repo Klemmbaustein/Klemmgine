@@ -24,7 +24,7 @@ struct MenuBarEntry
 {
 	std::string Name;
 	void(*Function)() = nullptr;
-	bool Seperator = false;
+	bool Separator = false;
 };
 
 struct MenuBarItem
@@ -157,7 +157,7 @@ void StatusBar::GenerateMenuBarDropdown(int ButtonIndex)
 	{
 		float PaddingSize = 2.0f / Graphics::WindowResolution.Y;
 		bool Upper = MenuBarItems[ButtonIndex].Entries[0].Name == i.Name;
-		bool Lower = i.Seperator || MenuBarItems[ButtonIndex].Entries[MenuBarItems[ButtonIndex].Entries.size() - 1].Name == i.Name;
+		bool Lower = i.Separator || MenuBarItems[ButtonIndex].Entries[MenuBarItems[ButtonIndex].Entries.size() - 1].Name == i.Name;
 
 		float Horizontal = 2.0f / Graphics::WindowResolution.X;
 

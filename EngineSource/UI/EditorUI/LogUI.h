@@ -1,6 +1,7 @@
 #if EDITOR
 #pragma once
 #include <UI/EditorUI/EditorPanel.h>
+#include <UI/Debug/ConsoleAutoComplete.h>
 
 class UITextField;
 class UIText;
@@ -14,6 +15,12 @@ class UIText;
 class LogUI : public EditorPanel
 {
 	std::vector<UIText*> LogTexts;
+	Debug::ConsoleAutoComplete* AutoComplete = nullptr;
+
+	std::string LastCommand;
+
+	UIBackground* CommandsBackground = nullptr;
+	UIScrollBox* CommandHighlightScrollBox = nullptr;
 
 	void UpdateLogBoxSize();
 public:

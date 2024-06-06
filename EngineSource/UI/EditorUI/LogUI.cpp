@@ -34,6 +34,18 @@ LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console")
 			->SetPadding(0)
 			->SetTryFill(true)));
 
+	AutoComplete = new Debug::ConsoleAutoComplete(EditorUI::MonoText, 0.425f);
+
+	CommandsBackground = new UIBackground(UIBox::Orientation::Vertical, 0, 0, Vector2(1, 0));
+	CommandHighlightScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
+	CommandHighlightScrollBox
+		->SetTryFill(true)
+		->SetPadding(0);
+	CommandsBackground
+		->SetOpacity(0.95f)
+		->SetPadding(0)
+		->AddChild(CommandHighlightScrollBox);
+
 	UpdateLogBoxSize();
 }
 
@@ -95,6 +107,16 @@ void LogUI::Tick()
 {
 	TickPanel();
 	auto LogMessages = Log::GetMessages();
+
+	if (LogPrompt->GetText() != LastCommand)
+	{
+		LastCommand = LogPrompt->GetText();
+
+		AutoComplete->RenderToBox(CommandHighlightScrollBox, AutoComplete->GetRecommendations(LastCommand));
+		CommandsBackground->SetPosition(LogPrompt->GetPosition() + Vector2(0, LogPrompt->GetUsedSize().Y));
+		CommandsBackground->SetMinSize(Vector2(LogPrompt->GetUsedSize().X, 0));
+	}
+
 	if (LogMessages.size() != PrevLogLength)
 	{
 		if (!LogTexts.empty())

@@ -1,6 +1,6 @@
 #ifdef EDITOR
 #pragma once
-#include "UI/Default/UICanvas.h"
+#include "EditorSubsystem/EditorSubsystem.h"
 #include "UI/Default/TextRenderer.h"
 #include <UI/UIBackground.h>
 #include "UI/UIButton.h"
@@ -12,7 +12,6 @@
 #include <Rendering/Framebuffer.h>
 #include <Engine/Build/Build.h>
 
-class EditorUI;
 class UIVectorField;
 class UITextField;
 struct SDL_Cursor;
@@ -32,7 +31,7 @@ struct SDL_Cursor;
 * 
 * @ingroup Editor
 */
-class EditorUI : public UICanvas
+class EditorUI : public EditorSubsystem
 {
 public:
 #if ENGINE_CSHARP
@@ -144,6 +143,7 @@ public:
 	static void CreateFile(std::string Path, std::string Name, std::string Ext);
 
 	EditorUI();
+	~EditorUI();
 
 	/**
 	* @brief
@@ -155,14 +155,13 @@ public:
 	* The function that should be called to quit the applicatin.
 	*/
 	void OnLeave(void(*ReturnF)());
-	virtual void Tick() override;
+	virtual void Update() override;
 
 	void LoadEditorTextures();
 
 	UIBox* DraggedItem = nullptr;
-	UIBox* Dropdown = nullptr;
 
-	static inline constexpr uint32_t NumUIColors = 4;
+	static constexpr uint32_t NumUIColors = 4;
 
 	/**
 	* @brief
@@ -206,15 +205,6 @@ public:
 		End
 	};
 
-	struct DropdownItem
-	{
-		std::string Title;
-		void (*OnPressed)() = nullptr;
-		bool Seperator = false;
-	};
-
-	void ShowDropdownMenu(std::vector<DropdownItem> Menu, Vector2 Position);
-
 	static EditorPanel* RootPanel;
 
 	static CursorType CurrentCursor;
@@ -222,7 +212,6 @@ public:
 
 protected:
 	SDL_Cursor* Cursors[(int)CursorType::End];
-	std::vector<DropdownItem> CurrentDropdown;
 	bool ShouldSave = false;
 public:
 	static std::vector<WorldObject*> SelectedObjects;

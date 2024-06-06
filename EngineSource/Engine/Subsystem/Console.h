@@ -81,6 +81,10 @@ public:
 
 	void Update() override;
 
+	std::map<std::string, Variable> ConVars;
+	std::map<std::string, Command> Commands;
+	static std::vector<std::string> SeparateToStringArray(const std::string& InString);
+
 private:
 #if _WIN32
 	static std::condition_variable ConsoleConditionVariable;
@@ -91,8 +95,6 @@ private:
 	static void ReadConsole();
 #endif
 
-	std::map<std::string, Variable> ConVars;
-	std::map<std::string, Command> Commands;
 	std::vector<std::string> ConsoleInput;
 
 	static NativeType::NativeType GetDataTypeFromString(const std::string& str);
@@ -100,7 +102,6 @@ private:
 	{
 		return GivenType == NativeType::Int || GivenType == NativeType::Float;
 	}
-	static std::vector<std::string> SeperateToStringArray(const std::string& InString);
 
 	template<typename T>
 	static void SafePtrAssign(void* Ptr, T NewValue)
@@ -111,7 +112,7 @@ private:
 			*ptr = NewValue;
 		}
 	}
-	const std::set<char> Seperators
+	const std::set<char> Separators
 	{
 		' ',
 		'	',

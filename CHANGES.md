@@ -1,26 +1,41 @@
 # Changes
 
+## Version 1.10.10
+
+### Changes
+
+- Added EditorSubsystem class.
+- Added a list of matching commands to the console in Editor and Debug builds.
+- Moved `UICanvas.h`.
+- Renamed some console commands to be more consistent with the rest.
+
+### Fixes
+
+- Fixed some spelling mistakes in the source code.
+- `StrUtil::Format()` can now accept format arguments with unlimited size.
+- When loading a new scene, if it didn't have a lightmap the lightmap of the previous scene would remain active.
+
 ## Version 1.10.9
 
-## Changes
+### Changes
 
 - Merged some namespaces into the `Stats` namespace.
 
-## Fixes
+### Fixes
 
 - Fixed the error handler crashing.
 
 ## Version 1.10.8
 
-## Fixes
+### Fixes
 
 - Renamed game build output folder to `GameBuild`
-- Improved how builds on linux work.
+- Improved how builds on Linux work.
 
 
 ## Version 1.10.7
 
-## Fixes
+### Fixes
 
 - Fixed some bad/incorrect math related to rotations.
 - Fixed an issue where materials wouldn't be saved correctly.
@@ -29,16 +44,16 @@
 
 ## Version 1.10.6
 
-## Fixes
+### Fixes
 
-- Fixed some isssues that appeared with 1.10.5
+- Fixed some issues that appeared with 1.10.5
 
 
 ## Version 1.10.5
 
-## Changes
+### Changes
 
-- UI performance improvements. Only the neccesary areas of the screen will be redrawn.
+- UI performance improvements. Only the necessary areas of the screen will be redrawn.
 
 
 ## Version 1.10.4
@@ -133,7 +148,7 @@
 ### Fixes
 
 - Improved how baked point light shadows are calculated.
-- Fixed the MovementComponent sometiems letting the object to go through walls.
+- Fixed the MovementComponent sometimes letting the object to go through walls.
 - Fixed a crash when a MeshComponent has no mesh loaded.
 - Fixed a crash when reloading the C# assembly.
 
@@ -197,7 +212,7 @@
 - Added documentation using doxygen.
 - Moved engine functions into `KlemmgineCSharp` project.
 - Renamed some C# functions to match their C++ equivalent.
-- Added enum `Input::GamepadType` and `Input::GetGamepadType(Input::Gamepad* From)`.
+- Added Enum `Input::GamepadType` and `Input::GetGamepadType(Input::Gamepad* From)`.
 - `UIButton` and `UITextField` now inherit from `UIBackground`.
 - Added `Engine.NativeObject` and a few more utility functions to C#.
 - Added C# `EditorProperty` attribute and functionality.

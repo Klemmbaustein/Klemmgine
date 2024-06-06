@@ -1,6 +1,6 @@
 #if EDITOR
 #pragma once
-#include <UI/Default/UICanvas.h>
+#include <UI/UICanvas.h>
 #include <UI/UIBackground.h>
 
 class EditorPopup : public UICanvas
