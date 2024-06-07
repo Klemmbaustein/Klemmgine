@@ -20,11 +20,8 @@ void StrUtil::ReplaceChar(std::string& Target, char A, std::string b)
 
 std::string StrUtil::Format(std::string Format, ...)
 {
-	int Size = (int)Format.size() + 2, NewSize = Size;
-	int Returned = 0;
+	int Size = (int)Format.size() + 50, NewSize = Size;
 	char* Buffer = nullptr;
-	va_list va;
-	va_start(va, Format);
 	do
 	{
 		Size = NewSize;
@@ -32,13 +29,14 @@ std::string StrUtil::Format(std::string Format, ...)
 		{
 			delete[] Buffer;
 		}
-		Buffer = new char[Size]();
-		Returned = vsnprintf(Buffer, Format.size() + 250, Format.c_str(), va);
-		NewSize = Returned;
+		Buffer = new char[Size](0);
+		va_list va;
+		va_start(va, Format);
+		NewSize = vsnprintf(Buffer, Size, Format.c_str(), va);
+		va_end(va);
 
-	} while (Returned > Size);
+	} while (NewSize > Size);
 
-	va_end(va);
 
 	std::string StrBuffer = Buffer;
 	delete[] Buffer;
