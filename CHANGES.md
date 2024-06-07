@@ -14,6 +14,7 @@
 - Fixed some spelling mistakes in the source code.
 - `StrUtil::Format()` can now accept format arguments with unlimited size.
 - When loading a new scene, if it didn't have a lightmap the lightmap of the previous scene would remain active.
+- Turned off warnings as errors for JoltPhysics dependency since that would cause the build to fail.
 
 ## Version 1.10.9
 

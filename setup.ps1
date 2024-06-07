@@ -33,7 +33,8 @@ Build-MsBuild -name OpenAL.vcxproj -config Release
 cd ..\..
 
 cd Dependencies\JoltPhysics\Build
-.\cmake_vs2022_cl.bat -DINTERPROCEDURAL_OPTIMIZATION=OFF -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF
+# ENABLE_ALL_WARNINGS needs to be off, since /Wall + /WX:warnings isn't a good idea.
+.\cmake_vs2022_cl.bat -DINTERPROCEDURAL_OPTIMIZATION=OFF -DUSE_STATIC_MSVC_RUNTIME_LIBRARY=OFF -DENABLE_ALL_WARNINGS=OFF
 cd VS2022_CL
 Build-MsBuild -name Jolt.vcxproj -config Distribution
 cd ..\..\..\..
