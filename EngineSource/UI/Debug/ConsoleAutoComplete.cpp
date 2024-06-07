@@ -1,3 +1,4 @@
+#if !SERVER
 #include "ConsoleAutoComplete.h"
 #include <Engine/Utility/StringUtility.h>
 
@@ -120,3 +121,4 @@ void Debug::ConsoleAutoComplete::RenderToBox(UIBox* Target, const std::vector<Re
 		Target->AddChild((new UIText(TextSize, Segments, Font))->SetPadding(0));
 	}
 }
+#endif

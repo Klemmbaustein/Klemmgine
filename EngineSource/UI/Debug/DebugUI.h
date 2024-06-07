@@ -1,4 +1,4 @@
-#if !RELEASE && !EDITOR
+#if !RELEASE && !EDITOR && !SERVER
 #pragma once
 #include <UI/UICanvas.h>
 #include <UI/UIfwd.h>

@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <UI/UICanvas.h>
 #include <UI/UIText.h>
@@ -26,3 +27,4 @@ namespace Debug
 		void RenderToBox(UIBox* Target, const std::vector<Recommendation>& Found);
 	};
 }
+#endif
