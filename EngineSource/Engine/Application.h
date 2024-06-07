@@ -6,9 +6,9 @@ class EditorUI;
 
 #include <set>
 #include <Math/Vector.h>
+#include <UI/UICanvas.h>
 
 struct SDL_Window;
-struct ButtonEvent;
 
 /**
 * @file
