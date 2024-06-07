@@ -1,3 +1,4 @@
+#if !SERVER
 #pragma once
 #include <cstdint>
 #include <string>
@@ -37,3 +38,4 @@ private:
 	static void BakeLog(std::string Msg);
 	static void LoadBakeTexture(uint8_t* Texture);
 };
+#endif

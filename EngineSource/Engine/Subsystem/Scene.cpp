@@ -91,10 +91,10 @@ void Scene::LoadSceneInternally(std::string FilePath)
 			}
 		}
 		WorldObject::DestroyMarkedObjects();
-		BakedLighting::LoadEmpty();
 
 		Objects::AllObjects.clear();
 #if !SERVER
+		BakedLighting::LoadEmpty();
 		if (!IsInEditor)
 		{
 			for (FramebufferObject* f : Graphics::AllFramebuffers)

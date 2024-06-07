@@ -1,3 +1,4 @@
+#if !SERVER
 #include "BakedLighting.h"
 #include <GL/glew.h>
 #include <Math/Vector.h>
@@ -597,3 +598,4 @@ std::vector<std::string> BakedLighting::GetBakeLog()
 {
 	return BakeLogMessages;
 }
+#endif
