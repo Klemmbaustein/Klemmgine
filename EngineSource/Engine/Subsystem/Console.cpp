@@ -258,7 +258,7 @@ Console::Console()
 	RegisterCommand(Command("stats", []()
 		{
 			ConsoleSystem->Print("FPS: " + std::to_string(1.f / Stats::DeltaTime) + ", Delta: " + std::to_string(Stats::DeltaTime));
-			ConsoleSystem->Print("Drawcalls: " + std::to_string(Stats::DrawCalls));
+			ConsoleSystem->Print("DrawCalls: " + std::to_string(Stats::DrawCalls));
 		}, {}));
 
 	RegisterCommand(Command("locate", []()
@@ -328,6 +328,7 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 	std::vector<std::string> CommandVec = SeparateToStringArray(Command);
 	if (!CommandVec.size())
 	{
+		ConsoleSystem->Print("Expected a Command.", ErrorLevel::Error);
 		return false;
 	}
 
@@ -418,30 +419,30 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 	// Check if the first part of the command is a registered command
 	if (ConsoleSystem->Commands.contains(CommandVec[0]))
 	{
-		// If any part of the command arguments is a convar, we replace it with it's value
+		// If any part of the command arguments is a ConVar, we replace it with it's value
 		for (auto& i : CommandVec)
 		{
 			if (!ConsoleSystem->ConVars.contains(i))
 			{
 				continue;
 			}
-			const Variable& Convar = ConsoleSystem->ConVars[i];
-			switch (Convar.NativeType)
+			const Variable& ConVar = ConsoleSystem->ConVars[i];
+			switch (ConVar.NativeType)
 			{
 			case NativeType::Int:
-				i = std::to_string(*(int*)Convar.Var);
+				i = std::to_string(*(int*)ConVar.Var);
 				break;
 			case NativeType::Byte:
-				i = std::to_string(*(char*)Convar.Var);
+				i = std::to_string(*(char*)ConVar.Var);
 				break;
 			case NativeType::Float:
-				i = std::to_string(*(int*)Convar.Var);
+				i = std::to_string(*(int*)ConVar.Var);
 				break;
 			case NativeType::String:
-				i = *(std::string*)Convar.Var;
+				i = *(std::string*)ConVar.Var;
 				break;
 			case NativeType::Bool:
-				i = std::to_string(*(bool*)Convar.Var);
+				i = std::to_string(*(bool*)ConVar.Var);
 				break;
 			default:
 				break;
@@ -489,11 +490,7 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 
 	if (CommandVec.size())
 	{
-		ConsoleSystem->Print("Unknown convar or command: " + CommandVec[0], ErrorLevel::Error);
-	}
-	else
-	{
-		ConsoleSystem->Print("Expected a command.", ErrorLevel::Error);
+		ConsoleSystem->Print("Unknown ConVar or Command: " + CommandVec[0], ErrorLevel::Error);
 	}
 	return false;
 }
@@ -556,7 +553,8 @@ void Console::PrintArguments(std::vector<Command::Argument> args, ErrorLevel Sev
 
 void Console::Update()
 {
-	// On linux this seems to cause issues where the application completely freezes
+	// On linux this seems to cause issues where the application completely freezes.
+	// It's disabled for now.
 #if _WIN32
 	std::deque<std::string> ConsoleCommands;
 	{
@@ -570,8 +568,6 @@ void Console::Update()
 
 	for (auto& i : ConsoleCommands)
 	{
-		std::cout << i << std::endl;
-
 		Console::ExecuteConsoleCommand(i);
 	}
 #endif

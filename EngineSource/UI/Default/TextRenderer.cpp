@@ -1,6 +1,5 @@
 ﻿#if !SERVER
 #define _CRT_SECURE_NO_WARNINGS
-#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #include "TextRenderer.h"
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <Utility/stb_truetype.hpp>
@@ -18,9 +17,10 @@
 
 // TODO: Correct handling of tabs like in the standalone ui library
 
-std::wstring GetUnicodeString(std::string utf8)
+static std::wstring GetUnicodeString(const std::string& utf8)
 {
 	std::vector<unsigned long> unicode;
+	unicode.reserve(utf8.size());
 	size_t i = 0;
 	while (i < utf8.size())
 	{
@@ -163,14 +163,14 @@ TextRenderer::TextRenderer(std::string filename)
 		Log::Print("Failed to load font: " + filename);
 		return;
 	}
-	stbtt_fontinfo finf;
-	stbtt_InitFont(&finf, ttfBuffer, stbtt_GetFontOffsetForIndex(ttfBuffer, 0));
+	stbtt_fontinfo FontInfo;
+	stbtt_InitFont(&FontInfo, ttfBuffer, stbtt_GetFontOffsetForIndex(ttfBuffer, 0));
 
 
-	uint8_t* GlypthBitmap = new uint8_t[FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH](0);
+	uint8_t* GlyphBitmap = new uint8_t[FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH](0);
 	int Offset = 0;
-	int xcoord = 0;
-	int ycoord = 0;
+	int xCoord = 0;
+	int yCoord = 0;
 	int maxH = 0;
 
 	LoadedGlyphs.clear();
@@ -183,37 +183,37 @@ TextRenderer::TextRenderer(std::string filename)
 		{
 			glyph = '#';
 		}
-		int w, h, xoff, yoff;
-		auto bmp = stbtt_GetCodepointBitmap(&finf,
+		int w, h, xOff, yOff;
+		auto bmp = stbtt_GetCodepointBitmap(&FontInfo,
 			0.05f,
 			0.05f,
 			glyph,
 			&w,
 			&h, 
-			&xoff, 
-			&yoff);
+			&xOff, 
+			&yOff);
 
 		int advW, leftB;
-		stbtt_GetCodepointHMetrics(&finf, glyph, &advW, &leftB);
+		stbtt_GetCodepointHMetrics(&FontInfo, glyph, &advW, &leftB);
 
 		New.TotalSize.X = (float)advW / 400.0f;
 		New.TotalSize.Y = 0;
 
-		if (xcoord + w + FONT_BITMAP_PADDING > FONT_BITMAP_WIDTH)
+		if (xCoord + w + FONT_BITMAP_PADDING > FONT_BITMAP_WIDTH)
 		{
-			xcoord = 0;
-			ycoord += maxH + FONT_BITMAP_PADDING;
+			xCoord = 0;
+			yCoord += maxH + FONT_BITMAP_PADDING;
 		}
 
 		New.TexCoordStart = Vector2(
-			(float)xcoord / FONT_BITMAP_WIDTH,
-			(float)ycoord / FONT_BITMAP_WIDTH);
+			(float)xCoord / FONT_BITMAP_WIDTH,
+			(float)yCoord / FONT_BITMAP_WIDTH);
 
 		New.TexCoordOffset = Vector2(
 			(float)(w + 3) / FONT_BITMAP_WIDTH,
 			(float)(h + 3) / FONT_BITMAP_WIDTH);
 
-		New.Offset = Vector2((float)xoff, (float)yoff) / 20.0f;
+		New.Offset = Vector2((float)xOff, (float)yOff) / 20.0f;
 		New.Size = Vector2((float)w, (float)h) / 20.0f;
 
 		CharacterSize = std::max(New.Size.Y + New.Offset.Y, CharacterSize);
@@ -233,19 +233,19 @@ TextRenderer::TextRenderer(std::string filename)
 		{
 			for (int itw = 0; itw < w; itw++)
 			{
-				int Index = (ith + ycoord) * FONT_BITMAP_WIDTH + (xcoord + itw);
+				int Index = (ith + yCoord) * FONT_BITMAP_WIDTH + (xCoord + itw);
 
 				if (Index > FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH)
 				{
 					break;
 				}
 
-				GlypthBitmap[Index] = bmp[ith * w + itw];
+				GlyphBitmap[Index] = bmp[ith * w + itw];
 			}
 		}
 		free(bmp);
 		maxH = std::max(maxH, h);
-		xcoord += w + FONT_BITMAP_PADDING;
+		xCoord += w + FONT_BITMAP_PADDING;
 		LoadedGlyphs.push_back(New);
 	}
 
@@ -259,7 +259,7 @@ TextRenderer::TextRenderer(std::string filename)
 		0,
 		GL_ALPHA,
 		GL_UNSIGNED_BYTE, 
-		GlypthBitmap);
+		GlyphBitmap);
 	// can free temp_bitmap at this point
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -283,7 +283,7 @@ TextRenderer::TextRenderer(std::string filename)
 	glBindVertexArray(0);
 
 	free(ttfBuffer);
-	delete[] GlypthBitmap;
+	delete[] GlyphBitmap;
 }
 
 Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, float LengthBeforeWrap)
@@ -529,7 +529,7 @@ DrawableText::DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumV
 	this->Color = Color;
 }
 
-void DrawableText::Draw(ScrollObject* CurrentScrollObject)
+void DrawableText::Draw(ScrollObject* CurrentScrollObject) const
 {
 	Graphics::TextShader->Bind();
 	if (CurrentScrollObject != nullptr)

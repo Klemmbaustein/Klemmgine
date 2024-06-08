@@ -27,7 +27,7 @@ class DrawableText
 	DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumVerts, unsigned int Texture, Vector2 Position, float Scale, Vector3 Color, float opacity);
 public:
 	float Opacity = 1.f;
-	void Draw(ScrollObject* CurrentScrollObject);
+	void Draw(ScrollObject* CurrentScrollObject) const;
 	~DrawableText();
 };
 
@@ -35,11 +35,11 @@ class TextRenderer
 {
 	friend class DrawableText;
 private:
-	unsigned int fontTexture;
-	unsigned int fontVao;
-	unsigned int fontVertexBufferId;
+	unsigned int fontTexture = 0;
+	unsigned int fontVao = 0;
+	unsigned int fontVertexBufferId = 0;
 	FontVertex* fontVertexBufferData = 0;
-	uint32_t fontVertexBufferCapacity;
+	uint32_t fontVertexBufferCapacity = 0;
 public:
 	float CharacterSize = 0;
 	struct Glyph

@@ -1,6 +1,6 @@
 #include "Collision.h"
 #include <algorithm>
-#include <Math/Collision/TriangleIntersect.h>
+#include <Math/Collision/TriangleIntersect.hpp>
 #include <Objects/Components/CollisionComponent.h>
 #include <Engine/Log.h>
 #include <cmath>

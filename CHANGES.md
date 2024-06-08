@@ -1,5 +1,17 @@
 # Changes
 
+## Version 1.10.11
+
+### Changes
+
+- Renamed some variables to have clearer names.
+- The `save` console command now has an optional parameter for the scene file name,
+
+### Fixes
+
+- Ran VC++ code analysis on entire project, fixed all found issues that weren't from 3rd party libraries.
+- `ToUnicodeString()` now reserves the string length to increase the speed of the function.
+
 ## Version 1.10.10
 
 ### Changes
@@ -100,7 +112,7 @@
 
 - Improved build tool will now not assume class declarations from header file names but scan header files for class declarations.
 - Added `Subsystem` interfaces.
-- Log files will now be written to disk in WorkingDirectory/Logs/
+- Log files will now be written to disk in {WorkingDirectory}/Logs/
 - Improvements to text fields.
 
 
@@ -210,7 +222,7 @@
 ### Changes
 
 - Large editor UI rewrite.
-- Added documentation using doxygen.
+- Added documentation using Doxygen.
 - Moved engine functions into `KlemmgineCSharp` project.
 - Renamed some C# functions to match their C++ equivalent.
 - Added Enum `Input::GamepadType` and `Input::GetGamepadType(Input::Gamepad* From)`.

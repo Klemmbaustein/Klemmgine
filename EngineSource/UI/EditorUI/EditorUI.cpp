@@ -455,7 +455,16 @@ EditorUI::EditorUI()
 	Cursors[7] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_IBEAM);
 
 	Console::ConsoleSystem->RegisterCommand(Console::Command("build", []() {new std::thread(Build::TryBuildProject, "GameBuild/"); }, {}));
-	Console::ConsoleSystem->RegisterCommand(Console::Command("save", EditorUI::SaveCurrentScene, {}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("save", []() {
+		std::string Old = Scene::CurrentScene;
+		if (!Console::ConsoleSystem->CommandArgs().empty())
+		{
+			Scene::CurrentScene = "Content/" + Console::ConsoleSystem->CommandArgs()[0];
+		}
+
+		EditorUI::SaveCurrentScene();
+		Scene::CurrentScene = Old;
+		}, { Console::Command::Argument("scene_file_path", NativeType::String, true)}));
 #ifdef ENGINE_CSHARP
 	Console::ConsoleSystem->RegisterCommand(Console::Command("reload", EditorUI::RebuildAssembly, {}));
 	Console::ConsoleSystem->RegisterCommand(Console::Command("run", EditorUI::LaunchInEditor, {}));
@@ -495,7 +504,7 @@ void EditorUI::Update()
 #ifdef ENGINE_CSHARP
 	if (Editor::CanHotreload == true)
 	{
-		Application::EditorInstance->Print("Finished building assembly. Hotreloading .dll file.", Subsystem::ErrorLevel::Info);
+		Application::EditorInstance->Print("Finished building assembly. HotReloading .dll file.", Subsystem::ErrorLevel::Info);
 		CSharpInterop::CSharpSystem->ReloadCSharpAssembly();
 		for (UICanvas* c : Graphics::UIToRender)
 		{
@@ -619,7 +628,7 @@ void EditorUI::LoadEditorTextures()
 		"CollapsedArrow.png",		//14 -> Collapsed arrow
 		"Placeholder.png",			//15 -> Placeholder
 		"Checkbox.png",				//16 -> Checked checkbox
-		"Cubemap.png",				//17 -> Cubemap icon
+		"Cubemap.png",				//17 -> CubeMap icon
 		"Texture.png",				//18 -> Texture icon
 		"Particle.png",				//19 -> Particle icon
 		"Settings.png",				//20 -> Settings icon
@@ -627,7 +636,7 @@ void EditorUI::LoadEditorTextures()
 		"CSharpClass.png",			//22 -> CSharp class icon
 		"WindowX.png",				//23 -> Window X icon
 		"WindowResize.png",			//24 -> Window Resize icon
-		"WindowResize2.png",		//25 -> Window Fullscreen Resize icon
+		"WindowResize2.png",		//25 -> Window FullScreen Resize icon
 		"WindowMin.png",			//26 -> Window Minimize icon
 		"Lighting.png"				//27 -> Lightmap icon	
 	};

@@ -327,6 +327,10 @@ void JoltPhysics::RegisterBody(Physics::PhysicsBody* Body)
 	if (!Body->ShapeInfo)
 	{
 		CreateShape(Body);
+		if (!Body->ShapeInfo)
+		{
+			return;
+		}
 	}
 	auto JoltShape = static_cast<BodyCreationSettings*>(Body->ShapeInfo);
 
@@ -575,6 +579,10 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 	if (!Body->ShapeInfo)
 	{
 		CreateShape(Body);
+		if (!Body->ShapeInfo)
+		{
+			return {};
+		}
 	}
 	auto JoltShape = static_cast<BodyCreationSettings*>(Body->ShapeInfo);
 
@@ -607,6 +615,10 @@ std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody*
 	if (!Body->ShapeInfo)
 	{
 		CreateShape(Body);
+		if (!Body->ShapeInfo)
+		{
+			return {};
+		}
 	}
 
 	auto JoltShape = static_cast<BodyCreationSettings*>(Body->ShapeInfo);

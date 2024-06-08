@@ -93,13 +93,13 @@ public:
 		 * @brief
 		 * Function pointer to the function corresponding to the event.
 		 */
-		NetEventFunction Function;
+		NetEventFunction Function = nullptr;
 
 		/**
 		 * @brief
 		 * A pointer to the WorldObject owning this NetEvent.
 		 */
-		WorldObject* Parent;
+		WorldObject* Parent = nullptr;
 
 		/**
 		 * @brief
@@ -115,7 +115,7 @@ public:
 			Clients
 		};
 
-		EventType NativeType;
+		EventType NativeType = EventType::Server;
 		
 		void Invoke(std::vector<std::string> Arguments) const;
 	};

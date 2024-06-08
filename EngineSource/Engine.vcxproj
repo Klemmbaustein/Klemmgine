@@ -191,7 +191,7 @@
     <ClInclude Include="Engine\Utility\StringUtility.h" />
     <ClInclude Include="Math\Collision\Collision.h" />
     <ClInclude Include="Math\Collision\CollisionBox.h" />
-    <ClInclude Include="Math\Collision\TriangleIntersect.h" />
+    <ClInclude Include="Math\Collision\TriangleIntersect.hpp" />
     <ClInclude Include="Math\Math.h" />
     <ClInclude Include="Math\Vector.h" />
     <ClInclude Include="Networking\Client.h" />

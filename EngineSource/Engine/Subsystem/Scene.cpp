@@ -205,14 +205,7 @@ void Scene::SaveSceneAs(std::string FilePath, bool Subscene)
 {
 	Stats::EngineStatus = "Saving Scene";
 	std::ofstream Output(FilePath + (Subscene ? ".subscn" : ".jscn"), std::ios::out | std::ios::binary);
-	std::vector<WorldObject*> SavedObjects;
-	for (WorldObject* o : Objects::AllObjects)
-	{
-		if (o->CurrentScene == CurrentScene)
-		{
-			SavedObjects.push_back(o);
-		}
-	}
+	std::vector<WorldObject*> SavedObjects = Objects::AllObjects;
 #if SAVE_FOG_AND_SUN
 	if (!Subscene)
 	{
@@ -241,16 +234,16 @@ void Scene::SaveSceneAs(std::string FilePath, bool Subscene)
 
 	for (int i = 0; i < ObjectLength; i++)
 	{
-		std::string name = SavedObjects.at(i)->Name;
-		std::string path = SavedObjects.at(i)->Serialize();
-		uint32_t ID = SavedObjects[i]->GetObjectDescription().ID; //C++ 20 or not?
+		std::string Name = SavedObjects.at(i)->Name;
+		std::string Path = SavedObjects.at(i)->Serialize();
+		uint32_t ID = SavedObjects[i]->GetObjectDescription().ID;
 		Transform T = SavedObjects[i]->GetTransform();
 		Output.write((char*)&T, sizeof(Transform));
 		Output.write((char*)&ID, sizeof(uint32_t));
-		WriteBinaryStringToFile(name, Output);
-		WriteBinaryStringToFile(path, Output);
-		std::string Desc = SavedObjects[i]->GetPropertiesAsString();
-		WriteBinaryStringToFile(Desc, Output);
+		WriteBinaryStringToFile(Name, Output);
+		WriteBinaryStringToFile(Path, Output);
+		std::string Descr = SavedObjects[i]->GetPropertiesAsString();
+		WriteBinaryStringToFile(Descr, Output);
 	}
 
 	Output.close();
