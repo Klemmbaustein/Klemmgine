@@ -12,7 +12,7 @@ bool Graphics::VSync = true;
 bool Graphics::Bloom = true;
 bool Graphics::IsWireframe = false;
 bool Graphics::RenderAntiAlias = true;
-bool Graphics::RenderFullbright = false;
+bool Graphics::RenderFullBright = false;
 Graphics::Sun Graphics::WorldSun;
 Graphics::Fog Graphics::WorldFog;
 const int Graphics::MAX_LIGHTS = 8;

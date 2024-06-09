@@ -336,6 +336,8 @@ void EditorUI::OpenScene(std::string NewScene)
 	ChangedScene = false; 
 	Scene::LoadNewScene(NewScene, true);
 
+	EditorUI::SelectedObjects.clear();
+
 	UpdateAllInstancesOf<ContextMenu>();
 }
 

@@ -118,13 +118,13 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 			ElementButton->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], 0.03f))
 				->SetUseTexture(true, Application::EditorInstance->Textures[13ull + (size_t)Object.IsCollapsed])
 				->SetPadding(0, 0.01f, Depth - 0.04f / Graphics::AspectRatio + 0.005f, 0.001f)
-				->SetSizeMode(UIBox::SizeMode::PixelRelative));
+				->SetSizeMode(UIBox::SizeMode::AspectRelative));
 		}
 
 		auto Icon = (new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], 0.04f))
 			->SetUseTexture(true, Application::EditorInstance->Textures[ElemIcon])
 			->SetPadding(0, 0, 0, 0.005f)
-			->SetSizeMode(UIBox::SizeMode::PixelRelative);
+			->SetSizeMode(UIBox::SizeMode::AspectRelative);
 		ElementButton->AddChild(Icon);
 
 		if (Object.Object)

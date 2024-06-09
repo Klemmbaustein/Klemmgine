@@ -107,9 +107,18 @@ public:
 		*
 		* A box where `size x` = `size y` is guaranteed to be square.
 		*
-		* A PixelRelative box with the size x=1, x=1 has the same size as a ScreenRelative box with the size x=1/AspectRatio, y=1.
+		* A AspectRelative box with the size x=1, x=1 has the same size as a ScreenRelative box with the size x=1/AspectRatio, y=1.
 		*/
-		PixelRelative = 1
+		AspectRelative = 1,
+
+		/**
+		 * @brief
+		 * Size should be relative to the screen resolution.
+		 *
+		 * A box where `size x` = `size y` is guaranteed to be square.
+		 * No matter the screens resolution, the box will always have the same size in pixels.
+		 */
+		PixelRelative = 2,
 	};
 
 	virtual std::string GetAsString();
@@ -200,7 +209,7 @@ public:
 	 * A reference to this %UIBox.
 	 */
 	UIBox* SetMaxSize(Vector2 NewMaxSize);
-	Vector2 GetMaxSize();
+	Vector2 GetMaxSize() const;
 
 	/**
 	 * @brief
@@ -213,7 +222,7 @@ public:
 	 * A reference to this %UIBox.
 	 */
 	UIBox* SetMinSize(Vector2 NewMinSize);
-	Vector2 GetMinSize();
+	Vector2 GetMinSize() const;
 
 	/**
 	 * @brief
@@ -231,7 +240,7 @@ public:
 	 * @return
 	 * The position of the box, where -1, -1 is the bottom left corner of the screen and 1, 1 is the top right corner.
 	 */
-	Vector2 GetPosition();
+	Vector2 GetPosition() const;
 
 	/**
 	 * @brief
@@ -257,8 +266,8 @@ public:
 	UIBox* SetTryFill(bool NewTryFill);
 	UIBox* SetPaddingSizeMode(SizeMode NewSizeMode);
 	UIBox* SetOrientation(Orientation NewOrientation);
-	Orientation GetOrientation();
-	bool GetTryFill();
+	Orientation GetOrientation() const;
+	bool GetTryFill() const;
 	friend UIScrollBox;
 	virtual void OnChildClicked(int Index);
 
@@ -284,7 +293,7 @@ public:
 	static void RedrawUI();
 	static void ClearUI();
 	static void UpdateUI();
-	bool IsHovered();
+	bool IsHovered() const;
 	
 	/**
 	 * @brief
@@ -317,8 +326,14 @@ public:
 	static void RedrawArea(RedrawBox Box);
 
 	UIBox* GetParent();
+	void GetLeftRightPadding();
+	void GetPaddingScreenSize(Vector2& UpDown, Vector2& LeftRight) const;
+	static Vector2 PixelSizeToScreenSize(Vector2 PixelSize);
+
+	static float DpiScale;
 
 protected:
+	Vector2 GetLeftRightPadding(const UIBox* Target) const;
 	bool ShouldBeTicked = true;
 	bool TryFill = false;
 	virtual void Update();

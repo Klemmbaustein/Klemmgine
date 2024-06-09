@@ -64,7 +64,7 @@ static std::vector<MenuBarItem> MenuBarItems =
 	MenuBarItem("View",
 		{
 			MenuBarEntry("Toggle Wireframe", []() {Graphics::IsWireframe = !Graphics::IsWireframe; }),
-			MenuBarEntry("Toggle Fullbright", []() {Graphics::RenderFullbright = !Graphics::RenderFullbright; }),
+			MenuBarEntry("Toggle Fullbright", []() {Graphics::RenderFullBright = !Graphics::RenderFullBright; }),
 			MenuBarEntry("Toggle Collision View", []() {
 					if (!CollisionVisualize::GetIsActive())
 					{

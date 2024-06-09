@@ -73,6 +73,7 @@ static std::wstring GetUnicodeString(const std::string& utf8)
 		unicode.push_back(uni);
 	}
 	std::wstring utf16;
+	utf16.reserve(unicode.size());
 	for (size_t i = 0; i < unicode.size(); ++i)
 	{
 		unsigned long uni = unicode[i];
@@ -90,31 +91,33 @@ static std::wstring GetUnicodeString(const std::string& utf8)
 	return utf16;
 }
 
-namespace _TextRenderer
-{
-	std::vector<TextRenderer*> Renderers;
-}
-
 constexpr int FONT_BITMAP_WIDTH = 2700;
 constexpr int FONT_BITMAP_PADDING = 32;
 constexpr int FONT_MAX_UNICODE_CHARS = 700;
+constexpr int TAB_SIZE = 4;
 
 size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale)
 {
-	float originalScale = Scale;
-	Scale *= 5.0f;
+	Scale *= 10.0f;
 	std::wstring TextString = GetUnicodeString(TextSegment::CombineToString(Text));
 	TextString.append(L" ");
 	float MaxHeight = 0.0f;
 	float x = 0.f, y = 0.f;
-	Uint32 numVertices = 0;
 	size_t i = 0;
+	size_t CharIndex = 0;
 	float PrevDepth = 0;
 	float PrevMaxDepth = 0;
 	for (auto& c : TextString)
 	{
+		bool IsTab = false;
+		if (c == L'\t')
 		{
-			int GlyphIndex = (int)TextString[i] - 32;
+			c = L' ';
+			IsTab = true;
+		}
+		if (c >= 32)
+		{
+			int GlyphIndex = (int)c - 32;
 			if (GlyphIndex < 0)
 			{
 				continue;
@@ -124,26 +127,34 @@ size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, fl
 				GlyphIndex = FONT_MAX_UNICODE_CHARS - 31;
 			}
 			Glyph g = LoadedGlyphs[GlyphIndex];
-			x += g.TotalSize.X;
+			do
+			{
+				x += g.TotalSize.X;
+			} while (++CharIndex % TAB_SIZE && IsTab);
 			MaxHeight = std::max(g.Size.Y + g.Offset.Y, MaxHeight);
+			float LastDistance = x / 450 / Graphics::AspectRatio * Scale;
 			PrevMaxDepth = x;
 			PrevDepth = x;
-		}
-		numVertices += 6;
-		if (x / 450 / Graphics::AspectRatio * Scale > Dist)
-		{
-			return i;
+			if (LastDistance > Dist)
+			{
+				if (LastDistance > Dist + (g.TotalSize.X / 800 / Graphics::AspectRatio * Scale))
+				{
+					return std::min(i, TextSegment::CombineToString(Text).size());
+				}
+
+				return std::min(i + 1, TextSegment::CombineToString(Text).size());
+			}
+			PrevMaxDepth = g.Offset.Y + g.Size.X, 0;
+			PrevDepth = g.Offset.Y;
 		}
 		i++;
 	}
-	return TextString.size() - 1;
+
+	return std::min(i, TextSegment::CombineToString(Text).size());
 }
 
 TextRenderer::TextRenderer(std::string filename)
 {
-	_TextRenderer::Renderers.push_back(this);
-	Uint8* ttfBuffer = (Uint8*)malloc(1 << 20);
-	ENGINE_ASSERT(ttfBuffer != nullptr, "The allocated buffer should never be null");
 	if (!std::filesystem::exists(filename))
 	{
 #if RELEASE
@@ -157,17 +168,26 @@ TextRenderer::TextRenderer(std::string filename)
 		Filename = filename;
 	}
 
-	size_t ret = fread(ttfBuffer, 1, 1 << 20, fopen(Filename.c_str(), "rb"));
-	if (!ret)
+	if (!std::filesystem::exists(Filename))
 	{
-		Log::Print("Failed to load font: " + filename);
+		Log::Print("Failed to load font: " + Filename, Log::LogColor::Red);
+		return;
+	}
+
+	Uint8* ttfBuffer = (Uint8*)malloc(1 << 20);
+	ENGINE_ASSERT(ttfBuffer != nullptr, "Failed to allocate space for font bitmap");
+
+	size_t ret = fread(ttfBuffer, 1, 1 << 20, fopen(Filename.c_str(), "rb"));
+	if (!ret || !ttfBuffer)
+	{
+		Log::Print("Failed to load font: " + Filename, Log::LogColor::Red);
 		return;
 	}
 	stbtt_fontinfo FontInfo;
 	stbtt_InitFont(&FontInfo, ttfBuffer, stbtt_GetFontOffsetForIndex(ttfBuffer, 0));
 
 
-	uint8_t* GlyphBitmap = new uint8_t[FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH](0);
+	uint8_t* GlypthBitmap = new uint8_t[FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH](0);
 	int Offset = 0;
 	int xCoord = 0;
 	int yCoord = 0;
@@ -181,17 +201,17 @@ TextRenderer::TextRenderer(std::string filename)
 		int glyph = i;
 		if (i > FONT_MAX_UNICODE_CHARS)
 		{
-			glyph = '#';
+			glyph = 0x000025A1;
 		}
-		int w, h, xOff, yOff;
+		int w, h, xOffset, yOffset;
 		auto bmp = stbtt_GetCodepointBitmap(&FontInfo,
 			0.05f,
 			0.05f,
 			glyph,
 			&w,
-			&h, 
-			&xOff, 
-			&yOff);
+			&h,
+			&xOffset,
+			&yOffset);
 
 		int advW, leftB;
 		stbtt_GetCodepointHMetrics(&FontInfo, glyph, &advW, &leftB);
@@ -213,13 +233,16 @@ TextRenderer::TextRenderer(std::string filename)
 			(float)(w + 3) / FONT_BITMAP_WIDTH,
 			(float)(h + 3) / FONT_BITMAP_WIDTH);
 
-		New.Offset = Vector2((float)xOff, (float)yOff) / 20.0f;
-		New.Size = Vector2((float)w, (float)h) / 20.0f;
+		New.Offset = Vector2((float)xOffset, (float)yOffset) / 20.0;
+		New.Size = Vector2((float)w, (float)h) / 20.0;
 
-		CharacterSize = std::max(New.Size.Y + New.Offset.Y, CharacterSize);
+		CharacterSize = std::max(New.Size.Y + New.Offset.Y, (float)CharacterSize);
 
-		// Give some additional space for better anti aliasing
-		New.Size += Vector2(3.0f / 20.0f, 3.0f / 20.0f);
+		if (New.Size != 0)
+		{
+			// Give some additional space for better anti aliasing
+			New.Size += Vector2(3.0f / 20.0f, 3.0f / 20.0f);
+		}
 
 		if (w == 0 || h == 0 || i == ' ')
 		{
@@ -233,20 +256,13 @@ TextRenderer::TextRenderer(std::string filename)
 		{
 			for (int itw = 0; itw < w; itw++)
 			{
-				int Index = (ith + yCoord) * FONT_BITMAP_WIDTH + (xCoord + itw);
-
-				if (Index > FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH)
-				{
-					break;
-				}
-
-				GlyphBitmap[Index] = bmp[ith * w + itw];
+				GlypthBitmap[(ith + yCoord) * FONT_BITMAP_WIDTH + (xCoord + itw)] = bmp[ith * w + itw];
 			}
 		}
-		free(bmp);
 		maxH = std::max(maxH, h);
 		xCoord += w + FONT_BITMAP_PADDING;
 		LoadedGlyphs.push_back(New);
+		free(bmp);
 	}
 
 	glGenTextures(1, &fontTexture);
@@ -258,8 +274,8 @@ TextRenderer::TextRenderer(std::string filename)
 		FONT_BITMAP_WIDTH,
 		0,
 		GL_ALPHA,
-		GL_UNSIGNED_BYTE, 
-		GlyphBitmap);
+		GL_UNSIGNED_BYTE,
+		GlypthBitmap);
 	// can free temp_bitmap at this point
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -283,29 +299,37 @@ TextRenderer::TextRenderer(std::string filename)
 	glBindVertexArray(0);
 
 	free(ttfBuffer);
-	delete[] GlyphBitmap;
+	delete[] GlypthBitmap;
 }
 
 Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, float LengthBeforeWrap)
 {
-	float originalScale = Scale;
 	Scale *= 5.0f;
-	FontVertex* vData = fontVertexBufferData;
-	float x = 0.f, y = CharacterSize;
+	LengthBeforeWrap = LengthBeforeWrap * Graphics::AspectRatio / Scale;
+	float x = 0.f, y = CharacterSize * 5;
 	float MaxX = 0.0f;
+	FontVertex* vData = fontVertexBufferData;
+	Uint32 numVertices = 0;
 	size_t Wraps = 0;
+	size_t CharIndex = 0;
 	for (auto& seg : Text)
 	{
 		size_t LastWordIndex = SIZE_MAX;
 		size_t LastWrapIndex = 0;
 		Uint32 LastWordNumVertices = 0;
-		std::wstring UTFString = GetUnicodeString(seg.Text);
-
-		for (size_t i = 0; i < UTFString.size(); i++)
+		FontVertex* LastWordVDataPtr = nullptr;
+		std::wstring SegmentText = GetUnicodeString(seg.Text);
+		for (size_t i = 0; i < SegmentText.size(); i++)
 		{
-			//for (int txIt = 0; txIt < (IsTab ? 4 : 1); txIt++)
+			bool IsTab = SegmentText[i] == '\t';
+			if (IsTab)
 			{
-				int GlyphIndex = (int)UTFString[i] - 32;
+				SegmentText[i] = ' ';
+			}
+
+			if (SegmentText[i] >= 32)
+			{
+				int GlyphIndex = (int)SegmentText[i] - 32;
 				if (GlyphIndex < 0)
 				{
 					continue;
@@ -315,99 +339,62 @@ Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, f
 					GlyphIndex = FONT_MAX_UNICODE_CHARS - 31;
 				}
 				Glyph g = LoadedGlyphs[GlyphIndex];
-				x += g.TotalSize.X;
-			}
-			if (UTFString[i] == ' ')
-			{
-				LastWordIndex = i;
-			}
+				do
+				{
+					x += g.TotalSize.X;
+				} while (++CharIndex % TAB_SIZE && IsTab);
 
-			MaxX = std::max(x, MaxX);
+				if (SegmentText[i] == ' ')
+				{
+					LastWordIndex = i;
+					LastWordNumVertices = numVertices;
+					LastWordVDataPtr = vData;
+				}
 
-			vData += 6;
-			if (x * Scale / 450 > LengthBeforeWrap && Wrapped)
+				vData += 6;
+				numVertices += 6;
+				MaxX = std::max(MaxX, x);
+			}
+			if ((x / 225 > LengthBeforeWrap && Wrapped) || SegmentText[i] == (int)'\n')
 			{
 				Wraps++;
 				if (LastWordIndex != SIZE_MAX && LastWordIndex != LastWrapIndex)
 				{
 					i = LastWordIndex;
 					LastWrapIndex = i;
+					vData = LastWordVDataPtr;
+					numVertices = LastWordNumVertices;
 				}
 				x = 0;
-				y += CharacterSize;
+				y += CharacterSize * 5;
 			}
 		}
 	}
-	return (Vector2(MaxX / Graphics::AspectRatio / 450, y / 450 * 5)) * Scale;
-}
-
-Vector2 TextRenderer::GetLetterPosition(ColoredText Text, size_t Index, float Scale, bool Wrapped, float LengthBeforeWrap)
-{
-	Scale *= 5.0f;
-	float x = 0.f, y = CharacterSize;
-	size_t Wraps = 0;
-	size_t it = 0;
-	Vector2 LetterPosition = Vector2(x / Graphics::AspectRatio / 450, (y / 450 * 5)) * Scale;
-
-	for (auto& seg : Text)
-	{
-		size_t LastWordIndex = SIZE_MAX;
-		size_t LastWrapIndex = 0;
-		Uint32 LastWordNumVertices = 0;
-		std::wstring UTFString = GetUnicodeString(seg.Text);
-
-		for (size_t i = 0; i < UTFString.size(); i++)
-		{
-			//for (int txIt = 0; txIt < (IsTab ? 4 : 1); txIt++)
-			{
-				int GlyphIndex = (int)UTFString[i] - 32;
-				if (GlyphIndex < 0)
-				{
-					continue;
-				}
-				if (GlyphIndex > FONT_MAX_UNICODE_CHARS)
-				{
-					GlyphIndex = FONT_MAX_UNICODE_CHARS - 31;
-				}
-				Glyph g = LoadedGlyphs[GlyphIndex];
-				x += g.TotalSize.X;
-			}
-			if (UTFString[i] == ' ')
-			{
-				LastWordIndex = i;
-			}
-
-			if (it++ < Index)
-			{
-				LetterPosition = Vector2(x / Graphics::AspectRatio / 450, (y / 450 * 5)) * Scale;
-			}
-
-			if (x * Scale / 450 > LengthBeforeWrap && Wrapped)
-			{
-				Wraps++;
-				if (LastWordIndex != SIZE_MAX && LastWordIndex != LastWrapIndex)
-				{
-					i = LastWordIndex;
-					LastWrapIndex = i;
-				}
-				x = 0;
-				y -= CharacterSize;
-			}
-		}
-	}
-	if (Wraps == 0)
-	{
-		return Vector2(LetterPosition.X, 0);
-	}
-	return Vector2(LetterPosition.X, LetterPosition.Y);
+	return Vector2(MaxX / 450 / Graphics::AspectRatio * Scale, y / 450 * Scale);
 }
 
 DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale, Vector3 Color, float opacity, float LengthBeforeWrap)
 {
+	size_t CharIndex = 0;
 	for (auto& i : Text)
 	{
-		StrUtil::ReplaceChar(i.Text, '	', "    ");
+		for (size_t it = 0; it < i.Text.size(); it++)
+		{
+			if (i.Text[it] == '\t')
+			{
+				i.Text[it] = ' ';
+				while (++CharIndex % TAB_SIZE)
+				{
+					i.Text.insert(i.Text.begin() + it++, ' ');
+				}
+			}
+			else
+			{
+				CharIndex++;
+			}
+		}
 	}
+
 	GLuint newVAO = 0, newVBO = 0;
 	glGenVertexArrays(1, &newVAO);
 	glBindVertexArray(newVAO);
@@ -424,6 +411,7 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 	glBindVertexArray(0);
 
 	Scale *= 5.0f;
+	LengthBeforeWrap = LengthBeforeWrap * Graphics::AspectRatio / Scale;
 	Pos.X = Pos.X * 450 * Graphics::AspectRatio;
 	Pos.Y = Pos.Y * -450;
 	glBindVertexArray(newVAO);
@@ -433,10 +421,9 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 	{
 		fontVertexBufferCapacity = len;
 		glBufferData(GL_ARRAY_BUFFER, sizeof(FontVertex) * 6 * fontVertexBufferCapacity, 0, GL_DYNAMIC_DRAW);
-		delete[]fontVertexBufferData;
+		delete[] fontVertexBufferData;
 		fontVertexBufferData = new FontVertex[fontVertexBufferCapacity * 6];
 	}
-	float MaxHeight = 0.0f;
 	float x = 0.f, y = 0.f;
 	FontVertex* vData = fontVertexBufferData;
 	Uint32 numVertices = 0;
@@ -451,36 +438,39 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 		for (size_t i = 0; i < UTFString.size(); i++)
 		{
 			int GlyphIndex = (int)UTFString[i] - 32;
-			if (GlyphIndex > FONT_MAX_UNICODE_CHARS)
+			if (GlyphIndex >= 0)
 			{
-				GlyphIndex = FONT_MAX_UNICODE_CHARS - 31;
+				if (GlyphIndex > FONT_MAX_UNICODE_CHARS)
+				{
+					GlyphIndex = FONT_MAX_UNICODE_CHARS - 31;
+				}
+				Glyph g = LoadedGlyphs[GlyphIndex];
+
+				Vector2 StartPos = Vector2(x, y) + g.Offset;
+				if (g.Size != 0)
+				{
+					vData[0].position = StartPos + Vector2(0, g.Size.Y); vData[0].texCoords = g.TexCoordStart + Vector2(0, g.TexCoordOffset.Y);
+					vData[1].position = StartPos + g.Size;               vData[1].texCoords = g.TexCoordStart + g.TexCoordOffset;
+					vData[2].position = StartPos + Vector2(g.Size.X, 0); vData[2].texCoords = g.TexCoordStart + Vector2(g.TexCoordOffset.X, 0);
+					vData[3].position = StartPos;                        vData[3].texCoords = g.TexCoordStart;
+					vData[4].position = StartPos + Vector2(0, g.Size.Y); vData[4].texCoords = g.TexCoordStart + Vector2(0, g.TexCoordOffset.Y);
+					vData[5].position = StartPos + Vector2(g.Size.X, 0); vData[5].texCoords = g.TexCoordStart + Vector2(g.TexCoordOffset.X, 0);
+					vData[0].color = seg.Color;	                         vData[1].color = seg.Color;
+					vData[2].color = seg.Color;	                         vData[3].color = seg.Color;
+					vData[4].color = seg.Color;                          vData[5].color = seg.Color;
+					vData += 6;
+					numVertices += 6;
+				}
+				x += g.TotalSize.X;
+
+				if (UTFString[i] == ' ')
+				{
+					LastWordIndex = i;
+					LastWordNumVertices = numVertices;
+					LastWordVDataPtr = vData;
+				}
 			}
-			Glyph g = LoadedGlyphs[GlyphIndex];
-
-			Vector2 StartPos = Vector2(x, y) + g.Offset;
-
-			vData[0].position = StartPos + Vector2(0, g.Size.Y); vData[0].texCoords = g.TexCoordStart + Vector2(0, g.TexCoordOffset.Y);
-			vData[1].position = StartPos + g.Size;               vData[1].texCoords = g.TexCoordStart + g.TexCoordOffset;
-			vData[2].position = StartPos + Vector2(g.Size.X, 0); vData[2].texCoords = g.TexCoordStart + Vector2(g.TexCoordOffset.X, 0);
-			vData[3].position = StartPos;                        vData[3].texCoords = g.TexCoordStart;
-			vData[4].position = StartPos + Vector2(0, g.Size.Y); vData[4].texCoords = g.TexCoordStart + Vector2(0, g.TexCoordOffset.Y);
-			vData[5].position = StartPos + Vector2(g.Size.X, 0); vData[5].texCoords = g.TexCoordStart + Vector2(g.TexCoordOffset.X, 0);
-			vData[0].color = seg.Color;		vData[1].color = seg.Color;
-			vData[2].color = seg.Color;		vData[3].color = seg.Color;
-			vData[4].color = seg.Color;		vData[5].color = seg.Color;
-			x += g.TotalSize.X;
-
-			if (UTFString[i] == L' ')
-			{
-				LastWordIndex = i;
-				LastWordNumVertices = numVertices;
-				LastWordVDataPtr = vData;
-			}
-
-			MaxHeight = std::max(StartPos.Y + g.Offset.Y, MaxHeight);
-			vData += 6;
-			numVertices += 6;
-			if (x * Scale / 450 > LengthBeforeWrap)
+			if (x / 225 > LengthBeforeWrap || UTFString[i] == (int)'\n')
 			{
 				if (LastWordIndex != SIZE_MAX && LastWordIndex != LastWrapIndex)
 				{
@@ -500,13 +490,6 @@ DrawableText* TextRenderer::MakeText(ColoredText Text, Vector2 Pos, float Scale,
 
 TextRenderer::~TextRenderer()
 {
-	unsigned int i = 0;
-	for (TextRenderer* r : _TextRenderer::Renderers)
-	{
-		if (r == this)
-			_TextRenderer::Renderers.erase(_TextRenderer::Renderers.begin() + i);
-		i++;
-	}
 	glDeleteTextures(1, &fontTexture);
 	glDeleteBuffers(1, &fontVertexBufferId);
 	glDeleteBuffers(1, &fontVao);
@@ -531,37 +514,24 @@ DrawableText::DrawableText(unsigned int VAO, unsigned int VBO, unsigned int NumV
 
 void DrawableText::Draw(ScrollObject* CurrentScrollObject) const
 {
-	Graphics::TextShader->Bind();
-	if (CurrentScrollObject != nullptr)
-	{
-		float TextPos = (Position.Y) / -450 + CurrentScrollObject->Percentage;
-
-		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"),
-			-CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y);
-		if (CurrentScrollObject->Position.Y > TextPos + Scale * 0.01f)
-		{
-			return;
-		}
-		if (CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y < TextPos)
-		{
-			return;
-		}
-	}
-	else
-	{
-		glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_offset"), 0, -1000, 1000);
-	}
+	Shader* TextShader = Graphics::TextShader;
 	glBindVertexArray(VAO);
+	TextShader->Bind();
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, Texture);
-	glUniform1i(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_texture"), 0);
-	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "textColor"), Color.X, Color.Y, Color.Z);
-	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_aspectratio"), Graphics::AspectRatio);
-	glUniform3f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "transform"), (float)Position.X, (float)Position.Y, Scale);
-	glUniform1f(glGetUniformLocation(Graphics::TextShader->GetShaderID(), "u_opacity"), Opacity);
-	Graphics::TextShader->SetVector2("u_screenRes", Graphics::WindowResolution);
-	unsigned int attachments[2] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-	glDrawBuffers(2, attachments);
+	TextShader->SetInt("u_texture", 0);
+	TextShader->SetVector3("textColor", Vector3(Color.X, Color.Y, Color.Z));
+	TextShader->SetFloat("u_aspectratio", Graphics::AspectRatio);
+	TextShader->SetVector3("transform", Vector3((float)Position.X, (float)Position.Y, Scale));
+	TextShader->SetVector2("u_screenRes", Vector2(Graphics::WindowResolution.Y * 1.5f));
+	TextShader->SetFloat("u_opacity", Opacity);
+	if (CurrentScrollObject != nullptr)
+	{
+		TextShader->SetVector3("u_offset",
+			Vector3(-CurrentScrollObject->Percentage, CurrentScrollObject->Position.Y, CurrentScrollObject->Position.Y - CurrentScrollObject->Scale.Y));
+	}
+	else
+		TextShader->SetVector3("u_offset", Vector3(0, -1000, 1000));
 	glDrawArrays(GL_TRIANGLES, 0, NumVerts);
 }
 

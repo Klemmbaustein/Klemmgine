@@ -24,7 +24,10 @@ class UIText : public UIBox
 	float TextWidthOverride = 0;
 	float Opacity = 1.f;
 	SizeMode WrapSizeMode = SizeMode::ScreenRelative;
+	float GetRenderedSize() const;
+	float GetWrapDistance() const;
 public:
+	SizeMode TextSizeMode = SizeMode::AspectRelative;
 
 	void Tick() override;
 	bool Wrap = false;
@@ -37,13 +40,21 @@ public:
 	UIText* SetTextWidthOverride(float NewTextWidthOverride);
 	UIText* SetWrapEnabled(bool WrapEnabled, float WrapDistance, SizeMode WrapSizeMode);
 
+	/**
+	 * @brief
+	 * Sets the size mode of the text.
+	 *
+	 * > Note: This has to be used instead of UIBox::SetSizeMode()
+	 */
+	UIText* SetTextSizeMode(SizeMode NewMode);
+
 	size_t GetNearestLetterAtLocation(Vector2 Position);
 	Vector2 GetLetterLocation(size_t Index);
 
 	virtual std::string GetAsString() override;
 
-	void SetText(ColoredText NewText);
-	void SetText(std::string NewText);
+	UIText* SetText(ColoredText NewText);
+	UIText* SetText(std::string NewText);
 	std::string GetText() const;
 	UIText(float Scale, Vector3 Color, std::string Text, TextRenderer* Renderer);
 	UIText(float Scale, ColoredText Text, TextRenderer* Renderer);

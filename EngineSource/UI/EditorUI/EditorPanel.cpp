@@ -434,7 +434,7 @@ void EditorPanel::AddTabButton(bool Selected, int Index, std::string Name, bool 
 		->SetCanBeDragged(true)
 		->SetPadding(0, 0, 0.005f, 0.005f)
 		->SetMinSize(Vector2(0.05f, 0.04f))
-		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
+		->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)
 		->AddChild((new UIBackground(UIBox::Orientation::Horizontal,
 			0,
 			Selected ? EditorUI::UIColors[2] : EditorUI::UIColors[0] * 0.75f,
@@ -453,7 +453,7 @@ void EditorPanel::AddTabButton(bool Selected, int Index, std::string Name, bool 
 		HorizontalBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, Index))
 			->SetUseTexture(true, EditorUI::Textures[4])
 			->SetMinSize(0.03f)
-			->SetSizeMode(UIBox::SizeMode::PixelRelative)
+			->SetSizeMode(UIBox::SizeMode::AspectRelative)
 			->SetPadding(0, 0, 0, 0.005f));
 	}
 }
