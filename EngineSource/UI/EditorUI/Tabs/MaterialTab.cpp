@@ -280,7 +280,7 @@ void MaterialTab::GenerateUI()
 		case NativeType::Bool:
 		{
 			NewField = new UIButton(UIBox::Orientation::Horizontal, 0, 1, this, Index);
-			NewField->SetSizeMode(UIBox::SizeMode::PixelRelative);
+			NewField->SetSizeMode(UIBox::SizeMode::AspectRelative);
 			NewField->SetMinSize(0.04f);
 			NewField->SetBorder(UIBox::BorderType::Rounded, 0.3f);
 			NewField->SetPadding(0.03f, 0.03f, 0.02f, 0.01f);
@@ -301,7 +301,7 @@ void MaterialTab::GenerateUI()
 				->SetMinSize(Vector2(DesiredValueSize - 0.1f, 0.04f));
 			ParamBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1, DesiredValueSize > 0.175f ? 0.15f : 0.1f))
 				->SetUseTexture(true, NewTexture)
-				->SetSizeMode(UIBox::SizeMode::PixelRelative));
+				->SetSizeMode(UIBox::SizeMode::AspectRelative));
 
 			UIBox* TextureSelectionBoxes[2] =
 			{
@@ -420,7 +420,7 @@ void MaterialTab::GenerateMaterialProperties()
 	for (const auto& i : Options)
 	{
 		auto NewField = new UIButton(UIBox::Orientation::Horizontal, 0, 0.75f, this, -5 - it++);
-		NewField->SetSizeMode(UIBox::SizeMode::PixelRelative);
+		NewField->SetSizeMode(UIBox::SizeMode::AspectRelative);
 		NewField->SetMinSize(0.04f);
 		NewField->SetBorder(UIBox::BorderType::Rounded, 0.3f);
 		NewField->SetPadding(0, 0, 0.03f, 0);

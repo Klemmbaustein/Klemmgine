@@ -26,7 +26,7 @@ ItemBrowser::ItemBrowser(EditorPanel* Parent, std::string Name) : EditorPanel(Pa
 
 	PanelMainBackground->AddChild(SeparatorLine
 		->SetPadding(0, 0, 0.005f, 0.005f)
-		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
+		->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)
 		->SetTryFill(true));
 
 	BrowserScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
@@ -213,9 +213,9 @@ void ItemBrowser::GenerateTopBox()
 	TopBox->AddChild(UpButton
 		->SetUseTexture(true, EditorUI::Textures[8])
 		->SetPadding(0.01f)
-		->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
+		->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)
 		->SetMinSize(0.05f)
-		->SetSizeMode(UIBox::SizeMode::PixelRelative));
+		->SetSizeMode(UIBox::SizeMode::AspectRelative));
 
 	TopBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Path, EditorUI::Text))
 		->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
@@ -256,21 +256,21 @@ void ItemBrowser::GenerateAssetList()
 			->SetBorder(UIBox::BorderType::Rounded, 0.4f)
 			->SetMinSize(Vector2(0, 0.2f))
 			->SetPadding(0.01f, 0.0f, 0.01f, 0.0f)
-			->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
-			->SetSizeMode(UIBox::SizeMode::PixelRelative)
+			->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)
+			->SetSizeMode(UIBox::SizeMode::AspectRelative)
 			->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, Item.Color, 0.125f))
 				->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1.0f, 0.125f))
 					->SetUseTexture(true, Item.Texture)
-					->SetSizeMode(UIBox::SizeMode::PixelRelative)
+					->SetSizeMode(UIBox::SizeMode::AspectRelative)
 					->SetPadding(0))
 				->SetBorder(UIBox::BorderType::Rounded, 0.4f)
 				->SetPadding(0.005f)
-				->SetSizeMode(UIBox::SizeMode::PixelRelative)
-				->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative))
+				->SetSizeMode(UIBox::SizeMode::AspectRelative)
+				->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative))
 			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], Item.Name, EditorUI::Text))
 				->SetWrapEnabled(true, 0.115f, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0, 0, 0.005f, 0.005f)
-				->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)));
+				->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)));
 		Index++;
 	}
 
@@ -298,10 +298,10 @@ void ItemBrowser::OnButtonDragged(int Index)
 	DraggedButton
 		->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1.0f, 0.125f))
 			->SetUseTexture(true, Item.Texture)
-			->SetSizeMode(UIBox::SizeMode::PixelRelative)
+			->SetSizeMode(UIBox::SizeMode::AspectRelative)
 			->SetPadding(0))
 		->SetBorder(UIBox::BorderType::Rounded, 0.4f)
-		->SetSizeMode(UIBox::SizeMode::PixelRelative);
+		->SetSizeMode(UIBox::SizeMode::AspectRelative);
 
 	DraggedItem = Item;
 }

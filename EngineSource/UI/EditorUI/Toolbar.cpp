@@ -43,7 +43,7 @@ void Toolbar::GenerateButtons()
 			}
 			ButtonsBox->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, (int)i * 16 + (int)j))
 				->SetUseTexture(true, Buttons[i].Buttons[j].Texture)
-				->SetSizeMode(UIBox::SizeMode::PixelRelative)
+				->SetSizeMode(UIBox::SizeMode::AspectRelative)
 				->SetPadding(0, 0, 0.01f, 0.01f)
 				->SetMinSize(0.04f));
 

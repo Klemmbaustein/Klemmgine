@@ -119,12 +119,12 @@ void FramebufferObject::Draw()
 	glEnable(GL_CULL_FACE);
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.f, 0.f, 0.f, 1.f);		//Clear color black
+	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glViewport(0, 0, Graphics::ShadowResolution, Graphics::ShadowResolution);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	CSM::UpdateMatricesUBO(FramebufferCamera);
 
-	if (Graphics::RenderShadows && Graphics::ShadowResolution > 0 && !Graphics::RenderFullbright)
+	if (Graphics::RenderShadows && Graphics::ShadowResolution > 0 && !Graphics::RenderFullBright)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, CSM::LightFBO);
 		glClear(GL_DEPTH_BUFFER_BIT);

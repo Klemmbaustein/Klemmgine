@@ -1,5 +1,12 @@
 # Changes
 
+## Version 1.10.12
+
+### Changes
+
+- Brought over `UIBox::SizeMode::AspectRelative` and `UIBox::SizeMode::PixelRelative` from KlemmUI.
+- Changed the way text wrapping works.
+
 ## Version 1.10.11
 
 ### Changes

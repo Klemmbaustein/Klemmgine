@@ -1,6 +1,5 @@
 #include "OS.h"
 #if _WIN32
-//Include Windows Headers
 #include <Windows.h>
 #include <Shlobj.h>
 #include <shobjidl.h> 
@@ -13,11 +12,11 @@
 #include <unistd.h>
 #include <ios>
 #include <iostream>
+#endif
+
 #include <fstream>
 #include <string>
 #include <Engine/Utility/StringUtility.h>
-#endif
-
 #include <Engine/Log.h>
 
 namespace OS

@@ -17,32 +17,39 @@ public static class NativeFunction
 	{
 		LoadedNativeFunctions.Add(Name, FunctionPtr);
 	}
-	public static object CallNativeFunction(string Name, Type del, object[] Args)
+
+	private static void NativeFunctionError(string Message)
 	{
-		if (!LoadedNativeFunctions.TryGetValue(Name, out nint Value))
+		Log.Print(Message, Log.Severity.Error);
+		Log.Print("------------------------ Native functions: ------------------------", Log.Severity.Error);
+		foreach (var i in LoadedNativeFunctions)
 		{
-			Log.Print("Failed to call native function: " + Name, Log.Severity.Error);
-			Log.Print("------------------------ Native functions: ------------------------", Log.Severity.Error);
-			foreach (var i in LoadedNativeFunctions)
-			{
-				Log.Print(i.Key, Log.Severity.Error);
-			}
+			Log.Print(i.Key, Log.Severity.Error);
+		}
+	}
+
+	public static object CallNativeFunction(string Name, Type DelegateType, object[] Args)
+	{
+		if (!DelegateType.IsSubclassOf(typeof(Delegate)))
+		{
+			Log.Print($"Attempted to call a native function but the given type doesn't derive from Delegate. Type: {DelegateType}", Log.Severity.Error);
 			return null;
 		}
 
-		var NewDel = Marshal.GetDelegateForFunctionPointer(Value, del);
-
-		if (NewDel == null)
+		if (!LoadedNativeFunctions.TryGetValue(Name, out IntPtr FunctionPointer))
 		{
-			Log.Print("Failed to get delegate for native function: " + Name, Log.Severity.Error);
-			Log.Print("------------------------ Native functions: ------------------------", Log.Severity.Error);
-			foreach (var i in LoadedNativeFunctions)
-			{
-				Log.Print(i.Key, Log.Severity.Error);
-			}
+			NativeFunctionError($"Failed to call native function: {Name}");
 			return null;
 		}
 
-		return NewDel.DynamicInvoke(Args);
+		Delegate PointerDelegate = Marshal.GetDelegateForFunctionPointer(FunctionPointer, DelegateType);
+
+		if (PointerDelegate == null)
+		{
+			NativeFunctionError($"Failed to get delegate for native function: {Name}");
+			return null;
+		}
+
+		return PointerDelegate.DynamicInvoke(Args);
 	}
 }

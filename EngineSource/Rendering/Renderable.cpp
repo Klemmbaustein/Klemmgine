@@ -47,7 +47,7 @@ void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFr
 
 	ShaderToApply->SetVector3("u_directionallight.Direction", Vector3::GetForwardVector(Graphics::WorldSun.Rotation));
 
-	const Graphics::Sun& UsedSun = Graphics::RenderFullbright ? FullbrightSun : Graphics::WorldSun;
+	const Graphics::Sun& UsedSun = Graphics::RenderFullBright ? FullbrightSun : Graphics::WorldSun;
 
 	ShaderToApply->SetFloat("u_directionallight.Intensity", UsedSun.Intensity);
 	ShaderToApply->SetFloat("u_directionallight.AmbientIntensity", UsedSun.AmbientIntensity);

@@ -23,7 +23,7 @@ public:
 	static bool IsWireframe;
 	static int ShadowResolution;
 	static bool Bloom;
-	static bool RenderFullbright;
+	static bool RenderFullBright;
 	static float Gamma;
 
 	static const int MAX_LIGHTS;

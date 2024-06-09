@@ -135,7 +135,7 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 		}
 		Element = (new UIButton(UIBox::Orientation::Horizontal, 0, 1, this, Index))
 			->SetUseTexture(std::stoi(Value), Application::EditorInstance->Textures[16])
-			->SetSizeMode(UIBox::SizeMode::PixelRelative)
+			->SetSizeMode(UIBox::SizeMode::AspectRelative)
 			->SetMinSize(0.04f)
 			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);

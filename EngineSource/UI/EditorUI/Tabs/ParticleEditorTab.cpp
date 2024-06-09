@@ -225,7 +225,7 @@ void ParticleEditorTab::Generate()
 			->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, it * 100 + 99))
 				->SetUseTexture(true, EditorUI::Textures[4])
 				->SetPadding(0)
-				->SetSizeMode(UIBox::SizeMode::PixelRelative)
+				->SetSizeMode(UIBox::SizeMode::AspectRelative)
 				->SetMinSize(0.04f)));
 
 		Rows[it % NumRows]->AddChild(ElementBackground

@@ -159,7 +159,7 @@ void MeshTab::Generate()
 			->SetUseTexture(*OptionVariables[std::abs(Index) - 1], Application::EditorInstance->Textures[16])
 			->SetMinSize(0.04f)
 			->SetPadding(0, 0, 0.01f, 0)
-			->SetSizeMode(UIBox::SizeMode::PixelRelative);
+			->SetSizeMode(UIBox::SizeMode::AspectRelative);
 		NewText->SetPadding(0, 0, 0.02f, 0);
 		NewText->SetTextWidthOverride(0.15f);
 		NewButton->SetBorder(UIBox::BorderType::Rounded, 0.3f);

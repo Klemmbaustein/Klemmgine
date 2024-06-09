@@ -4,14 +4,33 @@
 #include <iostream>
 #include <Rendering/Graphics.h>
 
+float UIText::GetRenderedSize() const
+{
+	float RenderedSize = TextSize;
+	if (TextSizeMode == SizeMode::PixelRelative)
+	{
+		RenderedSize = RenderedSize / Graphics::WindowResolution.Y * 50 * UIBox::DpiScale;
+	}
+	return RenderedSize;
+}
+
+float UIText::GetWrapDistance() const
+{
+	float Distance = WrapDistance;
+	if (WrapSizeMode == SizeMode::AspectRelative)
+	{
+		Distance /= Graphics::AspectRatio;
+	}
+	if (WrapSizeMode == SizeMode::PixelRelative)
+	{
+		Distance = UIBox::PixelSizeToScreenSize(Vector2(Distance, 0.0)).X;
+	}
+	return Distance;
+}
+
 void UIText::Tick()
 {
-	Vector2 NewMin = Renderer->GetTextSize(RenderedText, TextSize, Wrap, WrapDistance);
-	if (TextWidthOverride > 0)
-	{
-		NewMin.X = std::max(MinSize.X, TextWidthOverride);
-	}
-	SetMinSize(NewMin);
+	SetMinSize(GetUsedSize());
 }
 
 Vector3 UIText::GetColor() const
@@ -77,36 +96,37 @@ UIText* UIText::SetWrapEnabled(bool WrapEnabled, float WrapDistance, SizeMode Wr
 	return this;
 }
 
-void UIText::SetText(std::string NewText)
+UIText* UIText::SetText(std::string NewText)
 {
-	SetText({ TextSegment(NewText, Color) });
+	return SetText({ TextSegment(NewText, Color) });
 }
 
-void UIText::SetText(ColoredText NewText)
+UIText* UIText::SetText(ColoredText NewText)
 {
 	if (NewText != RenderedText)
 	{
 		RenderedText = NewText;
 		if (Wrap)
 		{
-			float Distance = WrapDistance;
-			if (WrapSizeMode == SizeMode::PixelRelative)
-			{
-				Distance /= Graphics::AspectRatio;
-			}
-			Vector2 s = Renderer->GetTextSize(RenderedText, TextSize, Wrap, Distance)
-				/ (15.0f * 60.0f);
+			if (!Renderer)
+				return this;
 
-			if (s.X < Distance)
-			{
-				Update();
-				RedrawElement();
-				return;
-			}
+			Vector2 s = Renderer->GetTextSize(RenderedText, GetRenderedSize(), Wrap, GetWrapDistance());
 		}
 		InvalidateLayout();
 		RedrawElement();
 	}
+	return this;
+}
+
+UIText* UIText::SetTextSizeMode(SizeMode NewMode)
+{
+	if (this->TextSizeMode != NewMode)
+	{
+		RedrawElement();
+		this->TextSizeMode = NewMode;
+	}
+	return this;
 }
 
 size_t UIText::GetNearestLetterAtLocation(Vector2 Position)
@@ -143,18 +163,9 @@ UIText::~UIText()
 
 Vector2 UIText::GetLetterLocation(size_t Index)
 {
-	float Distance = WrapDistance;
-	if (WrapSizeMode == SizeMode::PixelRelative)
-	{
-		Distance /= Graphics::AspectRatio;
-	}
-	return Renderer->GetLetterPosition(
-		RenderedText,
-		Index,
-		TextSize,
-		Wrap,
-		WrapDistance
-	) + OffsetPosition;
+	if (!Renderer) return 0;
+	std::string Text = TextSegment::CombineToString(RenderedText);
+	return Vector2(Renderer->GetTextSize({ TextSegment(Text.substr(0, Index), 1) }, GetRenderedSize(), false, 999).X, 0) + OffsetPosition;
 }
 
 std::string UIText::GetAsString()
@@ -173,21 +184,23 @@ void UIText::Draw()
 
 void UIText::Update()
 {
-	if (Text) delete Text;
+	if (!Renderer)
+	{
+		return;
+	}
+	if (Text)
+	{
+		delete Text;
+	}
 	if (Wrap)
 	{
-		float Distance = WrapDistance;
-		if (WrapSizeMode == SizeMode::PixelRelative)
-		{
-			Distance /= Graphics::AspectRatio;
-		}
-		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / (27 / Renderer->CharacterSize)),
-			TextSize, Color, Opacity, Distance);
+		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - GetRenderedSize() / 20),
+			GetRenderedSize(), Color, Opacity, GetWrapDistance());
 	}
 	else
 	{
-		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - TextSize / (27 / Renderer->CharacterSize)),
-			TextSize, Color, Opacity, 999);
+		Text = Renderer->MakeText(RenderedText, OffsetPosition + Vector2(0, Size.Y - GetRenderedSize() / 20),
+			GetRenderedSize(), Color, Opacity, 999);
 	}
 }
 
@@ -197,11 +210,15 @@ void UIText::OnAttached()
 
 Vector2 UIText::GetUsedSize()
 {
-	float Distance = WrapDistance;
-	if (WrapSizeMode == SizeMode::PixelRelative)
+	if (!Renderer)
+		return 0;
+
+	Vector2 Size = Renderer->GetTextSize(RenderedText, GetRenderedSize(), Wrap, GetWrapDistance());
+
+	if (TextWidthOverride != 0)
 	{
-		Distance /= Graphics::AspectRatio;
+		return Vector2(TextWidthOverride, Size.Y);
 	}
-	return Renderer->GetTextSize(RenderedText, TextSize, Wrap, WrapDistance);
+	return Size;
 }
 #endif

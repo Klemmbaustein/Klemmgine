@@ -40,17 +40,22 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 {
 	auto SeparatorBorder = new UIButton(UIBox::Orientation::Horizontal, 0, 0.5f, this, Index);
 
+	StrUtil::ReplaceChar(Name, '\n', "");
+
 	std::string Prefix = ContextObject ? "OBJ_CAT_" : "SCN_";
+
+	bool Collapsed = Application::EditorInstance->CollapsedItems.contains(Prefix + Name);
 
 	auto SeparatorArrow = new UIBackground(UIBox::Orientation::Horizontal, Vector2(0), EditorUI::UIColors[2], 0.035f);
 	SeparatorArrow->SetPadding(0, 0, 0.005f, 0);
 	SeparatorArrow->SetUseTexture(true,
-		Application::EditorInstance->CollapsedItems.contains(Prefix + Name) ? Application::EditorInstance->Textures[14] : Application::EditorInstance->Textures[13])
-		->SetSizeMode(UIBox::SizeMode::PixelRelative);
+			Collapsed ? Application::EditorInstance->Textures[14] : Application::EditorInstance->Textures[13])
+		->SetSizeMode(UIBox::SizeMode::AspectRelative);
+
 	SeparatorBorder
 		->SetVerticalAlign(UIBox::Align::Centered)
 		->AddChild(SeparatorArrow);
-	StrUtil::ReplaceChar(Name, '\n', "");
+
 	auto SeparatorText = new UIText(0.45f, EditorUI::UIColors[2], Name, EditorUI::Text);
 	SeparatorText->SetPadding(0.005f);
 	SeparatorBorder->SetPadding(0.015f, 0, 0, 0);
@@ -61,7 +66,7 @@ void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::
 	BackgroundBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], Vector2(Scale.X - 0.005f, 2.0f / Graphics::WindowResolution.Y)))
 		->SetPadding(0, 0.005f, 0.0025f, 0));
 	ContextCategories.push_back(Name);
-	if (Application::EditorInstance->CollapsedItems.contains(Prefix + Name))
+	if (Collapsed)
 	{
 		return;
 	}
@@ -115,7 +120,7 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 			break;
 		case NativeType::Bool:
 			NewElement = new UIButton(UIBox::Orientation::Horizontal, 0, 0.75f, this, -1);
-			NewElement->SetSizeMode(UIBox::SizeMode::PixelRelative);
+			NewElement->SetSizeMode(UIBox::SizeMode::AspectRelative);
 			NewElement->SetMinSize(0.04f);
 			NewElement->SetBorder(UIBox::BorderType::Rounded, 0.3f);
 			NewElement->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
@@ -281,7 +286,7 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject
 				Value = *((bool*)val);
 			}
 			NewElement = new UIButton(UIBox::Orientation::Horizontal, 0, 0.75f, this, ElemIndex);
-			NewElement->SetSizeMode(UIBox::SizeMode::PixelRelative);
+			NewElement->SetSizeMode(UIBox::SizeMode::AspectRelative);
 			NewElement->SetMinSize(0.04f);
 			NewElement->SetBorder(UIBox::BorderType::Rounded, 0.3f);
 			NewElement->SetPadding(0.01f, 0.01f, 0.02f, 0.01f);
@@ -314,7 +319,7 @@ void ContextMenu::OnButtonClicked(int Index)
 	if (Index >= 0)
 	{
 		std::string Name = ContextCategories.at(Index);
-		Name = (EditorUI::SelectedObjects.size() ? "OBJ_CAT_" : "SCN_") + Name;
+		Name = (IsObject ? "OBJ_CAT_" : "SCN_") + Name;
 		if (Application::EditorInstance->CollapsedItems.contains(Name))
 		{
 			Application::EditorInstance->CollapsedItems.erase(Name);
@@ -547,7 +552,7 @@ void ContextMenu::OnResized()
 				ContextMenuSection(&SelectedObject->GetTransform().Scale, NativeType::Vector3, "Scale"),
 				ContextMenuSection(&SelectedObject->Name, NativeType::String, "Name"),
 			},
-			"Object", nullptr, 0);
+			"Object", SelectedObject, 0);
 
 		std::map<std::string, std::vector<ContextMenuSection>> Categories;
 
@@ -592,10 +597,10 @@ void ContextMenu::OnResized()
 	{
 		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Scene: "
 			+ FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), EditorUI::Text))
-			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
+			->SetWrapEnabled(true, Scale.X * 2.0f - 0.1f, UIBox::SizeMode::ScreenRelative)
 			->SetPadding(0.01f, 0, 0.01f, 0.01f));
 		BackgroundBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], "Path: " + Scene::CurrentScene + ".jscn", EditorUI::Text))
-			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
+			->SetWrapEnabled(true, Scale.X * 2.0f - 0.1f, UIBox::SizeMode::ScreenRelative)
 			->SetPadding(0.005f, 0, 0.01f, 0.01f));
 		BackgroundBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal,
 			0, 

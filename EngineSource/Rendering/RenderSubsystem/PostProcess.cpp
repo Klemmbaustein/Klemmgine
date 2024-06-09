@@ -117,7 +117,7 @@ PostProcess::PostProcess()
 	AddEffect(AntiAliasEffect);
 
 	Console::ConsoleSystem->RegisterConVar(Console::Variable("post_process", NativeType::Bool, &RenderPostProcess, nullptr));
-	Console::ConsoleSystem->RegisterConVar(Console::Variable("full_bright", NativeType::Bool, &Graphics::RenderFullbright, nullptr));
+	Console::ConsoleSystem->RegisterConVar(Console::Variable("full_bright", NativeType::Bool, &Graphics::RenderFullBright, nullptr));
 	Console::ConsoleSystem->RegisterConVar(Console::Variable("aa_enabled", NativeType::Bool, &Graphics::RenderAntiAlias, []() {
 		Graphics::SetWindowResolution(Graphics::WindowResolution, true);
 		}));
