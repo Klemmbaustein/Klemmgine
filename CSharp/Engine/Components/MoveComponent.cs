@@ -13,7 +13,7 @@ public class MoveComponent : ObjectComponent
 	public override void OnAttached()
 	{
 		base.OnAttached();
-		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewMoveComponent", typeof(NewMovement), [ Parent.NativePtr ]);
+		NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewMoveComponent", typeof(NewMovement), [Parent.NativePtr]);
 	}
 
 	public override void Tick()
@@ -23,16 +23,21 @@ public class MoveComponent : ObjectComponent
 
 	public void AddMovementInput(Vector3 Direction)
 	{
-		if (NativePtr != new IntPtr())
+		if (NativePtr == 0)
 		{
-			NativeFunction.CallNativeFunction("MovementComponentAddMovementInput", typeof(AddMovementDelegate), [ Direction, NativePtr ]);
+			return;
 		}
+		NativeFunction.CallNativeFunction("MovementComponentAddMovementInput", typeof(AddMovementDelegate), [Direction, NativePtr]);
 	}
 
 	public float MoveSpeed
 	{
 		set
 		{
+			if (NativePtr == 0)
+			{
+				return;
+			}
 			NativeFunction.CallNativeFunction("MoveComponentSetMoveSpeed", typeof(SetFloatDelegate), [NativePtr, value]);
 		}
 	}
@@ -40,6 +45,11 @@ public class MoveComponent : ObjectComponent
 	{
 		set
 		{
+			if (NativePtr == 0)
+			{
+				return;
+			}
+
 			NativeFunction.CallNativeFunction("MoveComponentSetAcceleration", typeof(SetFloatDelegate), [NativePtr, value]);
 		}
 	}
@@ -47,6 +57,11 @@ public class MoveComponent : ObjectComponent
 	{
 		set
 		{
+			if (NativePtr == 0)
+			{
+				return;
+			}
+
 			NativeFunction.CallNativeFunction("MoveComponentSetDeceleration", typeof(SetFloatDelegate), [NativePtr, value]);
 		}
 	}
@@ -55,6 +70,11 @@ public class MoveComponent : ObjectComponent
 	{
 		set
 		{
+			if (NativePtr == 0)
+			{
+				return;
+			}
+
 			NativeFunction.CallNativeFunction("MoveComponentSetAirAccel", typeof(SetFloatDelegate), [NativePtr, value]);
 		}
 	}
@@ -63,6 +83,11 @@ public class MoveComponent : ObjectComponent
 	{
 		set
 		{
+			if (NativePtr == 0)
+			{
+				return;
+			}
+
 			NativeFunction.CallNativeFunction("MoveComponentSetGravity", typeof(SetFloatDelegate), [NativePtr, value]);
 		}
 	}
@@ -71,6 +96,11 @@ public class MoveComponent : ObjectComponent
 	{
 		get
 		{
+			if (NativePtr == 0)
+			{
+				return false;
+			}
+
 			return (bool)NativeFunction.CallNativeFunction("MoveComponentIsOnGround", typeof(GetBoolDelegate), [NativePtr]);
 		}
 	}
@@ -79,15 +109,21 @@ public class MoveComponent : ObjectComponent
 	{
 		set
 		{
+			if (NativePtr == 0)
+			{
+				return;
+			}
+
 			NativeFunction.CallNativeFunction("MoveComponentSetJumpHeight", typeof(SetFloatDelegate), [NativePtr, value]);
 		}
 	}
 
 	public void Jump()
 	{
-		if (NativePtr != new IntPtr())
+		if (NativePtr == 0)
 		{
-			NativeFunction.CallNativeFunction("MovementComponentJump", typeof(JumpDelegate), [ NativePtr ]);
+			return;
 		}
+		NativeFunction.CallNativeFunction("MovementComponentJump", typeof(JumpDelegate), [NativePtr]);
 	}
 }

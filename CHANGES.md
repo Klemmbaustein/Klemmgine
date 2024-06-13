@@ -1,5 +1,13 @@
 # Changes
 
+## Version 1.10.13
+
+### Fixes
+
+- Fixed some spelling mistakes in the source code.
+- Removed an unused function from Build.cpp.
+- Fixed a bug introduced by the changes to text wrapping in 1.10.12.
+
 ## Version 1.10.12
 
 ### Changes

@@ -42,27 +42,6 @@ namespace Build
 #endif
 }
 
-#if _WIN32
-
-#define NOMINMAX
-#include <Windows.h>
-
-LONG GetStringRegKey(HKEY hKey, const std::wstring& strValueName, std::wstring& strValue, const std::wstring& strDefaultValue)
-{
-	strValue = strDefaultValue;
-	WCHAR szBuffer[512];
-	DWORD dwBufferSize = sizeof(szBuffer);
-	ULONG nError;
-	nError = RegQueryValueExW(hKey, strValueName.c_str(), 0, NULL, (LPBYTE)szBuffer, &dwBufferSize);
-	if (ERROR_SUCCESS == nError)
-	{
-		strValue = szBuffer;
-	}
-	return nError;
-}
-
-#endif
-
 std::string Build::TryBuildProject(std::string TargetFolder)
 {
 	try
@@ -177,7 +156,7 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 					}
 				}
 
-				Log::Print("[Build]: Copying .net runtime. Avaliable runtimes: ");
+				Log::Print("[Build]: Copying .net runtime. Available runtimes: ");
 
 				std::string LatestRuntimePath;
 				std::string LatestRuntimeVersion;
@@ -246,12 +225,10 @@ int Build::BuildCurrentSolution(std::string Configuration)
 	}
 	if (SolutionName.empty())
 	{
-		Log::Print("[Build]: Build system is 'msvc' but there is no .sln file in the main folder", Vector3(1, 0, 0));
+		Log::Print("[Build]: Attempted to build project solution but there is no .sln file in the main folder", Vector3(1, 0, 0));
 		return 1;
 	}
 	Log::Print("[Build]: Found .sln file: " + SolutionName, Log::LogColor::Green);
-
-	std::filesystem::create_directories("Build\\");
 
 	std::string Command = (MSBuildPath + " " + SolutionName + ".sln /p:Configuration=" + Configuration);
 

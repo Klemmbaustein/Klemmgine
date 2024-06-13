@@ -74,7 +74,7 @@ namespace Engine
 		 * @brief
 		 * Executes a console command.
 		 */
-		public static bool ExecuteConsoleCommand(string Command)
+		public static bool Execute(string Command)
 		{
 			return (bool)NativeFunction.CallNativeFunction("CallConsoleCommand", typeof(CommandDelegate), new object[] { Command });
 		}

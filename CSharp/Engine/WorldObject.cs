@@ -92,7 +92,7 @@ public abstract class WorldObject
 
 	/**
 	 * @brief
-	 * Returns a C# object corrisponding to the given native object.
+	 * Returns a C# object corresponding to the given native object.
 	 * 
 	 * If no object has been found, a new Engine.NativePtr is created from the given pointer.
 	 */
@@ -198,6 +198,11 @@ public abstract class WorldObject
 	public Vector3 GetRotation()
 	{
 		return GetTransform().Rotation;
+	}
+
+	public virtual void OnPropertySet()
+	{
+
 	}
 
 	/**

@@ -91,14 +91,14 @@ static std::wstring GetUnicodeString(const std::string& utf8)
 	return utf16;
 }
 
-constexpr int FONT_BITMAP_WIDTH = 2700;
+constexpr int FONT_BITMAP_WIDTH = 3000;
 constexpr int FONT_BITMAP_PADDING = 32;
 constexpr int FONT_MAX_UNICODE_CHARS = 700;
 constexpr int TAB_SIZE = 4;
 
 size_t TextRenderer::GetCharacterIndexADistance(ColoredText Text, float Dist, float Scale)
 {
-	Scale *= 10.0f;
+	Scale *= 5.0f;
 	std::wstring TextString = GetUnicodeString(TextSegment::CombineToString(Text));
 	TextString.append(L" ");
 	float MaxHeight = 0.0f;
@@ -187,7 +187,7 @@ TextRenderer::TextRenderer(std::string filename)
 	stbtt_InitFont(&FontInfo, ttfBuffer, stbtt_GetFontOffsetForIndex(ttfBuffer, 0));
 
 
-	uint8_t* GlypthBitmap = new uint8_t[FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH](0);
+	uint8_t* GlyphBitmap = new uint8_t[FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH](0);
 	int Offset = 0;
 	int xCoord = 0;
 	int yCoord = 0;
@@ -256,7 +256,7 @@ TextRenderer::TextRenderer(std::string filename)
 		{
 			for (int itw = 0; itw < w; itw++)
 			{
-				GlypthBitmap[(ith + yCoord) * FONT_BITMAP_WIDTH + (xCoord + itw)] = bmp[ith * w + itw];
+				GlyphBitmap[(ith + yCoord) * FONT_BITMAP_WIDTH + (xCoord + itw)] = bmp[ith * w + itw];
 			}
 		}
 		maxH = std::max(maxH, h);
@@ -275,7 +275,7 @@ TextRenderer::TextRenderer(std::string filename)
 		0,
 		GL_ALPHA,
 		GL_UNSIGNED_BYTE,
-		GlypthBitmap);
+		GlyphBitmap);
 	// can free temp_bitmap at this point
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -299,7 +299,7 @@ TextRenderer::TextRenderer(std::string filename)
 	glBindVertexArray(0);
 
 	free(ttfBuffer);
-	delete[] GlypthBitmap;
+	delete[] GlyphBitmap;
 }
 
 Vector2 TextRenderer::GetTextSize(ColoredText Text, float Scale, bool Wrapped, float LengthBeforeWrap)

@@ -297,15 +297,15 @@ static class Engine
 				switch (field.FieldType.ToString())
 				{
 					case "System.Int[]":
-						if (int.TryParse(PropertyValue, out int iresult))
+						if (int.TryParse(PropertyValue, out int iResult))
 						{
-							destinationArray.SetValue(iresult, i);
+							destinationArray.SetValue(iResult, i);
 						}
 						break;
 					case "System.Float[]":
-						if (float.TryParse(PropertyValue, out float fresult))
+						if (float.TryParse(PropertyValue, out float fResult))
 						{
-							destinationArray.SetValue(fresult, i);
+							destinationArray.SetValue(fResult, i);
 						}
 						break;
 					case "System.String[]":
@@ -332,16 +332,16 @@ static class Engine
 		switch (field.FieldType.ToString())
 		{
 			case "System.Int":
-				if (int.TryParse(PropertyValue, out int iresult))
+				if (int.TryParse(PropertyValue, out int iResult))
 				{
-					field.SetValue(obj, iresult);
+					field.SetValue(obj, iResult);
 				}
 				break;
 			case "System.Single":
 			case "System.Float":
-				if (float.TryParse(PropertyValue, out float fresult))
+				if (float.TryParse(PropertyValue, out float fResult))
 				{
-					field.SetValue(obj, fresult);
+					field.SetValue(obj, fResult);
 				}
 				break;
 			case "System.String":
@@ -349,7 +349,7 @@ static class Engine
 				break;
 			case "Engine.Vector3":
 				var Culture = CultureInfo.GetCultureInfo("en-US");
-				float[] newPosCoordinates = PropertyValue.Split(new string[] { " " }, StringSplitOptions.None).Select(x => float.Parse(x, Culture)).ToArray();
+				float[] newPosCoordinates = PropertyValue.Split([ " " ], StringSplitOptions.None).Select(x => float.Parse(x, Culture)).ToArray();
 				var vec = field.GetValue(obj)!;
 				Set(ref vec, "X", newPosCoordinates[0]);
 				Set(ref vec, "Y", newPosCoordinates[1]);
@@ -363,22 +363,23 @@ static class Engine
 				EngineLog.Print("Unknown type: " + field.FieldType.ToString(), 2);
 				break;
 		}
+		obj.GetType()!.GetMethod("OnPropertySet")!.Invoke(obj, []);
 	}
 
 	public static object? Get(object obj, string member)
 	{
-		var memb = obj.GetType().GetField(member);
-		return memb?.GetValue(obj);
+		var MemberField = obj.GetType().GetField(member);
+		return MemberField?.GetValue(obj);
 	}
 	public static void Set(ref object obj, string field, object value)
 	{
-		var memb = obj?.GetType().GetField(field);
-		if (memb == null)
+		var MemberField = obj?.GetType().GetField(field);
+		if (MemberField == null)
 		{
 			EngineLog.Print("Object " + obj?.ToString() + " does not have member " + field);
 			return;
 		}
-		memb?.SetValueDirect(__makeref(obj), value);
+		MemberField?.SetValueDirect(__makeref(obj), value);
 	}
 
 	public static EngineVector GetVectorFieldOfObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string Field)
