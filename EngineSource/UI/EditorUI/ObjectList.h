@@ -12,11 +12,18 @@
 */
 class ObjectList : public EditorPanel
 {
-public:
 	size_t ObjectSize = 0;
 	size_t ListIterator = 0;
-	UIScrollBox* ObjectListBox;
+	UIScrollBox* ObjectListBox = nullptr;
 	bool RecalculateObjects = false;
+
+	struct ObjectButton
+	{
+		UIButton* Button = nullptr;
+		int Index = 0;
+	};
+
+public:
 
 	ObjectList(EditorPanel* Parent);
 	

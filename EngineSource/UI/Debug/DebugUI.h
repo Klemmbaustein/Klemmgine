@@ -21,8 +21,10 @@ namespace Debug
 		UIText* DebugTexts[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
 
 		bool ConsoleReadInput(Input::Key Key);
+		void UpdateAutoComplete();
 
 		int LastLogMessageAmount = 0;
+		bool UpDownPressed = false;
 
 		UIBackground* LogBackground = nullptr;
 	public:

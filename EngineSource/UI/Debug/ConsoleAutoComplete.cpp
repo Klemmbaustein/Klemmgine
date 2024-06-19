@@ -10,6 +10,25 @@ ConsoleAutoComplete::ConsoleAutoComplete(TextRenderer* Font, float TextSize)
 	this->TextSize = TextSize;
 }
 
+std::string Debug::ConsoleAutoComplete::CompleteSelection(std::string Command)
+{
+	auto Commands = GetRecommendations(Command);
+
+	if (Commands.empty())
+	{
+		return Command;
+	}
+
+	if (Commands[SelectionIndex].IsComplete)
+	{
+		return Command;
+	}
+	else
+	{
+		return Commands[SelectionIndex].Name;
+	}
+}
+
 std::vector<ConsoleAutoComplete::Recommendation> ConsoleAutoComplete::GetRecommendations(std::string Command)
 {
 	std::vector<Recommendation> Found;
@@ -30,6 +49,7 @@ std::vector<ConsoleAutoComplete::Recommendation> ConsoleAutoComplete::GetRecomme
 			Found.insert(Found.begin(), Recommendation{
 				.Type = "* <command> ",
 				.Name = i.second.Name,
+				.IsComplete = true,
 				.NameHighlight = SIZE_MAX,
 				.Attributes = GetCommandArguments(i.second)
 				});
@@ -39,6 +59,7 @@ std::vector<ConsoleAutoComplete::Recommendation> ConsoleAutoComplete::GetRecomme
 			Found.insert(Found.begin(), Recommendation{
 				.Type = "<command> ",
 				.Name = i.second.Name,
+				.IsComplete = false,
 				.NameHighlight = First.size(),
 				.Attributes = GetCommandArguments(i.second)
 				});
@@ -48,24 +69,23 @@ std::vector<ConsoleAutoComplete::Recommendation> ConsoleAutoComplete::GetRecomme
 
 	for (const auto& i : Console::ConsoleSystem->ConVars)
 	{
-		if (i.second.Name == First)
-		{
-			Found.insert(Found.begin(), Recommendation{
-				.Type = "* <variable>",
-				.Name = i.second.Name,
-				.NameHighlight = SIZE_MAX,
-				.Attributes = { "=" , NativeType::TypeStrings[i.second.NativeType]}
-				});
-		}
-		else if (i.second.Name.substr(0, First.size()) == First)
-		{
-			Found.insert(Found.begin(), Recommendation{
-				.Type = "<variable>",
-				.Name = i.second.Name,
-				.NameHighlight = First.size(),
-				.Attributes = { "=" , StrUtil::Format("(%s)", NativeType::TypeStrings[i.second.NativeType].c_str())}
-				});
+		bool IsEqual = i.second.Name == First;
 
+		if (IsEqual || i.second.Name.substr(0, First.size()) == First)
+		{
+			Found.insert(Found.begin(), Recommendation{
+				.Type = IsEqual ? "* <variable>" : "<variable>",
+				.Name = i.second.Name,
+				.IsComplete = IsEqual,
+				.NameHighlight = First.size(),
+				.Attributes =
+				{
+					"=" ,
+					StrUtil::Format("(%s) %s",
+						NativeType::TypeStrings[i.second.NativeType].c_str(),
+						Console::GetVariableValueString(i.second).c_str())
+				}
+			});
 		}
 	}
 
@@ -101,24 +121,38 @@ std::vector<std::string> ConsoleAutoComplete::GetCommandArguments(const Console:
 void Debug::ConsoleAutoComplete::RenderToBox(UIBox* Target, const std::vector<Recommendation>& Found)
 {
 	Target->DeleteChildren();
+	size_t CommandIndex = 0;
+
+
+	if (SelectionIndex > Found.size())
+	{
+		SelectionIndex = 0;
+	}
+	else if (SelectionIndex == Found.size())
+	{
+		SelectionIndex = Found.size() - 1;
+	}
+
 	for (auto& i : Found)
 	{
+		bool Selected = CommandIndex++ == SelectionIndex;
+
 		std::vector<TextSegment> Segments = {
-			TextSegment(i.Type + "  ", 0.75f),
-			TextSegment(i.Name.substr(0, i.NameHighlight), Vector3(1, 0.2f, 0.1f)),
+			TextSegment(i.Type + "  ", Selected ? 0.75f : 0.55f),
+			TextSegment(i.Name.substr(0, i.NameHighlight), Selected ? Vector3(0.1f, 1.0f, 0.2f) : Vector3(1, 0.2f, 0.1f)),
 		};
 
 		if (i.NameHighlight < i.Name.size())
 		{
-			Segments.push_back(TextSegment(i.Name.substr(i.NameHighlight), 1));
+			Segments.push_back(TextSegment(i.Name.substr(i.NameHighlight), Selected ? 1.0f : 0.75f));
 		}
 
 		for (const auto& attr : i.Attributes)
 		{
-			Segments.push_back(TextSegment(" " + attr, 0.75f));
+			Segments.push_back(TextSegment(" " + attr, Selected ? 0.75f : 0.55f));
 		}
 
-		Target->AddChild((new UIText(TextSize, Segments, Font))->SetPadding(0));
+		Target->AddChild((new UIText(TextSize, Segments, Font))->SetPadding(0, 0, 0.01f, 0.0f));
 	}
 }
 #endif

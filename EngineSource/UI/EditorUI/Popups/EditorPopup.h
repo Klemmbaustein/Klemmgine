@@ -2,6 +2,7 @@
 #pragma once
 #include <UI/UICanvas.h>
 #include <UI/UIBackground.h>
+#include <functional>
 
 class EditorPopup : public UICanvas
 {
@@ -9,7 +10,7 @@ public:
 	struct PopupOption
 	{
 		std::string Name;
-		void(*OnClicked)() = nullptr;
+		std::function<void()> OnClicked = nullptr;
 		bool Close = true;
 	};
 

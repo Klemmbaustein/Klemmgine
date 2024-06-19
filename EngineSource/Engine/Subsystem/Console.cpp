@@ -91,6 +91,25 @@ std::vector<std::string> Console::SeparateToStringArray(const std::string& InStr
 	return ProgramStringArray;
 }
 
+std::string Console::GetVariableValueString(Variable Var)
+{
+	switch (Var.NativeType)
+	{
+	case NativeType::Int:
+		return std::to_string(*(int*)Var.Var);
+	case NativeType::Byte:
+		return std::to_string(*(char*)Var.Var);
+	case NativeType::Float:
+		return std::to_string(*(float*)Var.Var);
+	case NativeType::String:
+		return *(std::string*)Var.Var;
+	case NativeType::Bool:
+		return std::to_string(*(bool*)Var.Var);
+	default:
+		return "";
+	}
+}
+
 Console::Console()
 {
 	ConsoleSystem = this;
@@ -309,6 +328,11 @@ Console::Console()
 			Graphics::SetWindowResolution(Application::GetWindowSize()); 
 		}));
 
+	RegisterCommand(Command("crash", []()
+		{
+			abort();
+		}, {  }));
+
 #if _WIN32
 	ReadConsoleThread = std::thread(ReadConsole);
 #endif
@@ -336,27 +360,7 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 	{
 		std::string ValueString;
 		Variable FoundVar = ConsoleSystem->ConVars[CommandVec[0]];
-		switch (FoundVar.NativeType)
-		{
-		case NativeType::Float:
-			ValueString = std::to_string(*(float*)FoundVar.Var);
-			break;
-		case NativeType::Int:
-			ValueString = std::to_string(*(int*)FoundVar.Var);
-			break;
-		case NativeType::Byte:
-			ValueString = std::to_string(*(char*)FoundVar.Var);
-			break;
-		case NativeType::Bool:
-			ValueString = std::to_string(*(bool*)FoundVar.Var);
-			break;
-		case NativeType::String:
-			ValueString = *(std::string*)FoundVar.Var;
-			break;
-		default:
-			return false;
-		}
-		ConsoleSystem->Print(FoundVar.Name + " = " + ValueString);
+		ConsoleSystem->Print(FoundVar.Name + " = " + GetVariableValueString(FoundVar));
 		return true;
 	}
 
@@ -427,26 +431,7 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 				continue;
 			}
 			const Variable& ConVar = ConsoleSystem->ConVars[i];
-			switch (ConVar.NativeType)
-			{
-			case NativeType::Int:
-				i = std::to_string(*(int*)ConVar.Var);
-				break;
-			case NativeType::Byte:
-				i = std::to_string(*(char*)ConVar.Var);
-				break;
-			case NativeType::Float:
-				i = std::to_string(*(int*)ConVar.Var);
-				break;
-			case NativeType::String:
-				i = *(std::string*)ConVar.Var;
-				break;
-			case NativeType::Bool:
-				i = std::to_string(*(bool*)ConVar.Var);
-				break;
-			default:
-				break;
-			}
+			i = GetVariableValueString(ConVar);
 		}
 
 		auto& FoundCommand = ConsoleSystem->Commands[CommandVec[0]];
@@ -495,7 +480,7 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 	return false;
 }
 
-Console::Command::Command(std::string Name, void(*Function)(), std::vector<Argument> Arguments)
+Console::Command::Command(std::string Name, std::function<void()> Function, std::vector<Argument> Arguments)
 {
 	this->Name = Name;
 	this->Function = Function;
@@ -580,7 +565,7 @@ Console::Command::Argument::Argument(std::string Name, NativeType::NativeType Na
 	this->Optional = Optional;
 }
 
-Console::Variable::Variable(std::string Name, NativeType::NativeType NativeType, void* Var, void(*OnSet)())
+Console::Variable::Variable(std::string Name, NativeType::NativeType NativeType, void* Var, std::function<void()> OnSet)
 {
 	this->Name = Name;
 	this->NativeType = NativeType;

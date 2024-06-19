@@ -1,5 +1,6 @@
 #if EDITOR
 #pragma once
+#include <functional>
 #include <UI/UICanvas.h>
 
 class EditorDropdown : public UICanvas
@@ -9,7 +10,7 @@ public:
 	struct DropdownItem
 	{
 		std::string Title;
-		void (*OnPressed)() = nullptr;
+		std::function<void()> OnPressed = nullptr;
 		bool Separator = false;
 	};
 

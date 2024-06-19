@@ -302,29 +302,27 @@ void EditorUI::SaveCurrentScene()
 	UpdateAllInstancesOf<ObjectList>();
 }
 
-std::string EditorSceneToOpen;
 void EditorUI::OpenScene(std::string NewScene)
 {
 	if (ChangedScene)
 	{
-		EditorSceneToOpen = NewScene;
 		new DialogBox(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene),
 			0, 
 			"The current scene has unsaved changes. Save these changes before loading a new scene?",
 			{
-				EditorPopup::PopupOption("Yes", []()
+				EditorPopup::PopupOption("Yes", [NewScene]()
 				{
 					SaveCurrentScene(); 
 					ChangedScene = false;
-					Scene::LoadNewScene(EditorSceneToOpen, true);
+					Scene::LoadNewScene(NewScene, true);
 					Viewport::ViewportInstance->ClearSelectedObjects();
 					UpdateAllInstancesOf<ContextMenu>();
 				}),
 
-				EditorPopup::PopupOption("No", []()
+				EditorPopup::PopupOption("No", [NewScene]()
 				{
 					ChangedScene = false;
-					Scene::LoadNewScene(EditorSceneToOpen, true);
+					Scene::LoadNewScene(NewScene, true);
 					Viewport::ViewportInstance->ClearSelectedObjects();
 					UpdateAllInstancesOf<ContextMenu>();
 				}),
@@ -479,17 +477,14 @@ EditorUI::~EditorUI()
 {
 }
 
-void(*QuitFunction)();
-
 void EditorUI::OnLeave(void(*ReturnF)())
 {
-	QuitFunction = ReturnF;
 	if (ChangedScene)
 	{
 		new DialogBox("Scene", 0,
 			"The current scene has unsaved changes. Save changes before exiting?",
 			{
-				EditorPopup::PopupOption("Yes", []() { SaveCurrentScene(); QuitFunction(); }),
+				EditorPopup::PopupOption("Yes", [ReturnF]() { SaveCurrentScene(); ReturnF(); }),
 				EditorPopup::PopupOption("No", ReturnF),
 				EditorPopup::PopupOption("Cancel", nullptr)
 			});

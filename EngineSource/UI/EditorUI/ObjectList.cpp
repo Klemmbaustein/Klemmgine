@@ -7,6 +7,7 @@
 #include <Engine/Log.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Viewport.h>
+#include <UI/EditorUI/EditorDropdown.h>
 #ifdef ENGINE_CSHARP
 #include <Objects/CSharpObject.h>
 #endif
@@ -27,6 +28,28 @@ void ObjectList::Tick()
 	{
 		ObjectSize = Objects::AllObjects.size();
 		OnResized();
+	}
+
+	if (Input::IsRMBClicked && PanelMainBackground->IsHovered() && EditorUI::SelectedObjects.size())
+	{
+		new EditorDropdown({
+			EditorDropdown::DropdownItem{
+			.Title = "Duplicate",
+			.OnPressed = []() {
+				Viewport::CopySelectedObjects();
+				}
+			},
+			EditorDropdown::DropdownItem{
+			.Title = "Delete",
+			.OnPressed = []() {
+				for (WorldObject* i : EditorUI::SelectedObjects)
+				{
+					Objects::DestroyObject(i);
+				}
+				EditorUI::ChangedScene = true;
+				}
+			},
+			}, Input::MouseLocation);
 	}
 }
 

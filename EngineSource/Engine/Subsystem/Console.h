@@ -9,6 +9,7 @@
 
 #include "Subsystem.h"
 #include <mutex>
+#include <functional>
 #include <deque>
 
 /**
@@ -35,35 +36,49 @@ public:
 	*/
 	static bool ExecuteConsoleCommand(std::string Command);
 
+	/// The current active console subsystem.
 	static Console* ConsoleSystem;
 
 	/// Contains information about a console variable.
 	struct Variable
 	{
+		/// Name of the console variable.
 		std::string Name;
-		// If OnSet == nullptr/NULL, OnSet will be ignored.
-		void(*OnSet)() = nullptr;
+		/// Callback called when the value of the variable is changed.
+		std::function<void()> OnSet = nullptr;
+		/// A pointer to the variable in memory.
 		void* Var = nullptr;
+		/// The type of the variable.
 		NativeType::NativeType NativeType = NativeType::Int;
-		Variable(std::string Name, NativeType::NativeType NativeType, void* Var, void (*OnSet)());
+		Variable(std::string Name, NativeType::NativeType NativeType, void* Var, std::function<void()> OnSet);
 		Variable() {}
 	};
 
 	/// Contains information about a console command.
 	struct Command
 	{
+		/// The name of the command.
 		std::string Name;
-		void(*Function)() = nullptr;
+
+		/// The function for the command. If the command is called, the function is called.
+		std::function<void()> Function = nullptr;
+
+		/// A console command argument.
 		struct Argument
 		{
 			Argument(std::string Name, NativeType::NativeType NativeType, bool Optional = false);
+			/// The name of the argument.
 			std::string Name;
+			/// The type of the argument value.
 			NativeType::NativeType NativeType;
+			/// True if the argument is optional. Optional arguments must always be the last.
 			bool Optional;
 		};
+
+		/// The arguments for this command. If the arguments aren't satisfied, Function will not be called.
 		std::vector<Argument> Arguments;
 		
-		Command(std::string Name, void(*Function)(), std::vector<Argument> Arguments);
+		Command(std::string Name, std::function<void()> Function, std::vector<Argument> Arguments);
 		Command() {}
 	};
 
@@ -84,6 +99,8 @@ public:
 	std::map<std::string, Variable> ConVars;
 	std::map<std::string, Command> Commands;
 	static std::vector<std::string> SeparateToStringArray(const std::string& InString);
+
+	static std::string GetVariableValueString(Variable Var);
 
 private:
 #if _WIN32

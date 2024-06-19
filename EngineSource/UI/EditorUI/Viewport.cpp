@@ -51,7 +51,88 @@ Collision::Box ArrowBoxZ
 
 );
 
-UIBackground* TestCursor = nullptr;
+bool Viewport::CheckGizmoCollision(Vector3 RayDir)
+{
+	if (EditorUI::SelectedObjects.empty())
+	{
+		return false;
+	}
+
+	WorldObject* SelectedObject = EditorUI::SelectedObjects.at(0);
+	Transform& ObjectTransform = SelectedObject->GetTransform();
+
+	Vector3 CameraPosition = Graphics::MainCamera->Position;
+
+	Vector3 DistanceScaleMultiplier = (ObjectTransform.Position - CameraPosition).Length() * 0.15f;
+
+	bool Hit = false;
+	float t = INFINITY;
+
+	Collision::HitResponse CollisionTest = Collision::LineCheckForAABB(
+		ArrowBoxZ * DistanceScaleMultiplier + ObjectTransform.Position,
+		CameraPosition, (RayDir * 500.f) + CameraPosition
+	);
+	if (CollisionTest.Hit)
+	{
+		PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
+		Hit = true;
+		Dragging = true;
+		Axis = Vector3(0, 0, 1.0f);
+		BoxAxis = 2;
+		t = CollisionTest.Distance;
+	}
+
+	CollisionTest = Collision::LineCheckForAABB(
+		(ArrowBoxY * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
+		CameraPosition, (RayDir * 500.f) + CameraPosition
+	);
+	if (CollisionTest.Hit && CollisionTest.Distance < t)
+	{
+		PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
+		Hit = true;
+		Dragging = true;
+		BoxAxis = 1;
+		Axis = Vector3(0, 1.0f, 0);
+		t = CollisionTest.Distance;
+	}
+
+	CollisionTest = Collision::LineCheckForAABB(
+		(ArrowBoxX * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
+		Graphics::MainCamera->Position, (RayDir * 500.f) + CameraPosition
+	);
+	if (CollisionTest.Hit && CollisionTest.Distance < t)
+	{
+		PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
+		Hit = true;
+		Dragging = true;
+		Axis = Vector3(1.0f, 0, 0);
+		BoxAxis = 0;
+		t = CollisionTest.Distance;
+	}
+	FirstDragFrame = true;
+	DragOffset = 0;
+	InitialMousePosition = Input::MouseLocation;
+
+	return Hit;
+}
+
+void Viewport::CopySelectedObjects()
+{
+	std::vector<WorldObject*> CopiedObjects;
+	for (WorldObject* i : EditorUI::SelectedObjects)
+	{
+		WorldObject* o = Objects::SpawnObjectFromID(i->GetObjectDescription().ID, i->GetTransform());
+		o->Name = i->Name;
+		o->DeSerialize(i->Serialize());
+		o->LoadProperties(i->GetPropertiesAsString());
+		o->OnPropertySet();
+		o->IsSelected = true;
+		CopiedObjects.push_back(o);
+	}
+	ViewportInstance->ClearSelectedObjects();
+	EditorUI::SelectedObjects = CopiedObjects;
+	EditorUI::ChangedScene = true;
+}
 
 Viewport::Viewport(EditorPanel* Parent) : EditorPanel(Parent, "Viewport")
 {
@@ -247,8 +328,7 @@ void Viewport::Tick()
 	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Position + (Scale * 0.5));
 	Vector3 Rotation = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
-	if (UI::HoveredBox == PanelMainBackground
-		&& !Dragging)
+	if (UI::HoveredBox == PanelMainBackground && !Dragging)
 	{
 		// Default Cursor = 0. So if the current cursor evaluates to 'false' its the default cursor
 		if (!(int)Application::EditorInstance->CurrentCursor)
@@ -268,20 +348,7 @@ void Viewport::Tick()
 		if (!IsCopying)
 		{
 			IsCopying = true;
-			std::vector<WorldObject*> CopiedObjects;
-			for (WorldObject* i : EditorUI::SelectedObjects)
-			{
-				WorldObject* o = Objects::SpawnObjectFromID(i->GetObjectDescription().ID, i->GetTransform());
-				o->Name = i->Name;
-				o->DeSerialize(i->Serialize());
-				o->LoadProperties(i->GetPropertiesAsString());
-				o->OnPropertySet();
-				o->IsSelected = true;
-				CopiedObjects.push_back(o);
-			}
-			ClearSelectedObjects();
-			EditorUI::SelectedObjects = CopiedObjects;
-			EditorUI::ChangedScene = true;
+			CopySelectedObjects();
 		}
 	}
 	else
@@ -296,55 +363,10 @@ void Viewport::Tick()
 	if (Input::IsLMBDown && !PressedLMB)
 	{
 		PressedLMB = true;
+
 		if (Math::IsPointIn2DBox(Position, Position + Scale, Input::MouseLocation) && UI::HoveredBox == PanelMainBackground)
 		{
-			Vector3 DistanceScaleMultiplier;
-			if (EditorUI::SelectedObjects.size() > 0)
-				DistanceScaleMultiplier = Vector3((EditorUI::SelectedObjects.at(0)->GetTransform().Position 
-					- Vector3(Graphics::MainCamera->Position)).Length() * 0.15f);
-
-			bool Hit = false;
-			if (EditorUI::SelectedObjects.size() > 0)
-			{
-				float t = INFINITY;
-				Collision::HitResponse CollisionTest 
-					= Collision::LineCheckForAABB((ArrowBoxZ * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
-						Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
-				if (CollisionTest.Hit)
-				{
-					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
-					Hit = true;
-					Dragging = true;
-					Axis = Vector3(0, 0, 1.0f);
-					BoxAxis = 2;
-					t = CollisionTest.Distance;
-				}
-				CollisionTest = Collision::LineCheckForAABB((ArrowBoxY * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
-					Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
-				if (CollisionTest.Hit && CollisionTest.Distance < t)
-				{
-					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
-					Hit = true;
-					Dragging = true;
-					BoxAxis = 1;
-					Axis = Vector3(0, 1.0f, 0);
-					t = CollisionTest.Distance;
-				}
-				CollisionTest = Collision::LineCheckForAABB((ArrowBoxX * DistanceScaleMultiplier) + EditorUI::SelectedObjects.at(0)->GetTransform().Position,
-					Graphics::MainCamera->Position, (Rotation * 500.f) + Graphics::MainCamera->Position);
-				if (CollisionTest.Hit && CollisionTest.Distance < t)
-				{
-					PreviousLocation = EditorUI::SelectedObjects[0]->GetTransform().Position;
-					Hit = true;
-					Dragging = true;
-					Axis = Vector3(1.0f, 0, 0);
-					BoxAxis = 0;
-					t = CollisionTest.Distance;
-				}
-				FirstDragFrame = true;
-				DragOffset = 0;
-				InitialMousePosition = Input::MouseLocation;
-			}
+			bool Hit = CheckGizmoCollision(Rotation);
 
 			Collision::HitResponse CollisionTest = Collision::LineTrace(
 				Graphics::MainCamera->Position,
@@ -434,17 +456,18 @@ void Viewport::Tick()
 		Vector3 Forward = Vector3::GetForwardVector(Graphics::MainCamera->Rotation);
 		for (int i = 0; i < 3; i++)
 		{
-			if (i != BoxAxis)
+			if (i == BoxAxis)
 			{
-				if (Prev == -1)
-				{
-					Prev = i;
-				}
-				else
-				{
-					BoxScale.at(i) = std::abs(Forward.at(Prev)) > std::abs(Forward.at(i)) ? 1.0f : 0.0f;
-					BoxScale.at(Prev) = std::abs(Forward.at(Prev)) > std::abs(Forward.at(i)) ? 0.0f : 1.0f;
-				}
+				continue;
+			}
+			if (Prev == -1)
+			{
+				Prev = i;
+			}
+			else
+			{
+				BoxScale.at(i) = std::abs(Forward.at(Prev)) > std::abs(Forward.at(i)) ? 1.0f : 0.0f;
+				BoxScale.at(Prev) = std::abs(Forward.at(Prev)) > std::abs(Forward.at(i)) ? 0.0f : 1.0f;
 			}
 		}
 

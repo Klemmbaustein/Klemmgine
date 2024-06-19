@@ -15,7 +15,7 @@ unsigned int Bloom::pingpongBuffer[2];
 
 unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 {
-	if (Graphics::Bloom)
+	if (Graphics::Bloom && BloomShape != 0)
 	{
 		glViewport(0,
 			0,

@@ -20,6 +20,15 @@ void LogUI::UpdateLogBoxSize()
 	LogScrollBox->SetMaxSize((Scale - Vector2(0.06f, 0.1f)));
 }
 
+void LogUI::UpdateAutoComplete()
+{
+	LastCommand = LogPrompt->GetText();
+
+	AutoComplete->RenderToBox(CommandHighlightScrollBox, AutoComplete->GetRecommendations(LastCommand));
+	CommandsBackground->SetPosition(LogPrompt->GetPosition() + Vector2(0, LogPrompt->GetUsedSize().Y));
+	CommandsBackground->SetMinSize(Vector2(LogPrompt->GetUsedSize().X, 0));
+}
+
 LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console")
 {
 	LogScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
@@ -110,11 +119,36 @@ void LogUI::Tick()
 
 	if (LogPrompt->GetText() != LastCommand)
 	{
-		LastCommand = LogPrompt->GetText();
+		UpdateAutoComplete();
+	}
 
-		AutoComplete->RenderToBox(CommandHighlightScrollBox, AutoComplete->GetRecommendations(LastCommand));
-		CommandsBackground->SetPosition(LogPrompt->GetPosition() + Vector2(0, LogPrompt->GetUsedSize().Y));
-		CommandsBackground->SetMinSize(Vector2(LogPrompt->GetUsedSize().X, 0));
+	if (LogPrompt->GetIsEdited() && Input::IsKeyDown(Input::Key::TAB))
+	{
+		LogPrompt->SetText(AutoComplete->CompleteSelection(LogPrompt->GetText()));
+		LogPrompt->Edit();
+	}
+
+	if (Input::IsKeyDown(Input::Key::UP))
+	{
+		if (!UpDownPressed)
+		{
+			AutoComplete->SelectionIndex--;
+			UpdateAutoComplete();
+		}
+		UpDownPressed = true;
+	}
+	else if (Input::IsKeyDown(Input::Key::DOWN))
+	{
+		if (!UpDownPressed)
+		{
+			AutoComplete->SelectionIndex++;
+			UpdateAutoComplete();
+		}
+		UpDownPressed = true;
+	}
+	else
+	{
+		UpDownPressed = false;
 	}
 
 	if (LogMessages.size() != PrevLogLength)

@@ -18,6 +18,14 @@ using namespace Debug;
 
 DebugUI* DebugUI::CurrentDebugUI = nullptr;
 
+
+void DebugUI::UpdateAutoComplete()
+{
+	LastCommand = LogPrompt->GetText();
+
+	AutoComplete->RenderToBox(CompleteBackground, AutoComplete->GetRecommendations(LastCommand));
+}
+
 DebugUI::DebugUI()
 {
 	CurrentDebugUI = this;
@@ -60,12 +68,38 @@ bool DebugUI::ConsoleReadInput(Input::Key KeyCode)
 
 void DebugUI::Tick()
 {
-
 	if (LogPrompt->GetText() != LastCommand)
 	{
-		LastCommand = LogPrompt->GetText();
+		UpdateAutoComplete();
+	}
 
-		AutoComplete->RenderToBox(CompleteBackground, AutoComplete->GetRecommendations(LastCommand));
+	if (LogPrompt->GetIsEdited() && ConsoleReadInput(Input::Key::TAB))
+	{
+		LogPrompt->SetText(AutoComplete->CompleteSelection(LogPrompt->GetText()));
+		LogPrompt->Edit();
+	}
+
+	if (ConsoleReadInput(Input::Key::UP))
+	{
+		if (!UpDownPressed)
+		{
+			AutoComplete->SelectionIndex--;
+			UpdateAutoComplete();
+		}
+		UpDownPressed = true;
+	}
+	else if (ConsoleReadInput(Input::Key::DOWN))
+	{
+		if (!UpDownPressed)
+		{
+			AutoComplete->SelectionIndex++;
+			UpdateAutoComplete();
+		}
+		UpDownPressed = true;
+	}
+	else
+	{
+		UpDownPressed = false;
 	}
 
 

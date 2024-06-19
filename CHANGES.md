@@ -1,5 +1,13 @@
 # Changes
 
+## Version 1.10.14
+
+### Changes
+
+- Code cleanup.
+- Improved console auto complete.
+- Updated some documentation.
+
 ## Version 1.10.13
 
 ### Fixes

@@ -21,8 +21,9 @@ class LogUI : public EditorPanel
 
 	UIBackground* CommandsBackground = nullptr;
 	UIScrollBox* CommandHighlightScrollBox = nullptr;
-
+	bool UpDownPressed = false;
 	void UpdateLogBoxSize();
+	void UpdateAutoComplete();
 public:
 	LogUI(EditorPanel* Parent);
 	void OnResized() override;

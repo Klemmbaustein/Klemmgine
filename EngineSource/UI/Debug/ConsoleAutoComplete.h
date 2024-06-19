@@ -11,12 +11,17 @@ namespace Debug
 		TextRenderer* Font = nullptr;
 		float TextSize = 0;
 	public:
+		size_t SelectionIndex = 0;
+
 		ConsoleAutoComplete(TextRenderer* Font, float TextSize);
+
+		std::string CompleteSelection(std::string Command);
 
 		struct Recommendation
 		{
 			std::string Type;
 			std::string Name;
+			bool IsComplete = false;
 			size_t NameHighlight = 0;
 			std::vector<std::string> Attributes;
 		};

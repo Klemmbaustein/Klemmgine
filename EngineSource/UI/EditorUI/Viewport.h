@@ -26,7 +26,11 @@ class Viewport : public EditorPanel
 	Model* ArrowsModel = nullptr;
 	bool IsCopying = false;
 	FramebufferObject* CurrentMainBuffer = nullptr;
+	bool CheckGizmoCollision(Vector3 RayDir);
 public:
+
+	static void CopySelectedObjects();
+
 	static Viewport* ViewportInstance;
 	WorldObject* PreviousSelectedObject = nullptr;
 	size_t PreviousSelectedObjectSize = 0;
