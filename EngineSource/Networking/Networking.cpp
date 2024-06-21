@@ -14,25 +14,22 @@
 #include "Server.h"
 #include <Engine/Subsystem/Console.h>
 #include <Engine/EngineError.h>
+#if _WIN32
+// Undefine macros first defined in SDL_net.h to avoid warnings.
+#undef INADDR_ANY
+#undef INADDR_BROADCAST
+#undef INADDR_NONE
+
+#include <winsock.h>
+#pragma comment(lib, "Ws2_32.lib")
+#else
+#include <arpa/inet.h>
+#endif
 
 namespace Networking
 {
 	constexpr uint16_t DEFAULT_PORT = 1234;
 	constexpr uint32_t TICK_RATE = 64;
-
-	uint16_t reverse_bytes(uint16_t bytes)
-	{
-		uint16_t aux = 0;
-		uint8_t byte;
-		int i;
-
-		for (i = 0; i < 16; i += 8)
-		{
-			byte = (bytes >> i) & 0xff;
-			aux |= byte << (16 - 8 - i);
-		}
-		return aux;
-	}
 
 	void InitPacket(IPaddress* Target);
 	void InitSockets(uint16_t Port);
@@ -43,7 +40,7 @@ namespace Networking
 	UDPsocket Socket;
 	UDPpacket* SentPacket;
 	float TickTimer = 0;
-	uint64_t Gametick = 0;
+	uint64_t GameTick = 0;
 	bool IsServerTickFrame = false;
 	uint64_t NetIDCounter = 0;
 }
@@ -66,8 +63,8 @@ void Networking::InitSockets(uint16_t Port)
 		exit(1);
 	}
 
-	IPaddress* myaddress = SDLNet_UDP_GetPeerAddress(Socket, -1);
-	if (!myaddress)
+	IPaddress* CurrentAddress = SDLNet_UDP_GetPeerAddress(Socket, -1);
+	if (!CurrentAddress)
 	{
 		printf("Could not get own port\n");
 		exit(2);
@@ -80,8 +77,8 @@ void Networking::InitSockets(uint16_t Port)
 		exit(2);
 	}
 
-	auto numused = SDLNet_UDP_AddSocket(SocketSet, Socket);
-	if (numused == -1)
+	auto UsedSockets = SDLNet_UDP_AddSocket(SocketSet, Socket);
+	if (UsedSockets == -1)
 	{
 		printf("SDLNet_AddSocket: %s\n", SDLNet_GetError());
 		exit(2);
@@ -107,15 +104,15 @@ UDPsocket Networking::InitSocketFrom(IPaddress* Target)
 		exit(1);
 	}
 
-	IPaddress* myaddress = SDLNet_UDP_GetPeerAddress(fret, -1);
-	if (!myaddress)
+	IPaddress* CurrentAddress = SDLNet_UDP_GetPeerAddress(fret, -1);
+	if (!CurrentAddress)
 	{
 		printf("Could not get own port\n");
 		exit(2);
 	}
 
 	UDPsocket rcvS;
-	rcvS = SDLNet_UDP_Open(myaddress->port);
+	rcvS = SDLNet_UDP_Open(CurrentAddress->port);
 	if (!rcvS)
 	{
 		printf("Could not allocate receiving socket\n");
@@ -132,8 +129,8 @@ UDPsocket Networking::InitSocketFrom(IPaddress* Target)
 		fprintf(stderr, "Couldn't create socket set: %s\n", SDLNet_GetError());
 		exit(2);
 	}
-	auto numused = SDLNet_UDP_AddSocket(SocketSet, fret);
-	if (numused == -1)
+	auto UsedSockets = SDLNet_UDP_AddSocket(SocketSet, fret);
+	if (UsedSockets == -1)
 	{
 		printf("SDLNet_AddSocket: %s\n", SDLNet_GetError());
 		exit(2);
@@ -270,7 +267,7 @@ void Networking::Update()
 	TickTimer += Stats::DeltaTime;
 	if (TickTimer > TickInterval)
 	{
-		Gametick += (uint64_t)(TickTimer / TickInterval);
+		GameTick += (uint64_t)(TickTimer / TickInterval);
 		TickTimer = 0;
 		IsServerTickFrame = true;
 		HandleTick();
@@ -282,7 +279,7 @@ void Networking::Update()
 #else
 	HandleTick();
 	IsServerTickFrame = true;
-	Gametick++;
+	GameTick++;
 #endif
 }
 
@@ -305,7 +302,7 @@ std::string Networking::IPtoStr(void* addr)
 		(int)parts[1],
 		(int)parts[2],
 		(int)parts[3],
-		(int)Networking::reverse_bytes(((IPaddress*)addr)->port));
+		(int)ntohs(((IPaddress*)addr)->port));
 }
 
 void Networking::Exit()
@@ -327,7 +324,7 @@ uint32_t Networking::GetTickRate()
 
 uint64_t Networking::GetGameTick()
 {
-	return Gametick;
+	return GameTick;
 }
 
 bool Networking::GetIsServerTickFrame()

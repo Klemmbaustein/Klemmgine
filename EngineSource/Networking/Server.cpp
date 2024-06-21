@@ -135,7 +135,7 @@ void Server::OnConnectRequestReceived(Packet p)
 	ClientInfo NewClient;
 	NewClient.ID = UIDCounter;
 	NewClient.IP = NewIP;
-	NewClient.LastResponseTick = Networking::Gametick;
+	NewClient.LastResponseTick = Networking::GameTick;
 
 	ReturnPacket.Send(NewClient.IP);
 
@@ -244,7 +244,7 @@ void Server::Init()
 		{
 			PlayerList.append("\tuid: " + std::to_string(i.ID)
 				+ ", ip: " + Networking::IPtoStr(i.IP)
-				+ ", last response: " + std::to_string(Networking::Gametick - i.LastResponseTick)
+				+ ", last response: " + std::to_string(Networking::GameTick - i.LastResponseTick)
 				+ " ticks\n");
 		}
 		Log::PrintMultiLine(StrUtil::Format("Players connected: (%i):\n%s", Clients.size(), PlayerList.c_str()), Log::LogColor::White, "[Net]: ");
@@ -293,12 +293,12 @@ void Server::Update()
 	for (size_t i = 0; i < Clients.size(); i++)
 	{
 		SendClientInfo(&Clients[i]);
-		if (Networking::Gametick - Clients[i].LastResponseTick > (size_t)Networking::GetTickRate() * 5)
+		if (Networking::GameTick - Clients[i].LastResponseTick > (size_t)Networking::GetTickRate() * 5)
 		{
 			Log::PrintMultiLine(StrUtil::Format("Client %i has timed out.\n\tLast seen tick: %i\n\tCurrent tick %i",
 				Clients[i].ID,
 				(int)Clients[i].LastResponseTick,
-				(int)Networking::Gametick),
+				(int)Networking::GameTick),
 				Log::LogColor::Yellow, "[Net]: ");
 			HandleClientDisconnect(&Clients[i]);
 			break;
@@ -312,7 +312,7 @@ void Server::HandlePacket(Packet* p)
 
 	if (PacketSender)
 	{
-		PacketSender->LastResponseTick = Networking::Gametick;
+		PacketSender->LastResponseTick = Networking::GameTick;
 	}
 }
 

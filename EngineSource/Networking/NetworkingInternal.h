@@ -12,7 +12,7 @@ namespace Networking
 	extern UDPsocket Socket;
 	extern UDPpacket* SentPacket;
 	extern float TickTimer;
-	extern size_t Gametick;
+	extern size_t GameTick;
 	UDPsocket InitSocketFrom(IPaddress* Target);
 
 	void SendObjectInfo(WorldObject* obj, void* TargetAddr);

@@ -314,7 +314,11 @@ static void CreateWindow()
 {
 	std::cout << "Starting..." << std::endl;
 	std::cout << "- Starting SDL2 - ";
+#if !SERVER
 	int SDLReturnValue = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_JOYSTICK);
+#else
+	int SDLReturnValue = SDL_Init(SDL_INIT_EVENTS);
+#endif
 	if (SDLReturnValue != 0)
 	{
 		std::cout << "Could not start SDL2 (" << SDL_GetError() << ")\n";

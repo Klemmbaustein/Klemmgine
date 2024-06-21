@@ -17,6 +17,8 @@ class CollisionComponent;
 /**
 * @brief
 * Namespace containing functions related to Collision
+* 
+* @deprecated New collision/physics related functions are in Physics.h.
 */
 namespace Collision
 {
@@ -56,6 +58,9 @@ namespace Collision
 
 	bool IsPointIn3DBox(Box a, Vector3 p);
 	/**
+	* 
+	* @deprecated Use Physics::RayCast instead.
+	* 
 	* @brief
 	* Traces a line from RayStart to RayEnd.
 	* 
