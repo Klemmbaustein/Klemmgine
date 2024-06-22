@@ -14,6 +14,7 @@
 namespace Input
 {
 	extern bool Keys[351];
+	extern bool BlockInputConsole;
 }
 
 static void MoveTextIndex(int Amount, bool RespectShiftPress = true)
@@ -116,7 +117,7 @@ void InputSubsystem::PollInput()
 				MoveTextIndex(1);
 				break;
 			case SDLK_x:
-				if (!TextInput::PollForText || (!Input::IsKeyDown(Input::Key::LCTRL) && !Input::IsKeyDown(Input::Key::RCTRL)))
+				if (!TextInput::PollForText || !(SDL_GetModState() & KMOD_CTRL))
 					break;
 				SDL_SetClipboardText(TextInput::GetSelectedTextString().c_str());
 				[[fallthrough]];
@@ -174,13 +175,13 @@ void InputSubsystem::PollInput()
 				Application::SetFullScreen(!Application::GetFullScreen());
 				break;
 			case SDLK_c:
-				if (TextInput::PollForText && (Input::IsKeyDown(Input::Key::LCTRL) || Input::IsKeyDown(Input::Key::RCTRL)))
+				if (TextInput::PollForText && (SDL_GetModState() & KMOD_CTRL))
 				{
 					SDL_SetClipboardText(TextInput::GetSelectedTextString().c_str());
 				}
 				break;
 			case SDLK_v:
-				if (TextInput::PollForText && (Input::IsKeyDown(Input::Key::LCTRL) || Input::IsKeyDown(Input::Key::RCTRL)))
+				if (TextInput::PollForText && (SDL_GetModState() & KMOD_CTRL))
 				{
 					DeleteSelection();
 					std::string ClipboardText = SDL_GetClipboardText();

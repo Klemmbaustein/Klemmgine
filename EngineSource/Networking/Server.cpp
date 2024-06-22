@@ -60,7 +60,7 @@ namespace Server
 				+ ". Target: "
 				+ std::to_string(Networking::GetTickRate())
 				+ ". Delta time: "
-				+ std::to_string(100.0f * Stats::DeltaTime)
+				+ std::to_string(1000.0f * Stats::DeltaTime)
 				+ "ms", Log::LogColor::Gray);
 		}
 	}
@@ -189,7 +189,7 @@ void Server::DisconnectPlayer(uint64_t UID)
 		if (i.ID == UID)
 		{
 			Packet p;
-			p.Data = 
+			p.Data =
 			{
 				(uint8_t)Packet::PacketType::DisconnectRequest
 			};
@@ -279,7 +279,7 @@ bool Server::IsServer()
 void Server::Update()
 {
 	TPS::NewTicksPerSecond++;
-	if (TPS::PerSecondTimer.Get() > 1.0f + Stats::DeltaTime)
+	if (TPS::PerSecondTimer.Get() > 1.0f)
 	{
 		TPS::PerSecondTimer.Reset();
 		TPS::TicksPerSecond = TPS::NewTicksPerSecond;
@@ -304,7 +304,7 @@ void Server::Update()
 			break;
 		}
 	}
-}			
+}
 
 void Server::HandlePacket(Packet* p)
 {

@@ -51,10 +51,10 @@ namespace Log
 		}
 		OS::SetConsoleColor(OS::ConsoleColor::Gray);
 		std::cout << "Log: ";
-		std::fflush(stdout);
 		OS::SetConsoleColor(NearestColor);
-		std::cout << Text << std::endl;
+		std::cout << Text;
 		OS::SetConsoleColor(OS::ConsoleColor::Gray);
+		std::cout << std::endl;
 		LogMutex.unlock();
 	}
 

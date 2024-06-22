@@ -1,10 +1,10 @@
 #include "OS.h"
+#include <map>
 #if _WIN32
 #include <Windows.h>
 #include <Shlobj.h>
 #include <shobjidl.h> 
 #include <Engine/Utility/FileUtility.h>
-#include <map>
 #include <Psapi.h>
 #endif
 
@@ -67,35 +67,35 @@ void OS::SetConsoleWindowVisible(bool Visible)
 #if __linux__
 size_t OS::GetMemUsage()
 {
-   using std::ios_base;
-   using std::ifstream;
-   using std::string;
+	using std::ios_base;
+	using std::ifstream;
+	using std::string;
 
-   // 'file' stat seems to give the most reliable results
-   //
-   ifstream stat_stream("/proc/self/stat",ios_base::in);
+	// 'file' stat seems to give the most reliable results
+	//
+	ifstream stat_stream("/proc/self/stat", ios_base::in);
 
-   // dummy vars for leading entries in stat that we don't care about
-   //
-   string pid, comm, state, ppid, pgrp, session, tty_nr;
-   string tpgid, flags, minflt, cminflt, majflt, cmajflt;
-   string utime, stime, cutime, cstime, priority, nice;
-   string O, itrealvalue, starttime;
+	// dummy vars for leading entries in stat that we don't care about
+	//
+	string pid, comm, state, ppid, pgrp, session, tty_nr;
+	string tpgid, flags, minflt, cminflt, majflt, cmajflt;
+	string utime, stime, cutime, cstime, priority, nice;
+	string O, itrealvalue, starttime;
 
-   // the two fields we want
-   //
-   size_t vsize;
-   long rss;
+	// the two fields we want
+	//
+	size_t vsize;
+	long rss;
 
-   stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
-               >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
-               >> utime >> stime >> cutime >> cstime >> priority >> nice
-               >> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
+	stat_stream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr
+		>> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt
+		>> utime >> stime >> cutime >> cstime >> priority >> nice
+		>> O >> itrealvalue >> starttime >> vsize >> rss; // don't care about the rest
 
-   stat_stream.close();
+	stat_stream.close();
 
-   long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-   return vsize / 1024.0;
+	long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
+	return vsize / 1024.0;
 }
 
 
@@ -169,7 +169,7 @@ std::string OS::ShowOpenFileDialog()
 std::string OS::ShowOpenFileDialog()
 {
 	char filename[4096];
-	FILE *f = popen("zenity --file-selection", "r");
+	FILE* f = popen("zenity --file-selection", "r");
 	char* buf = fgets(filename, 4096, f);
 	if (!buf)
 	{
@@ -248,7 +248,7 @@ std::string OS::GetOSString()
 
 namespace OS
 {
-	std::map<ConsoleColor, WORD> WindowsColors =
+	static std::map<ConsoleColor, WORD> WindowsColors =
 	{
 		std::pair(ConsoleColor::White, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY),
 		std::pair(ConsoleColor::Gray, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED),
@@ -261,15 +261,27 @@ namespace OS
 
 	void SetConsoleColor(ConsoleColor NewColor)
 	{
+		std::fflush(stdout);
 		SetConsoleTextAttribute(hConsole, WindowsColors[NewColor]);
 	}
 }
 #endif
 
+
 #if __linux__
 void OS::SetConsoleColor(ConsoleColor NewColor)
 {
-	//TODO: implement console colors on linux
+	static std::map<ConsoleColor, const char*> ColorCodes =
+	{
+		std::pair(ConsoleColor::White, "97"),
+		std::pair(ConsoleColor::Gray, "39"),
+		std::pair(ConsoleColor::Red, "91"),
+		std::pair(ConsoleColor::Green, "92"),
+		std::pair(ConsoleColor::Blue, "94"),
+		std::pair(ConsoleColor::Yellow, "93"),
+	};
+
+	std::cout << "\033[" << ColorCodes[NewColor] << "m";
 }
 #endif
 

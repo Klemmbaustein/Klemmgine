@@ -15,6 +15,9 @@
 #include <Engine/Stats.h>
 #include <Rendering/Graphics.h>
 #include <iostream>
+#if __linux__
+#include <poll.h>
+#endif
 
 Console* Console::ConsoleSystem = nullptr;
 #if _WIN32
@@ -250,7 +253,7 @@ Console::Console()
 		{
 			ConsoleSystem->Print("Could not find scene \"" + ConsoleSystem->CommandArgs()[0] + "\"", ErrorLevel::Error);
 		}
-		}, { Command::Argument("scene", NativeType::String)}));
+		}, { Command::Argument("scene", NativeType::String) }));
 
 	RegisterCommand(Command("help", []() {
 		std::string CommandString = ConsoleSystem->CommandArgs()[0];
@@ -323,9 +326,9 @@ Console::Console()
 	RegisterConVar(Variable("vignette", NativeType::Float, &Graphics::Vignette, nullptr));
 	RegisterConVar(Variable("vsync", NativeType::Bool, &Graphics::VSync, nullptr));
 	RegisterConVar(Variable("timescale", NativeType::Float, &Stats::TimeMultiplier, nullptr));
-	RegisterConVar(Variable("resolution_scale", NativeType::Float, &Graphics::ResolutionScale, []() 
+	RegisterConVar(Variable("resolution_scale", NativeType::Float, &Graphics::ResolutionScale, []()
 		{
-			Graphics::SetWindowResolution(Application::GetWindowSize()); 
+			Graphics::SetWindowResolution(Application::GetWindowSize());
 		}));
 
 	RegisterCommand(Command("crash", []()
@@ -462,7 +465,7 @@ bool Console::ExecuteConsoleCommand(std::string Command)
 				ConsoleSystem->Print("Expected "
 					+ NativeType::TypeStrings[FoundCommand.Arguments[i].NativeType]
 					+ " for '"
-					+ FoundCommand.Arguments[i].Name 
+					+ FoundCommand.Arguments[i].Name
 					+ "', found string.", ErrorLevel::Error);
 				ConsoleSystem->PrintArguments(FoundCommand.Arguments, ErrorLevel::Error);
 				return false;
@@ -538,8 +541,8 @@ void Console::PrintArguments(std::vector<Command::Argument> args, ErrorLevel Sev
 
 void Console::Update()
 {
-	// On linux this seems to cause issues where the application completely freezes.
-	// It's disabled for now.
+	// On linux, reading console input using std::cin on a different thread causes the entire terminal to freeze sometimes (what???)
+	// But on windows this works fine.
 #if _WIN32
 	std::deque<std::string> ConsoleCommands;
 	{
@@ -553,7 +556,22 @@ void Console::Update()
 
 	for (auto& i : ConsoleCommands)
 	{
-		Console::ExecuteConsoleCommand(i);
+		ExecuteConsoleCommand(i);
+	}
+#elif __linux
+	// Most sane linux name (this is what the poll() argument is called)
+	pollfd fds;
+	fds.fd = fileno(stdin);
+	fds.events = POLLIN;
+	fds.revents = 0;
+
+	int poll_result = poll(&fds, 1, 0);
+
+	if (poll_result)
+	{
+		char Line[4000];
+		std::cin.getline(Line, sizeof(Line));
+		ExecuteConsoleCommand(Line);
 	}
 #endif
 }

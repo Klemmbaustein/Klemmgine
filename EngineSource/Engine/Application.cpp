@@ -86,7 +86,7 @@ namespace Application
 
 	SDL_Window* Window = nullptr;
 	bool ShouldClose = false;
-	
+
 	bool WindowHasFocus()
 	{
 #if SERVER
@@ -221,7 +221,7 @@ static void GLAPIENTRY MessageCallback(
 		|| type == GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR
 		|| type == GL_DEBUG_TYPE_PORTABILITY)
 	{
-		Log::Print(std::string(message)  + " - " + Stats::EngineStatus, Log::LogColor::Red);
+		Log::Print(std::string(message) + " - " + Stats::EngineStatus, Log::LogColor::Red);
 		SDL_Delay(5);
 	}
 }
@@ -245,12 +245,6 @@ static void ApplicationLoop()
 	Subsystem::UpdateSubsystems();
 #if !SERVER
 	CameraShake::Tick();
-#endif
-#if !EDITOR
-	if (Project::UseNetworkFunctions)
-	{
-		Networking::Update();
-	}
 #endif
 
 	UpdateObjects();
@@ -299,13 +293,14 @@ static void ApplicationLoop()
 	}
 #endif
 #if SERVER
-	if (Networking::GetTickRate() > Stats::DeltaTime)
+	if (Networking::GetTickDelta() > Stats::DeltaTime)
 	{
-		SDL_Delay((Uint32)(1000.0f
-			* 1.0f / (float)Networking::GetTickRate() - Stats::DeltaTime));
+		float SleepDelay = Networking::GetTickDelta() - Stats::DeltaTime;
+
+		std::this_thread::sleep_for(std::chrono::microseconds(Uint32(1000.0f * 1000.0f * SleepDelay)));
 	}
 
-	Stats::DeltaTime = std::max(Stats::DeltaTime, 1.0f / (float)Networking::GetTickRate());
+	Stats::DeltaTime = std::max(Stats::DeltaTime, Networking::GetTickDelta());
 #endif
 	Stats::Time += Stats::DeltaTime;
 }
