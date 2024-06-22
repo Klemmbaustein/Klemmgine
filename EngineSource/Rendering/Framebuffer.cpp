@@ -178,7 +178,7 @@ void FramebufferObject::Draw()
 		for (int i = 0; i < Graphics::MAX_LIGHTS; i++)
 		{
 			std::string CurrentLight = "u_lights[" + std::to_string(i) + "]";
-			if (i < DrawnLights.size())
+			if (i < DrawnLights.size() && DrawnLights[i]->Intensity > 0 && DrawnLights[i]->Distance > 0)
 			{
 				s.second.UsedShader->SetVector3(CurrentLight + ".Position", DrawnLights[i]->Position);
 				s.second.UsedShader->SetVector3(CurrentLight + ".Color", DrawnLights[i]->Color);
