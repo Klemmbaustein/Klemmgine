@@ -21,7 +21,7 @@ namespace pkt
 	std::thread* pktThread = nullptr;
 	static bool RecvPacket = false;
 	std::condition_variable cv;
-	std::mutex Mutex;
+	std::mutex PacketReceiveMutex;
 	std::map<uint64_t, Packet> Lines;
 	UDPpacket* threadPacket;
 }
@@ -212,6 +212,7 @@ void PacketReceive()
 					NewP.Data.push_back(threadPacket->data[i]);
 				}
 				NewP.FromAddr = &threadPacket->address;
+				std::lock_guard lock{ PacketReceiveMutex };
 				Lines.insert(std::pair(pID, NewP));
 			}
 			else
@@ -224,12 +225,9 @@ void PacketReceive()
 
 std::map<uint64_t, Packet> Packet::Receive()
 {
-	std::unique_lock lock{ Mutex };
+	std::lock_guard lock{ PacketReceiveMutex };
 	std::map<uint64_t, Packet> toProcess;
-	if (cv.wait_for(lock, std::chrono::seconds(0), [&] { return !Lines.empty(); }))
-	{
-		std::swap(Lines, toProcess);
-	}
+	std::swap(Lines, toProcess);
 #if 0
 	for (auto& i : toProcess)
 	{
