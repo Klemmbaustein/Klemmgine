@@ -28,7 +28,6 @@
 
 namespace Networking
 {
-	constexpr uint16_t DEFAULT_PORT = 1234;
 	constexpr uint32_t TICK_RATE = 64;
 
 	void InitPacket(IPaddress* Target);
@@ -43,6 +42,8 @@ namespace Networking
 	uint64_t GameTick = 0;
 	bool IsServerTickFrame = false;
 	uint64_t NetIDCounter = 0;
+
+	static uint16_t DefaultPort = 0;
 }
 
 void Networking::InitPacket(IPaddress* Target)
@@ -50,8 +51,7 @@ void Networking::InitPacket(IPaddress* Target)
 	SentPacket = SDLNet_AllocPacket(Packet::MAX_PACKET_SIZE);
 	if (!SentPacket)
 	{
-		printf("Could not allocate receiving packet\n");
-		exit(3);
+		Log::Print("Could not allocate receiving packet", Log::LogColor::Red);
 	}
 }
 
@@ -59,36 +59,36 @@ void Networking::InitSockets(uint16_t Port)
 {
 	if (!(Socket = SDLNet_UDP_Open(Port)))
 	{
-		printf("Could not create socket\n");
-		exit(1);
+		Log::Print(StrUtil::Format("Could not create socket on port '%i'", int(Port)), Log::LogColor::Red);
+		return;
 	}
 
 	IPaddress* CurrentAddress = SDLNet_UDP_GetPeerAddress(Socket, -1);
 	if (!CurrentAddress)
 	{
-		printf("Could not get own port\n");
-		exit(2);
+		Log::Print("Could not get own port", Log::LogColor::Red);
+		return;
 	}
 
 	SocketSet = SDLNet_AllocSocketSet(2);
 	if (SocketSet == NULL)
 	{
-		fprintf(stderr, "Couldn't create socket set: %s\n", SDLNet_GetError());
-		exit(2);
+		Log::Print(StrUtil::Format("Couldn't create socket set: %s\n", SDLNet_GetError()), Log::LogColor::Red);
+		return;
 	}
 
 	auto UsedSockets = SDLNet_UDP_AddSocket(SocketSet, Socket);
 	if (UsedSockets == -1)
 	{
-		printf("SDLNet_AddSocket: %s\n", SDLNet_GetError());
-		exit(2);
+		Log::Print(StrUtil::Format("SDLNet_AddSocket: %s\n", SDLNet_GetError()), Log::LogColor::Red);
+		return;
 	}
 
 	SentPacket = SDLNet_AllocPacket(Packet::MAX_PACKET_SIZE);
 	if (!SentPacket)
 	{
-		printf("Could not allocate packet\n");
-		exit(2);
+		Log::Print("Could not allocate packet", Log::LogColor::Red);
+		return;
 	}
 	Log::Print(StrUtil::Format("[Net]: Listening on port %i", Port), Log::LogColor::Blue);
 }
@@ -98,25 +98,25 @@ UDPsocket Networking::InitSocketFrom(IPaddress* Target)
 	UDPsocket fret;
 	if (!(fret = SDLNet_UDP_Open(0)))
 	{
-		printf("Could not create socket\n");
+		Log::Print("Could not create socket", Log::LogColor::Red);
 		SDLNet_Quit();
 		SDL_Quit();
-		exit(1);
+		return nullptr;
 	}
 
 	IPaddress* CurrentAddress = SDLNet_UDP_GetPeerAddress(fret, -1);
 	if (!CurrentAddress)
 	{
-		printf("Could not get own port\n");
-		exit(2);
+		Log::Print("Could not get own port", Log::LogColor::Red);
+		return nullptr;
 	}
 
 	UDPsocket rcvS;
 	rcvS = SDLNet_UDP_Open(CurrentAddress->port);
 	if (!rcvS)
 	{
-		printf("Could not allocate receiving socket\n");
-		exit(4);
+		Log::Print(StrUtil::Format("Could not allocate receiving socket: %s\n", SDLNet_GetError()), Log::LogColor::Red);
+		return nullptr;
 	}
 
 	//resolve the address of the server
@@ -126,14 +126,14 @@ UDPsocket Networking::InitSocketFrom(IPaddress* Target)
 	SocketSet = SDLNet_AllocSocketSet(2);
 	if (SocketSet == NULL)
 	{
-		fprintf(stderr, "Couldn't create socket set: %s\n", SDLNet_GetError());
-		exit(2);
+		Log::Print(StrUtil::Format("Couldn't create socket set: %s\n", SDLNet_GetError()), Log::LogColor::Red);
+		return nullptr;
 	}
 	auto UsedSockets = SDLNet_UDP_AddSocket(SocketSet, fret);
 	if (UsedSockets == -1)
 	{
-		printf("SDLNet_AddSocket: %s\n", SDLNet_GetError());
-		exit(2);
+		Log::Print(StrUtil::Format("SDLNet_AddSocket: %s\n", SDLNet_GetError()), Log::LogColor::Red);
+		return nullptr;
 	}
 	InitPacket(&srvHost);
 	return fret;
@@ -201,16 +201,17 @@ void Networking::SendObjectInfo(WorldObject* obj, void* TargetAddr)
 	}
 }
 
-void Networking::Init()
+void Networking::Init(uint16_t DefaultPort)
 {
+	Networking::DefaultPort = DefaultPort;
 	SDLNet_Init();
 
 #if SERVER
-	InitSockets(DEFAULT_PORT);
+	InitSockets(DefaultPort);
 #else
 	Console::ConsoleSystem->RegisterCommand(Console::Command("connect", []()
 		{
-			uint16_t Port = DEFAULT_PORT;
+			uint16_t Port = Networking::DefaultPort;
 
 			if (Console::ConsoleSystem->CommandArgs().size() > 1)
 			{
@@ -344,6 +345,10 @@ std::string Networking::ClientIDToString(uint64_t ID)
 		return "Server";
 	}
 	return "Client " + std::to_string(ID);
+}
+uint16_t Networking::GetDefaultPort()
+{
+	return DefaultPort;
 }
 #endif
 

@@ -42,6 +42,7 @@ public:
 	};
 
 	float MasterVolume = 1.0f;
+	bool Enabled = true;
 
 	Sound();
 	virtual ~Sound() override;

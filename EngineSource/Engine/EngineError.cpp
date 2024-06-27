@@ -30,9 +30,13 @@ static void HandleSignal(int SignalID)
 {
 	if (Failed)
 	{
+		Log::Print("Crash handler crashed.", Log::LogColor::Red);
 		return;
 	}
 	Failed = true;
+
+	// Do not crash again due to the abort() call in AssertFailure()
+	signal(SIGABRT, nullptr);
 
 	Error::AssertFailure(SignalTypes[SignalID], Stats::EngineStatus);
 }

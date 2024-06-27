@@ -10,7 +10,7 @@ class WorldObject;
 
 namespace Networking
 {
-	void Init();
+	void Init(uint16_t DefaultPort);
 	void HandleTick();
 	void ReceivePackets();
 	void Update();
@@ -27,6 +27,7 @@ namespace Networking
 
 	std::string ClientIDToString(uint64_t ID);
 
+	uint16_t GetDefaultPort();
 }
 #endif
 

@@ -34,7 +34,7 @@
     <ClCompile Include="Objects\Components\PhysicsComponent.cpp" />
     <ClCompile Include="Rendering\RenderSubsystem\OcclusionCulling.cpp" />
     <ClCompile Include="Rendering\RenderSubsystem\RenderSubsystem.cpp" />
-    <ClCompile Include="Rendering\RenderSubsystem\RenderSubsystem.h" />
+    <ClInclude Include="Rendering\RenderSubsystem\RenderSubsystem.h" />
     <ClCompile Include="UI\Debug\ConsoleAutoComplete.cpp" />
     <ClCompile Include="UI\EditorUI\AssetBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\ClassesBrowser.cpp" />

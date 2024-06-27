@@ -1,18 +1,16 @@
 #if !EDITOR
 #include "Packet.h"
 #include <Engine/Log.h>
-#include "Networking.h"
 #include "NetworkEvent.h"
 #include "NetworkingInternal.h"
 #include <iostream>
 #include <Networking/Server.h>
 #include <Networking/Client.h>
 #include <Engine/Utility/StringUtility.h>
-#include <Objects/WorldObject.h>
 #include <Engine/Subsystem/Scene.h>
 #include <thread>
 #include <mutex>
-#include <condition_variable>
+#include "Networking.h"
 
 const int Packet::MAX_PACKET_SIZE = 512;
 uint64_t Packet::PacketID = 0;
@@ -185,6 +183,10 @@ void PacketReceive()
 {
 	while (true)
 	{
+		if (!Networking::SocketSet)
+		{
+			return;
+		}
 		int ret = SDLNet_CheckSockets(Networking::SocketSet, 150);
 		if (ret == -1)
 		{
@@ -277,4 +279,5 @@ void Packet::SetReceivePackets(bool NewRecv)
 {
 	RecvPacket = true;
 }
+
 #endif

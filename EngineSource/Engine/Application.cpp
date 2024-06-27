@@ -8,7 +8,6 @@
 #include <Engine/EngineError.h>
 #include <Engine/File/Assets.h>
 #include <Engine/Stats.h>
-#include <Engine/Gamepad.h>
 
 #include <Engine/Subsystem/Console.h>
 #include <Engine/Subsystem/Sound.h>
@@ -40,11 +39,7 @@
 // STL includes
 #include <iostream>
 #include <thread>
-#include <deque>
 #include <cstdint>
-#include <mutex>
-#include <chrono>
-#include <condition_variable>
 #include <Rendering/RenderSubsystem/PostProcess.h>
 
 static Vector2 GetMousePosition()
@@ -396,7 +391,7 @@ int Application::Initialize(int argc, char** argv)
 #if !EDITOR
 	if (Project::UseNetworkFunctions)
 	{
-		Subsystem::Load(new NetworkSubsystem());
+		Subsystem::Load(new NetworkSubsystem(12345));
 	}
 #endif
 

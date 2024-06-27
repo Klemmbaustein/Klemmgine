@@ -4,7 +4,7 @@
 class NetworkSubsystem : public Subsystem
 {
 public:
-	NetworkSubsystem();
+	NetworkSubsystem(uint16_t DefaultServerPort);
 	~NetworkSubsystem();
 
 	void Update() override;

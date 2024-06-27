@@ -1,11 +1,11 @@
 #include "NetworkSubsystem.h"
 #include <Networking/Networking.h>
 
-NetworkSubsystem::NetworkSubsystem()
+NetworkSubsystem::NetworkSubsystem(uint16_t DefaultServerPort)
 {
 	Name = "Network";
 #if !EDITOR
-	Networking::Init();
+	Networking::Init(DefaultServerPort);
 #endif
 }
 

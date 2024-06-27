@@ -232,18 +232,6 @@ Console::Console()
 		}, { Command::Argument("pack_file", NativeType::String) }));
 
 
-	RegisterCommand(Command("find",
-		[]() {
-			std::string File = Assets::GetAsset(ConsoleSystem->CommandArgs()[0]);
-			if (File.empty())
-			{
-				ConsoleSystem->Print("Could not find " + ConsoleSystem->CommandArgs()[0], ErrorLevel::Error);
-				return;
-			}
-			ConsoleSystem->Print(ConsoleSystem->CommandArgs()[0] + " -> " + File);
-
-		}, { Command::Argument("file", NativeType::String) }));
-
 	RegisterCommand(Command("open", []() {
 		if (std::filesystem::exists(Assets::GetAsset(ConsoleSystem->CommandArgs()[0] + +".jscn")))
 		{

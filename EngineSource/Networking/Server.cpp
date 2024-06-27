@@ -35,7 +35,6 @@ void Server::ClearOnPlayerdisconnectedCallbacks()
 #include <Engine/Subsystem/Console.h>
 #include <Engine/Subsystem/Scene.h>
 #include <Engine/Utility/FileUtility.h>
-#include <Engine/EngineError.h>
 #include "NetworkEvent.h"
 #include <Engine/Stats.h>
 
@@ -269,7 +268,7 @@ void Server::Init()
 
 bool Server::IsServer()
 {
-#if SERVER
+#ifdef SERVER
 	return true;
 #else
 	return false;

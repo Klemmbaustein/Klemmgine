@@ -1,15 +1,11 @@
 #include "Sound.h"
 #if !SERVER
 #include <AL/al.h>
-#include <Engine/Utility/FileUtility.h>
 #include <AL/alc.h>
-#include "AL/alext.h"
-#include <fstream>
-#include <sstream>
 #include <cmath>
-#include <Engine/Log.h>
 #include <Rendering/Camera/Camera.h>
 #include <Engine/File/Assets.h>
+#include <fstream>
 #include <iostream>
 #include <Rendering/Graphics.h>
 #include <filesystem>
@@ -156,7 +152,7 @@ void Sound::Update()
 		ForwardVec = Vector3(0, 0, 1);
 	}
 	Vector3 Forward[2] = { ForwardVec, Vector3(0, 1, 0) };
-	alListenerf(AL_GAIN, MasterVolume);
+	alListenerf(AL_GAIN, MasterVolume * float(Enabled));
 	alListenerfv(AL_POSITION, &PositionVec.X);
 	alListenerfv(AL_ORIENTATION, &Forward[0].X);
 	for (int i = 0; i < CurrentSources.size(); i++)
@@ -193,7 +189,7 @@ Sound::Sound()
 	alcMakeContextCurrent(context);
 	alDistanceModel(AL_INVERSE_DISTANCE_CLAMPED);
 	alListenerf(AL_GAIN, 1.1f);
-	Console::ConsoleSystem->RegisterCommand(Console::Command("play_sound", []()
+	Console::ConsoleSystem->RegisterCommand(Console::Command("sound_play", []()
 		{
 			auto LoadedBuffer = new SoundBuffer(Console::ConsoleSystem->CommandArgs()[0]);
 			if (LoadedBuffer)
@@ -205,6 +201,7 @@ Sound::Sound()
 			Console::ConsoleSystem->Print("Sound " + Console::ConsoleSystem->CommandArgs()[0] + " doesn't exist!", ErrorLevel::Error);
 		}, { Console::Command::Argument("sound", NativeType::String) }));
 	Console::ConsoleSystem->RegisterConVar(Console::Variable("sound_volume", NativeType::Float, &MasterVolume, nullptr));
+	Console::ConsoleSystem->RegisterConVar(Console::Variable("sound_enabled", NativeType::Bool, &Enabled, nullptr));
 
 	Update();
 #endif

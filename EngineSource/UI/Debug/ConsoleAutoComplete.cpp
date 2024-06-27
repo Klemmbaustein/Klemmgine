@@ -56,7 +56,7 @@ std::vector<ConsoleAutoComplete::Recommendation> ConsoleAutoComplete::GetRecomme
 		}
 		else if (i.second.Name.substr(0, First.size()) == First)
 		{
-			Found.insert(Found.begin(), Recommendation{
+			Found.push_back(Recommendation{
 				.Type = "<command> ",
 				.Name = i.second.Name,
 				.IsComplete = false,
@@ -73,7 +73,7 @@ std::vector<ConsoleAutoComplete::Recommendation> ConsoleAutoComplete::GetRecomme
 
 		if (IsEqual || i.second.Name.substr(0, First.size()) == First)
 		{
-			Found.insert(Found.begin(), Recommendation{
+			Found.push_back(Recommendation{
 				.Type = IsEqual ? "* <variable>" : "<variable>",
 				.Name = i.second.Name,
 				.IsComplete = IsEqual,

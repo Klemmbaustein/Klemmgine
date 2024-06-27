@@ -1,5 +1,20 @@
 # Changes
 
+## Version 1.10.15
+
+### Changes
+
+- The server port is no longer a constant.
+- Added an error message to the crash handler if it crashes.
+- Added `Sound::Enabled`.
+
+### Fixes
+
+- Fixed auto complete being in reverse alphabetical order.
+- Fixed a server crash if the current port was already in use.
+- Removed some unused #include-statements.
+- Fixed `RenderSubsystem.h` being considered as a ClCompile item by msbuild.
+
 ## Version 1.10.14
 
 ### Changes
