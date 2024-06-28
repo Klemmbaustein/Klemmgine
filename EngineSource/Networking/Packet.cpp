@@ -9,6 +9,7 @@
 #include <Engine/Utility/StringUtility.h>
 #include <Engine/Subsystem/Scene.h>
 #include <thread>
+#include <condition_variable>
 #include <mutex>
 #include "Networking.h"
 

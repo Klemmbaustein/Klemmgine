@@ -477,21 +477,21 @@ EditorUI::~EditorUI()
 {
 }
 
-void EditorUI::OnLeave(void(*ReturnF)())
+void EditorUI::OnLeave()
 {
 	if (ChangedScene)
 	{
 		new DialogBox("Scene", 0,
 			"The current scene has unsaved changes. Save changes before exiting?",
 			{
-				EditorPopup::PopupOption("Yes", [ReturnF]() { SaveCurrentScene(); ReturnF(); }),
-				EditorPopup::PopupOption("No", ReturnF),
+				EditorPopup::PopupOption("Yes", []() { SaveCurrentScene(); Application::Quit(); }),
+				EditorPopup::PopupOption("No", &Application::Quit),
 				EditorPopup::PopupOption("Cancel", nullptr)
 			});
 	}
 	else
 	{
-		ReturnF();
+		Application::Quit();
 	}
 }
 

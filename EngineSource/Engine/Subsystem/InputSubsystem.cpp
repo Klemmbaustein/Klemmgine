@@ -75,7 +75,7 @@ void InputSubsystem::PollInput()
 		if (Event.type == SDL_QUIT)
 		{
 #if EDITOR
-			Application::EditorInstance->OnLeave(Application::Quit);
+			Application::EditorInstance->OnLeave();
 #else
 			Application::Quit();
 #endif

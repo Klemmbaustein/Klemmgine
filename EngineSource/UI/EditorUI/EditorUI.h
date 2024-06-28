@@ -148,13 +148,8 @@ public:
 	/**
 	* @brief
 	* Function that creates a "Save changes" popup if necessary, then quits the application.
-	* 
-	* If you want to quit the application, use Application::Quit() instead.
-	* 
-	* @param ReturnF
-	* The function that should be called to quit the applicatin.
 	*/
-	void OnLeave(void(*ReturnF)());
+	void OnLeave();
 	virtual void Update() override;
 
 	void LoadEditorTextures();
