@@ -300,3 +300,4 @@
 - Fixed some issues with point lights.
 - Fixed issues with shadows.
 - Fixed an issue with the default movement.
+
