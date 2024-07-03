@@ -45,7 +45,7 @@ void WriteSpawnList(std::vector<ParseFile::Object> Objects, std::string TargetFo
 	std::stringstream OutStream;
 	for (unsigned int i = 0; i < Objects.size(); i++)
 	{
-		OutStream << "case " + std::to_string(Objects[i].Hash) + ": return (WorldObject*)SpawnObject<" + Objects[i].Name + ">(ObjectTransform, NetID); " << std::endl;
+		OutStream << "case " + std::to_string(Objects[i].Hash) + ": return (SceneObject*)SpawnObject<" + Objects[i].Name + ">(ObjectTransform, NetID); " << std::endl;
 	}
 	ParseFile::WriteToFile(OutStream.str(), TargetFolder + "/GENERATED_Spawnlist.h");
 }
@@ -132,17 +132,17 @@ int main(int argc, char** argv)
 		RecursiveSearch(location, Objects);
 	}
 
-	std::vector<ParseFile::Object> WorldObjects;
+	std::vector<ParseFile::Object> SceneObjects;
 	for (ParseFile::Object& i : Objects)
 	{
-		if (i.DerivesFromWorldObject(Objects))
+		if (i.DerivesFromSceneObject(Objects))
 		{
 			i.WriteGeneratedHeader(OutLoc);
-			WorldObjects.push_back(i);
+			SceneObjects.push_back(i);
 		}
 	}
-	WriteIncludeList(WorldObjects, OutLoc);
-	WriteObjectList(WorldObjects, OutLoc);
-	WriteSpawnList(WorldObjects, OutLoc);
-	WriteCategoryList(WorldObjects, OutLoc);
+	WriteIncludeList(SceneObjects, OutLoc);
+	WriteObjectList(SceneObjects, OutLoc);
+	WriteSpawnList(SceneObjects, OutLoc);
+	WriteCategoryList(SceneObjects, OutLoc);
 }

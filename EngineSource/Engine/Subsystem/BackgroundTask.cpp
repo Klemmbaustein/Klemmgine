@@ -9,10 +9,9 @@ float BackgroundTask::CurrentTaskProgress;
 bool BackgroundTask::IsRunningTask;
 std::vector<BackgroundTask*> BackgroundTask::AllTasks;
 
-BackgroundTask::BackgroundTask(void(*Function)(), void(*Callback)())
+BackgroundTask::BackgroundTask(std::function<void()> Function, std::function<void()> CallbackFunction)
 {
 	// Using a pointer as an ID. Why not?
-	NativeType = (size_t)Function;
 	AllTasks.push_back(this);
 	this->Callback = Callback;
 
@@ -37,23 +36,11 @@ void BackgroundTask::SetStatus(std::string NewStatus)
 	ThisThreadPtr->Status = NewStatus;
 }
 
-void BackgroundTask::TaskRun(void (*Function)(), BackgroundTask* ThisTask)
+void BackgroundTask::TaskRun(std::function<void()> Function, BackgroundTask* ThisTask)
 {
 	ThisThreadPtr = ThisTask;
 	Function();
 	ThisTask->Progress = 1;
-}
-
-bool BackgroundTask::IsFunctionRunningAsTask(void(*Function)())
-{
-	for (auto& i : AllTasks)
-	{
-		if (i->NativeType == (size_t)Function)
-		{
-			return true;
-		}
-	}
-	return false;
 }
 
 bool BackgroundTask::IsBackgroundTask()

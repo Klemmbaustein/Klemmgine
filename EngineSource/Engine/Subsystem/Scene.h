@@ -1,5 +1,5 @@
 #pragma once
-#include "Objects/WorldObject.h"
+#include "Objects/SceneObject.h"
 #include <fstream>
 #include "Subsystem.h"
 class Camera;

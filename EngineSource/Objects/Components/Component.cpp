@@ -13,7 +13,7 @@ void Component::Destroy()
 }
 
 
-WorldObject* Component::GetParent()
+SceneObject* Component::GetParent()
 {
 	return Parent;
 }

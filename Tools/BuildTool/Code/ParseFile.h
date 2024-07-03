@@ -12,7 +12,7 @@ namespace ParseFile
 		std::vector<std::string> Parents;
 		unsigned int Hash = 0;
 
-		bool DerivesFromWorldObject(const std::vector<Object>& AllObjects) const;
+		bool DerivesFromSceneObject(const std::vector<Object>& AllObjects) const;
 
 		void WriteGeneratedHeader(std::string TargetFolder);
 	};

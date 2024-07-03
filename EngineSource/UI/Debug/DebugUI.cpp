@@ -26,6 +26,21 @@ void DebugUI::UpdateAutoComplete()
 	AutoComplete->RenderToBox(CompleteBackground, AutoComplete->GetRecommendations(LastCommand));
 }
 
+void Debug::DebugUI::UpdatePerfGraph()
+{
+	if (PerformanceGraphBox->GetChildren().size() > 18)
+	{
+		UIBox* Oldest = PerformanceGraphBox->GetChildren().at(0);
+		delete Oldest;
+	}
+
+	float Value = float(FPS) / 240;
+
+	Vector3 Color = Vector3::Lerp(Vector3(1.0f, 0.0f, 0.0f), Vector3(0.5f, 1.0f, 0.0f), std::min(Value, 1.0f));
+
+	PerformanceGraphBox->AddChild(new UIBackground(UIBox::Orientation::Horizontal, 0, Color, Vector2(0.01f, 0.19f * Value)));
+}
+
 DebugUI::DebugUI()
 {
 	CurrentDebugUI = this;
@@ -40,6 +55,21 @@ DebugUI::DebugUI()
 		i->SetPadding(-0.005f);
 		DebugTextBackground->AddChild(i);
 	}
+	PerformanceGraphBox = new UIBox(UIBox::Orientation::Horizontal, 0);
+
+	(new UIBackground(UIBox::Orientation::Horizontal, -0.975f, 0))
+		->SetVerticalAlign(UIBox::Align::Default)
+		->AddChild(PerformanceGraphBox
+			->SetVerticalAlign(UIBox::Align::Default)
+			->SetPadding(0.02f)
+			->SetMinSize(0.2f))
+		->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
+			->SetPadding(0.01f)
+			->AddChild(new UIText(0.9f, 1, "240 FPS", Text))
+			->AddChild(new UIText(0.9f, 1, "120 FPS", Text))
+			->AddChild(new UIText(0.9f, 1, "0   FPS", Text)));
+
+	PerformanceGraphBox->GetAbsoluteParent()->IsVisible = false;
 
 	LogPrompt = new UITextField(-1, 0.1f, this, 0, Text);
 	LogPrompt->SetMinSize(Vector2(2, 0.06f));
@@ -53,6 +83,7 @@ DebugUI::DebugUI()
 	CompleteBackground = new UIBackground(UIBox::Orientation::Vertical, Vector2(-1, -0.94f), 0, Vector2(2, 0.0f));
 
 	CompleteBackground->SetOpacity(0.95f);
+
 }
 
 bool DebugUI::ConsoleReadInput(Input::Key KeyCode)
@@ -102,10 +133,20 @@ void DebugUI::Tick()
 		UpDownPressed = false;
 	}
 
+	if (!RShiftDown && ConsoleReadInput(Input::Key::RSHIFT))
+	{
+		PerformanceGraphBox->GetAbsoluteParent()->IsVisible = !PerformanceGraphBox->GetAbsoluteParent()->IsVisible;
+		RShiftDown = true;
+	}
+	if (!ConsoleReadInput(Input::Key::RSHIFT))
+	{
+		RShiftDown = false;
+	}
 
 	auto LogMessages = Log::GetMessages();
 	if (StatsRedrawTimer >= 1)
 	{
+		UpdatePerfGraph();
 		DebugTexts[0]->SetText("FPS: " + std::to_string(FPS - 1));
 		DebugTexts[1]->SetText("Delta: " + std::to_string(1000 / FPS) + "ms");
 

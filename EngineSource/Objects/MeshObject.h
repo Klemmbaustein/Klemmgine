@@ -1,5 +1,5 @@
 #pragma once
-#include "Objects/WorldObject.h"
+#include "Objects/SceneObject.h"
 #include <Objects/Components/CollisionComponent.h>
 #include <Objects/Components/MeshComponent.h>
 #include <GENERATED/MeshObject.h>
@@ -14,7 +14,7 @@ class Model;
 * 
 * Path: Classes/Default/Mesh.
 */
-class MeshObject : public WorldObject
+class MeshObject : public SceneObject
 {
 public:
 	MESHOBJECT_GENERATED("Default/Mesh")

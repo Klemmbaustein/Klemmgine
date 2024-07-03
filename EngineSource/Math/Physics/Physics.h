@@ -5,7 +5,7 @@
 #include <set>
 
 class Component;
-class WorldObject;
+class SceneObject;
 
 /**
 * @defgroup Physics
@@ -184,8 +184,8 @@ namespace Physics
 		Vector3 GetVelocity();
 		Vector3 GetAngularVelocity();
 
-		std::vector<HitResult> CollisionTest(Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore = {});
-		std::vector<HitResult> ShapeCast(Transform StartTransform, Vector3 EndPos, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore = {});
+		std::vector<HitResult> CollisionTest(Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore = {});
+		std::vector<HitResult> ShapeCast(Transform StartTransform, Vector3 EndPos, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore = {});
 
 		/// The *initial* Transform of the body.
 		Transform BodyTransform;
@@ -318,5 +318,5 @@ namespace Physics
 	void AddBody(PhysicsBody* Body);
 	void RemoveBody(PhysicsBody* Body, bool Destroy);
 
-	HitResult RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<WorldObject*> ObjectsToIgnore = {});
+	HitResult RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<SceneObject*> ObjectsToIgnore = {});
 }

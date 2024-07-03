@@ -349,32 +349,32 @@ void CSharpInterop::RegisterNativeFunction(std::string Name, void* Function)
 	StaticCall<void, const char*, void*>(RegisterNativeFunctionPtr, Name.c_str(), Function);
 }
 
-void CSharpInterop::ExecuteFunctionOnObject(CSharpWorldObject Object, std::string FunctionName)
+void CSharpInterop::ExecuteFunctionOnObject(CSharpSceneObject Object, std::string FunctionName)
 {
 	StaticCall<void, int32_t, const char*>(ExecuteOnObjectFunction, Object.ID, FunctionName.c_str());
 }
 
-std::string CSharpInterop::ExecuteStringFunctionOnObject(CSharpWorldObject Object, std::string FunctionName)
+std::string CSharpInterop::ExecuteStringFunctionOnObject(CSharpSceneObject Object, std::string FunctionName)
 {
 	return StaticCall<const char*, int32_t, const char*>(ExecuteStringOnObjectFunction, Object.ID, FunctionName.c_str());
 }
 
-std::string CSharpInterop::GetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName)
+std::string CSharpInterop::GetPropertyOfObject(CSharpSceneObject Object, std::string FunctionName)
 {
 	return StaticCall<const char*, int32_t, const char*>(GetPropertyFunction, Object.ID,  FunctionName.c_str());
 }
 
-void CSharpInterop::SetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName, std::string Value)
+void CSharpInterop::SetPropertyOfObject(CSharpSceneObject Object, std::string FunctionName, std::string Value)
 {
 	return StaticCall<void, int32_t, const char*, const char*>(SetPropertyFunction, Object.ID, FunctionName.c_str(), Value.c_str());
 }
 
-Vector3 CSharpInterop::GetObjectVectorField(CSharpWorldObject Obj, std::string Field)
+Vector3 CSharpInterop::GetObjectVectorField(CSharpSceneObject Obj, std::string Field)
 {
 	return StaticCall<Vector3, int32_t, const char*>(GetPosFunction, Obj.ID, Field.c_str());
 }
 
-void CSharpInterop::SetObjectVectorField(CSharpWorldObject Obj, std::string Field, Vector3 Value)
+void CSharpInterop::SetObjectVectorField(CSharpSceneObject Obj, std::string Field, Vector3 Value)
 {
 	return StaticCall<void, int32_t, const char*, Vector3>(SetPosFunction, Obj.ID, Field.c_str(), Value);
 }
@@ -552,16 +552,16 @@ void CSharpInterop::LoadAssembly()
 	}
 }
 
-CSharpInterop::CSharpWorldObject CSharpInterop::InstantiateObject(std::string Typename, Transform t, WorldObject* NativeObject)
+CSharpInterop::CSharpSceneObject CSharpInterop::InstantiateObject(std::string Typename, Transform t, SceneObject* NativeObject)
 {
 	if (!GetUseCSharp())
 	{
-		return CSharpWorldObject();
+		return CSharpSceneObject();
 	}
-	return CSharpWorldObject(StaticCall<int32_t, const char*, Transform, void*>(InstantiateFunction, Typename.c_str(), t, NativeObject));
+	return CSharpSceneObject(StaticCall<int32_t, const char*, Transform, void*>(InstantiateFunction, Typename.c_str(), t, NativeObject));
 }
 
-void CSharpInterop::DestroyObject(CSharpWorldObject Obj)
+void CSharpInterop::DestroyObject(CSharpSceneObject Obj)
 {
 	if (!GetUseCSharp())
 	{

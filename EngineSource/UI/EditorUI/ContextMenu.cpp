@@ -36,7 +36,7 @@ UITextField* ContextMenu::GenerateTextField(std::string Content, int Index)
 	return NewElement;
 }
 
-void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index)
+void ContextMenu::GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, SceneObject* ContextObject, unsigned int Index)
 {
 	auto SeparatorBorder = new UIButton(UIBox::Orientation::Horizontal, 0, 0.5f, this, Index);
 
@@ -88,7 +88,7 @@ std::vector<T>& GetVec(void* vec)
 	return *(std::vector<T>*)vec;
 }
 
-void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& Element, WorldObject* ContextObject)
+void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& Element, SceneObject* ContextObject)
 {
 	UIBox* NewElement = nullptr;
 	CSharpObject* obj = static_cast<CSharpObject*>(ContextObject);
@@ -176,7 +176,7 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 	}
 }
 
-void ContextMenu::GenerateSectionElement(ContextMenuSection Element, WorldObject* ContextObject, std::string Name)
+void ContextMenu::GenerateSectionElement(ContextMenuSection Element, SceneObject* ContextObject, std::string Name)
 {
 	UIBox* NewElement = nullptr;
 	UIText* NewElementText = new UIText(0.4f, EditorUI::UIColors[2], Element.Name, EditorUI::Text);
@@ -515,7 +515,7 @@ void ContextMenu::OnResized()
 	if (IsObject)
 	{
 		Properties.clear();
-		WorldObject* SelectedObject = nullptr;
+		SceneObject* SelectedObject = nullptr;
 		if (!EditorUI::SelectedObjects.empty())
 		{
 			SelectedObject = EditorUI::SelectedObjects[0];
@@ -525,7 +525,9 @@ void ContextMenu::OnResized()
 		if (!SelectedObject)
 		{
 			BackgroundBox->HorizontalBoxAlign = UIBox::Align::Centered;
-			BackgroundBox->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "No object selected", EditorUI::Text)));
+			BackgroundBox->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "No object selected", EditorUI::Text))
+				->SetPadding(0.02f)
+				->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative));
 			return;
 		}
 		else
@@ -556,10 +558,10 @@ void ContextMenu::OnResized()
 
 		std::map<std::string, std::vector<ContextMenuSection>> Categories;
 
-		for (WorldObject::Property i : SelectedObject->Properties)
+		for (SceneObject::Property i : SelectedObject->Properties)
 		{
 
-			if (i.PType != WorldObject::Property::PropertyType::EditorProperty && i.PType != WorldObject::Property::PropertyType::CSharpProperty)
+			if (i.PType != SceneObject::Property::PropertyType::EditorProperty && i.PType != SceneObject::Property::PropertyType::CSharpProperty)
 			{
 				continue;
 			}

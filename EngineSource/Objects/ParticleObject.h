@@ -1,5 +1,5 @@
 #pragma once
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <GENERATED/ParticleObject.h>
 
 class ParticleComponent;
@@ -10,7 +10,7 @@ class ParticleComponent;
 *
 * Path: Classes/Default
 */
-class ParticleObject : public WorldObject
+class ParticleObject : public SceneObject
 {
 	ParticleComponent* Particle = nullptr;
 public:

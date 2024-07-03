@@ -11,7 +11,7 @@ using Engine.Native;
  * 
  * @ingroup CSharp-Objects
  */
-public class NativeObject : WorldObject
+public class NativeObject : SceneObject
 {
 	delegate NativeType GetPropertyTypeDelegate(IntPtr obj, [MarshalAs(UnmanagedType.LPUTF8Str)] string Name);
 

@@ -2,7 +2,7 @@
 #pragma once
 #include <UI/EditorUI/EditorPanel.h>
 #include <UI/UIfwd.h>
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <UI/EditorUI/EditorDropdown.h>
 
 /**

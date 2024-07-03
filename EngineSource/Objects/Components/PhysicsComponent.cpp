@@ -217,7 +217,7 @@ void PhysicsComponent::SetActive(bool NewActive)
 	Active = NewActive;
 }
 
-Physics::HitResult PhysicsComponent::ShapeCast(Transform Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+Physics::HitResult PhysicsComponent::ShapeCast(Transform Start, Vector3 End, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	if (!PhysicsBodyPtr)
 	{
@@ -228,7 +228,7 @@ Physics::HitResult PhysicsComponent::ShapeCast(Transform Start, Vector3 End, Phy
 
 }
 
-Physics::HitResult PhysicsComponent::CollisionCheck(Transform Start, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+Physics::HitResult PhysicsComponent::CollisionCheck(Transform Start, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	if (!PhysicsBodyPtr)
 	{

@@ -12,9 +12,9 @@ namespace Engine;
 
 /**
  * @brief
- * WorldObject Component in C#.
+ * SceneObject Component in C#.
  * 
- * Can be attached to any Engine.WorldObject.
+ * Can be attached to any Engine.SceneObject.
  * 
  * C++ equivalent: Component.
  * 
@@ -25,7 +25,7 @@ public abstract class ObjectComponent
 	// Points to the native version of this class
 	public IntPtr NativePtr = new();
 
-	public WorldObject Parent = null;
+	public SceneObject Parent = null;
 	protected delegate void DestroyComponent(IntPtr Component, IntPtr Parent);
 	private delegate void SetTransformDelegate(IntPtr Component, Transform NewTransform);
 	private delegate Transform GetTransformDelegate(IntPtr Component);

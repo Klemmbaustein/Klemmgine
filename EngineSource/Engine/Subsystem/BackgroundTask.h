@@ -3,20 +3,20 @@
 #include <string>
 #include <thread>
 #include <vector>
+#include <functional>
 #include "Subsystem.h"
 
 struct BackgroundTask
 {
-	size_t NativeType = 0;
 	std::atomic<float> Progress = 0;
 	std::string Status;
 	std::thread* Thread = nullptr;
-	void(*Callback)() = nullptr;
+	std::function<void()> Callback = nullptr;
 
 	// Will point to the task that is being executed right now.
 	thread_local static BackgroundTask* ThisThreadPtr;
 
-	BackgroundTask(void (*Function)(), void(*Callback)() = nullptr);
+	BackgroundTask(std::function<void()> Function, std::function<void()> Callback = nullptr);
 	~BackgroundTask();
 
 	static void SetProgress(float Progress);
@@ -28,11 +28,10 @@ struct BackgroundTask
 
 	static bool IsBackgroundTask();
 
-	static bool IsFunctionRunningAsTask(void (*Function)());
 	static std::vector<BackgroundTask*> AllTasks;
 
 private:
-	static void TaskRun(void (*Function)(), BackgroundTask* Task);
+	static void TaskRun(std::function<void()> Function, BackgroundTask* Task);
 };
 
 class BackgroundTaskSubsystem : public Subsystem

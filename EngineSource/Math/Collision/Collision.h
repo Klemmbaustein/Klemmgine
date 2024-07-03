@@ -2,7 +2,7 @@
 #include "Math/Vector.h"
 #include "Rendering/Mesh/Model.h"
 #include "CollisionBox.h"
-#include "Objects/WorldObject.h"
+#include "Objects/SceneObject.h"
 #include <set>
 
 
@@ -37,7 +37,7 @@ namespace Collision
 		/// The distance the collision ray has traveled, from 0 - 1. If the collision is not a RayCast or ShapeCast, this can be ignored.
 		float Distance = INFINITY;
 		/// The object that was hit.
-		WorldObject* HitObject = nullptr;
+		SceneObject* HitObject = nullptr;
 		/// The component that was hit.
 		Component* HitComponent = nullptr;
 		/// The normal vector of the collision.
@@ -46,7 +46,7 @@ namespace Collision
 		{
 			Hit = false;
 		}
-		HitResponse(bool Hit, Vector3 ImpactPoint, Vector3 Normal, float Distance = INFINITY, WorldObject* HitObject = nullptr)
+		HitResponse(bool Hit, Vector3 ImpactPoint, Vector3 Normal, float Distance = INFINITY, SceneObject* HitObject = nullptr)
 		{
 			this->Hit = Hit;
 			this->ImpactPoint = ImpactPoint;
@@ -73,7 +73,7 @@ namespace Collision
 	* @param ObjectsToIgnore
 	* Objects that should be ignored in the collision check.
 	*/
-	HitResponse LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<WorldObject*> ObjectsToIgnore = {});
+	HitResponse LineTrace(Vector3 RayStart, Vector3 RayEnd, std::set<SceneObject*> ObjectsToIgnore = {});
 
 	HitResponse LineCheckForAABB(Box b, Vector3 RayStart, Vector3 RayEnd);
 }

@@ -85,7 +85,7 @@
     <ClCompile Include="Objects\MeshObject.cpp" />
     <ClCompile Include="Objects\ParticleObject.cpp" />
     <ClCompile Include="Objects\SoundObject.cpp" />
-    <ClCompile Include="Objects\WorldObject.cpp" />
+    <ClCompile Include="Objects\SceneObject.cpp" />
     <ClCompile Include="Rendering\BillboardSprite.cpp" />
     <ClCompile Include="Rendering\Camera\Camera.cpp" />
     <ClCompile Include="Rendering\Camera\CameraShake.cpp" />
@@ -215,7 +215,7 @@
     <ClInclude Include="Objects\MeshObject.h" />
     <ClInclude Include="Objects\ParticleObject.h" />
     <ClInclude Include="Objects\SoundObject.h" />
-    <ClInclude Include="Objects\WorldObject.h" />
+    <ClInclude Include="Objects\SceneObject.h" />
     <ClInclude Include="Rendering\BillboardSprite.h" />
     <ClInclude Include="Rendering\Camera\Camera.h" />
     <ClInclude Include="Rendering\Camera\CameraShake.h" />

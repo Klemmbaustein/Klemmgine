@@ -156,13 +156,13 @@ namespace Engine
 			public Vector3 Normal;
 
 			/// Gets the object that was hit, in the form of a C# object class..
-			public readonly WorldObject GetHitObject()
+			public readonly SceneObject GetHitObject()
 			{
 				if (!Hit)
 				{
 					return null;
 				}
-				return WorldObject.GetObjectFromNativePointer(HitObject);
+				return SceneObject.GetObjectFromNativePointer(HitObject);
 			}
 		}
 
@@ -177,7 +177,7 @@ namespace Engine
 		 * @param ObjectsToIgnore
 		 * Colliders that belong to these objects should be ignored.
 		 */
-		public static HitResponse RayCast(Vector3 Start, Vector3 End, WorldObject[] ObjectsToIgnore = null)
+		public static HitResponse RayCast(Vector3 Start, Vector3 End, SceneObject[] ObjectsToIgnore = null)
 		{
 			IntPtr[] ComponentPtrs;
 			if (ObjectsToIgnore == null)

@@ -129,6 +129,7 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 	ColorPickerBackgrounds[1] = new UIBackground(UIBox::Orientation::Horizontal, 0, 1, Vector2(0.025f, 0.3f), ColorPickerShaders[1]);
 	ColorPickerBackgrounds[1]->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 	ColorPickerBackgrounds[2] = new UIBackground(UIBox::Orientation::Horizontal, 0, SelectedColor, Vector2(0.1f, 0.075f));
+	ColorPickerBackgrounds[2]->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 
 	RGBBox = new UIBox(UIBox::Orientation::Vertical, 0);
 	RGBBox->SetPadding(0);

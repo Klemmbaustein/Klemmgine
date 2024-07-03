@@ -1,6 +1,6 @@
 #if EDITOR
 #include "ObjectList.h"
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <UI/UIScrollBox.h>
 #include <UI/UIButton.h>
 #include <UI/UIText.h>
@@ -42,7 +42,7 @@ void ObjectList::Tick()
 			EditorDropdown::DropdownItem{
 			.Title = "Delete",
 			.OnPressed = []() {
-				for (WorldObject* i : EditorUI::SelectedObjects)
+				for (SceneObject* i : EditorUI::SelectedObjects)
 				{
 					Objects::DestroyObject(i);
 				}

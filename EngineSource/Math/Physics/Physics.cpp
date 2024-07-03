@@ -1,7 +1,7 @@
 #include "Physics.h"
 #include "JoltPhysics.h"
 #include <Engine/EngineError.h>
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <iostream>
 #include <Math/Collision/CollisionVisualize.h>
 
@@ -30,7 +30,7 @@ void Physics::RemoveBody(PhysicsBody* Body, bool Destroy)
 #endif
 }
 
-Physics::HitResult Physics::RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+Physics::HitResult Physics::RayCast(Vector3 Start, Vector3 End, Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	return PHYSICS_SYSTEM::LineCast(Start, End, Layers, ObjectsToIgnore);
 }
@@ -95,12 +95,12 @@ Vector3 Physics::PhysicsBody::GetAngularVelocity()
 	return PHYSICS_SYSTEM::GetBodyAngularVelocity(this);
 }
 
-std::vector<Physics::HitResult> Physics::PhysicsBody::CollisionTest(Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+std::vector<Physics::HitResult> Physics::PhysicsBody::CollisionTest(Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	return PHYSICS_SYSTEM::CollisionTest(this, Layers, ObjectsToIgnore);
 }
 
-std::vector<Physics::HitResult> Physics::PhysicsBody::ShapeCast(Transform StartTransform, Vector3 EndPos, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+std::vector<Physics::HitResult> Physics::PhysicsBody::ShapeCast(Transform StartTransform, Vector3 EndPos, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	return PHYSICS_SYSTEM::ShapeCastBody(this, StartTransform, EndPos, Layers, ObjectsToIgnore);
 }

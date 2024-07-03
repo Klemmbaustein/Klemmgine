@@ -5,7 +5,7 @@
 #include "Packet.h"
 #include "Networking.h"
 #include <Engine/Utility/StringUtility.h>
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <Engine/Application.h>
 
 namespace Client
@@ -139,7 +139,7 @@ void Client::Update()
 		return;
 	}
 
-	for (WorldObject* i : Objects::AllObjects)
+	for (SceneObject* i : Objects::AllObjects)
 	{
 		if (i->NetOwner == GetClientID())
 		{
@@ -217,7 +217,7 @@ bool Client::HandleValueUpdate(uint64_t ObjNetID, std::string Name, std::string 
 	{
 		for (auto& i : obj->Properties)
 		{
-			if (i.PType != WorldObject::Property::PropertyType::NetProperty)
+			if (i.PType != SceneObject::Property::PropertyType::NetProperty)
 			{
 				continue;
 			}

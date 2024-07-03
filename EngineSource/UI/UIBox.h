@@ -347,10 +347,10 @@ protected:
 	Vector2 MaxSize = Vector2(2, 2);
 	Vector2 MinSize = Vector2(0, 0);
 
-	float UpPadding = 0.02f;
-	float DownPadding = 0.02f;
-	float RightPadding = 0.02f;
-	float LeftPadding = 0.02f;
+	float UpPadding = 0;
+	float DownPadding = 0;
+	float RightPadding = 0;
+	float LeftPadding = 0;
 	Vector2 Size;
 	SizeMode BoxSizeMode = SizeMode::ScreenRelative;
 

@@ -8,7 +8,7 @@
 #include <UI/UIText.h>
 #include <UI/EditorUI/EditorPanel.h>
 #include <Engine/TypeEnun.h>
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <Rendering/Framebuffer.h>
 #include <Engine/Build/Build.h>
 
@@ -209,7 +209,7 @@ protected:
 	SDL_Cursor* Cursors[(int)CursorType::End];
 	bool ShouldSave = false;
 public:
-	static std::vector<WorldObject*> SelectedObjects;
+	static std::vector<SceneObject*> SelectedObjects;
 	static void OnObjectSelected();
 	std::set<std::string> CollapsedItems;
 	std::vector<std::string> ObjectCategories;
@@ -226,7 +226,7 @@ public:
 			this->IsScene = IsScene;
 			this->IsCollapsed = IsCollapsed;
 		}
-		ObjectListItem(WorldObject* Object, int ListIndex)
+		ObjectListItem(SceneObject* Object, int ListIndex)
 		{
 			this->Object = Object;
 			this->ListIndex = ListIndex;
@@ -241,7 +241,7 @@ public:
 		bool IsCollapsed = false;
 		std::vector<ObjectListItem> Children;
 		std::string Name;
-		WorldObject* Object = nullptr;
+		SceneObject* Object = nullptr;
 		int ListIndex = -1;
 		bool IsScene = false;
 	};
@@ -292,6 +292,6 @@ public:
 	};
 
 protected:
-	friend WorldObject;
+	friend SceneObject;
 };
 #endif

@@ -225,7 +225,7 @@ static void GLAPIENTRY MessageCallback(
 static void UpdateObjects()
 {
 	Stats::EngineStatus = "Updating objects";
-	WorldObject::DestroyMarkedObjects();
+	SceneObject::DestroyMarkedObjects();
 	for (size_t i = 0; i < Objects::AllObjects.size(); i++)
 	{
 		Objects::AllObjects.at(i)->Update();

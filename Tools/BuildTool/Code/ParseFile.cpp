@@ -208,17 +208,17 @@ void ParseFile::WriteToFile(std::string str, std::string File)
 	out.close();
 }
 
-bool ParseFile::Object::DerivesFromWorldObject(const std::vector<Object>& AllObjects) const
+bool ParseFile::Object::DerivesFromSceneObject(const std::vector<Object>& AllObjects) const
 {
 	for (auto& Parent : Parents)
 	{
-		if (Parent == "WorldObject")
+		if (Parent == "SceneObject")
 		{
 			return true;
 		}
 		for (auto& Obj : AllObjects)
 		{
-			if (Parent == Obj.Name && Obj.DerivesFromWorldObject(AllObjects))
+			if (Parent == Obj.Name && Obj.DerivesFromSceneObject(AllObjects))
 			{
 				return true;
 			}
@@ -233,7 +233,7 @@ void ParseFile::Object::WriteGeneratedHeader(std::string TargetFolder)
 	std::string UppercaseName = Name;
 	std::transform(Name.begin(), Name.end(), UppercaseName.begin(), ::toupper);
 	OutStream << "#define " << UppercaseName << "_GENERATED(Category) "
-		<< Name << "() : WorldObject(ObjectDescription(\"" << Name << "\", " << std::to_string(Hash) << ")) {}\\\n"
+		<< Name << "() : SceneObject(ObjectDescription(\"" << Name << "\", " << std::to_string(Hash) << ")) {}\\\n"
 		<< "static std::string GetCategory() { return Category; }\\\n";
 	OutStream << "static uint32_t GetID() { return " << std::to_string(Hash) << ";}\n";
 	WriteToFile(OutStream.str(), TargetFolder + "/" + Name + ".h");

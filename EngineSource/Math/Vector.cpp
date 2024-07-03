@@ -257,24 +257,24 @@ float Vector3::Dot(Vector3 a, Vector3 b)
 	return result;
 }
 
-Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants)
+Vector3 Vector3::LookAtFunctionY(Vector3 Start, Vector3 End, bool Radians)
 {
 	Vector3 Dir = (End - Start).Normalize();
 	glm::quat quat = glm::quatLookAt((glm::vec3)Dir, glm::vec3(0, 0, 1));
 	glm::vec3 Euler = glm::eulerAngles(quat) + glm::vec3(-Math::PI_F / 2, 0, 0);
-	if (Radiants)
+	if (Radians)
 		return Euler;
 	else
 		return Vector3(Euler).RadiansToDegrees();
 }
 
-Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radiants)
+Vector3 Vector3::LookAtFunction(Vector3 Start, Vector3 End, bool Radians)
 {
 	Vector3 Dir = (End - Start).Normalize();
 	glm::quat quat = glm::quatLookAt((glm::vec3)Dir, glm::vec3(0, 1, 0));
 	glm::vec3 Euler = glm::eulerAngles(quat);
 
-	if (Radiants)
+	if (Radians)
 		return Vector3(Euler);
 	else
 		return Vector3(Euler).RadiansToDegrees();

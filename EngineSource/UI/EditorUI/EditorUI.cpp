@@ -39,7 +39,7 @@ TextRenderer* EditorUI::Text = nullptr;
 TextRenderer* EditorUI::MonoText = nullptr;
 EditorPanel* EditorUI::RootPanel = nullptr;
 std::vector<unsigned int> EditorUI::Textures;
-std::vector<WorldObject*> EditorUI::SelectedObjects;
+std::vector<SceneObject*> EditorUI::SelectedObjects;
 EditorUI::CursorType EditorUI::CurrentCursor = CursorType::Default;
 
 // TODO: Move run-in-editor and C# hotreload stuff into subsystems. (for prettier logging and cleaner code)
@@ -216,13 +216,15 @@ void EditorUI::LaunchInEditor()
 		}
 	}
 
+	// If only one new process is created, write the output of that process to the log.
+	// With multiple processes this gets very confusing.
 	if (NumLaunchClients == 1)
 	{
-		PipeProcessToLog(Command, "[Debug]: ");
+		new BackgroundTask([Command]() { PipeProcessToLog(Command, "[Debug]: "); });
 	}
 	else
 	{
-		int ret = system(Command.c_str());
+		new BackgroundTask([Command]() { int ret = system(Command.c_str()); });
 	}
 #else
 	for (int i = 0; i < NumLaunchClients; i++)
@@ -241,12 +243,6 @@ void EditorUI::LaunchInEditor()
 	if (LaunchWithServer)
 	{
 #if _WIN32
-		std::cout << ("start bin\\"
-			+ ProjectName
-			+ "-Server.exe -nostartupinfo -quitondisconnect -editorPath "
-			+ Application::GetEditorPath()
-			+ " "
-			+ Args) << std::endl;
 		ret = system(("start bin\\"
 			+ ProjectName
 			+ "-Server.exe -nostartupinfo -quitondisconnect -editorPath "
@@ -653,7 +649,7 @@ std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
 	std::vector<ObjectListItem> ObjectList;
 	ObjectCategories.clear();
 	size_t ListIndex = 0;
-	for (WorldObject* o : Objects::AllObjects)
+	for (SceneObject* o : Objects::AllObjects)
 	{
 		ObjectListItem* SceneList = nullptr;
 		// Get the list for the scene the object belongs to

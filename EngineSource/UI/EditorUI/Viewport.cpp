@@ -58,7 +58,7 @@ bool Viewport::CheckGizmoCollision(Vector3 RayDir)
 		return false;
 	}
 
-	WorldObject* SelectedObject = EditorUI::SelectedObjects.at(0);
+	SceneObject* SelectedObject = EditorUI::SelectedObjects.at(0);
 	Transform& ObjectTransform = SelectedObject->GetTransform();
 
 	Vector3 CameraPosition = Graphics::MainCamera->Position;
@@ -118,10 +118,10 @@ bool Viewport::CheckGizmoCollision(Vector3 RayDir)
 
 void Viewport::CopySelectedObjects()
 {
-	std::vector<WorldObject*> CopiedObjects;
-	for (WorldObject* i : EditorUI::SelectedObjects)
+	std::vector<SceneObject*> CopiedObjects;
+	for (SceneObject* i : EditorUI::SelectedObjects)
 	{
-		WorldObject* o = Objects::SpawnObjectFromID(i->GetObjectDescription().ID, i->GetTransform());
+		SceneObject* o = Objects::SpawnObjectFromID(i->GetObjectDescription().ID, i->GetTransform());
 		o->Name = i->Name;
 		o->DeSerialize(i->Serialize());
 		o->LoadProperties(i->GetPropertiesAsString());

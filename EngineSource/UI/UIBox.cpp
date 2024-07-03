@@ -829,6 +829,8 @@ void UIBox::DrawAllUIElements()
 				std::clamp((GLsizei)Res.X, 0, (GLsizei)Graphics::WindowResolution.X),
 				std::clamp((GLsizei)Res.Y, 0, (GLsizei)Graphics::WindowResolution.Y)
 			);
+			i.Max += 2 / Graphics::WindowResolution;
+			i.Min = i.Min - 2 / Graphics::WindowResolution;
 			glClear(GL_COLOR_BUFFER_BIT);
 			for (UIBox* elem : UI::UIElements)
 			{

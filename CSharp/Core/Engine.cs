@@ -50,12 +50,12 @@ static class Engine
 	static Type? StatsObject = null;
 	static Type? InputObject = null;
 
-	static readonly Dictionary<Int32, Object> WorldObjects = [];
-	static readonly List<Type> WorldObjectTypes = [];
+	static readonly Dictionary<Int32, Object> SceneObjects = [];
+	static readonly List<Type> SceneObjectTypes = [];
 
 	public static object? GetObjectFromID(Int32 Id)
 	{
-		if (WorldObjects.TryGetValue(Id, out object? value))
+		if (SceneObjects.TryGetValue(Id, out object? value))
 		{
 			return value;
 		}
@@ -64,7 +64,7 @@ static class Engine
 
 	public static object? GetObjectFromPtr(IntPtr Ptr)
 	{
-		foreach (var i in WorldObjects)
+		foreach (var i in SceneObjects)
 		{
 			if ((IntPtr)Get(i.Value, "NativePtr")! == Ptr)
 			{
@@ -78,7 +78,7 @@ static class Engine
 
 	public static void LoadAssembly([MarshalAs(UnmanagedType.LPUTF8Str)] string Path, [MarshalAs(UnmanagedType.LPUTF8Str)] string EngineDllPath, int EngineConfig)
 	{
-		WorldObjectTypes.Clear();
+		SceneObjectTypes.Clear();
 		CoreNativeFunction.UnloadNativeFunctions();
 		EngineLog.Print("Loading C# assembly...");
 
@@ -95,15 +95,15 @@ static class Engine
 		LoadTypeFromAssembly("Engine.Log")!.GetMethod("LoadLogFunction")!.Invoke(null, [new Action<string, int>(EngineLog.Print)]);
 
 
-		var WorldObjectType = LoadTypeFromAssembly("Engine.WorldObject");
+		var SceneObjectType = LoadTypeFromAssembly("Engine.SceneObject");
 
-		if (WorldObjectType == null)
+		if (SceneObjectType == null)
 		{
-			EngineLog.Print("Could not load WorldObject class.");
+			EngineLog.Print("Could not load SceneObject class.");
 			return;
 		}
 
-		WorldObjectType?.GetMethod("LoadGetObjectFunctions")!.Invoke(null, new object[] 
+		SceneObjectType.GetMethod("LoadGetObjectFunctions")!.Invoke(null, new object[] 
 		{ 
 			(object)GetObjectFromID,
 			(object)GetObjectFromPtr
@@ -111,9 +111,9 @@ static class Engine
 
 		foreach (var i in LoadedAsm.GetTypes())
 		{
-			if (i.IsSubclassOf(WorldObjectType!))
+			if (i.IsSubclassOf(SceneObjectType!))
 			{
-				WorldObjectTypes.Add(i);
+				SceneObjectTypes.Add(i);
 			}
 		}
 
@@ -124,7 +124,7 @@ static class Engine
 
 	public static Int32 Instantiate(string obj, EngineTransform t, IntPtr NativeObject)
 	{
-		foreach (var ObjectType in WorldObjectTypes)
+		foreach (var ObjectType in SceneObjectTypes)
 		{
 			if (ObjectType.Name == obj)
 			{
@@ -142,7 +142,7 @@ static class Engine
 				}
 				Set(ref NewObject!, "NativePtr", NativeObject);
 
-				WorldObjects.Add(HashCode, NewObject);
+				SceneObjects.Add(HashCode, NewObject);
 				SetVectorFieldOfObject(HashCode, "Position", t.Position);
 				SetVectorFieldOfObject(HashCode, "Rotation", t.Rotation);
 				SetVectorFieldOfObject(HashCode, "Scale", t.Scale);
@@ -154,13 +154,13 @@ static class Engine
 
 	public static void Destroy(Int32 ID)
 	{
-		if (!WorldObjects.ContainsKey(ID))
+		if (!SceneObjects.ContainsKey(ID))
 		{
 			return;
 		}
 
 		ExecuteFunctionOnObject(ID, "DestroyObjectInternal");
-		WorldObjects.Remove(ID);
+		SceneObjects.Remove(ID);
 	}
 
 	public static Type? LoadTypeFromAssembly(string Type)
@@ -198,7 +198,7 @@ static class Engine
 
 	public static void ExecuteFunctionOnObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string FunctionName)
 	{
-		if (!WorldObjects.TryGetValue(ID, out object? value))
+		if (!SceneObjects.TryGetValue(ID, out object? value))
 		{
 			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID), 1);
 			return;
@@ -216,7 +216,7 @@ static class Engine
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
 	public static string ExecuteStringFunctionOnObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string FunctionName)
 	{
-		if (!WorldObjects.TryGetValue(ID, out object? value))
+		if (!SceneObjects.TryGetValue(ID, out object? value))
 		{
 			EngineLog.Print(string.Format("Tried to call {0} on the object with ID {1} but that object doesn't exist!", FunctionName, ID), 1);
 			return "";
@@ -234,7 +234,7 @@ static class Engine
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
 	public static string GetObjectPropertyString(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyName)
 	{
-		if (!WorldObjects.TryGetValue(ID, out object? value))
+		if (!SceneObjects.TryGetValue(ID, out object? value))
 		{
 			EngineLog.Print(string.Format("Tried get the field {0} on the object with ID {1} but that object doesn't exist!", PropertyName, ID));
 			return "";
@@ -264,7 +264,7 @@ static class Engine
 		[MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyName,
 		[MarshalAs(UnmanagedType.LPUTF8Str)] string PropertyValue)
 	{
-		if (!WorldObjects.TryGetValue(ID, out object? value))
+		if (!SceneObjects.TryGetValue(ID, out object? value))
 		{
 			EngineLog.Print(string.Format("Tried set the field {0} on the object with ID {1} but that object doesn't exist!", PropertyName, ID), 1);
 			return;
@@ -384,7 +384,7 @@ static class Engine
 
 	public static EngineVector GetVectorFieldOfObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string Field)
 	{
-		if (!WorldObjects.TryGetValue(ID, out object? value))
+		if (!SceneObjects.TryGetValue(ID, out object? value))
 		{
 			EngineLog.Print(string.Format("Tried to access {1} of object with ID {0} but that object doesn't exist!", ID, Field));
 			return new EngineVector();
@@ -397,12 +397,12 @@ static class Engine
 
 	public static void SetVectorFieldOfObject(Int32 ID, [MarshalAs(UnmanagedType.LPUTF8Str)] string Field, EngineVector NewValue)
 	{
-		if (!WorldObjects.ContainsKey(ID))
+		if (!SceneObjects.ContainsKey(ID))
 		{
 			EngineLog.Print(string.Format("Tried to access {1} of object with ID {0} but that object doesn't exist!", ID, Field));
 			return;
 		}
-		var obj = WorldObjects[ID];
+		var obj = SceneObjects[ID];
 		if (obj == null)
 		{
 			return;
@@ -428,7 +428,7 @@ static class Engine
 	public static string GetAllObjectTypes()
 	{
 		string AllTypes = "";
-		foreach (var i in WorldObjectTypes)
+		foreach (var i in SceneObjectTypes)
 		{
 			if (i.Namespace != null)
 			{

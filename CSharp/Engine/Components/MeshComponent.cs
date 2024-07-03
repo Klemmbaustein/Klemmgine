@@ -7,7 +7,7 @@ namespace Engine;
  * @brief
  * MeshComponent in C#.
  * 
- * Can be attached to any Engine.WorldObject.
+ * Can be attached to any Engine.SceneObject.
  * 
  * C++ equivalent: MeshComponent.
  * 

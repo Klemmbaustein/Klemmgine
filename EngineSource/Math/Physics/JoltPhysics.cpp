@@ -557,7 +557,7 @@ public:
 class BodyFilterImpl : public BodyFilter
 {
 public:
-	std::set<WorldObject*>* ObjectsToIgnore = nullptr;
+	std::set<SceneObject*>* ObjectsToIgnore = nullptr;
 
 	virtual bool ShouldCollide(const BodyID& inObject) const override
 	{
@@ -572,7 +572,7 @@ public:
 	}
 };
 
-std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody* Body, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody* Body, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	using namespace Physics;
 
@@ -608,7 +608,7 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 	return cl.Hits;
 }
 
-std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	using namespace Physics;
 
@@ -644,7 +644,7 @@ std::vector<Physics::HitResult> JoltPhysics::ShapeCastBody(Physics::PhysicsBody*
 
 }
 
-Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore)
+Physics::HitResult JoltPhysics::LineCast(Vector3 Start, Vector3 End, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	RRayCast Cast = RRayCast(ToJPHVec3(Start), ToJPHVec3(End - Start));
 	RayCastResult HitInfo;

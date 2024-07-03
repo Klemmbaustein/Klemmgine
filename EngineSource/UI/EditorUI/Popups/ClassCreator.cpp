@@ -32,7 +32,8 @@ ClassCreator::ClassCreator() : EditorPopup(0, 0.3f, "Create class")
 
 	PathText = new UIText(0.4f, EditorUI::UIColors[2], "File: ", EditorUI::Text);
 
-	PopupBackground->AddChild(PathText);
+	PopupBackground->AddChild(PathText
+		->SetPadding(0.02f));
 
 	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 		->SetPadding(0)

@@ -3,9 +3,9 @@
 #include <UI/EditorUI/EditorPanel.h>
 #include <Engine/TypeEnun.h>
 #include <UI/UIfwd.h>
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 
-class WorldObject;
+class SceneObject;
 
 /**
 * @brief
@@ -18,7 +18,7 @@ class ContextMenu : public EditorPanel
 	bool IsObject = false;
 public:
 	UIScrollBox* BackgroundBox;
-	std::vector<WorldObject::Property> Properties;
+	std::vector<SceneObject::Property> Properties;
 	ContextMenu(EditorPanel* Parent, bool IsScene);
 	struct ContextMenuSection
 	{
@@ -40,13 +40,13 @@ public:
 	std::vector<UIBox*> ContextButtons;
 
 	UITextField* GenerateTextField(std::string Content, int Index);
-	void GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, WorldObject* ContextObject, unsigned int Index);
-	void GenerateSectionElement(ContextMenuSection Element, WorldObject* ContextObject, std::string Name);
+	void GenerateSection(std::vector<ContextMenuSection> Section, std::string Name, SceneObject* ContextObject, unsigned int Index);
+	void GenerateSectionElement(ContextMenuSection Element, SceneObject* ContextObject, std::string Name);
 
 	void Tick() override;
 	void OnButtonClicked(int Index) override;
 	void OnResized() override;
 private:
-	void GenerateCSharpProperty(const ContextMenu::ContextMenuSection& Element, WorldObject* ContextObject);
+	void GenerateCSharpProperty(const ContextMenu::ContextMenuSection& Element, SceneObject* ContextObject);
 };
 #endif

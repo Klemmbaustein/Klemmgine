@@ -18,12 +18,12 @@ namespace Engine;
  * @brief
  * C# class representing an object.
  * 
- * C++ equivalent: WorldObject class.
+ * C++ equivalent: SceneObject class.
  * 
  * @ingroup CSharp-Objects
  * @todo Implement networking functions in C#.
  */
-public abstract class WorldObject
+public abstract class SceneObject
 {
 	/**
 	 * @brief
@@ -61,7 +61,7 @@ public abstract class WorldObject
 	private static Delegate GetCSObjectDelegate;
 	private static Delegate GetCSObjectByPtrDelegate;
 
-	private static readonly Dictionary<IntPtr, WorldObject> Objects = [];
+	private static readonly Dictionary<IntPtr, SceneObject> Objects = [];
 
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]
 	public string GetEditorProperties()
@@ -96,9 +96,9 @@ public abstract class WorldObject
 	 * 
 	 * If no object has been found, a new Engine.NativePtr is created from the given pointer.
 	 */
-	public static WorldObject GetObjectFromNativePointer(IntPtr Pointer)
+	public static SceneObject GetObjectFromNativePointer(IntPtr Pointer)
 	{
-		WorldObject ManagedObject = (WorldObject)GetCSObjectByPtrDelegate?.DynamicInvoke(Pointer);
+		SceneObject ManagedObject = (SceneObject)GetCSObjectByPtrDelegate?.DynamicInvoke(Pointer);
 		if (ManagedObject != null)
 		{
 			return ManagedObject;
@@ -131,7 +131,7 @@ public abstract class WorldObject
 	 * @param t
 	 * The Transform of the new object.
 	 */
-	public static WorldObject NewCSObject(string TypeName, Transform t)
+	public static SceneObject NewCSObject(string TypeName, Transform t)
 	{
 		object RetVal = NativeFunction.CallNativeFunction("NewCSObject", typeof(NewCSObjectDelegate), [ TypeName, t ]);
 		if (RetVal == null)
@@ -149,7 +149,7 @@ public abstract class WorldObject
 		{
 			return null;
 		}
-		return (WorldObject)objRef;
+		return (SceneObject)objRef;
 	}
 
 	/**
@@ -262,7 +262,7 @@ public abstract class WorldObject
 	 * @param o
 	 * The object to destroy.
 	 */
-	public static void DestroyObject(WorldObject o)
+	public static void DestroyObject(SceneObject o)
 	{
 		NativeFunction.CallNativeFunction("DestroyObject", typeof(DestroyObjectDelegate), [ o.NativePtr ]);
 		return;

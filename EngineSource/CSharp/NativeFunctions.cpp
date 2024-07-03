@@ -47,7 +47,7 @@ class TextRenderer;
 
 namespace NativeFunctions
 {
-	static MeshComponent* NewMeshComponent(const char* ModelFile, WorldObject* Parent)
+	static MeshComponent* NewMeshComponent(const char* ModelFile, SceneObject* Parent)
 	{
 		MeshComponent* NewModel = new MeshComponent();
 		Parent->Attach(NewModel);
@@ -56,7 +56,7 @@ namespace NativeFunctions
 		return NewModel;
 	}
 
-	static CollisionComponent* NewCollisionComponent(const char* ModelFile, WorldObject* Parent)
+	static CollisionComponent* NewCollisionComponent(const char* ModelFile, SceneObject* Parent)
 	{
 		CollisionComponent* NewCollider = new CollisionComponent();
 		Parent->Attach(NewCollider);
@@ -66,7 +66,7 @@ namespace NativeFunctions
 		return NewCollider;
 	}
 
-	static CameraComponent* NewCameraComponent(float FOV, WorldObject* Parent)
+	static CameraComponent* NewCameraComponent(float FOV, SceneObject* Parent)
 	{
 		CameraComponent* NewCamera = new CameraComponent();
 		Parent->Attach(NewCamera);
@@ -74,7 +74,7 @@ namespace NativeFunctions
 		return NewCamera;
 	}
 
-	static ParticleComponent* NewParticleComponent(const char* ParticleFile, WorldObject* Parent)
+	static ParticleComponent* NewParticleComponent(const char* ParticleFile, SceneObject* Parent)
 	{
 		ParticleComponent* Particle = new ParticleComponent();
 		Parent->Attach(Particle);
@@ -82,14 +82,14 @@ namespace NativeFunctions
 		return Particle;
 	}
 
-	static MoveComponent* NewMoveComponent(WorldObject* Parent)
+	static MoveComponent* NewMoveComponent(SceneObject* Parent)
 	{
 		MoveComponent* Movement = new MoveComponent();
 		Parent->Attach(Movement);
 		return Movement;
 	}
 
-	static PhysicsComponent* NewPhysicsComponent(WorldObject* Parent, Transform t, Physics::PhysicsBody::BodyType BodyType, Physics::MotionType Movability, Physics::Layer Layers)
+	static PhysicsComponent* NewPhysicsComponent(SceneObject* Parent, Transform t, Physics::PhysicsBody::BodyType BodyType, Physics::MotionType Movability, Physics::Layer Layers)
 	{
 		PhysicsComponent* c = new PhysicsComponent();
 		Parent->Attach(c);
@@ -155,10 +155,10 @@ namespace NativeFunctions
 		PhysicsComponent* PhysComponent,
 		Transform Where,
 		Physics::Layer Layers,
-		WorldObject** IgnoredObjects,
+		SceneObject** IgnoredObjects,
 		int32_t IgnoredLength)
 	{
-		std::set<WorldObject*> Ignored;
+		std::set<SceneObject*> Ignored;
 		for (int32_t i = 0; i < IgnoredLength; i++)
 		{
 			Ignored.insert(IgnoredObjects[i]);
@@ -184,10 +184,10 @@ namespace NativeFunctions
 		Transform Start,
 		Vector3 End,
 		Physics::Layer Layers,
-		WorldObject** IgnoredObjects,
+		SceneObject** IgnoredObjects,
 		int32_t IgnoredLength)
 	{
-		std::set<WorldObject*> Ignored = { PhysComponent->GetParent() };
+		std::set<SceneObject*> Ignored = { PhysComponent->GetParent() };
 		for (int32_t i = 0; i < IgnoredLength; i++)
 		{
 			Ignored.insert(IgnoredObjects[i]);
@@ -273,7 +273,7 @@ namespace NativeFunctions
 		return Cam->GetFOV();
 	}
 
-	static void DestroyComponent(Component* c, WorldObject* Parent)
+	static void DestroyComponent(Component* c, SceneObject* Parent)
 	{
 		Parent->Detach(c);
 	}
@@ -298,29 +298,29 @@ namespace NativeFunctions
 		Scene::LoadNewScene(SceneName);
 	}
 
-	static CSharpInterop::CSharpWorldObject NewCSObject(const char* TypeName, Transform ObjectTransform)
+	static CSharpInterop::CSharpSceneObject NewCSObject(const char* TypeName, Transform ObjectTransform)
 	{
 		CSharpObject* NewObject = Objects::SpawnObject<CSharpObject>(ObjectTransform, 0);
 		NewObject->LoadClass(TypeName);
 		return NewObject->CS_Obj;
 	}
 
-	static char* GetTypeNameOfObject(WorldObject* Object)
+	static char* GetTypeNameOfObject(SceneObject* Object)
 	{
 		return CopyString(Object->GetObjectDescription().Name.c_str());
 	}
 
-	static void DestroyObject(WorldObject* Ptr)
+	static void DestroyObject(SceneObject* Ptr)
 	{
 		Objects::DestroyObject(Ptr);
 	}
 
-	static void SetObjectName(WorldObject* Object, const char* NewName)
+	static void SetObjectName(SceneObject* Object, const char* NewName)
 	{
 		Object->Name = NewName;
 	}
 
-	static char* GetObjectName(WorldObject* Object)
+	static char* GetObjectName(SceneObject* Object)
 	{
 		// The .NET runtime (apparently) frees this.
 		return CopyString(Object->Name.c_str());
@@ -341,9 +341,9 @@ namespace NativeFunctions
 		delete s;
 	}
 
-	static Collision::HitResponse NativeRaycast(Vector3 Start, Vector3 End, WorldObject** IgnoredObjects, int32_t IgnoredLength)
+	static Collision::HitResponse NativeRaycast(Vector3 Start, Vector3 End, SceneObject** IgnoredObjects, int32_t IgnoredLength)
 	{
-		std::set<WorldObject*> Ignored;
+		std::set<SceneObject*> Ignored;
 		for (int32_t i = 0; i < IgnoredLength; i++)
 		{
 			Ignored.insert(IgnoredObjects[i]);
@@ -356,12 +356,12 @@ namespace NativeFunctions
 		return Console::ExecuteConsoleCommand(cmd);
 	}
 
-	static Transform GetObjectTransform(WorldObject* TargetObject)
+	static Transform GetObjectTransform(SceneObject* TargetObject)
 	{
 		return TargetObject->GetTransform();
 	}
 
-	static void SetObjectTransform(Transform NewTransform, WorldObject* TargetObject)
+	static void SetObjectTransform(Transform NewTransform, SceneObject* TargetObject)
 	{
 		TargetObject->SetTransform(NewTransform);
 	}
@@ -604,7 +604,7 @@ namespace NativeFunctions
 		return Input::Gamepad();
 	}
 
-	static NativeType::NativeType GetObjectPropertyType(WorldObject* Obj, const char* Property)
+	static NativeType::NativeType GetObjectPropertyType(SceneObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
 		{
@@ -619,7 +619,7 @@ namespace NativeFunctions
 	}
 
 #pragma region Properties
-	static const char* GetObjectPropertyString(WorldObject* Obj, const char* Property)
+	static const char* GetObjectPropertyString(SceneObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
 		{
@@ -638,7 +638,7 @@ namespace NativeFunctions
 		return "";
 	}
 
-	static int GetObjectPropertyInt(WorldObject* Obj, const char* Property)
+	static int GetObjectPropertyInt(SceneObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
 		{
@@ -657,7 +657,7 @@ namespace NativeFunctions
 		return 0;
 	}
 
-	static bool GetObjectPropertyBool(WorldObject* Obj, const char* Property)
+	static bool GetObjectPropertyBool(SceneObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
 		{
@@ -676,7 +676,7 @@ namespace NativeFunctions
 		return false;
 	}
 
-	static Vector3 GetObjectPropertyVector3(WorldObject* Obj, const char* Property)
+	static Vector3 GetObjectPropertyVector3(SceneObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
 		{
@@ -695,7 +695,7 @@ namespace NativeFunctions
 		return Vector3(0);
 	}
 
-	static float GetObjectPropertyFloat(WorldObject* Obj, const char* Property)
+	static float GetObjectPropertyFloat(SceneObject* Obj, const char* Property)
 	{
 		for (auto& i : Obj->Properties)
 		{

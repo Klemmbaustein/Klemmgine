@@ -1,5 +1,13 @@
 # Changes
 
+## Version 1.11.0
+
+### Changes
+
+- Renamed WorldObject to SceneObject in both C++ and C#.
+- Added a performance graph to the debug UI that can be toggled with Right Shift.
+- Set default padding value to 0.
+
 ## Version 1.10.15
 
 ### Changes

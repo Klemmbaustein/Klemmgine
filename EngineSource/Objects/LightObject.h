@@ -1,5 +1,5 @@
 #pragma once
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <GENERATED/LightObject.h>
 
 class PointLightComponent;
@@ -13,7 +13,7 @@ class BillboardComponent;
 * 
 * Path: Classes/Default
 */
-class LightObject : public WorldObject
+class LightObject : public SceneObject
 {
 public:
 	LIGHTOBJECT_GENERATED("Default")

@@ -265,7 +265,8 @@ void MaterialTab::GenerateUI()
 		case NativeType::Vector3:
 		{	
 			NewField = (new UIVectorField(DesiredValueSize, Vector3::FromString(i.Value), this, Index, EditorUI::Text))
-				->SetValueType(UIVectorField::VecType::rgb);
+				->SetValueType(UIVectorField::VecType::rgb)
+				->SetPadding(0.02f);
 			break;
 		}
 		case NativeType::Float:
@@ -274,6 +275,7 @@ void MaterialTab::GenerateUI()
 			NewField = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 				->SetText(i.Value)
 				->SetTextColor(EditorUI::UIColors[2])
+				->SetPadding(0.02f)
 				->SetMinSize(Vector2(DesiredValueSize, 0.04f));
 			break;
 		}
@@ -301,7 +303,8 @@ void MaterialTab::GenerateUI()
 				->SetMinSize(Vector2(DesiredValueSize - 0.1f, 0.04f));
 			ParamBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1, DesiredValueSize > 0.175f ? 0.15f : 0.1f))
 				->SetUseTexture(true, NewTexture)
-				->SetSizeMode(UIBox::SizeMode::AspectRelative));
+				->SetSizeMode(UIBox::SizeMode::AspectRelative)
+				->SetPadding(0.02f));
 
 			UIBox* TextureSelectionBoxes[2] =
 			{

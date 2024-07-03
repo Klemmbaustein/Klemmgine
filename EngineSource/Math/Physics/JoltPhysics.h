@@ -35,7 +35,7 @@ namespace JoltPhysics
 
 	void Update();
 
-	std::vector<Physics::HitResult> CollisionTest(Physics::PhysicsBody* Body, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
-	std::vector<Physics::HitResult> ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
-	Physics::HitResult LineCast(Vector3 Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
+	std::vector<Physics::HitResult> CollisionTest(Physics::PhysicsBody* Body, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore);
+	std::vector<Physics::HitResult> ShapeCastBody(Physics::PhysicsBody* Body, Transform StartPos, Vector3 EndPos, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore);
+	Physics::HitResult LineCast(Vector3 Start, Vector3 End, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore);
 }

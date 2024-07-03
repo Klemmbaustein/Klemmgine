@@ -31,7 +31,7 @@ void Server::ClearOnPlayerdisconnectedCallbacks()
 #include <Engine/Utility/StringUtility.h>
 #include <Networking/NetworkingInternal.h>
 #include "Networking.h"
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <Engine/Subsystem/Console.h>
 #include <Engine/Subsystem/Scene.h>
 #include <Engine/Utility/FileUtility.h>
@@ -140,7 +140,7 @@ void Server::OnConnectRequestReceived(Packet p)
 
 	NewClient.SendServerTravelRequest(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene));
 
-	for (WorldObject* i : Objects::AllObjects)
+	for (SceneObject* i : Objects::AllObjects)
 	{
 		if (i->GetIsReplicated())
 		{
@@ -208,7 +208,7 @@ void Server::SpawnObject(int32_t ObjID, uint64_t NetID, Transform SpawnTransform
 	}
 }
 
-void Server::HandleDestroyObject(WorldObject* o)
+void Server::HandleDestroyObject(SceneObject* o)
 {
 	for (auto& i : Server::Clients)
 	{
@@ -216,7 +216,7 @@ void Server::HandleDestroyObject(WorldObject* o)
 	}
 }
 
-void Server::SetObjNetOwner(WorldObject* obj, uint64_t NetOwner)
+void Server::SetObjNetOwner(SceneObject* obj, uint64_t NetOwner)
 {
 	Packet p;
 	p.Data =
@@ -317,7 +317,7 @@ void Server::HandlePacket(Packet* p)
 
 void Server::SendClientInfo(ClientInfo* c)
 {
-	for (WorldObject* i : Objects::AllObjects)
+	for (SceneObject* i : Objects::AllObjects)
 	{
 		Networking::SendObjectInfo(i, c->IP);
 	}

@@ -198,7 +198,7 @@ public class PhysicsComponent : ObjectComponent
 	* @param ObjectsToIgnore
 	* These objects shouldn't be considered for the query.
 	*/
-	public Collision.HitResponse ShapeCast(Transform Start, Vector3 End, Collision.Layer Layers, WorldObject[] ObjectsToIgnore = null)
+	public Collision.HitResponse ShapeCast(Transform Start, Vector3 End, Collision.Layer Layers, SceneObject[] ObjectsToIgnore = null)
 	{
 		IntPtr[] ComponentPtrs;
 		if (ObjectsToIgnore == null)
@@ -233,7 +233,7 @@ public class PhysicsComponent : ObjectComponent
 	* @param ObjectsToIgnore
 	* These objects shouldn't be considered for the query.
 	*/
-	public Collision.HitResponse CollisionCheck(Transform Where, Collision.Layer Layers, WorldObject[] ObjectsToIgnore = null)
+	public Collision.HitResponse CollisionCheck(Transform Where, Collision.Layer Layers, SceneObject[] ObjectsToIgnore = null)
 	{
 		IntPtr[] ComponentPtrs;
 		if (ObjectsToIgnore == null)

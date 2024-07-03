@@ -2,7 +2,7 @@
 #include "CollisionVisualize.h"
 #include <vector>
 #include <Rendering/Mesh/Model.h>
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <Objects/Components/CollisionComponent.h>
 #include <Engine/Application.h>
 #include <Math/Physics/Physics.h>
@@ -46,7 +46,7 @@ void CollisionVisualize::Activate()
 
 	std::string MaterialPath = Application::GetEditorPath() + "/EditorContent/Materials/CollisionVisualize/";
 
-	for (WorldObject* Obj : Objects::AllObjects)
+	for (SceneObject* Obj : Objects::AllObjects)
 	{
 		for (Component* c : Obj->GetComponents())
 		{

@@ -19,13 +19,15 @@ namespace Debug
 		UIBackground* CompleteBackground = nullptr;
 		UITextField* LogPrompt = nullptr;
 		UIText* DebugTexts[5] = { nullptr, nullptr, nullptr, nullptr, nullptr };
+		UIBox* PerformanceGraphBox = nullptr;
 
 		bool ConsoleReadInput(Input::Key Key);
 		void UpdateAutoComplete();
 
+		bool RShiftDown = false;
 		int LastLogMessageAmount = 0;
 		bool UpDownPressed = false;
-
+		void UpdatePerfGraph();
 		UIBackground* LogBackground = nullptr;
 	public:
 		static DebugUI* CurrentDebugUI;

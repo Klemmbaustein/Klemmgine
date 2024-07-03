@@ -140,12 +140,14 @@ void MeshTab::Generate()
 {
 	Rows[0]->DeleteChildren();
 	Rows[1]->DeleteChildren();
-	Rows[1]->AddChild(new UIText(0.7f, EditorUI::UIColors[2], "Materials:", EditorUI::Text));
+	Rows[1]->AddChild((new UIText(0.7f, EditorUI::UIColors[2], "Materials:", EditorUI::Text))
+		->SetPadding(0.02f));
 	int Index = -1;
 	PreviewWindow = new UIBackground(UIBox::Orientation::Horizontal, 0, 1, 0.3f);
 	Rows[0]->AddChild(PreviewWindow
 		->SetPadding(0.05f, 0.02f, 0.02f, 0.04f));
-	Rows[0]->AddChild(new UIText(0.5f, EditorUI::UIColors[2], "Model properties:", EditorUI::Text));
+	Rows[0]->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "Model properties:", EditorUI::Text))
+		->SetPadding(0.02f));
 
 	for (auto& i : Options)
 	{

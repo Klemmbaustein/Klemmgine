@@ -6,7 +6,7 @@
 #include "Networking.h"
 #include "Server.h"
 #include <unordered_set>
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <Engine/Utility/StringUtility.h>
 
 namespace NetworkEvent
@@ -53,7 +53,7 @@ namespace NetworkEvent
 	}
 }
 
-void NetworkEvent::TriggerNetworkEvent(std::string Name, std::vector<std::string> Arguments, WorldObject* Target, uint64_t TargetClient)
+void NetworkEvent::TriggerNetworkEvent(std::string Name, std::vector<std::string> Arguments, SceneObject* Target, uint64_t TargetClient)
 {
 	Event e;
 	e.EventID = EventID++;
@@ -114,7 +114,7 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 	{
 		ReceivedEvents.insert(EventID);
 
-		WorldObject* Target = Networking::GetObjectFromNetID(ObjID);
+		SceneObject* Target = Networking::GetObjectFromNetID(ObjID);
 		if (!Target)
 		{
 			// TODO: Handle missing objects by requesting it from the server
@@ -143,7 +143,7 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 		for (const auto& i : Target->NetEvents)
 		{
 #if SERVER
-			if (i.NativeType != WorldObject::NetEvent::EventType::Server)
+			if (i.NativeType != SceneObject::NetEvent::EventType::Server)
 			{
 				continue;
 			}

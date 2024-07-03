@@ -210,13 +210,13 @@ struct Vector3
 	* @param End
 	* The look-at target
 	*
-	* @param Radiants
-	* If true, the rotation will be given in radiants. If false, the rotation will be in degrees.
+	* @param Radians
+	* If true, the rotation will be given in radians. If false, the rotation will be in degrees.
 	*
 	* @return
-	* A rotation pointing from Start to End, where Y is forward. If Radiants is true, this rotation will be in radiants, otherwise it will be in degrees.
+	* A rotation pointing from Start to End, where Y is forward. If Radians is true, this rotation will be in radians, otherwise it will be in degrees.
 	*/
-	static Vector3 LookAtFunctionY(Vector3 Start, Vector3 End, bool Radiants = false);
+	static Vector3 LookAtFunctionY(Vector3 Start, Vector3 End, bool Radians = false);
 
 	/**
 	* @brief
@@ -228,13 +228,13 @@ struct Vector3
 	* @param End
 	* The look-at target
 	* 
-	* @param Radiants
-	* If true, the rotation will be given in radiants. If false, the rotation will be in degrees.
+	* @param Radians
+	* If true, the rotation will be given in radians. If false, the rotation will be in degrees.
 	* 
 	* @return
-	* A rotation pointing from Start to End. If Radiants is true, this rotation will be in radiants, otherwise it will be in degrees.
+	* A rotation pointing from Start to End. If Radians is true, this rotation will be in radians, otherwise it will be in degrees.
 	*/
-	static Vector3 LookAtFunction(Vector3 Start, Vector3 End, bool Radiants = false);
+	static Vector3 LookAtFunction(Vector3 Start, Vector3 End, bool Radians = false);
 	static Vector3 QuatToEuler(glm::quat quat);
 
 	/**
@@ -268,7 +268,7 @@ struct Vector3
 
 	/**
 	* @brief
-	* Returns true if the difference between a and b is less than Treshold.
+	* Returns true if the difference between a and b is less than Threshold.
 	*/
 	static bool NearlyEqual(Vector3 a, Vector3 b, float Threshold);
 	static Vector3 Clamp(Vector3 v, Vector3 min, Vector3 max);

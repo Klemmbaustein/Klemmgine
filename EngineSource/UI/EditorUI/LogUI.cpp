@@ -35,6 +35,7 @@ LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console")
 	LogPrompt = new UITextField(0, EditorUI::UIColors[1] * 0.5f, this, 0, EditorUI::MonoText);
 	LogPrompt->HintText = "Console";
 	PanelMainBackground->AddChild((new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[1] * 0.99f, 0))
+		->SetPadding(0.02f)
 		->AddChild(LogScrollBox
 			->SetScrollSpeed(4)
 			->SetPadding(0, 0, 0.01f, 0))

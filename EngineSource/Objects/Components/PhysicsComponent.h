@@ -97,7 +97,7 @@ public:
 	* @param ObjectsToIgnore
 	* These objects shouldn't be considered for the query.
 	*/
-	Physics::HitResult ShapeCast(Transform Start, Vector3 End, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
+	Physics::HitResult ShapeCast(Transform Start, Vector3 End, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore);
 
 	/**
 	* @brief
@@ -110,7 +110,7 @@ public:
 	* @param ObjectsToIgnore
 	* These objects shouldn't be considered for the query.
 	*/
-	Physics::HitResult CollisionCheck(Transform Where, Physics::Layer Layers, std::set<WorldObject*> ObjectsToIgnore);
+	Physics::HitResult CollisionCheck(Transform Where, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore);
 	void* PhysicsBodyPtr = nullptr;
 
 private:

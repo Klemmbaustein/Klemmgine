@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-class WorldObject;
+class SceneObject;
 
 #if !EDITOR
 #include <string>
@@ -14,7 +14,7 @@ namespace Networking
 	void HandleTick();
 	void ReceivePackets();
 	void Update();
-	WorldObject* SpawnReplicatedObjectFromID(uint32_t ID, Transform Position);
+	SceneObject* SpawnReplicatedObjectFromID(uint32_t ID, Transform Position);
 	std::string IPtoStr(void* addr);
 	void DisconnectPlayer(void* IP);
 	void Exit();
@@ -34,7 +34,7 @@ namespace Networking
 namespace Networking
 {
 	const uint64_t ServerID = UINT64_MAX;
-	WorldObject* GetObjectFromNetID(uint64_t NetID);
+	SceneObject* GetObjectFromNetID(uint64_t NetID);
 }
 
 namespace Project

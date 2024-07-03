@@ -1,5 +1,5 @@
 #include "Networking.h"
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #if !EDITOR
 #include <iostream>
 #include <Engine/Log.h>
@@ -139,7 +139,7 @@ UDPsocket Networking::InitSocketFrom(IPaddress* Target)
 	return fret;
 }
 
-void Networking::SendObjectInfo(WorldObject* obj, void* TargetAddr)
+void Networking::SendObjectInfo(SceneObject* obj, void* TargetAddr)
 {
 	if (!obj->GetIsReplicated())
 	{
@@ -171,14 +171,14 @@ void Networking::SendObjectInfo(WorldObject* obj, void* TargetAddr)
 	Packet Properties;
 	for (auto& i : obj->Properties)
 	{
-		if (i.PType != WorldObject::Property::PropertyType::NetProperty)
+		if (i.PType != SceneObject::Property::PropertyType::NetProperty)
 		{
 			continue;
 		}
 #if SERVER
-		if (i.PropertyOwner == WorldObject::Property::NetOwner::Server || obj->NetOwner != Server::GetClientInfoFromIP(TargetAddr)->ID)
+		if (i.PropertyOwner == SceneObject::Property::NetOwner::Server || obj->NetOwner != Server::GetClientInfoFromIP(TargetAddr)->ID)
 #else
-		if (i.PropertyOwner == WorldObject::Property::NetOwner::Client && obj->NetOwner == Client::GetClientID())
+		if (i.PropertyOwner == SceneObject::Property::NetOwner::Client && obj->NetOwner == Client::GetClientID())
 #endif
 		{
 			if (Properties.Data.empty())
@@ -284,9 +284,9 @@ void Networking::Update()
 #endif
 }
 
-WorldObject* Networking::SpawnReplicatedObjectFromID(uint32_t ID, Transform Position)
+SceneObject* Networking::SpawnReplicatedObjectFromID(uint32_t ID, Transform Position)
 {
-	WorldObject* obj = Objects::SpawnObjectFromID(ID, Position, NetIDCounter);
+	SceneObject* obj = Objects::SpawnObjectFromID(ID, Position, NetIDCounter);
 	obj->NetOwner = UINT64_MAX;
 #if SERVER
 	Server::SpawnObject(ID, NetIDCounter, Position, obj->GetPropertiesAsString());
@@ -353,9 +353,9 @@ uint16_t Networking::GetDefaultPort()
 #endif
 
 // TODO: Have a map of all replicated objects to speed this up.
-WorldObject* Networking::GetObjectFromNetID(uint64_t NetID)
+SceneObject* Networking::GetObjectFromNetID(uint64_t NetID)
 {
-	for (WorldObject* i : Objects::AllObjects)
+	for (SceneObject* i : Objects::AllObjects)
 	{
 		if (i->GetIsReplicated() && i->NetID == NetID)
 		{

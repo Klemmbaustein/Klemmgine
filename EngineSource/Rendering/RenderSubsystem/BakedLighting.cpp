@@ -237,7 +237,7 @@ void BakedLighting::BakeCurrentSceneToFile()
 	const bool IsEven = !(Number & 1);
 	Bake::Meshes.clear();
 
-	for (WorldObject* i : Objects::AllObjects)
+	for (SceneObject* i : Objects::AllObjects)
 	{
 		for (Component* c : i->GetComponents())
 		{

@@ -2,8 +2,8 @@
 #include <SDL_net.h>
 #include <cstdint>
 
-class WorldObject;
-class WorldObject;
+class SceneObject;
+class SceneObject;
 
 namespace Networking
 {
@@ -15,5 +15,5 @@ namespace Networking
 	extern size_t GameTick;
 	UDPsocket InitSocketFrom(IPaddress* Target);
 
-	void SendObjectInfo(WorldObject* obj, void* TargetAddr);
+	void SendObjectInfo(SceneObject* obj, void* TargetAddr);
 }

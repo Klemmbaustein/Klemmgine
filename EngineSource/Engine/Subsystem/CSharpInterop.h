@@ -12,7 +12,7 @@
 #endif
 
 
-class WorldObject;
+class SceneObject;
 
 /**
 * @brief
@@ -25,7 +25,7 @@ public:
 
 	static CSharpInterop* CSharpSystem;
 
-	struct CSharpWorldObject
+	struct CSharpSceneObject
 	{
 		int32_t ID = 0;
 	};
@@ -33,8 +33,8 @@ public:
 	void LoadRuntime();
 
 	static void LoadAssembly();
-	CSharpWorldObject InstantiateObject(std::string Typename, Transform t, WorldObject* NativeObject);
-	void DestroyObject(CSharpWorldObject Obj);
+	CSharpSceneObject InstantiateObject(std::string Typename, Transform t, SceneObject* NativeObject);
+	void DestroyObject(CSharpSceneObject Obj);
 
 	void* LoadCSharpFunction(std::string Function, std::string Namespace, std::string DelegateName);
 
@@ -72,14 +72,14 @@ public:
 	void CSharpLog(std::string Msg, CSharpLogType NativeType, CSharpLogSev Severity = CS_Log_Info);
 	void RegisterNativeFunction(std::string Name, void* Function);
 
-	void ExecuteFunctionOnObject(CSharpWorldObject Object, std::string FunctionName);
-	std::string ExecuteStringFunctionOnObject(CSharpWorldObject Object, std::string FunctionName);
+	void ExecuteFunctionOnObject(CSharpSceneObject Object, std::string FunctionName);
+	std::string ExecuteStringFunctionOnObject(CSharpSceneObject Object, std::string FunctionName);
 
-	std::string GetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName);
-	void SetPropertyOfObject(CSharpWorldObject Object, std::string FunctionName, std::string Value);
+	std::string GetPropertyOfObject(CSharpSceneObject Object, std::string FunctionName);
+	void SetPropertyOfObject(CSharpSceneObject Object, std::string FunctionName, std::string Value);
 
-	Vector3 GetObjectVectorField(CSharpWorldObject Obj, std::string Field);
-	void SetObjectVectorField(CSharpWorldObject Obj, std::string Field, Vector3 Value);
+	Vector3 GetObjectVectorField(CSharpSceneObject Obj, std::string Field);
+	void SetObjectVectorField(CSharpSceneObject Obj, std::string Field, Vector3 Value);
 
 	static std::string GetNetVersion();
 

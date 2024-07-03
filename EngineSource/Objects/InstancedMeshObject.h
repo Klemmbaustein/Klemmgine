@@ -9,7 +9,7 @@
 * @ingroup Objects
 * Path: Classes/Default/Mesh.
 */
-class InstancedMeshObject : public WorldObject
+class InstancedMeshObject : public SceneObject
 {
 public:
 	virtual void Destroy() override;

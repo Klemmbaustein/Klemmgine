@@ -3,7 +3,7 @@
 #if !EDITOR
 #include "Packet.h"
 
-class WorldObject;
+class SceneObject;
 
 namespace Server
 {
@@ -29,9 +29,9 @@ namespace Server
 	void DisconnectPlayer(uint64_t UID);
 	void SpawnObject(int32_t ObjID, uint64_t NetID, Transform SpawnTransform, std::string ObjProperties);
 
-	void HandleDestroyObject(WorldObject* o);
+	void HandleDestroyObject(SceneObject* o);
 
-	void SetObjNetOwner(WorldObject* obj, uint64_t NetOwner);
+	void SetObjNetOwner(SceneObject* obj, uint64_t NetOwner);
 
 	void Init();
 

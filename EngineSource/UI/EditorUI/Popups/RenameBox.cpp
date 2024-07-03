@@ -17,7 +17,8 @@ RenameBox::RenameBox(std::string FileToRename)
 	InputField = new UITextField(0, EditorUI::UIColors[1], this, -1, EditorUI::Text);
 
 	std::string Ext = FileUtil::GetExtension(FileToRename);
-	PopupBackground->AddChild(new UIText(0.4f, EditorUI::UIColors[2], "From:  " + FileUtil::GetFileNameFromPath(FileToRename), EditorUI::Text));
+	PopupBackground->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "From:  " + FileUtil::GetFileNameFromPath(FileToRename), EditorUI::Text))
+		->SetPadding(0.02f));
 	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 		->SetPadding(0)
 		->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "To:   ", EditorUI::Text))

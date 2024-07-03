@@ -90,7 +90,7 @@ void Scene::LoadSceneInternally(std::string FilePath)
 				Objects::DestroyObject(Objects::AllObjects[i]);
 			}
 		}
-		WorldObject::DestroyMarkedObjects();
+		SceneObject::DestroyMarkedObjects();
 
 		Objects::AllObjects.clear();
 #if !SERVER
@@ -119,7 +119,7 @@ void Scene::LoadSceneInternally(std::string FilePath)
 		//Collision::CollisionBoxes.clear();
 		std::ifstream Input(FilePath, std::ios::in | std::ios::binary);
 		Input.exceptions(std::ios::failbit | std::ios::badbit);
-		std::vector<WorldObject> WorldObjects;
+		std::vector<SceneObject> SceneObjects;
 		Editor::IsInSubscene = false;
 		CurrentScene = FileUtil::GetFilePathWithoutExtension(FilePath);
 
@@ -177,7 +177,7 @@ void Scene::LoadSceneInternally(std::string FilePath)
 				Name = ReadBinaryStringFromFile(Input);
 				Path = ReadBinaryStringFromFile(Input);
 				desc = ReadBinaryStringFromFile(Input);
-				WorldObject* NewObject = Objects::SpawnObjectFromID(ID, Transform1);
+				SceneObject* NewObject = Objects::SpawnObjectFromID(ID, Transform1);
 				if (NewObject)
 				{
 					NewObject->DeSerialize(Path);
@@ -205,7 +205,7 @@ void Scene::SaveSceneAs(std::string FilePath, bool Subscene)
 {
 	Stats::EngineStatus = "Saving Scene";
 	std::ofstream Output(FilePath + (Subscene ? ".subscn" : ".jscn"), std::ios::out | std::ios::binary);
-	std::vector<WorldObject*> SavedObjects = Objects::AllObjects;
+	std::vector<SceneObject*> SavedObjects = Objects::AllObjects;
 #if SAVE_FOG_AND_SUN
 	if (!Subscene)
 	{
@@ -262,7 +262,7 @@ void Scene::LoadSubScene(std::string FilePath)
 	if (std::filesystem::exists(FilePath))
 	{
 		std::ifstream Input(FilePath, std::ios::in | std::ios::binary);
-		std::vector<WorldObject> WorldObjects;
+		std::vector<SceneObject> SceneObjects;
 		CurrentScene = FileUtil::GetFilePathWithoutExtension(FilePath);
 
 		if (std::filesystem::is_empty(FilePath))
@@ -284,7 +284,7 @@ void Scene::LoadSubScene(std::string FilePath)
 				std::string Name = ReadBinaryStringFromFile(Input);
 				std::string Path = ReadBinaryStringFromFile(Input);
 				std::string desc = ReadBinaryStringFromFile(Input);
-				WorldObject* NewObject = Objects::SpawnObjectFromID(ID, Transform1);
+				SceneObject* NewObject = Objects::SpawnObjectFromID(ID, Transform1);
 				if (NewObject)
 				{
 					NewObject->DeSerialize(Path);

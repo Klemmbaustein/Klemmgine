@@ -1,5 +1,5 @@
 #pragma once
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <Engine/Subsystem/Sound.h>
 #include <GENERATED/SoundObject.h>
 
@@ -11,7 +11,7 @@
 * 
 * @ingroup Objects
 */
-class SoundObject : public WorldObject
+class SoundObject : public SceneObject
 {
 public:
 	SOUNDOBJECT_GENERATED("Default");

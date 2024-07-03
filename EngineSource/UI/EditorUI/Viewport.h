@@ -2,7 +2,7 @@
 #pragma once
 #include <UI/EditorUI/EditorPanel.h>
 
-class WorldObject;
+class SceneObject;
 class Model;
 class EditorTab;
 
@@ -32,7 +32,7 @@ public:
 	static void CopySelectedObjects();
 
 	static Viewport* ViewportInstance;
-	WorldObject* PreviousSelectedObject = nullptr;
+	SceneObject* PreviousSelectedObject = nullptr;
 	size_t PreviousSelectedObjectSize = 0;
 
 	Viewport(EditorPanel* Parent);

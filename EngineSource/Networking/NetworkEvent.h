@@ -2,12 +2,12 @@
 #include <string>
 #include <vector>
 
-class WorldObject;
+class SceneObject;
 struct Packet;
 
 namespace NetworkEvent
 {
-	void TriggerNetworkEvent(std::string Name, std::vector<std::string> Arguments, WorldObject* Target, uint64_t TargetClient);
+	void TriggerNetworkEvent(std::string Name, std::vector<std::string> Arguments, SceneObject* Target, uint64_t TargetClient);
 
 	void HandleNetworkEvent(Packet* Data);
 	void HandleEventAccept(Packet* Data);

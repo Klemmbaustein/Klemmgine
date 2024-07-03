@@ -1,4 +1,4 @@
-#include "WorldObject.h"
+#include "SceneObject.h"
 #include "Components/Component.h"
 #include <sstream>
 #include <Engine/Log.h>
@@ -12,12 +12,12 @@
 
 namespace Objects
 {
-	std::set<WorldObject*> ObjectsToDestroy;
-	std::vector<WorldObject*> AllObjects;
-	std::vector<WorldObject*> GetAllObjectsWithID(uint32_t ID)
+	std::set<SceneObject*> ObjectsToDestroy;
+	std::vector<SceneObject*> AllObjects;
+	std::vector<SceneObject*> GetAllObjectsWithID(uint32_t ID)
 	{
-		std::vector<WorldObject*> FoundObjects;
-		for (WorldObject* o : Objects::AllObjects)
+		std::vector<SceneObject*> FoundObjects;
+		for (SceneObject* o : Objects::AllObjects)
 		{
 			if (o->GetObjectDescription().ID == ID && ObjectsToDestroy.find(o) == ObjectsToDestroy.end())
 			{
@@ -28,7 +28,7 @@ namespace Objects
 	}
 }
 
-void WorldObject::_CallEvent(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments)
+void SceneObject::_CallEvent(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments)
 {
 	for (const auto& i : NetEvents)
 	{
@@ -41,17 +41,17 @@ void WorldObject::_CallEvent(NetEvent::NetEventFunction Function, std::vector<st
 	Log::Print("[Net]: Could not invoke Event", Log::LogColor::Yellow);
 }
 
-WorldObject::WorldObject(ObjectDescription _d)
+SceneObject::SceneObject(ObjectDescription _d)
 {
 	TypeName = _d.Name;
 	TypeID = _d.ID;
 }
 
-WorldObject::~WorldObject()
+SceneObject::~SceneObject()
 {
 }
 
-WorldObject* WorldObject::Start(std::string ObjectName, Transform Transform, uint64_t NetID)
+SceneObject* SceneObject::Start(std::string ObjectName, Transform Transform, uint64_t NetID)
 {
 #if !EDITOR
 	if (!GetIsReplicated() || NetID != UINT64_MAX)
@@ -83,34 +83,34 @@ WorldObject* WorldObject::Start(std::string ObjectName, Transform Transform, uin
 	return this;
 }
 
-void WorldObject::Destroy()
+void SceneObject::Destroy()
 {
 }
 
-void WorldObject::Update()
+void SceneObject::Update()
 {
 }
 
-void WorldObject::Begin()
+void SceneObject::Begin()
 {
 }
 
-bool WorldObject::GetIsReplicated()
+bool SceneObject::GetIsReplicated()
 {
 	return false;
 }
 
-void WorldObject::SetTransform(Transform NewTransform)
+void SceneObject::SetTransform(Transform NewTransform)
 {
 	ObjectTransform = NewTransform;
 }
 
-Transform& WorldObject::GetTransform()
+Transform& SceneObject::GetTransform()
 {
 	return ObjectTransform;
 }
 
-int WorldObject::Attach(Component* NewComponent)
+int SceneObject::Attach(Component* NewComponent)
 {
 	Components.push_back(NewComponent);
 	ComponentModifier::SetParent(NewComponent, this);
@@ -118,12 +118,12 @@ int WorldObject::Attach(Component* NewComponent)
 	return (int)Components.size() - 1;
 }
 
-ObjectDescription WorldObject::GetObjectDescription()
+ObjectDescription SceneObject::GetObjectDescription()
 {
 	return ObjectDescription(TypeName, TypeID);
 }
 
-void WorldObject::UpdateComponents()
+void SceneObject::UpdateComponents()
 {
 	for (size_t i = 0; i < Components.size(); i++)
 	{
@@ -131,26 +131,26 @@ void WorldObject::UpdateComponents()
 	}
 }
 
-void WorldObject::AddEditorProperty(Property p)
+void SceneObject::AddEditorProperty(Property p)
 {
 	p.PType = Property::PropertyType::EditorProperty;
 	Properties.push_back(p);
 }
 
-void WorldObject::AddNetProperty(Property p, Property::NetOwner Owner)
+void SceneObject::AddNetProperty(Property p, Property::NetOwner Owner)
 {
 	p.PType = Property::PropertyType::NetProperty;
 	p.PropertyOwner = Owner;
 	Properties.push_back(p);
 }
 
-std::string WorldObject::Serialize()
+std::string SceneObject::Serialize()
 {
 	return "";
 }
 
 
-void WorldObject::Detach(Component* C)
+void SceneObject::Detach(Component* C)
 {
 	for (int i = 0; i < Components.size(); i++)
 	{
@@ -163,15 +163,15 @@ void WorldObject::Detach(Component* C)
 	}
 }
 
-void WorldObject::DeSerialize(std::string SerializedObject)
+void SceneObject::DeSerialize(std::string SerializedObject)
 {
 }
 
-void WorldObject::OnPropertySet()
+void SceneObject::OnPropertySet()
 {
 }
 
-std::string WorldObject::GetPropertiesAsString()
+std::string SceneObject::GetPropertiesAsString()
 {
 	std::stringstream OutProperties;
 	for (Property p : Properties)
@@ -224,7 +224,7 @@ static void AssignStringToPtr(NativeType::NativeType t, std::string str, void* p
 	*(T*)ptr = FromString(str);
 }
 
-void WorldObject::LoadProperties(std::string in)
+void SceneObject::LoadProperties(std::string in)
 {
 	int i = 0;
 	Property CurrentProperty = Property("", NativeType::Float, nullptr);
@@ -324,7 +324,7 @@ void WorldObject::LoadProperties(std::string in)
 	}
 }
 
-void WorldObject::DestroyMarkedObjects()
+void SceneObject::DestroyMarkedObjects()
 {
 	for (auto* o : Objects::ObjectsToDestroy)
 	{
@@ -362,7 +362,7 @@ void WorldObject::DestroyMarkedObjects()
 	Objects::ObjectsToDestroy.clear();
 }
 
-void WorldObject::SetNetOwner(int64_t NewNetID)
+void SceneObject::SetNetOwner(int64_t NewNetID)
 {
 #if SERVER
 	Server::SetObjNetOwner(this, NewNetID);
@@ -387,7 +387,7 @@ static std::string ListToString(void* Data, std::string(*ToString)(T Data))
 	return val;
 }
 
-std::string WorldObject::Property::ValueToString(WorldObject* Context)
+std::string SceneObject::Property::ValueToString(SceneObject* Context)
 {
 #if ENGINE_CSHARP
 	if (PType == PropertyType::CSharpProperty)
@@ -456,7 +456,7 @@ std::string WorldObject::Property::ValueToString(WorldObject* Context)
 	return std::string();
 }
 
-void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
+void SceneObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
 {
 #if !EDITOR
 	if (!Client::GetIsConnected())
@@ -467,7 +467,7 @@ void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
 
 	switch (NativeType)
 	{
-	case WorldObject::NetEvent::EventType::Server:
+	case SceneObject::NetEvent::EventType::Server:
 		if (Client::GetClientID() == Parent->NetOwner)
 		{
 			NetworkEvent::TriggerNetworkEvent(Name, Arguments, Parent, Networking::ServerID);
@@ -480,7 +480,7 @@ void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
 				"[Net]: ");
 		}
 		break;
-	case WorldObject::NetEvent::EventType::Owner:
+	case SceneObject::NetEvent::EventType::Owner:
 		if (Client::GetClientID() == Networking::ServerID)
 		{
 			NetworkEvent::TriggerNetworkEvent(Name, Arguments, Parent, Parent->NetOwner);
@@ -493,7 +493,7 @@ void WorldObject::NetEvent::Invoke(std::vector<std::string> Arguments) const
 				"[Net]: ");
 		}
 		break;
-	case WorldObject::NetEvent::EventType::Clients:
+	case SceneObject::NetEvent::EventType::Clients:
 		if (Client::GetClientID() == Networking::ServerID)
 		{
 			for (const auto& i : Server::GetClients())

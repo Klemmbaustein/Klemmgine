@@ -182,7 +182,7 @@ void ParticleEditorTab::Save()
 {
 	Particles::ParticleEmitter::SaveToFile(Particle->ParticleElements, ElementMaterials, LoadedFile);
 
-	for (WorldObject* o : Objects::AllObjects)
+	for (SceneObject* o : Objects::AllObjects)
 	{
 		ParticleObject* ParticleObj = dynamic_cast<ParticleObject*>(o);
 		if (ParticleObj && ParticleObj->ParticleName == FileUtil::GetFileNameWithoutExtensionFromPath(LoadedFile))
@@ -209,7 +209,8 @@ void ParticleEditorTab::Generate()
 		New->SetMinSize(Vector2(std::min(ChildBox->GetMinSize().X - 0.1f, 0.325f), 0));
 		ChildBox->AddChild(New);
 
-		Rows.push_back(New);
+		Rows.push_back(New
+			->SetPadding(0.02f));
 	}
 
 	int it = 0;

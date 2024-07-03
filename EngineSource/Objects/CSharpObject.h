@@ -1,23 +1,23 @@
 #ifdef ENGINE_CSHARP
 #pragma once
 #include <GENERATED/CSharpObject.h>
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 #include <Engine/Subsystem/CSharpInterop.h>
 
 /**
 * @brief
-* A C++ object representing a managed C# object of the WorldObject class.
+* A C++ object representing a managed C# object of the SceneObject class.
 * 
 * @ingroup Objects
 * @ingroup CSharp
 */
-class CSharpObject : public WorldObject
+class CSharpObject : public SceneObject
 {
 public:
 	CSHARPOBJECT_GENERATED("Default");
 
 	/// Struct containing information about the managed C# class this object manages.
-	CSharpInterop::CSharpWorldObject CS_Obj;
+	CSharpInterop::CSharpSceneObject CS_Obj;
 
 	void Begin() override;
 	void Update() override;

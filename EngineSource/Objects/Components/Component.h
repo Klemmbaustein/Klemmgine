@@ -1,19 +1,19 @@
 #pragma once
-#include <Objects/WorldObject.h>
+#include <Objects/SceneObject.h>
 
 class ComponentSetter;
 
 /**
 * @defgroup Components
 * @brief
-* Components that can be attached to any WorldObject.
+* Components that can be attached to any SceneObject.
 * 
 * @ingroup Objects
 */
 
 /**
 * @brief
-* A Component. Can be attached to any WorldObject.
+* A Component. Can be attached to any SceneObject.
 * 
 * @ingroup Components
 */
@@ -28,9 +28,9 @@ public:
 	virtual void Destroy();
 	/**
 	* @brief
-	* Gets the parent WorldObject.
+	* Gets the parent SceneObject.
 	*/
-	WorldObject* GetParent();
+	SceneObject* GetParent();
 	friend class ComponentModifier;
 
 	/**
@@ -42,13 +42,13 @@ public:
 	virtual Transform GetWorldTransform();
 
 private:
-	WorldObject* Parent = nullptr;
+	SceneObject* Parent = nullptr;
 };
 
 class ComponentModifier
 {
 public:
-	static void SetParent(Component* c, WorldObject* p)
+	static void SetParent(Component* c, SceneObject* p)
 	{
 		c->Parent = p;
 	}
