@@ -10,7 +10,7 @@ T* Objects::SpawnObject(Transform ObjectTransform, uint64_t NetID)
 	return dynamic_cast<T*>(NewObject->Start(NewObject->GetObjectDescription().Name, ObjectTransform, NetID));
 }
 
-bool Objects::DestroyObject(WorldObject* Object)
+bool Objects::DestroyObject(SceneObject* Object)
 {
 	if (Object)
 	{
@@ -20,7 +20,7 @@ bool Objects::DestroyObject(WorldObject* Object)
 	return false;
 }
 
-WorldObject* Objects::SpawnObjectFromID(uint32_t ID, Transform ObjectTransform, uint64_t NetID)
+SceneObject* Objects::SpawnObjectFromID(uint32_t ID, Transform ObjectTransform, uint64_t NetID)
 {
 	switch (ID)
 	{
