@@ -69,6 +69,10 @@ SaveData SaveData::ParseString(std::string Str)
 		if (c == '}' && !InString)
 		{
 			ReadBrackets = true;
+			if (BracketDepth == 0)
+			{
+				Error("Unexpected '}'");
+			}
 			BracketDepth--;
 			if (BracketDepth == 0)
 			{
@@ -92,7 +96,7 @@ SaveData SaveData::ParseString(std::string Str)
 			{
 				CurrentString.push_back(c);
 			}
-			if (!ReadString)
+			if (!InString)
 			{
 				ReadBrackets = true;
 				BracketDepth++;
@@ -210,6 +214,11 @@ SaveData SaveData::ParseString(std::string Str)
 			break;
 		}
 		Last = c;
+	}
+
+	if (BracketDepth != 0)
+	{
+		std::cout << "error" << std::endl;
 	}
 
 	return OutData;
@@ -372,20 +381,22 @@ bool SaveData::Field::operator<(Field b) const
 std::string SaveData::Field::Serialize(size_t Depth) const
 {
 	std::string str;
+	std::string Tabs;
 	if (Depth)
 	{
-		str.resize(Depth, '\t');
+		Tabs.resize(Depth, '\t');
+		str += Tabs;
 	}
 	str += NativeType::TypeStrings[Type] + " " + Name + " = ";
 
 	if (!Children.empty())
 	{
-		str += "\n{\n";
+		str += "\n" + Tabs + "{\n";
 		for (auto& c : Children)
 		{
 			str += c.Serialize(Depth + 1) + "\n";
 		}
-		str += "}";
+		str += Tabs + "}";
 		return str;
 	}
 
@@ -423,6 +434,18 @@ SaveData::Field& SaveData::Field::At(std::string Name)
 		}
 	}
 	throw std::exception();
+}
+
+bool SaveData::Field::Contains(std::string Name)
+{
+	for (SaveData::Field& i : Children)
+	{
+		if (i.Name == Name)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 int SaveData::Field::AsInt() const
@@ -471,7 +494,7 @@ std::string SaveData::Field::AsString() const
 
 float SaveData::Field::AsFloat() const
 {
-	if (Type != NativeType::Int)
+	if (Type != NativeType::Float)
 	{
 		return 0;
 	}

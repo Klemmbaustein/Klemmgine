@@ -71,7 +71,7 @@ public:
 	virtual void GoBack() = 0;
 
 	UIScrollBox* BrowserScrollBox;
-	ItemBrowser(EditorPanel* Parent, std::string Name);
+	ItemBrowser(EditorPanel* Parent, std::string Name, std::string ClassName);
 	void OnResized() override;
 	void Tick() override;
 	virtual void DeleteItem(BrowserItem Item);

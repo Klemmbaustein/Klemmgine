@@ -80,3 +80,59 @@ std::vector<std::string> StrUtil::SeparateString(std::string Value, char Sep)
 
 	return Values;
 }
+
+std::string StrUtil::GetPrettyName(std::string Name)
+{
+	std::string Out;
+	std::string CurrentWord;
+
+	char Previous = '\0';
+	for (size_t i = 0; i < Name.size(); i++)
+	{
+		char Current = Name[i];
+
+		if (i == 0 && islower(Current))
+		{
+			Current = toupper(Current);
+		}
+
+		if (islower(Previous) && isupper(Current))
+		{
+			Out.append(CurrentWord + " ");
+			CurrentWord.clear();
+		}
+		if (isupper(Previous) && isupper(Current))
+		{
+			Out.append(CurrentWord + " ");
+			CurrentWord.clear();
+		}
+
+		CurrentWord.push_back(Current);
+
+		Previous = Current;
+	}
+
+	if (CurrentWord.size())
+	{
+		Out.append(CurrentWord + " ");
+	}
+
+	if (Out.size())
+	{
+		Out.pop_back();
+	}
+	return Out;
+}
+
+std::string StrUtil::ShortenIfTooLong(std::string str, size_t MaxSize)
+{
+	if (str.size() > MaxSize)
+	{
+		if (MaxSize < 3)
+		{
+			return str.substr(0, MaxSize);
+		}
+		return str.substr(0, MaxSize - 3).append("...");
+	}
+	return str;
+}

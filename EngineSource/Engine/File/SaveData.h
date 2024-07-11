@@ -22,6 +22,7 @@ struct SaveData
 		std::string Serialize(size_t Depth) const;
 
 		Field& At(std::string Name);
+		bool Contains(std::string Name);
 
 		int AsInt() const;
 		bool AsBool() const;

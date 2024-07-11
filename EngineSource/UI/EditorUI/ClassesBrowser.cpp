@@ -4,6 +4,7 @@
 #include <Objects/CSharpObject.h>
 #include <UI/EditorUI/Popups/ClassCreator.h>
 #include <UI/EditorUI/EditorUI.h>
+#include <Engine/Utility/StringUtility.h>
 #include <Engine/OS.h>
 
 std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::CPPClasses;
@@ -24,10 +25,9 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetEditorUIClasse
 	}
 #endif
 
-
 	for (const auto& Object : AllObjects)
 	{
-		// First seperate the Category into multiple names. For example: "Default/Rendering" -> { "Default", "Rendering" }
+		// First separate the Category into multiple names. For example: "Default/Rendering" -> { "Default", "Rendering" }
 		std::string CurrentPath = Objects::GetCategoryFromID(Object.ID);
 		if (Object.ID == CSharpObject::GetID() && Object.Name != "CSharpObject")
 		{
@@ -57,7 +57,7 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetEditorUIClasse
 			CurrentPath = CurrentPath.substr(Index + 1);
 		} while (Index != std::string::npos);
 
-		// Iterate through every 'element' we just got from the Category string
+		// Iterate through every 'element' we just got from the category string.
 		for (const auto& elem : PathElements)
 		{
 			bool Found = false;
@@ -72,14 +72,14 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetEditorUIClasse
 				}
 			}
 			if (Found) continue;
-			// Else we create that new element.
+			// If not, we create that new element.
 			EditorClassesItem NewPath;
 			NewPath.IsFolder = true;
 			NewPath.Name = elem;
 			CurrentParent->SubItems.push_back(NewPath);
 			CurrentParent = &CurrentParent->SubItems[CurrentParent->SubItems.size() - 1];
 		}
-		// Create a new item structure so we can add it to the folder "file system"
+		// Create a new item structure so we can add it to the structure.
 		EditorClassesItem NewItem;
 		NewItem.Name = Object.Name;
 		NewItem.Object = Object;
@@ -97,17 +97,17 @@ std::string ClassesBrowser::GetCurrentCPPPathString()
 	{
 		// Reorder the content so that folders are first and items are second.
 		// It looks prettier in the item browser this way.
-		std::vector<EditorClassesItem> ReordererdSubItems;
+		std::vector<EditorClassesItem> ReOrderedSubItems;
 		for (const auto& i : CurrentItems[path].SubItems)
 		{
-			if (i.IsFolder) ReordererdSubItems.push_back(i);
+			if (i.IsFolder) ReOrderedSubItems.push_back(i);
 		}
 		for (const auto& i : CurrentItems[path].SubItems)
 		{
-			if (!i.IsFolder) ReordererdSubItems.push_back(i);
+			if (!i.IsFolder) ReOrderedSubItems.push_back(i);
 		}
 		PathString.append("/" + CurrentItems[path].Name);
-		CurrentItems = ReordererdSubItems;
+		CurrentItems = ReOrderedSubItems;
 	}
 	PathString.append("/");
 	return PathString;
@@ -140,21 +140,21 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetContentsOfCurr
 	{
 		// Reorder the content so that folders are first and items are second.
 		// It looks prettier in the item browser this way.
-		std::vector<EditorClassesItem> ReordererdSubItems;
+		std::vector<EditorClassesItem> ReOrderedSubItems;
 		for (const auto& i : CurrentItems[path].SubItems)
 		{
-			if (i.IsFolder) ReordererdSubItems.push_back(i);
+			if (i.IsFolder) ReOrderedSubItems.push_back(i);
 		}
 		for (const auto& i : CurrentItems[path].SubItems)
 		{
-			if (!i.IsFolder) ReordererdSubItems.push_back(i);
+			if (!i.IsFolder) ReOrderedSubItems.push_back(i);
 		}
-		CurrentItems = ReordererdSubItems;
+		CurrentItems = ReOrderedSubItems;
 	}
 	return CurrentItems;
 }
 
-ClassesBrowser::ClassesBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Classes")
+ClassesBrowser::ClassesBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Classes", "class_browser")
 {
 	DefaultDropdown =
 	{

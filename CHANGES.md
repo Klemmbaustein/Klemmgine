@@ -1,5 +1,20 @@
 # Changes
 
+## Version 1.12.0
+
+### Changes
+
+- Added the option to save the editor layout.
+- Added more documentation. (Subsystems, Sound, Editor documentation)
+- Improvements to the performance graph.
+- Added a constructor to Sound::SoundBuffer which constructs sounds from a byte array.
+
+### Fixes
+
+- Fixed issues with nested objects in save files.
+- Fixed the server creating an empty .keproj file if no .sln file exists.
+- Fixed the server not working with the file structure of release builds.
+
 ## Version 1.11.0
 
 ### Changes

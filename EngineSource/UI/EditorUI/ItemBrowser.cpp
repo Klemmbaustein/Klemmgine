@@ -13,7 +13,7 @@ static ItemBrowser::BrowserItem DropdownItem;
 static ItemBrowser::BrowserItem DraggedItem;
 ItemBrowser* ItemBrowser::DropdownBrowser = nullptr;
 
-ItemBrowser::ItemBrowser(EditorPanel* Parent, std::string Name) : EditorPanel(Parent, Name)
+ItemBrowser::ItemBrowser(EditorPanel* Parent, std::string Name, std::string ClassName) : EditorPanel(Parent, Name, ClassName)
 {
 	TopBox = new UIBox(UIBox::Orientation::Horizontal, 0);
 	PanelMainBackground->AddChild(TopBox
@@ -233,7 +233,7 @@ void ItemBrowser::GenerateAssetList()
 
 	std::vector<UIBox*> HorizontalBoxes;
 
-	int SlotsPerRow = (size_t)((Scale.X + 0.04f) / (0.14f / Graphics::AspectRatio)) - 1;
+	int SlotsPerRow = (size_t)((Scale.X - 0.04f) / (0.14f / Graphics::AspectRatio));
 	if (SlotsPerRow <= 0)
 	{
 		return;
@@ -261,14 +261,13 @@ void ItemBrowser::GenerateAssetList()
 			->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, Item.Color, 0.125f))
 				->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1.0f, 0.125f))
 					->SetUseTexture(true, Item.Texture)
-					->SetSizeMode(UIBox::SizeMode::AspectRelative)
-					->SetPadding(0))
+					->SetSizeMode(UIBox::SizeMode::AspectRelative))
 				->SetBorder(UIBox::BorderType::Rounded, 0.4f)
 				->SetPadding(0.005f)
 				->SetSizeMode(UIBox::SizeMode::AspectRelative)
 				->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative))
-			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], Item.Name, EditorUI::Text))
-				->SetWrapEnabled(true, 0.115f, UIBox::SizeMode::ScreenRelative)
+			->AddChild((new UIText(0.38f, EditorUI::UIColors[2], Item.Name, EditorUI::Text))
+				->SetWrapEnabled(true, 0.23f, UIBox::SizeMode::AspectRelative)
 				->SetPadding(0, 0, 0.005f, 0.005f)
 				->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)));
 		Index++;
@@ -298,8 +297,7 @@ void ItemBrowser::OnButtonDragged(int Index)
 	DraggedButton
 		->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1.0f, 0.125f))
 			->SetUseTexture(true, Item.Texture)
-			->SetSizeMode(UIBox::SizeMode::AspectRelative)
-			->SetPadding(0))
+			->SetSizeMode(UIBox::SizeMode::AspectRelative))
 		->SetBorder(UIBox::BorderType::Rounded, 0.4f)
 		->SetSizeMode(UIBox::SizeMode::AspectRelative);
 

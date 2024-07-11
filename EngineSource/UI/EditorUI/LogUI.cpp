@@ -29,7 +29,7 @@ void LogUI::UpdateAutoComplete()
 	CommandsBackground->SetMinSize(Vector2(LogPrompt->GetUsedSize().X, 0));
 }
 
-LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console")
+LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console", "log")
 {
 	LogScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	LogPrompt = new UITextField(0, EditorUI::UIColors[1] * 0.5f, this, 0, EditorUI::MonoText);

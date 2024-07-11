@@ -24,39 +24,43 @@ void EditorPanel::Collapse()
 	if (Parent && Parent->Children.size() > 1 && Parent->ChildrenAlign == ChildrenType::Vertical)
 	{
 		Collapsed = !Collapsed;
-		GetAbsoluteParent()->OnPanelResized();
+		GetAbsoluteParent()->UpdatePanelLayout = true;
 	}
 }
 
 void EditorPanel::ClearParent(bool Delete)
 {
-	if (Parent)
+	if (!Parent)
 	{
-		for (size_t i = 0; i < Parent->Children.size(); i++)
-		{
-			if (Parent->Children[i] == this)
-			{
-				Parent->Children.erase(Parent->Children.begin() + i);
-				if (Parent->ActiveTab > i && Parent->ActiveTab > 0)
-				{
-					Parent->ActiveTab--;
-				}
-				if (Parent->ActiveTab >= Parent->Children.size())
-				{
-					Parent->ActiveTab = Parent->Children.size() - 1;
-				}
-				break;
-			}
-		}
+		return;
+	}
 
-		if (Parent->Children.empty() && Delete)
+	for (size_t i = 0; i < Parent->Children.size(); i++)
+	{
+		if (Parent->Children[i] != this)
 		{
-			delete Parent;
+			continue;
 		}
-		else
+		Parent->Children.erase(Parent->Children.begin() + i);
+		if (Parent->ActiveTab > i && Parent->ActiveTab > 0)
 		{
-			Parent->GetAbsoluteParent()->OnPanelResized();
+			Parent->ActiveTab--;
 		}
+		if (Parent->ActiveTab >= Parent->Children.size())
+		{
+			Parent->ActiveTab = Parent->Children.size() - 1;
+		}
+		break;
+	}
+
+	if (Parent->Children.empty() && Delete)
+	{
+		delete Parent;
+		Parent = nullptr;
+	}
+	else
+	{
+		GetAbsoluteParent()->OnPanelResized();
 	}
 }
 
@@ -86,18 +90,20 @@ EditorPanel* EditorPanel::GetAbsoluteParent()
 	return this;
 }
 
-EditorPanel::EditorPanel(Vector2 Position, Vector2 Scale, std::string Name) : EditorPanel(nullptr, Name)
+EditorPanel::EditorPanel(Vector2 Position, Vector2 Scale, std::string Name, std::string ClassName) : EditorPanel(nullptr, Name, ClassName)
 {
 	this->Position = Position;
 	this->Scale = Scale;
+	this->Name = Name;
 	PanelMainBackground->SetPosition(Position);
 	PanelMainBackground->SetMinSize(Scale);
 	PanelMainBackground->SetMaxSize(Scale);
 }
 
-EditorPanel::EditorPanel(EditorPanel* NewParent, std::string Name, size_t TabPosition)
+EditorPanel::EditorPanel(EditorPanel* NewParent, std::string Name, std::string ClassName, size_t TabPosition)
 {
 	ENGINE_ASSERT(!Name.empty(), "Name should not be empty");
+	this->ClassName = ClassName;
 	this->Name = Name;
 	Parent = NewParent;
 	PanelMainBackground = new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[0], 1);
@@ -194,6 +200,11 @@ void EditorPanel::Tick()
 
 bool EditorPanel::TickPanelInternal()
 {
+	if (UpdatePanelLayout)
+	{
+		OnPanelResized();
+	}
+
 	if (DraggedTabPanel)
 	{
 		Dragged = nullptr;
@@ -265,13 +276,9 @@ bool EditorPanel::TickPanelInternal()
 		}
 	}
 
-	if (Dragged && IsDraggingHorizontal)
+	if (Dragged)
 	{
-		EditorUI::CurrentCursor = EditorUI::CursorType::Resize_WE;
-	}
-	if (Dragged && !IsDraggingHorizontal)
-	{
-		EditorUI::CurrentCursor = EditorUI::CursorType::Resize_NS;
+		EditorUI::CurrentCursor = IsDraggingHorizontal ? EditorUI::CursorType::Resize_WE : EditorUI::CursorType::Resize_NS;
 	}
 
 	if (!Input::IsLMBDown && Dragged == this)
@@ -307,7 +314,7 @@ bool EditorPanel::TickPanelInternal()
 			}
 		}
 
-		GetAbsoluteParent()->OnPanelResized();
+		GetAbsoluteParent()->UpdatePanelLayout = true;
 	}
 
 	for (EditorPanel* c : Children)
@@ -322,6 +329,7 @@ bool EditorPanel::TickPanelInternal()
 
 void EditorPanel::OnPanelResized()
 {
+	UpdatePanelLayout = false;
 	UpdateTabs();
 	PanelMainBackground->UpdateSelfAndChildren();
 	for (const auto& c : Children)
@@ -338,7 +346,7 @@ void EditorPanel::SetName(std::string Name)
 		return;
 	}
 	this->Name = Name;
-	GetAbsoluteParent()->OnPanelResized();
+	GetAbsoluteParent()->UpdatePanelLayout = true;
 }
 
 void EditorPanel::AddPanelTab(EditorPanel* Panel)
@@ -382,7 +390,7 @@ void EditorPanel::AddTab(EditorPanel* NewTab, ChildrenType Align, size_t TabPosi
 		}
 		ActiveTab = std::min(TabPosition, Children.size() - 1);
 		GetAbsoluteParent()->ReSort();
-		GetAbsoluteParent()->OnPanelResized();
+		GetAbsoluteParent()->UpdatePanelLayout = true;
 		return;
 	}
 	size_t i = 0;
@@ -403,9 +411,9 @@ void EditorPanel::AddTab(EditorPanel* NewTab, ChildrenType Align, size_t TabPosi
 	{
 		EditorPanel* OldParent = Parent;
 		ClearParent(false);
-		OldParent->OnPanelResized();
+		OldParent->UpdatePanelLayout = true;
 
-		auto NewPanel = new EditorPanel(OldParent, "panel", i);
+		auto NewPanel = new EditorPanel(OldParent, "panel", "panel", i);
 		NewPanel->ChildrenAlign = Align;
 		NewPanel->Size = Size;
 
@@ -425,6 +433,7 @@ void EditorPanel::AddTab(EditorPanel* NewTab, ChildrenType Align, size_t TabPosi
 		GetAbsoluteParent()->OnPanelResized();
 	}
 }
+
 void EditorPanel::AddTabButton(bool Selected, int Index, std::string Name, bool Closable)
 {
 	UIButton* TabButton = new UIButton(UIBox::Orientation::Vertical, 0, Selected ? EditorUI::UIColors[0] : EditorUI::UIColors[0] * 0.75f, this, Index);
@@ -433,7 +442,7 @@ void EditorPanel::AddTabButton(bool Selected, int Index, std::string Name, bool 
 	TabList->AddChild(TabButton
 		->SetCanBeDragged(true)
 		->SetPadding(0, 0, 0.005f, 0.005f)
-		->SetMinSize(Vector2(0.05f, 0.04f))
+		->SetMinSize(Vector2(0, 0.04f))
 		->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)
 		->AddChild((new UIBackground(UIBox::Orientation::Horizontal,
 			0,
@@ -563,7 +572,7 @@ void EditorPanel::TickPanel()
 	{
 		return;
 	}
-
+	TickPanelInternal();
 	for (EditorPanel* c : Children)
 	{
 		c->TickPanelInternal();
@@ -691,7 +700,7 @@ void EditorPanel::UpdateTabs()
 
 EditorPanel::~EditorPanel()
 {
-	ClearParent(true);
+	ClearParent(false);
 	if (Parent)
 	{
 		for (size_t i = 0; i < Parent->Children.size(); i++)
@@ -705,6 +714,12 @@ EditorPanel::~EditorPanel()
 				break;
 			}
 		}
+	}
+	Parent = nullptr;
+	while (Children.size())
+	{
+		// Children will put themselves out of the Children array.
+		delete Children[0];
 	}
 	delete PanelMainBackground;
 }

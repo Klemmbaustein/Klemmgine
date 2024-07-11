@@ -12,10 +12,14 @@ namespace Assets
 		if (!Recursive)
 		{
 			Assets.clear();
-			if (!(IsInEditor || EngineDebug))
+#if RELEASE
+			Path = "Assets/" + Path;
+#elif SERVER
+			if (std::filesystem::exists("Assets/" + Path))
 			{
 				Path = "Assets/" + Path;
 			}
+#endif
 		}
 		if (!std::filesystem::exists(Path))
 		{

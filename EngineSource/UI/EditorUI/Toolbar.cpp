@@ -94,7 +94,7 @@ void Toolbar::SetButtonVisibility(std::string Name, bool IsVisible)
 }
 
 
-Toolbar::Toolbar(EditorPanel* Parent) : EditorPanel(Parent, "Toolbar")
+Toolbar::Toolbar(EditorPanel* Parent) : EditorPanel(Parent, "Toolbar", "toolbar")
 {
 	ToolbarInstance = this;
 	RegisterNewButtonCategory(ButtonCategory("Scene", 

@@ -33,6 +33,7 @@
 #include <Engine/Application.h>
 #include <UI/EditorUI/SettingsPanel.h>
 #include <Networking/Networking.h>
+#include <UI/EditorUI/SerializePanel.h>
 
 int EditorUI::NumLaunchClients = 1;
 TextRenderer* EditorUI::Text = nullptr;
@@ -371,6 +372,49 @@ void EditorUI::SetUseLightMode(bool NewLightMode)
 	UIBox::ForceUpdateUI();
 }
 
+void EditorUI::LoadDefaultLayout()
+{
+	if (RootPanel)
+	{
+		delete RootPanel;
+	}
+
+	RootPanel = new EditorPanel(-1, Vector2(2, 1.95f), "root", "root");
+	RootPanel->ChildrenAlign = EditorPanel::ChildrenType::Horizontal;
+
+	EditorPanel* RightPanel = new EditorPanel(RootPanel, "panel");
+	RightPanel->Size = 0.3f;
+
+	(new AssetBrowser(RightPanel));
+	(new ClassesBrowser(RightPanel));
+
+	EditorPanel* CenterPanel = new EditorPanel(RootPanel, "panel");
+	CenterPanel->ChildrenAlign = EditorPanel::ChildrenType::Vertical;
+	CenterPanel->Size = 1.425f;
+	(new LogUI(CenterPanel))->Size = 0.4f;
+	(new Viewport(CenterPanel))->Size = 1.425f;
+	new Toolbar(CenterPanel);
+	EditorPanel* LeftPanel = new EditorPanel(RootPanel, "panel");
+	LeftPanel->ChildrenAlign = EditorPanel::ChildrenType::Vertical;
+	EditorPanel* BottomLeftPanel = new EditorPanel(LeftPanel, "panel");
+	new ContextMenu(BottomLeftPanel, false);
+	new ContextMenu(BottomLeftPanel, true);
+	BottomLeftPanel->Size = 0.8f;
+	new ObjectList(LeftPanel);
+
+	RootPanel->OnPanelResized();
+}
+
+void EditorUI::LoadPanelLayout(EditorPanel* From)
+{
+	if (RootPanel)
+	{
+		delete RootPanel;
+		RootPanel = nullptr;
+	}
+	RootPanel = From;
+}
+
 void EditorUI::PipeProcessToLog(std::string Command, std::string Prefix)
 {
 	using namespace Editor;
@@ -413,33 +457,17 @@ EditorUI::EditorUI()
 	Input::CursorVisible = true;
 	LoadEditorTextures();
 
-	RootPanel = new EditorPanel(-1, Vector2(2, 1.95f), "root");
-	RootPanel->ChildrenAlign = EditorPanel::ChildrenType::Horizontal;
-
-	EditorPanel* RightPanel = new EditorPanel(RootPanel, "panel");
-	RightPanel->Size = 0.3f;
-
-	(new AssetBrowser(RightPanel));
-	(new ClassesBrowser(RightPanel));
-
-	EditorPanel* CenterPanel = new EditorPanel(RootPanel, "panel");
-	CenterPanel->ChildrenAlign = EditorPanel::ChildrenType::Vertical;
-	CenterPanel->Size = 1.425f;
-	(new LogUI(CenterPanel))->Size = 0.4f;
-	(new Viewport(CenterPanel))->Size = 1.425f;
-	new Toolbar(CenterPanel);
-	delete new SettingsPanel(nullptr);
-	EditorPanel* LeftPanel = new EditorPanel(RootPanel, "panel");
-	LeftPanel->ChildrenAlign = EditorPanel::ChildrenType::Vertical;
-	EditorPanel* BottomLeftPanel = new EditorPanel(LeftPanel, "panel");
-	new ContextMenu(BottomLeftPanel, false);
-	new ContextMenu(BottomLeftPanel, true);
-	BottomLeftPanel->Size = 0.8f;
-	new ObjectList(LeftPanel);
-
+	if (std::filesystem::exists(Editor::SerializePanel::GetLayoutPrefFilePath() + ".pref"))
+	{
+		SaveData s = SaveData(Editor::SerializePanel::GetLayoutPrefFilePath(), "pref", false, false);
+		EditorUI::LoadPanelLayout(Editor::SerializePanel::DeSerializeLayout(s.GetField("root")));
+	}
+	else
+	{
+		LoadDefaultLayout();
+	}
 	new StatusBar();
-
-	RootPanel->OnPanelResized();
+	delete new SettingsPanel(nullptr);
 
 	Cursors[0] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_ARROW);
 	Cursors[1] = SDL_CreateSystemCursor(SDL_SYSTEM_CURSOR_HAND);
@@ -461,10 +489,15 @@ EditorUI::EditorUI()
 		EditorUI::SaveCurrentScene();
 		Scene::CurrentScene = Old;
 		}, { Console::Command::Argument("scene_file_path", NativeType::String, true)}));
+	Console::ConsoleSystem->RegisterCommand(Console::Command("dump_editor_layout", [this]() 
+		{
+			Print(Editor::SerializePanel::SerializeLayout(RootPanel).Serialize(0));
+		}, {}));
+
+	Console::ConsoleSystem->RegisterCommand(Console::Command("toggle_light", []() { EditorUI::SetUseLightMode(!EditorUI::GetUseLightMode()); }, {}));
 #ifdef ENGINE_CSHARP
 	Console::ConsoleSystem->RegisterCommand(Console::Command("reload", EditorUI::RebuildAssembly, {}));
 	Console::ConsoleSystem->RegisterCommand(Console::Command("run", EditorUI::LaunchInEditor, {}));
-	Console::ConsoleSystem->RegisterCommand(Console::Command("toggle_light", []() { EditorUI::SetUseLightMode(!EditorUI::GetUseLightMode()); }, {}));
 
 #endif
 }
@@ -642,112 +675,6 @@ void EditorUI::LoadEditorTextures()
 	{
 		Textures.push_back(Texture::LoadTexture(Application::GetEditorPath() + "/EditorContent/Images/" + Images[i]));
 	}
-}
-
-std::vector<EditorUI::ObjectListItem> EditorUI::GetObjectList()
-{
-	std::vector<ObjectListItem> ObjectList;
-	ObjectCategories.clear();
-	size_t ListIndex = 0;
-	for (SceneObject* o : Objects::AllObjects)
-	{
-		ObjectListItem* SceneList = nullptr;
-		// Get the list for the scene the object belongs to
-		for (auto& item : ObjectList)
-		{
-			if (item.Name == FileUtil::GetFileNameFromPath(o->CurrentScene))
-			{
-				SceneList = &item;
-			}
-		}
-
-		if (!SceneList)
-		{
-			std::string SceneName = FileUtil::GetFileNameFromPath(o->CurrentScene);
-			ObjectList.push_back(ObjectListItem(SceneName, {}, true, CollapsedItems.contains("OBJ_CAT_" + SceneName)));
-			ObjectCategories.push_back(FileUtil::GetFileNameFromPath(o->CurrentScene));
-			ObjectList[ObjectList.size() - 1].ListIndex = (int)ObjectCategories.size() - 1;
-			SceneList = &ObjectList[ObjectList.size() - 1];
-		}
-
-		// Separate the Object's category into multiple strings
-		std::string CurrentPath = Objects::GetCategoryFromID(o->GetObjectDescription().ID);
-		if (o->GetObjectDescription().ID == CSharpObject::GetID() && static_cast<CSharpObject*>(o)->CS_Obj.ID != 0)
-		{
-			auto Classes = CSharpInterop::CSharpSystem->GetAllClasses();
-			for (auto& i : Classes)
-			{
-				size_t LastSlash = i.find_last_of("/");
-				std::string Path;
-				std::string Name = i;
-				if (LastSlash != std::string::npos)
-				{
-					Path = i.substr(0, LastSlash);
-					Name = i.substr(LastSlash);
-				}
-				if (Name == static_cast<CSharpObject*>(o)->CSharpClass)
-				{
-					CurrentPath = Path;
-				}
-			}
-		}
-
-		std::vector<std::string> PathElements;
-		size_t Index = CurrentPath.find_first_of("/");
-		while (Index != std::string::npos)
-		{
-			Index = CurrentPath.find_first_of("/");
-			PathElements.push_back(CurrentPath.substr(0, Index));
-			CurrentPath = CurrentPath.substr(Index + 1);
-			Index = CurrentPath.find_first_of("/");
-		}
-		if (!CurrentPath.empty())
-		{
-			PathElements.push_back(CurrentPath);
-		}
-
-		ObjectListItem* CurrentList = SceneList;
-		if (SceneList->IsCollapsed) continue;
-		for (const auto& elem : PathElements)
-		{
-			ObjectListItem* NewList = nullptr;
-			for (auto& c : CurrentList->Children)
-			{
-				if (c.Name != elem) continue;
-				NewList = &c;
-				break;
-			}
-
-			if (!NewList && !CurrentList->IsCollapsed)
-			{
-				int it = 0;
-				while (true)
-				{
-					if (it >= (int)CurrentList->Children.size() || CurrentList->Children[it].Object)
-					{
-						break;
-					}
-					it++;
-				}
-				ObjectCategories.push_back(elem);
-				CurrentList->Children.insert(CurrentList->Children.begin() + it,
-					ObjectListItem(elem, {}, false, CollapsedItems.contains("OBJ_CAT_" + elem)));
-				CurrentList->Children[it].ListIndex = (int)ObjectCategories.size() - 1;
-				NewList = &CurrentList->Children[it];
-			}
-			CurrentList = NewList;
-		}
-		if (CurrentList && !CurrentList->IsCollapsed)
-		{
-			CurrentList->Children.push_back(ObjectListItem(o, (int)ListIndex));
-		}
-		else if (CurrentList && o->IsSelected)
-		{
-			CurrentList->IsSelected = true;
-		}
-		ListIndex++;
-	}
-	return ObjectList;
 }
 
 void EditorUI::BakeScene()

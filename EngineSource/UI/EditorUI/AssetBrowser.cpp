@@ -97,7 +97,7 @@ void AssetBrowser::OnItemClicked(BrowserItem Item)
 		EditorUI::OpenScene(Item.Path);
 	}
 
-	if (Extension == "png")
+	if (Extension == "png" || Extension == "wav")
 	{
 		OS::OpenFile(Item.Path);
 	}
@@ -153,7 +153,7 @@ void AssetBrowser::UpdateAll()
 
 }
 
-AssetBrowser::AssetBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Assets")
+AssetBrowser::AssetBrowser(EditorPanel* Parent) : ItemBrowser(Parent, "Assets", "file_browser")
 {
 	DefaultDropdown =
 	{

@@ -75,10 +75,10 @@ void Client::Disconnect()
 			(uint8_t)Packet::PacketType::DisconnectRequest
 		};
 		p.Send(&ConnectedServer);
+		Log::Print("Disconnected from server.", Log::LogColor::Blue);
 	}
 	IsConnected = false;
 	IsConnecting = false;
-	Log::Print("Disconnected from server.", Log::LogColor::Blue);
 }
 
 void Client::OnConnected(Packet* p)

@@ -17,6 +17,7 @@
 #include <Math/Collision/CollisionVisualize.h>
 #include <Engine/Utility/FileUtility.h>
 #include <Engine/Subsystem/CSharpInterop.h>
+#include "SerializePanel.h"
 
 StatusBar* CurrentStatusBar = nullptr;
 
@@ -74,7 +75,30 @@ static std::vector<MenuBarItem> MenuBarItems =
 					{
 						CollisionVisualize::Deactivate();
 					}
-				}),
+				}
+			),
+		}),
+	MenuBarItem("Window",
+		{
+			MenuBarEntry("Save Layout", []()
+				{
+					SaveData s = SaveData(Editor::SerializePanel::GetLayoutPrefFilePath(), "pref", false, true);
+					Log::Print("Saving layout to '" + Editor::SerializePanel::GetLayoutPrefFilePath() + ".pref'");
+					s.SetField(Editor::SerializePanel::SerializeLayout(EditorUI::RootPanel));
+				}
+			),
+			MenuBarEntry("Load Layout", []()
+				{
+					SaveData s = SaveData(Editor::SerializePanel::GetLayoutPrefFilePath(), "pref", false, false);
+					Log::Print("Loading layout from '" + Editor::SerializePanel::GetLayoutPrefFilePath() + ".pref'");
+					EditorUI::LoadPanelLayout(Editor::SerializePanel::DeSerializeLayout(s.GetField("root")));
+				}
+			),
+			MenuBarEntry("Load Default Layout", []()
+				{
+					EditorUI::LoadDefaultLayout();
+				}
+			),
 		}),
 	MenuBarItem("C#",
 		{

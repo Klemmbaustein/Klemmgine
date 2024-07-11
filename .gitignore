@@ -20,8 +20,6 @@ Tools/BuildTool/Release/
 Engine-*.*
 # C# related
 *.lastcodeanalysissucceeded
-EngineRelease
-EditorContent/Config/EditorPrefs.pref
 Build
 ProjectGenerator
 
@@ -35,3 +33,4 @@ obj/
 *.log
 *.obj
 Tools/BuildTool/Output/GENERATED/*
+*.pref

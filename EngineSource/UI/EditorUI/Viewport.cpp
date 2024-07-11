@@ -134,7 +134,7 @@ void Viewport::CopySelectedObjects()
 	EditorUI::ChangedScene = true;
 }
 
-Viewport::Viewport(EditorPanel* Parent) : EditorPanel(Parent, "Viewport")
+Viewport::Viewport(EditorPanel* Parent) : EditorPanel(Parent, "Viewport", "viewport")
 {
 	ViewportInstance = this;
 
@@ -237,7 +237,7 @@ void Viewport::Tick()
 	if (CurrentMainBuffer != Graphics::MainFramebuffer)
 	{
 		Graphics::MainFramebuffer->AddEditorGrid();
-		
+
 		CurrentMainBuffer = Graphics::MainFramebuffer;
 	}
 
@@ -371,6 +371,7 @@ void Viewport::Tick()
 			Collision::HitResponse CollisionTest = Collision::LineTrace(
 				Graphics::MainCamera->Position,
 				(Rotation * 50000.f) + Graphics::MainCamera->Position);
+
 			if (CollisionTest.Hit && !Hit)
 			{
 				if (!Input::IsKeyDown(Input::Key::LSHIFT))
@@ -381,6 +382,7 @@ void Viewport::Tick()
 			}
 		}
 	}
+
 	if (PressedLMB && !Input::IsLMBDown)
 	{
 		PressedLMB = false;
@@ -395,7 +397,7 @@ void Viewport::Tick()
 	if (ViewportLock && !Dragging)
 	{
 		Input::CursorVisible = false;
-		Graphics::MainCamera->OnMouseMoved(Input::MouseMovement.X * 6, -Input::MouseMovement.Y * 6);
+		Graphics::MainCamera->OnMouseMoved(Input::MouseMovement.X * 5, -Input::MouseMovement.Y * 5);
 
 		float MovementSpeed = 50;
 

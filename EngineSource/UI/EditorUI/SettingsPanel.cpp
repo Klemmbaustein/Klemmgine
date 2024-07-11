@@ -240,7 +240,7 @@ void SettingsPanel::OnButtonClicked(int Index)
 	Save();
 }
 
-SettingsPanel::SettingsPanel(EditorPanel* Parent) : EditorPanel(Parent, "Settings")
+SettingsPanel::SettingsPanel(EditorPanel* Parent) : EditorPanel(Parent, "Settings", "settings")
 {
 	CanBeClosed = true;
 	HorizontalBox = new UIBox(UIBox::Orientation::Horizontal, 0);

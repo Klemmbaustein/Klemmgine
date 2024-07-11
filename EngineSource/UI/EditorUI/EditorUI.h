@@ -72,6 +72,15 @@ public:
 	static void OpenScene(std::string NewScene);
 	static bool GetUseLightMode();
 	static void SetUseLightMode(bool NewLightMode);
+
+	/**
+	 * @brief
+	 * Loads the default editor panel layout.
+	 */
+	static void LoadDefaultLayout();
+
+	static void LoadPanelLayout(EditorPanel* From);
+
 	static int NumLaunchClients;
 	static bool LaunchWithServer;
 	static bool ChangedScene;
@@ -211,46 +220,9 @@ protected:
 public:
 	static std::vector<SceneObject*> SelectedObjects;
 	static void OnObjectSelected();
-	std::set<std::string> CollapsedItems;
-	std::vector<std::string> ObjectCategories;
-
-
 	static std::string ToShortString(float val);
 
-	struct ObjectListItem
-	{
-		ObjectListItem(std::string CategoryName, std::vector<ObjectListItem> Children, bool IsScene, bool IsCollapsed)
-		{
-			this->Name = CategoryName;
-			this->Children = Children;
-			this->IsScene = IsScene;
-			this->IsCollapsed = IsCollapsed;
-		}
-		ObjectListItem(SceneObject* Object, int ListIndex)
-		{
-			this->Object = Object;
-			this->ListIndex = ListIndex;
-			if (Object)
-			{
-				Name = Object->Name; 
-				IsSelected = Object->IsSelected;
-			}
-		}
-
-		bool IsSelected = false;
-		bool IsCollapsed = false;
-		std::vector<ObjectListItem> Children;
-		std::string Name;
-		SceneObject* Object = nullptr;
-		int ListIndex = -1;
-		bool IsScene = false;
-	};
-	std::vector<ObjectListItem> GetObjectList();
-	void OnButtonClicked(int Index);
-
 	void BakeScene();
-
-	void OnResized();
 
 	static bool IsBakingScene;
 	static inline std::map<std::string, Vector3> ItemColors
@@ -290,6 +262,8 @@ public:
 		"gltf",
 		"glb",
 	};
+
+	void OnResized();
 
 protected:
 	friend SceneObject;

@@ -47,6 +47,7 @@ public:
 	void OnButtonClicked(int Index) override;
 	void OnResized() override;
 private:
+	std::set<std::string> CollapsedItems;
 	void GenerateCSharpProperty(const ContextMenu::ContextMenuSection& Element, SceneObject* ContextObject);
 };
 #endif

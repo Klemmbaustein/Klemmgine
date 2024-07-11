@@ -39,6 +39,7 @@
     <ClCompile Include="UI\EditorUI\AssetBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\ClassesBrowser.cpp" />
     <ClCompile Include="UI\EditorUI\EditorDropdown.cpp" />
+    <ClCompile Include="UI\EditorUI\EditorSubsystem\EditorSubsystem.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\AboutWindow.cpp" />
     <ClCompile Include="Engine\Subsystem\CSharpInterop.cpp" />
     <ClCompile Include="CSharp\NativeFunctions.cpp" />
@@ -115,6 +116,7 @@
     <ClCompile Include="UI\Debug\DebugUI.cpp" />
     <ClCompile Include="UI\Default\ScrollObject.cpp" />
     <ClCompile Include="UI\Default\TextRenderer.cpp" />
+    <ClCompile Include="UI\EditorUI\SerializePanel.cpp" />
     <ClCompile Include="UI\UICanvas.cpp" />
     <ClCompile Include="UI\EditorUI\ContextMenu.cpp" />
     <ClCompile Include="UI\EditorUI\EditorPanel.cpp" />
@@ -129,7 +131,6 @@
     <ClCompile Include="UI\EditorUI\Popups\EditorPopup.cpp" />
     <ClCompile Include="UI\EditorUI\Popups\RenameBox.cpp" />
     <ClCompile Include="UI\EditorUI\StatusBar.cpp" />
-    <ClCompile Include="UI\EditorUI\EditorSubsystem\EditorSubsystem.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\CubemapTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\EditorTab.cpp" />
     <ClCompile Include="UI\EditorUI\Tabs\MaterialTab.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="UI\EditorUI\ClassesBrowser.h" />
     <ClInclude Include="Math\Collision\CollisionVisualize.h" />
     <ClInclude Include="UI\EditorUI\EditorDropdown.h" />
+    <ClInclude Include="UI\EditorUI\EditorSubsystem\EditorSubsystem.h" />
     <ClInclude Include="UI\EditorUI\Popups\AboutWindow.h" />
     <ClInclude Include="Engine\Subsystem\CSharpInterop.h" />
     <ClInclude Include="CSharp\NativeFunctions.h" />
@@ -246,6 +248,7 @@
     <ClInclude Include="UI\Default\ScrollObject.h" />
     <ClInclude Include="UI\Default\TextRenderer.h" />
     <ClInclude Include="UI\Default\TextSegment.h" />
+    <ClInclude Include="UI\EditorUI\SerializePanel.h" />
     <ClInclude Include="UI\UICanvas.h" />
     <ClInclude Include="UI\EditorUI\ContextMenu.h" />
     <ClInclude Include="UI\EditorUI\EditorPanel.h" />
@@ -260,7 +263,6 @@
     <ClInclude Include="UI\EditorUI\Popups\EditorPopup.h" />
     <ClInclude Include="UI\EditorUI\Popups\RenameBox.h" />
     <ClInclude Include="UI\EditorUI\StatusBar.h" />
-    <ClInclude Include="UI\EditorUI\EditorSubsystem\EditorSubsystem.h" />
     <ClInclude Include="UI\EditorUI\Tabs\CubemapTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\EditorTab.h" />
     <ClInclude Include="UI\EditorUI\Tabs\MaterialTab.h" />

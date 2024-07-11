@@ -28,7 +28,7 @@ void DebugUI::UpdateAutoComplete()
 
 void Debug::DebugUI::UpdatePerfGraph()
 {
-	if (PerformanceGraphBox->GetChildren().size() > 18)
+	if (PerformanceGraphBox->GetChildren().size() > 60)
 	{
 		UIBox* Oldest = PerformanceGraphBox->GetChildren().at(0);
 		delete Oldest;
@@ -38,7 +38,7 @@ void Debug::DebugUI::UpdatePerfGraph()
 
 	Vector3 Color = Vector3::Lerp(Vector3(1.0f, 0.0f, 0.0f), Vector3(0.5f, 1.0f, 0.0f), std::min(Value, 1.0f));
 
-	PerformanceGraphBox->AddChild(new UIBackground(UIBox::Orientation::Horizontal, 0, Color, Vector2(0.01f, 0.19f * Value)));
+	PerformanceGraphBox->AddChild(new UIBackground(UIBox::Orientation::Horizontal, 0, Color, Vector2(0.0035f, 0.19f * Value)));
 }
 
 DebugUI::DebugUI()
@@ -57,17 +57,23 @@ DebugUI::DebugUI()
 	}
 	PerformanceGraphBox = new UIBox(UIBox::Orientation::Horizontal, 0);
 
-	(new UIBackground(UIBox::Orientation::Horizontal, -0.975f, 0))
-		->SetVerticalAlign(UIBox::Align::Default)
-		->AddChild(PerformanceGraphBox
+	(new UIBackground(UIBox::Orientation::Vertical, -0.975f, 0))
+		->SetHorizontalAlign(UIBox::Align::Centered)
+		->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
 			->SetVerticalAlign(UIBox::Align::Default)
-			->SetPadding(0.02f)
-			->SetMinSize(0.2f))
-		->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
-			->SetPadding(0.01f)
-			->AddChild(new UIText(0.9f, 1, "240 FPS", Text))
-			->AddChild(new UIText(0.9f, 1, "120 FPS", Text))
-			->AddChild(new UIText(0.9f, 1, "0   FPS", Text)));
+			->AddChild(PerformanceGraphBox
+				->SetVerticalAlign(UIBox::Align::Default)
+				->SetPadding(0.02f, 0.02f, 0.01f, 0)
+				->SetMinSize(Vector2(0.225f, 0)))
+			->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
+				->SetPadding(0.01f, 0.01f, 0.0025f, 0.01f)
+				->AddChild((new UIText(0.7f, 1, "240 FPS", Text))
+					->SetPadding(0.01f, 0.01f, 0, 0))
+				->AddChild((new UIText(0.7f, 1, "120 FPS", Text))
+					->SetPadding(0.01f, 0.01f, 0, 0))
+				->AddChild((new UIText(0.7f, 1, "0   FPS", Text))
+					->SetPadding(0.01f, 0.01f, 0, 0))))
+		->AddChild(new UIText(0.7f, 1, "-- FPS (60s) ---", Text));
 
 	PerformanceGraphBox->GetAbsoluteParent()->IsVisible = false;
 

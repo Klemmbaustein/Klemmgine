@@ -3,6 +3,7 @@
 #include "UI/UIBackground.h"
 #include "UI/UICanvas.h"
 #include <UI/UIfwd.h>
+#include <Engine/File/SaveData.h>
 
 /**
 * @brief
@@ -21,6 +22,8 @@ protected:
 	static void HandleDrag();
 	bool TickPanelInternal();
 public:
+	bool UpdatePanelLayout = false;
+	std::string ClassName;
 	UIBackground* PanelMainBackground = nullptr;
 	bool CanBeClosed = false;
 	bool BackgroundVisible = true;
@@ -63,8 +66,8 @@ public:
 	ChildrenType ChildrenAlign = ChildrenType::Tabs;
 	std::vector<EditorPanel*> Children;
 
-	EditorPanel(Vector2 Position, Vector2 Scale, std::string Name);
-	EditorPanel(EditorPanel* Parent, std::string Name, size_t TabPosition = SIZE_MAX);
+	EditorPanel(Vector2 Position, Vector2 Scale, std::string Name, std::string ClassName = "panel");
+	EditorPanel(EditorPanel* Parent, std::string Name, std::string ClassName = "panel", size_t TabPosition = SIZE_MAX);
 
 	/**
 	* @brief

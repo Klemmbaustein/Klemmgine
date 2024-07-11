@@ -341,6 +341,22 @@ Sound::SoundBuffer::SoundBuffer(std::string File)
 #endif
 }
 
+Sound::SoundBuffer::SoundBuffer(std::vector<int16_t> SoundData, uint32_t SampleRate, bool Mono)
+{
+	Buffer = 0;
+#if !SERVER
+	bool FoundFormat = false;
+	unsigned int ALFormat = 0;
+
+	FoundFormat = true;
+
+	alGenBuffers(1, &Buffer);
+	alBufferData(Buffer, Mono ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, SoundData.data(), (ALsizei)SoundData.size(), SampleRate);
+
+	Name = "Procedural sound";
+#endif
+}
+
 Sound::SoundBuffer::~SoundBuffer()
 {
 #if !SERVER
@@ -378,6 +394,7 @@ void Sound::SoundSource::SetPitch(float NewPitch)
 #if !SERVER
 	if (alIsSource(Source))
 		alSourcef(Source, AL_PITCH, NewPitch);
+	Pitch = NewPitch;
 #endif
 }
 
@@ -386,20 +403,21 @@ void Sound::SoundSource::SetVolume(float NewVolume)
 #if !SERVER
 	if (alIsSource(Source))
 		alSourcef(Source, AL_GAIN, NewVolume);
+	Volume = NewVolume;
 #endif
 }
 
-float Sound::SoundSource::GetPitch()
+float Sound::SoundSource::GetPitch() const
 {
 	return Pitch;
 }
 
-float Sound::SoundSource::GetVolume()
+float Sound::SoundSource::GetVolume() const
 {
 	return Volume;
 }
 
-bool Sound::SoundSource::GetLooping()
+bool Sound::SoundSource::GetLooping() const
 {
 	return Looping;
 }

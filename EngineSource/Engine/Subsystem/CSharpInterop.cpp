@@ -314,17 +314,21 @@ bool CSharpInterop::GetUseCSharp()
 	if (!LoadedUseCSharp)
 	{
 		LoadedUseCSharp = true;
-#if RELEASE
+#if RELEASE || SERVER
 		UseCSharp = std::filesystem::exists("bin/CSharp");
-#else
-		SaveData g = SaveData(Build::GetProjectBuildName(), "keproj", false);
-		if (g.SaveGameIsNew())
+#endif
+#if !RELEASE
+		if (!std::filesystem::exists("Assets/Content/"))
 		{
-			UseCSharp = true;
-		}
-		else
-		{
-			UseCSharp = g.GetBool("C#:Use_C#_in_project_(Requires_restart)");
+			SaveData g = SaveData(Build::GetProjectBuildName(), "keproj", false);
+			if (g.SaveGameIsNew())
+			{
+				UseCSharp = true;
+			}
+			else
+			{
+				UseCSharp = g.GetBool("C#:Use_C#_in_project_(Requires_restart)");
+			}
 		}
 #endif
 		return UseCSharp;

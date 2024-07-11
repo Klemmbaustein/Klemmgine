@@ -14,7 +14,7 @@
 #include <Engine/Input.h>
 #include <Engine/Application.h>
 
-ObjectList::ObjectList(EditorPanel* Parent) : EditorPanel(Parent, "Objects")
+ObjectList::ObjectList(EditorPanel* Parent) : EditorPanel(Parent, "Objects", "object_list")
 {
 	ObjectListBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	PanelMainBackground
@@ -70,14 +70,14 @@ void ObjectList::OnButtonClicked(int Index)
 	}
 	if (Index < 0 && Index > -1000)
 	{
-		std::string Elem = "OBJ_CAT_" + Application::EditorInstance->ObjectCategories[-Index - 1];
-		if (Application::EditorInstance->CollapsedItems.contains(Elem))
+		std::string Elem = "OBJ_CAT_" + ObjectCategories[-Index - 1];
+		if (CollapsedItems.contains(Elem))
 		{
-			Application::EditorInstance->CollapsedItems.erase(Elem);
+			CollapsedItems.erase(Elem);
 		}
 		else
 		{
-			Application::EditorInstance->CollapsedItems.insert(Elem);
+			CollapsedItems.insert(Elem);
 		}
 		OnResized();
 	}
@@ -94,11 +94,11 @@ void ObjectList::OnResized()
 	ObjectListBox->SetVerticalAlign(UIBox::Align::Reverse);
 	ListIterator = 0;
 
-	auto ObjectList = Application::EditorInstance->GetObjectList();
+	auto ObjectList = GetObjectList();
 	GenerateObjectListSection(ObjectList, 0);
 }
 
-void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem> Section, float Depth)
+void ObjectList::GenerateObjectListSection(std::vector<ObjectListItem> Section, float Depth)
 {
 	for (auto& Object : Section)
 	{
@@ -184,5 +184,112 @@ void ObjectList::GenerateObjectListSection(std::vector<EditorUI::ObjectListItem>
 			GenerateObjectListSection(Object.Children, Depth + 0.02f);
 		}
 	}
+}
+
+
+std::vector<ObjectList::ObjectListItem> ObjectList::GetObjectList()
+{
+	std::vector<ObjectListItem> ObjectList;
+	ObjectCategories.clear();
+	size_t ListIndex = 0;
+	for (SceneObject* o : Objects::AllObjects)
+	{
+		ObjectListItem* SceneList = nullptr;
+		// Get the list for the scene the object belongs to
+		for (auto& item : ObjectList)
+		{
+			if (item.Name == FileUtil::GetFileNameFromPath(o->CurrentScene))
+			{
+				SceneList = &item;
+			}
+		}
+
+		if (!SceneList)
+		{
+			std::string SceneName = FileUtil::GetFileNameFromPath(o->CurrentScene);
+			ObjectList.push_back(ObjectListItem(SceneName, {}, true, CollapsedItems.contains("OBJ_CAT_" + SceneName)));
+			ObjectCategories.push_back(FileUtil::GetFileNameFromPath(o->CurrentScene));
+			ObjectList[ObjectList.size() - 1].ListIndex = (int)ObjectCategories.size() - 1;
+			SceneList = &ObjectList[ObjectList.size() - 1];
+		}
+
+		// Separate the Object's category into multiple strings
+		std::string CurrentPath = Objects::GetCategoryFromID(o->GetObjectDescription().ID);
+		if (o->GetObjectDescription().ID == CSharpObject::GetID() && static_cast<CSharpObject*>(o)->CS_Obj.ID != 0)
+		{
+			auto Classes = CSharpInterop::CSharpSystem->GetAllClasses();
+			for (auto& i : Classes)
+			{
+				size_t LastSlash = i.find_last_of("/");
+				std::string Path;
+				std::string Name = i;
+				if (LastSlash != std::string::npos)
+				{
+					Path = i.substr(0, LastSlash);
+					Name = i.substr(LastSlash);
+				}
+				if (Name == static_cast<CSharpObject*>(o)->CSharpClass)
+				{
+					CurrentPath = Path;
+				}
+			}
+		}
+
+		std::vector<std::string> PathElements;
+		size_t Index = CurrentPath.find_first_of("/");
+		while (Index != std::string::npos)
+		{
+			Index = CurrentPath.find_first_of("/");
+			PathElements.push_back(CurrentPath.substr(0, Index));
+			CurrentPath = CurrentPath.substr(Index + 1);
+			Index = CurrentPath.find_first_of("/");
+		}
+		if (!CurrentPath.empty())
+		{
+			PathElements.push_back(CurrentPath);
+		}
+
+		ObjectListItem* CurrentList = SceneList;
+		if (SceneList->IsCollapsed) continue;
+		for (const auto& elem : PathElements)
+		{
+			ObjectListItem* NewList = nullptr;
+			for (auto& c : CurrentList->Children)
+			{
+				if (c.Name != elem) continue;
+				NewList = &c;
+				break;
+			}
+
+			if (!NewList && !CurrentList->IsCollapsed)
+			{
+				int it = 0;
+				while (true)
+				{
+					if (it >= (int)CurrentList->Children.size() || CurrentList->Children[it].Object)
+					{
+						break;
+					}
+					it++;
+				}
+				ObjectCategories.push_back(elem);
+				CurrentList->Children.insert(CurrentList->Children.begin() + it,
+					ObjectListItem(elem, {}, false, CollapsedItems.contains("OBJ_CAT_" + elem)));
+				CurrentList->Children[it].ListIndex = (int)ObjectCategories.size() - 1;
+				NewList = &CurrentList->Children[it];
+			}
+			CurrentList = NewList;
+		}
+		if (CurrentList && !CurrentList->IsCollapsed)
+		{
+			CurrentList->Children.push_back(ObjectListItem(o, (int)ListIndex));
+		}
+		else if (CurrentList && o->IsSelected)
+		{
+			CurrentList->IsSelected = true;
+		}
+		ListIndex++;
+	}
+	return ObjectList;
 }
 #endif
