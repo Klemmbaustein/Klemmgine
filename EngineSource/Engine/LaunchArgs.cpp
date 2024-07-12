@@ -97,7 +97,7 @@ namespace LaunchArgs
 
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
 	{
-		std::pair("neverhideconsole", &NeverHideConsole),
+		std::pair("neverHideConsole", &NeverHideConsole),
 		std::pair("scene", &LoadScene),
 		std::pair("novsync", &NoVSync),
 		std::pair("wireframe", &Wireframe),
@@ -105,7 +105,7 @@ namespace LaunchArgs
 #if !SERVER
 		std::pair("fullscreen", &FullScreen),
 #endif
-		std::pair("nostartupinfo", &NoStartupInfo),
+		std::pair("noStartupInfo", &NoStartupInfo),
 		std::pair("connect", &Connect),
 		std::pair("verbose", &LogVerbose),
 #if !RELEASE
@@ -118,7 +118,7 @@ namespace LaunchArgs
 #endif
 	};
 
-	void LaunchArgs::Evaluate(int argc, char** argv)
+	void Evaluate(int argc, char** argv)
 	{
 		std::vector<std::string> Args;
 		for (size_t i = 1; i < argc; i++)
