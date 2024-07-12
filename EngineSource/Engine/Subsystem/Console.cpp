@@ -559,7 +559,10 @@ void Console::Update()
 	{
 		char Line[4000];
 		std::cin.getline(Line, sizeof(Line));
-		ExecuteConsoleCommand(Line);
+		if (strlen(Line) > 0)
+		{
+			ExecuteConsoleCommand(Line);
+		}
 	}
 #endif
 }

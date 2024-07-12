@@ -94,8 +94,8 @@ size_t OS::GetMemUsage()
 
 	stat_stream.close();
 
-	long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024; // in case x86-64 is configured to use 2MB pages
-	return vsize / 1024.0;
+	long page_size_bytes = sysconf(_SC_PAGE_SIZE); // in case x86-64 is configured to use 2MB pages
+	return page_size_bytes * rss;
 }
 
 
