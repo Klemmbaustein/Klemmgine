@@ -2,6 +2,7 @@
 #include <Rendering/Camera/Camera.h>
 #include <Rendering/Shader.h>
 #include <Rendering/Texture/Material.h>
+#include <Rendering/Texture/Texture.h>
 
 struct ObjectRenderContext
 {
@@ -27,23 +28,26 @@ struct ObjectRenderContext
 	Material Mat;
 
 	void LoadUniform(Material::Param u);
+	void LoadTexture(std::string TextureName, Texture::TextureType TextureID);
 	void Unload();
+
+	bool DeleteUniform(std::string Name);
 
 protected:
 	Shader* ContextShader = nullptr;
 	std::vector<Uniform> Uniforms;
 };
 
-class Renderable
+class Drawable
 {
 public:
 	virtual void Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass) = 0;
 	virtual void SimpleRender(Shader* UsedShader) = 0;
-	Renderable()
+	Drawable()
 	{
 
 	};
-	virtual ~Renderable()
+	virtual ~Drawable()
 	{
 
 	};

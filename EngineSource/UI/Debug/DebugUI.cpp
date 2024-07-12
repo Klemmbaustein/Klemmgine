@@ -157,9 +157,9 @@ void DebugUI::Tick()
 		DebugTexts[1]->SetText("Delta: " + std::to_string(1000 / FPS) + "ms");
 
 		std::string DeltaString;
-		DeltaString.append(std::to_string((int)(Application::LogicTime / Stats::DeltaTime * 100.f)) + "% Log ");
-		DeltaString.append(std::to_string((int)(Application::RenderTime / Stats::DeltaTime * 100.f)) + "% Rend ");
-		DeltaString.append(std::to_string((int)(Application::SyncTime / Stats::DeltaTime * 100.f)) + "% Buf");
+		DeltaString.append(std::to_string((int)(Stats::LogicTime / Stats::DeltaTime * 100.f)) + "% Log ");
+		DeltaString.append(std::to_string((int)(Stats::RenderTime / Stats::DeltaTime * 100.f)) + "% Rend ");
+		DeltaString.append(std::to_string((int)(Stats::SyncTime / Stats::DeltaTime * 100.f)) + "% Buf");
 
 		DebugTexts[2]->SetText(DeltaString);
 		DebugTexts[3]->SetText("DrawCalls: " + std::to_string(Stats::DrawCalls));
@@ -231,7 +231,7 @@ void DebugUI::GenerateLog()
 		{
 			str.append(" (x" + std::to_string(LogMessages[i].Amount + 1) + ")");
 		}
-		LogBackground->AddChild((new UIText(0.5f, LogMessages[i].Color, str, Text))->SetPadding(0));
+		LogBackground->AddChild(new UIText(0.5f, LogMessages[i].Color, str, Text));
 	}
 }
 #endif

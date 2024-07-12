@@ -12,6 +12,7 @@
 #include <Rendering/Shader.h>
 #include <UI/UIBox.h>
 #include <UI/EditorUI/Viewport.h>
+#include <Engine/AppWindow.h>
 
 std::vector<PostProcess::Effect*> PostProcess::AllEffects;
 PostProcess* PostProcess::PostProcessSystem = nullptr;
@@ -104,6 +105,7 @@ void PostProcess::Effect::UpdateSize()
 }
 
 PostProcess::PostProcess()
+	: RenderSubsystem(true)
 {
 	Name = "PostProcess";
 	PostProcessSystem = this;
@@ -161,7 +163,7 @@ void PostProcess::Draw()
 #if !SERVER
 	bool ShouldSkip3D = false;
 #if EDITOR
-	if (!Application::WindowHasFocus())
+	if (!Window::WindowHasFocus())
 	{
 		ShouldSkip3D = true;
 	}

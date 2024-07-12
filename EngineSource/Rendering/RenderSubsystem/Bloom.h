@@ -12,8 +12,8 @@ public:
 
 private:
 	static Shader* BloomShader;
-	static unsigned int pingpongFBO[2];
-	static unsigned int pingpongBuffer[2];
+	static unsigned int PingPongFBO[2];
+	static unsigned int PingPongBuffer[2];
 	static float BloomResolutionMultiplier;
 	static int BloomShape;
 };

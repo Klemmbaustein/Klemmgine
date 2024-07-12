@@ -153,7 +153,7 @@ void Material::SaveMaterialFile(std::string Path, Material m)
 void Material::ReloadMaterial(std::string MaterialPath)
 {
 	Material NewMaterial = LoadMaterialFile(MaterialPath);
-	for (Renderable* m : Graphics::MainFramebuffer->Renderables)
+	for (Drawable* m : Graphics::MainFramebuffer->Renderables)
 	{
 		Model* RenderableModel = dynamic_cast<Model*>(m);
 		if (RenderableModel)

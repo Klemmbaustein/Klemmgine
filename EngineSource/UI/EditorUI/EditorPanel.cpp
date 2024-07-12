@@ -109,10 +109,8 @@ EditorPanel::EditorPanel(EditorPanel* NewParent, std::string Name, std::string C
 	PanelMainBackground = new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[0], 1);
 	TabList = new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75, Vector2(1, 0.04f));
 	PanelMainBackground
-		->SetPadding(0)
 		->SetBorder(UIBox::BorderType::DarkenedEdge, 0.15f);
-	PanelMainBackground->AddChild(TabList
-		->SetPadding(0));
+	PanelMainBackground->AddChild(TabList);
 	PanelMainBackground->HasMouseCollision = true;
 	TabList->HasMouseCollision = true;
 	if (Parent)
@@ -448,15 +446,13 @@ void EditorPanel::AddTabButton(bool Selected, int Index, std::string Name, bool 
 			0,
 			Selected ? EditorUI::UIColors[2] : EditorUI::UIColors[0] * 0.75f,
 			Vector2(0.02f, 2.0f / Graphics::WindowResolution.Y)))
-			->SetTryFill(true)
-			->SetPadding(0))
+			->SetTryFill(true))
 		->AddChild(HorizontalBox
 			->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Name, EditorUI::Text))
 				->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)
 				->SetPadding(0.005f))));
 	HorizontalBox
 		->SetMaxSize(Vector2(2, 0.04f))
-		->SetPadding(0)
 		->SetVerticalAlign(UIBox::Align::Centered);
 	if (Closable)
 	{
@@ -700,7 +696,7 @@ void EditorPanel::UpdateTabs()
 
 EditorPanel::~EditorPanel()
 {
-	ClearParent(false);
+	ClearParent(ClearParentOnDestruct);
 	if (Parent)
 	{
 		for (size_t i = 0; i < Parent->Children.size(); i++)
@@ -719,6 +715,7 @@ EditorPanel::~EditorPanel()
 	while (Children.size())
 	{
 		// Children will put themselves out of the Children array.
+		Children[0]->ClearParentOnDestruct = false;
 		delete Children[0];
 	}
 	delete PanelMainBackground;

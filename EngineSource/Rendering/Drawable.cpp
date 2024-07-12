@@ -1,4 +1,4 @@
-#include "Renderable.h"
+#include "Drawable.h"
 #include <GL/glew.h>
 #include <Rendering/RenderSubsystem/CSM.h>
 #include <Rendering/Graphics.h>
@@ -19,7 +19,7 @@ Graphics::Sun FullbrightSun =
 	.AmbientColor = 1,
 };
 
-void Renderable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFramebuffer)
+void Drawable::ApplyDefaultUniformsToShader(Shader* ShaderToApply, bool MainFramebuffer)
 {
 #if !SERVER
 	ShaderToApply->Bind();
@@ -244,6 +244,13 @@ void ObjectRenderContext::LoadUniform(Material::Param u)
 #endif
 }
 
+void ObjectRenderContext::LoadTexture(std::string UniformName, Texture::TextureType TextureID)
+{
+	DeleteUniform(UniformName);
+
+	Uniforms.push_back(Uniform(UniformName, NativeType::GL_Texture, new unsigned int(TextureID)));
+}
+
 void ObjectRenderContext::Unload()
 {
 #if !SERVER
@@ -278,4 +285,37 @@ void ObjectRenderContext::Unload()
 	ContextShader = nullptr;
 	Mat = Material();
 #endif
+}
+
+bool ObjectRenderContext::DeleteUniform(std::string Name)
+{
+	for (size_t i = 0; i < Uniforms.size(); i++)
+	{
+		if (Uniforms[i].Name != Name)
+		{
+			continue;
+		}
+		switch (Uniforms[i].NativeType)
+		{
+		case NativeType::Int:
+		case NativeType::Bool:
+			delete (int*)Uniforms[i].Content;
+			break;
+		case NativeType::Vector3Color:
+		case NativeType::Vector3Rotation:
+		case NativeType::Vector3:
+			delete (Vector3*)Uniforms[i].Content;
+			break;
+		case NativeType::Float:
+			delete (float*)Uniforms[i].Content;
+			break;
+		case NativeType::GL_Texture:
+			delete (unsigned int*)Uniforms[i].Content;
+			break;
+		default:
+			break;
+		}
+		return true;
+	}
+	return false;
 }

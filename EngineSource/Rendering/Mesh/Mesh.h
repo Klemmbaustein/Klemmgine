@@ -4,7 +4,7 @@
 #include "Rendering/Shader.h"
 #include "Rendering/VertexBuffer.h"
 #include <vector>
-#include <Rendering/Renderable.h>
+#include <Rendering/Drawable.h>
 
 class Mesh
 {

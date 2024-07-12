@@ -23,6 +23,7 @@
 #include "ContextMenu.h"
 #include <Objects/ParticleObject.h>
 #include <Objects/SoundObject.h>
+#include <Engine/AppWindow.h>
 
 Viewport* Viewport::ViewportInstance = nullptr;
 
@@ -160,7 +161,7 @@ void Viewport::ClearSelectedObjects()
 
 void Viewport::OnItemDropped(DroppedItem Item)
 {
-	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Position + (Scale * 0.5));
+	Vector2 RelativeMouseLocation = Window::GetCursorPosition() - (Position + (Scale * 0.5));
 	Vector3 Direction = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
 	Vector3 Point = (Direction * 100.0f) + Graphics::MainCamera->Position;
@@ -325,7 +326,7 @@ void Viewport::Tick()
 
 	SetName(EditorUI::ChangedScene ? "Viewport*" : "Viewport");
 
-	Vector2 RelativeMouseLocation = Application::GetCursorPosition() - (Position + (Scale * 0.5));
+	Vector2 RelativeMouseLocation = Window::GetCursorPosition() - (Position + (Scale * 0.5));
 	Vector3 Rotation = Graphics::MainCamera->ForwardVectorFromScreenPosition(RelativeMouseLocation.X, RelativeMouseLocation.Y);
 
 	if (UI::HoveredBox == PanelMainBackground && !Dragging)
@@ -357,7 +358,7 @@ void Viewport::Tick()
 	}
 	if (ViewportLock && !Input::IsRMBDown)
 	{
-		Application::SetCursorPosition(InitialMousePosition);
+		Window::SetCursorPosition(InitialMousePosition);
 		ViewportLock = false;
 	}
 	if (Input::IsLMBDown && !PressedLMB)

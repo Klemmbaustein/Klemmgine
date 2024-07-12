@@ -3,6 +3,8 @@
 
 namespace Texture
 {
+	typedef unsigned int TextureType;
+
 	struct Texture
 	{
 		unsigned int TextureID = 0;
@@ -50,11 +52,11 @@ namespace Texture
 	TextureInfo ParseTextureInfoString(std::string TextureInfoString);
 	std::string CreateTextureInfoString(TextureInfo TextureInfo);
 
-	unsigned int LoadTexture(std::string File, TextureFiltering Filtering = TextureFiltering::Nearest, TextureWrap Wrap = TextureWrap::Clamp);
-	unsigned int LoadTexture(TextureInfo T);
-	unsigned int CreateTexture(TextureData T);
+	TextureType LoadTexture(std::string File, TextureFiltering Filtering = TextureFiltering::Nearest, TextureWrap Wrap = TextureWrap::Clamp);
+	TextureType LoadTexture(TextureInfo T);
+	TextureType CreateTexture(TextureData T);
 
-	unsigned int LoadCubemapTexture(std::vector<std::string> Files);
+	TextureType LoadCubemapTexture(std::vector<std::string> Files);
 
-	void UnloadTexture(unsigned int TextureID);
+	void UnloadTexture(TextureType TextureID);
 }

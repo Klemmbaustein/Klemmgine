@@ -83,6 +83,13 @@ Subsystem* Subsystem::GetSubsystemByName(std::string Name)
 			return System;
 		}
 	}
+	for (Subsystem* System : LoadedSystems)
+	{
+		if (System->SystemType == Name && System->Name == nullptr)
+		{
+			return System;
+		}
+	}
 	return nullptr;
 }
 

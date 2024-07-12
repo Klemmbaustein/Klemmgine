@@ -24,17 +24,17 @@ public:
 
 	static Shader* ShadowShader;
 
-	static std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& projview);
+	static std::vector<glm::vec4> GetFrustumCornersWorldSpace(const glm::mat4& projview);
 
 	static void UpdateMatricesUBO(Camera* From);
 	static void BindLightSpaceMatricesToShader(const std::vector<glm::mat4>& Matrices, Shader* ShaderToBind);
-	static std::vector<glm::vec4> getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
+	static std::vector<glm::vec4> GetFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view);
 	CSM();
 
 	static void ReInit();
 
-	static glm::mat4 getLightSpaceMatrix(const float nearPlane, const float farPlane, Camera* From);
+	static glm::mat4 GetLightSpaceMatrix(const float nearPlane, const float farPlane, Camera* From);
 
-	static std::vector<glm::mat4> getLightSpaceMatrices(Camera* From);
+	static std::vector<glm::mat4> GetLightSpaceMatrices(Camera* From);
 };
 #endif

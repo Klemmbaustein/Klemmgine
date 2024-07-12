@@ -8,6 +8,8 @@
 #include <Engine/Subsystem/Scene.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Application.h>
+#include "AppWindow.h"
+#include "LaunchArgs.h"
 
 namespace LaunchArgs
 {
@@ -24,7 +26,7 @@ namespace LaunchArgs
 	{
 		if (AdditionalArgs.size() != 1)
 		{
-			Log::Print("Unexpected or missing arguments in -loadscene", Log::LogColor::Yellow);
+			Log::Print("Unexpected or missing arguments in -scene", Log::LogColor::Yellow);
 			return;
 		}
 		Application::StartupSceneOverride = AdditionalArgs[0];
@@ -52,11 +54,13 @@ namespace LaunchArgs
 		exit(0);
 	}
 
+#if !SERVER
 	static void FullScreen(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size()) Log::Print("Unexpected arguments in -fullscreen", Log::LogColor::Yellow);
-		Application::SetFullScreen(true);
+		Window::SetFullScreen(true);
 	}
+#endif
 
 	static void NoStartupInfo(std::vector<std::string> AdditionalArgs)
 	{
@@ -98,7 +102,9 @@ namespace LaunchArgs
 		std::pair("novsync", &NoVSync),
 		std::pair("wireframe", &Wireframe),
 		std::pair("version", &GetVersion),
+#if !SERVER
 		std::pair("fullscreen", &FullScreen),
+#endif
 		std::pair("nostartupinfo", &NoStartupInfo),
 		std::pair("connect", &Connect),
 		std::pair("verbose", &LogVerbose),
@@ -111,11 +117,22 @@ namespace LaunchArgs
 		}),
 #endif
 	};
-	void EvaluateLaunchArguments(std::vector<std::string> Arguments)
+
+	void LaunchArgs::Evaluate(int argc, char** argv)
+	{
+		std::vector<std::string> Args;
+		for (size_t i = 1; i < argc; i++)
+		{
+			Args.push_back(argv[i]);
+		}
+		EvaluateVector(Args);
+	}
+
+	void EvaluateVector(std::vector<std::string> Args)
 	{
 		std::vector<std::string> CommandArguments;
 		std::string CurrentCommand;
-		for (const std::string& arg : Arguments)
+		for (const std::string& arg : Args)
 		{
 			if (arg[0] == '-')
 			{
@@ -130,7 +147,7 @@ namespace LaunchArgs
 				CommandArguments.clear();
 				CurrentCommand = arg;
 			}
-			else if(!CurrentCommand.empty())
+			else if (!CurrentCommand.empty())
 			{
 				CommandArguments.push_back(arg);
 			}

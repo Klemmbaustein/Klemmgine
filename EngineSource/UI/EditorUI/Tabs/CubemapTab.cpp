@@ -109,7 +109,6 @@ void CubemapTab::Generate()
 		UITextField* text = new UITextField(0, 0.2f, this, 0, Renderer);
 		text->SetText(SaveFile->GetField(Cubenames[i]).Value);
 		text->SetMinSize(Vector2(0.2f, 0.05f));
-		text->SetPadding(0);
 		text->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		SideFields.push_back(text);
 		CubemapSidesBox->AddChild((new UIBox(false, 0))

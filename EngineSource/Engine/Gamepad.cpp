@@ -5,6 +5,7 @@
 #include <SDL.h>
 #include <iostream>
 #include "Application.h"
+#include "AppWindow.h"
 std::unordered_map<int32_t, Input::Gamepad> Input::Gamepads;
 Vector2 GetHatState(Uint8 hat);
 
@@ -15,6 +16,7 @@ Input::GamepadType Input::GetGamepadType(Gamepad* From)
 
 void Input::AddGamepad(int32_t ID)
 {
+#if !SERVER
 	SDL_Joystick* New = SDL_JoystickOpen(ID);
 	int32_t NewID = SDL_JoystickInstanceID(New);
 	Log::Print(StrUtil::Format("Connected device '%s' with ID %i.", SDL_JoystickName(New), NewID));
@@ -30,6 +32,7 @@ void Input::AddGamepad(int32_t ID)
 		g.Buttons = new bool[GAMEPAD_MAX]();
 		Gamepads.insert(std::pair(NewID, g));
 	}
+#endif
 }
 
 void Input::GamepadUpdate()
@@ -38,7 +41,8 @@ void Input::GamepadUpdate()
 
 void Input::HandleGamepadEvent(void* EventPtr)
 {
-	if (!Application::WindowHasFocus())
+#if !SERVER
+	if (!Window::WindowHasFocus())
 	{
 		return;
 	}
@@ -108,13 +112,13 @@ void Input::HandleGamepadEvent(void* EventPtr)
 		}
 		break;
 	}
-	//Log::Print(Gamepads[e->jdevice.which].LeftStickPosition.ToString());
-	//Log::Print(StrUtil::Format("%u\t%s\t%u\t%s", timestamp, eventType.c_str(), index, otherData.c_str()));
+#endif
 }
 
 Vector2 GetHatState(Uint8 hat) 
 {
-	switch (hat) 
+#if !SERVER
+	switch (hat)
 	{
 	case SDL_HAT_LEFTUP:
 		return Vector2(-1, 1);
@@ -147,6 +151,8 @@ Vector2 GetHatState(Uint8 hat)
 		return Vector2(0);
 		break;
 	}
+#endif
+	return 0;
 }
 
 Input::Gamepad::Gamepad()

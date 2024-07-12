@@ -20,7 +20,6 @@ ContextMenu::ContextMenu(EditorPanel* Parent, bool IsScene) : EditorPanel(Parent
 {
 	IsObject = !IsScene;
 	BackgroundBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
-	BackgroundBox->SetPadding(0);
 	PanelMainBackground->AddChild(BackgroundBox);
 }
 

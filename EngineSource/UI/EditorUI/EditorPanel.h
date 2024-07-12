@@ -21,6 +21,7 @@ protected:
 	void AddTabButton(bool Selected, int Index, std::string Name, bool Closable);
 	static void HandleDrag();
 	bool TickPanelInternal();
+	bool ClearParentOnDestruct = true;
 public:
 	bool UpdatePanelLayout = false;
 	std::string ClassName;

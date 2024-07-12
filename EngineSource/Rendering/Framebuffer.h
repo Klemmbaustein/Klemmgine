@@ -1,7 +1,7 @@
 #if !SERVER
 #pragma once
 #include <vector>
-#include <Rendering/Renderable.h>
+#include <Rendering/Drawable.h>
 #include <Rendering/Particle.h>
 #include <Rendering/Graphics.h>
 
@@ -42,13 +42,13 @@ public:
 	void ClearContent(bool Full = false);
 	Camera* FramebufferCamera = nullptr;
 	void ReInit();
-	void UseWith(Renderable* r);
+	void UseWith(Drawable* r);
 	std::vector<Particles::ParticleEmitter*> ParticleEmitters;
 	Framebuffer* GetBuffer();
 	std::string ReflectionCubemapName;
 	std::string PreviousReflectionCubemapName;
 	unsigned int ReflectionCubemap = 0;
-	std::vector<Renderable*> Renderables;
+	std::vector<Drawable*> Renderables;
 
 	void Draw();
 

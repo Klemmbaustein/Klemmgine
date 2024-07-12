@@ -1,11 +1,11 @@
 #pragma once
-#include <Rendering/Renderable.h>
+#include <Rendering/Drawable.h>
 
 class Camera;
 class FramebufferObject;
 struct VertexBuffer;
 
-class BillboardSprite : public Renderable
+class BillboardSprite : public Drawable
 {
 public:
 

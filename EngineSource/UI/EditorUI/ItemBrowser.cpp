@@ -19,8 +19,7 @@ ItemBrowser::ItemBrowser(EditorPanel* Parent, std::string Name, std::string Clas
 	PanelMainBackground->AddChild(TopBox
 		->SetMinSize(Vector2(0, 0.1f))
 		->SetVerticalAlign(UIBox::Align::Centered)
-		->SetTryFill(true)
-		->SetPadding(0));
+		->SetTryFill(true));
 
 	SeparatorLine = new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, Vector2(0, 6.0f / Graphics::WindowResolution.Y));
 
@@ -31,8 +30,7 @@ ItemBrowser::ItemBrowser(EditorPanel* Parent, std::string Name, std::string Clas
 
 	BrowserScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	BrowserScrollBox->SetMinSize(PanelMainBackground->GetMinSize() - Vector2(0.004f / Graphics::AspectRatio, TabList->GetMinSize().Y - 0.1f));
-	PanelMainBackground->AddChild(BrowserScrollBox
-		->SetPadding(0));
+	PanelMainBackground->AddChild(BrowserScrollBox);
 }
 
 void ItemBrowser::OnResized()
@@ -241,7 +239,7 @@ void ItemBrowser::GenerateAssetList()
 	for (int i = 0; i < (int)LoadedItems.size() / SlotsPerRow + 1; i++)
 	{
 		UIBox* New = (new UIBox(UIBox::Orientation::Horizontal, 0))
-			->SetPadding(0);
+			;
 		HorizontalBoxes.push_back(New);
 		BrowserScrollBox->AddChild(New);
 	}
@@ -276,7 +274,8 @@ void ItemBrowser::GenerateAssetList()
 	if (LoadedItems.empty())
 	{
 		HorizontalBoxes[0]->AddChild((new UIText(0.45f, EditorUI::UIColors[2], EmptyText, EditorUI::Text))
-			->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative));
+			->SetWrapEnabled(true, Scale.X * 2.0f - 0.1f, UIBox::SizeMode::ScreenRelative)
+			->SetPadding(0.01f));
 	}
 }
 

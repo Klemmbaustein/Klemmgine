@@ -16,6 +16,7 @@ namespace Texture
 {
 	std::vector<Texture> Textures;
 
+	// Deprecated for SaveData::Field objects.
 	TextureInfo ParseTextureInfoString(std::string TextureInfoString)
 	{
 		TextureInfo T;
@@ -53,7 +54,7 @@ namespace Texture
 		return TextureInfo.File + ";" + std::to_string((int)TextureInfo.Filtering) + ";" + std::to_string((int)TextureInfo.Wrap) + ";";
 	}
 
-	unsigned int LoadTexture(std::string File, TextureFiltering Filtering, TextureWrap Wrap)
+	TextureType LoadTexture(std::string File, TextureFiltering Filtering, TextureWrap Wrap)
 	{
 		std::string TextureInternalString = File + "_" + std::to_string((int)Filtering) + "_" + std::to_string((int)Wrap);
 		for (Texture& t : Textures)
@@ -64,76 +65,68 @@ namespace Texture
 				return t.TextureID;
 			}
 		}
-		try
+		std::string TextureFile = File;
+		if (!std::filesystem::exists(TextureFile))
 		{
-			std::string TextureFile = File;
-			if (!std::filesystem::exists(TextureFile))
-			{
-				TextureFile = Assets::GetAsset(File + ".png");
-			}
-
-			if (!std::filesystem::exists(TextureFile))
-			{
-				return 0;
-			}
-
-			int TextureWidth = 0;
-			int TextureHeigth = 0;
-			int BitsPerPixel = 0;
-			stbi_set_flip_vertically_on_load(true);
-			auto TextureBuffer = stbi_load(TextureFile.c_str(), &TextureWidth, &TextureHeigth, &BitsPerPixel, 4);
-			GLuint TextureID;
-			glGenTextures(1, &TextureID);
-			glBindTexture(GL_TEXTURE_2D, TextureID);
-
-			int FilterMode = GL_NEAREST;
-			int WrapMode = GL_REPEAT;
-			switch (Filtering)
-			{
-			case TextureFiltering::Linear:
-				FilterMode = GL_LINEAR;
-				break;
-			default:
-				break;
-			}
-			switch (Wrap)
-			{
-			case TextureWrap::Clamp:
-				WrapMode = GL_CLAMP_TO_EDGE;
-				break;
-			case TextureWrap::Border:
-				WrapMode = GL_CLAMP_TO_BORDER;
-				break;
-			default:
-				break;
-			}
-
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterMode);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, FilterMode);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, WrapMode);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, WrapMode);
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TextureWidth, TextureHeigth, 0, GL_RGBA, GL_UNSIGNED_BYTE, TextureBuffer);
-
-			Textures.push_back(Texture(TextureID, 1, TextureInternalString));
-			if (TextureBuffer)
-			{
-				stbi_image_free(TextureBuffer);
-			}
-			return TextureID;
+			TextureFile = Assets::GetAsset(File + ".png");
 		}
-		catch (std::exception& e)
+
+		if (!std::filesystem::exists(TextureFile))
 		{
-			Log::Print(std::string("Error loading Texture: ") + e.what(), Vector3(0.7f, 0.f, 0.f));
 			return 0;
 		}
+
+		int TextureWidth = 0;
+		int TextureHeight = 0;
+		int BitsPerPixel = 0;
+		stbi_set_flip_vertically_on_load(true);
+		auto TextureBuffer = stbi_load(TextureFile.c_str(), &TextureWidth, &TextureHeight, &BitsPerPixel, 4);
+		GLuint TextureID;
+		glGenTextures(1, &TextureID);
+		glBindTexture(GL_TEXTURE_2D, TextureID);
+
+		int FilterMode = GL_NEAREST;
+		int WrapMode = GL_REPEAT;
+		switch (Filtering)
+		{
+		case TextureFiltering::Linear:
+			FilterMode = GL_LINEAR;
+			break;
+		default:
+			break;
+		}
+		switch (Wrap)
+		{
+		case TextureWrap::Clamp:
+			WrapMode = GL_CLAMP_TO_EDGE;
+			break;
+		case TextureWrap::Border:
+			WrapMode = GL_CLAMP_TO_BORDER;
+			break;
+		default:
+			break;
+		}
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, FilterMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, WrapMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, WrapMode);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, TextureWidth, TextureHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, TextureBuffer);
+
+		Textures.push_back(Texture(TextureID, 1, TextureInternalString));
+		if (TextureBuffer)
+		{
+			stbi_image_free(TextureBuffer);
+		}
+		return TextureID;
 	}
 
-	unsigned int LoadTexture(TextureInfo T)
+	TextureType LoadTexture(TextureInfo T)
 	{
 		return LoadTexture(T.File, T.Filtering, T.Wrap);
 	}
 
-	unsigned int CreateTexture(TextureData T)
+	TextureType CreateTexture(TextureData T)
 	{
 		unsigned int TextureID;
 		glGenTextures(1, &TextureID);
@@ -148,7 +141,7 @@ namespace Texture
 		return TextureID;
 	}
 
-	unsigned int LoadCubemapTexture(std::vector<std::string> Files)
+	TextureType LoadCubemapTexture(std::vector<std::string> Files)
 	{
 		std::vector<bool> IsJPEG = { false, false, false, false, false, false };
 		for (int i = 0; i < Files.size(); i++)
@@ -171,15 +164,15 @@ namespace Texture
 				continue;
 			}
 		}
-		unsigned int textureID;
-		glGenTextures(1, &textureID);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+		TextureType TextureID;
+		glGenTextures(1, &TextureID);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, TextureID);
 
 		int width = 0, height = 0, nrChannels;
-		for (unsigned int i = 0; i < Files.size(); i++)
+		for (size_t i = 0; i < Files.size(); i++)
 		{
 			int newWidth, newHeight;
-			unsigned char* data = stbi_load(Files[i].c_str(), &newWidth, &newHeight, &nrChannels, 0);
+			uint8_t* data = stbi_load(Files[i].c_str(), &newWidth, &newHeight, &nrChannels, 0);
 			if (width == 0)
 			{
 				width = newWidth;
@@ -195,7 +188,7 @@ namespace Texture
 			if (data)
 			{
 				int format = nrChannels == 3 ? GL_RGB : GL_RGBA;
-				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+				glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + GLenum(i),
 					0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data
 				);
 				stbi_image_free(data);
@@ -210,10 +203,10 @@ namespace Texture
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-		return textureID;
+		return TextureID;
 	}
 
-	void UnloadTexture(unsigned int TextureID)
+	void UnloadTexture(TextureType TextureID)
 	{
 		for (int i = 0; i < Textures.size(); i++)
 		{

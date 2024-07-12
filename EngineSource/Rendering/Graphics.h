@@ -2,7 +2,7 @@
 #include <Math/Vector.h>
 #include <Engine/Subsystem/Subsystem.h>
 
-class Renderable;
+class Drawable;
 class UICanvas;
 class Camera;
 struct Shader;

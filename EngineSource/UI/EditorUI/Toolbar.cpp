@@ -137,8 +137,7 @@ Toolbar::Toolbar(EditorPanel* Parent) : EditorPanel(Parent, "Toolbar", "toolbar"
 
 	ButtonsBox = new UIBox(UIBox::Orientation::Horizontal, 0);
 	PanelMainBackground->AddChild(ButtonsBox
-		->SetVerticalAlign(UIBox::Align::Centered)
-		->SetPadding(0));
+		->SetVerticalAlign(UIBox::Align::Centered));
 
 	GenerateButtons();
 }

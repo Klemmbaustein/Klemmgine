@@ -136,7 +136,6 @@ void BakeMenu::StartBake()
 	LogScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	LogScrollBox->SetMinSize(Vector2(0.45f, 0.35f));
 	LogScrollBox->SetMaxSize(Vector2(0.45f, 0.35f));
-	LogScrollBox->SetPadding(0);
 
 	PopupBackground->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[1], 0))
 		->SetPadding(0.01f, 0.01f, 0.02f, 0.01f)

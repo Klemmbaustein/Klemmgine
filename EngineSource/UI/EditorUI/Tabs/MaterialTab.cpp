@@ -95,15 +95,12 @@ void MaterialTab::OnButtonClicked(int Index)
 MaterialTab::MaterialTab(EditorPanel* Parent, std::string File) : EditorTab(Parent, "Material", File)
 {
 	auto RowBox = new UIBox(UIBox::Orientation::Horizontal, 0);
-	PanelMainBackground->AddChild(RowBox
-		->SetPadding(0));
+	PanelMainBackground->AddChild(RowBox);
 	Rows[0] = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
-	RowBox->AddChild(Rows[0]
-		->SetPadding(0));
+	RowBox->AddChild(Rows[0]);
 
 	Rows[1] = new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[0] * 0.75f);
-	RowBox->AddChild(Rows[1]
-		->SetPadding(0));
+	RowBox->AddChild(Rows[1]);
 
 
 	if (!PreviewBuffer)
@@ -330,22 +327,15 @@ void MaterialTab::GenerateUI()
 				->SetPadding(0, 0.02f, 0, 0)
 			};
 
-			ParamBox->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
-				->SetPadding(0)
-				->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-					->SetPadding(0)
+			ParamBox->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))	
+				->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))	
 					->AddChild(NewField))
 				->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-					->SetPadding(0)
 					->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
-						->SetPadding(0)
-						->AddChild((new UIText(0.35f, EditorUI::UIColors[2] * 0.75f, "Filtering:", EditorUI::Text))
-							->SetPadding(0))
+						->AddChild(new UIText(0.35f, EditorUI::UIColors[2] * 0.75f, "Filtering:", EditorUI::Text))
 						->AddChild(TextureSelectionBoxes[0]))
 					->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
-						->SetPadding(0)
-						->AddChild((new UIText(0.35f, EditorUI::UIColors[2] * 0.75f, "Wrap:", EditorUI::Text))
-							->SetPadding(0))
+						->AddChild(new UIText(0.35f, EditorUI::UIColors[2] * 0.75f, "Wrap:", EditorUI::Text))
 						->AddChild(TextureSelectionBoxes[1]))));
 
 			TextBox->SetMinSize(Vector2(DescriptionSize, 0.15f));
@@ -389,7 +379,7 @@ void MaterialTab::GenerateMaterialProperties()
 	PreviewWindow = new UIBackground(UIBox::Orientation::Vertical, 0, 1, 0.25f);
 	auto ScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	Rows[1]->AddChild(ScrollBox
-		->SetPadding(0)
+		
 		->SetMaxSize(Rows[1]->GetMinSize())
 		->SetMinSize(Rows[1]->GetMinSize()));
 
@@ -436,7 +426,7 @@ void MaterialTab::GenerateMaterialProperties()
 			->SetPadding(0.01f, 0.00, 0.02f, 0.02f)
 			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], i.first, EditorUI::Text))
 				->SetTextWidthOverride(0.15f)
-				->SetPadding(0))
+				)
 			->AddChild(NewField));
 	}
 }

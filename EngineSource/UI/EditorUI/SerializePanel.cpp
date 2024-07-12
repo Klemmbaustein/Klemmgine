@@ -11,10 +11,13 @@
 #include <UI/EditorUI/SettingsPanel.h>
 #include <Engine/Application.h>
 #include <Engine/Log.h>
+#include <Engine/Utility/StringUtility.h>
 
 std::string Editor::SerializePanel::GetLayoutPrefFilePath()
 {
-	return Application::GetEditorPath() + "/EditorContent/Config/EditorLayout";
+	std::string EditorPath = Application::GetEditorPath();
+	StrUtil::ReplaceChar(EditorPath, '\\', "/");
+	return EditorPath + "/EditorContent/Config/EditorLayout";
 }
 
 SaveData::Field Editor::SerializePanel::SerializeLayout(EditorPanel* Target)

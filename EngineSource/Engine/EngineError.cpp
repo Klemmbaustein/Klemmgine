@@ -13,6 +13,7 @@
 #if __cpp_lib_stacktrace >= 202011L
 #include <stacktrace>
 #endif
+#include "AppWindow.h"
 
 std::map<int, const char*> SignalTypes =
 {
@@ -52,8 +53,10 @@ void Error::Init()
 
 void Error::AssertFailure(std::string Name, std::string Position)
 {
+#if !SERVER
 	OS::SetConsoleWindowVisible(true);
-	SDL_DestroyWindow(Application::Window);
+	Window::DestroyWindow();
+#endif
 	Log::Print("[Error]: ------------------------------------[Error]------------------------------------", Log::LogColor::Red);
 	Log::PrintMultiLine(Name, Log::LogColor::Red, "[Error]: ");
 	Log::Print("[Error]: " + Position, Log::LogColor::Red);

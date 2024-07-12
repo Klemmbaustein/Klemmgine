@@ -100,7 +100,7 @@ void UIBackground::SetInvertTextureCoordinates(bool Invert)
 	MakeGLBuffers(Invert);
 }
 
-UIBackground* UIBackground::SetUseTexture(bool UseTexture, unsigned int TextureID)
+UIBackground* UIBackground::SetUseTexture(bool UseTexture, Texture::TextureType TextureID)
 {
 	if (this->TextureMode != (UseTexture ? 1 : 0) || TextureID != this->TextureID)
 	{

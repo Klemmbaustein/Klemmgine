@@ -3,7 +3,7 @@
 #include <string>
 #include "Rendering/Camera/Camera.h"
 #include "Math/Collision/CollisionBox.h"
-#include <Rendering/Renderable.h>
+#include <Rendering/Drawable.h>
 #include <Rendering/Camera/FrustumCulling.h>
 #include <Rendering/Mesh/ModelGenerator.h>
 #include <Rendering/Texture/Material.h>
@@ -11,7 +11,7 @@
 #if !SERVER
 class Mesh;
 
-class Model : public Renderable
+class Model : public Drawable
 {
 public:
 	Model(std::string Filename);

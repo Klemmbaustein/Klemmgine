@@ -18,7 +18,7 @@ unsigned int CSM::ShadowMaps = 0;
 unsigned int CSM::matricesUBO = 0;
 Shader* CSM::ShadowShader = nullptr;
 
-std::vector<glm::vec4> CSM::getFrustumCornersWorldSpace(const glm::mat4& projview)
+std::vector<glm::vec4> CSM::GetFrustumCornersWorldSpace(const glm::mat4& projview)
 {
 	const auto inv = glm::inverse(projview);
 
@@ -45,7 +45,7 @@ void CSM::UpdateMatricesUBO(Camera* From)
 	{
 		return;
 	}
-	const auto LightSpaceMatrices = getLightSpaceMatrices(From);
+	const auto LightSpaceMatrices = GetLightSpaceMatrices(From);
 
 	glBindBuffer(GL_UNIFORM_BUFFER, matricesUBO);
 	for (size_t i = 0; i < LightSpaceMatrices.size(); ++i)
@@ -68,12 +68,13 @@ void CSM::BindLightSpaceMatricesToShader(const std::vector<glm::mat4>& Matrices,
 	}
 }
 
-std::vector<glm::vec4> CSM::getFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
+std::vector<glm::vec4> CSM::GetFrustumCornersWorldSpace(const glm::mat4& proj, const glm::mat4& view)
 {
-	return getFrustumCornersWorldSpace(proj * view);
+	return GetFrustumCornersWorldSpace(proj * view);
 }
 
 CSM::CSM()
+	: RenderSubsystem(true)
 {
 	Name = "Shadows";
 	ShadowShader = new Shader("Shaders/Internal/shadow.vert", "Shaders/Internal/shadow.frag", "Shaders/Internal/shadow.geom");
@@ -142,13 +143,13 @@ void CSM::ReInit()
 	}
 }
 
-glm::mat4 CSM::getLightSpaceMatrix(const float nearPlane, const float farPlane, Camera* From)
+glm::mat4 CSM::GetLightSpaceMatrix(const float nearPlane, const float farPlane, Camera* From)
 {
 	const auto proj = glm::perspective(
 		From->FOV, (float)Graphics::WindowResolution.X / (float)Graphics::WindowResolution.Y, nearPlane,
 		farPlane);
 
-	const auto corners = getFrustumCornersWorldSpace(proj, From->getView());
+	const auto corners = GetFrustumCornersWorldSpace(proj, From->getView());
 
 	glm::vec3 center = glm::vec3(0, 0, 0);
 	for (const auto& v : corners)
@@ -211,22 +212,22 @@ glm::mat4 CSM::getLightSpaceMatrix(const float nearPlane, const float farPlane, 
 	return lightProjection * lightView;
 }
 
-std::vector<glm::mat4> CSM::getLightSpaceMatrices(Camera* From)
+std::vector<glm::mat4> CSM::GetLightSpaceMatrices(Camera* From)
 {
 	std::vector<glm::mat4> ret;
 	for (size_t i = 0; i < shadowCascadeLevels.size() + 1; ++i)
 	{
 		if (i == 0)
 		{
-			ret.push_back(getLightSpaceMatrix(0.1f * CSMDistance, shadowCascadeLevels[i] * CSMDistance, From));
+			ret.push_back(GetLightSpaceMatrix(0.1f * CSMDistance, shadowCascadeLevels[i] * CSMDistance, From));
 		}
 		else if (i < shadowCascadeLevels.size())
 		{
-			ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, shadowCascadeLevels[i] * CSMDistance, From));
+			ret.push_back(GetLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, shadowCascadeLevels[i] * CSMDistance, From));
 		}
 		else
 		{
-			ret.push_back(getLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, cameraFarPlane * CSMDistance, From));
+			ret.push_back(GetLightSpaceMatrix(shadowCascadeLevels[i - 1] * CSMDistance, cameraFarPlane * CSMDistance, From));
 		}
 	}
 	return ret;

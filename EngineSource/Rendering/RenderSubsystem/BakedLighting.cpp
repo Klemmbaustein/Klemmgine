@@ -467,6 +467,7 @@ float BakedLighting::GetBakeProgress()
 #endif
 
 BakedLighting::BakedLighting()
+	: RenderSubsystem(true)
 {
 	Name = "LightMap";
 	BakeSystem = this;

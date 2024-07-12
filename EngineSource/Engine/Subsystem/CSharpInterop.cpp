@@ -15,6 +15,7 @@
 #include <Engine/Subsystem/Console.h>
 #include <Engine/OS.h>
 #include <Engine/Application.h>
+#include <Engine/AppWindow.h>
 
 #include <Utility/DotNet/nethost.h>
 #include <Utility/DotNet/coreclr_delegates.h>
@@ -289,6 +290,12 @@ CSharpInterop::CSharpInterop()
 
 	LoadAssembly();
 	NativeFunctions::RegisterNativeFunctions();
+
+#if ENGINE_NO_SOURCE && !SERVER
+	Window::SetWindowTitle(CSharpInterop::StaticCall<const char*>(
+		CSharpInterop::CSharpSystem->LoadCSharpFunction("GetNameInternally", "Engine", "StringDelegate")
+	));
+#endif
 }
 
 void CSharpInterop::Update()

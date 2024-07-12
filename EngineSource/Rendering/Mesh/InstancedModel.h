@@ -2,7 +2,7 @@
 #pragma once
 #include <Rendering/Mesh/Model.h>
 #include <Rendering/Mesh/InstancedMesh.h>
-class InstancedModel : public Renderable
+class InstancedModel : public Drawable
 {
 public:
 	InstancedModel(std::string Filename);

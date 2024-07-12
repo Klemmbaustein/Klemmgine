@@ -71,7 +71,6 @@ UIScrollBox* UIScrollBox::SetDisplayScrollBar(bool NewDisplay)
 #endif
 			ScrollBarBackground->AddChild(ScrollBar);
 			ScrollBar->SetBorder(UIBox::BorderType::Rounded, 0.25);
-			ScrollBar->SetPadding(0);
 		}
 		else if (ScrollBar)
 		{

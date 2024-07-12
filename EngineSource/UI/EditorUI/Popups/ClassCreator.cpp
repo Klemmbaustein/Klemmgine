@@ -36,7 +36,6 @@ ClassCreator::ClassCreator() : EditorPopup(0, 0.3f, "Create class")
 		->SetPadding(0.02f));
 
 	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-		->SetPadding(0)
 		->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "Path: ", EditorUI::Text))
 			->SetTextWidthOverride(0.06f)
 			->SetPadding(0.01f, 0.01f, 0.02f, 0))
@@ -47,7 +46,6 @@ ClassCreator::ClassCreator() : EditorPopup(0, 0.3f, "Create class")
 			->SetMinSize(Vector2(0.15f, 0.01f))));
 
 	PopupBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-		->SetPadding(0)
 		->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "Name: ", EditorUI::Text))
 			->SetTextWidthOverride(0.06f)
 			->SetPadding(0.01f, 0.01f, 0.02f, 0))

@@ -118,11 +118,8 @@ ParticleEditorTab::ParticleEditorTab(EditorPanel* Parent, std::string File) : Ed
 
 	PreviewBackground = new UIBackground(UIBox::Orientation::Horizontal, 0, 1, 0.275f);
 	PanelMainBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-		->SetPadding(0)
-		->AddChild(ChildBox
-			->SetPadding(0))
-		->AddChild(SideBar
-			->SetPadding(0)
+		->AddChild(ChildBox)
+		->AddChild(SideBar	
 			->AddChild(PreviewBackground
 				->SetPadding(0.02f, 0, 0, 0))
 			->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, -1))
@@ -219,13 +216,11 @@ void ParticleEditorTab::Generate()
 	{
 		UIBackground* ElementBackground = new UIBackground(UIBackground::Orientation::Vertical, 0, EditorUI::UIColors[0] * 0.75);
 		ElementBackground->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-			->SetPadding(0)
 			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "Element " + std::to_string(it) + ":", EditorUI::Text))
 				->SetTextWidthOverride(std::min(0.25f, Scale.X - 0.1f))
 				->SetPadding(0.01f, 0, 0.01f, 0))
 			->AddChild((new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], this, it * 100 + 99))
 				->SetUseTexture(true, EditorUI::Textures[4])
-				->SetPadding(0)
 				->SetSizeMode(UIBox::SizeMode::AspectRelative)
 				->SetMinSize(0.04f)));
 

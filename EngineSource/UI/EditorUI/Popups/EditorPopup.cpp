@@ -54,16 +54,13 @@ EditorPopup::EditorPopup(Vector2 Position, Vector2 Scale, std::string Name)
 	RootBox
 		->AddChild(TitleBackground
 			->SetVerticalAlign(UIBox::Align::Centered)
-			->SetPadding(0)
 			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], Name, EditorUI::Text))
 				->SetPadding(0, 0, 0.01f, 0.01f)))
 		->AddChild(PopupBackground
 			->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f)
-			->SetMinSize(Scale - Vector2(0, 0.1f))
-			->SetPadding(0))
+			->SetMinSize(Scale - Vector2(0, 0.1f)))
 		->AddChild(OptionsList
-			->SetHorizontalAlign(UIBox::Align::Reverse)
-			->SetPadding(0));
+			->SetHorizontalAlign(UIBox::Align::Reverse));
 
 	RootBox->HasMouseCollision = true;
 	TitleBackground->HasMouseCollision = true;

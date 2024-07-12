@@ -19,8 +19,7 @@ EditorDropdown::EditorDropdown(std::vector<DropdownItem> Menu, Vector2 Position)
 	Root = new UIBox(UIBox::Orientation::Vertical, Position);
 	auto Background = new UIBackground(UIBox::Orientation::Vertical, 0, Vector3::Lerp(EditorUI::UIColors[0], EditorUI::UIColors[2], 0.5f), 0);
 	Root->AddChild(Background
-		->SetMinSize(Vector2(0.15f, 0))
-		->SetPadding(0));
+		->SetMinSize(Vector2(0.15f, 0)));
 
 	for (size_t i = 0; i < Menu.size(); i++)
 	{

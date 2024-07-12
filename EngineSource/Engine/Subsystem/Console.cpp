@@ -18,6 +18,7 @@
 #if __linux__
 #include <poll.h>
 #endif
+#include <Engine/AppWindow.h>
 
 Console* Console::ConsoleSystem = nullptr;
 #if _WIN32
@@ -117,18 +118,18 @@ Console::Console()
 {
 	ConsoleSystem = this;
 	Name = "Console";
-	RegisterCommand(Command("echo",
-		[]() {
-			ConsoleSystem->Print(ConsoleSystem->CommandArgs()[0]);
+	RegisterCommand(Command("echo", [this]()
+		{
+			Print(CommandArgs()[0]);
 		}, { Console::Command::Argument("msg", NativeType::String) }));
 
-	RegisterCommand(Command("version",
-		[]() {
-			ConsoleSystem->Print(std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(Project::ProjectName) + ")");
+	RegisterCommand(Command("version", [this]()
+		{
+			Print(std::string(VERSION_STRING) + (IS_IN_EDITOR ? "-Editor (" : " (") + std::string(Project::ProjectName) + ")");
 		}, {}));
 
 	RegisterCommand(Command("info",
-		[]() {
+		[this]() {
 			void (*InfoPrintTypes[4])() =
 			{
 				[]() {
@@ -162,61 +163,61 @@ Console::Console()
 #endif
 				}
 			};
-			if (!ConsoleSystem->CommandArgs().size())
+			if (!CommandArgs().size())
 			{
-				ConsoleSystem->Print("-----------------------------------[Info]-------------------------------------");
+				Print("-----------------------------------[Info]-------------------------------------");
 				InfoPrintTypes[0]();
 				InfoPrintTypes[1]();
 				InfoPrintTypes[2]();
 				InfoPrintTypes[3]();
-				ConsoleSystem->Print("------------------------------------------------------------------------------");
+				Print("------------------------------------------------------------------------------");
 				return;
 			}
 			if (ConsoleSystem->CommandArgs()[0] == "version")
 			{
-				ConsoleSystem->Print("-----------------------------------[Info]-------------------------------------");
+				Print("-----------------------------------[Info]-------------------------------------");
 				InfoPrintTypes[0]();
-				ConsoleSystem->Print("------------------------------------------------------------------------------");
+				Print("------------------------------------------------------------------------------");
 				return;
 			}
-			if (ConsoleSystem->CommandArgs()[0] == "graphics")
+			if (CommandArgs()[0] == "graphics")
 			{
-				ConsoleSystem->Print("-----------------------------------[Info]-------------------------------------");
+				Print("-----------------------------------[Info]-------------------------------------");
 				InfoPrintTypes[1]();
-				ConsoleSystem->Print("------------------------------------------------------------------------------");
+				Print("------------------------------------------------------------------------------");
 				return;
 			}
 			if (ConsoleSystem->CommandArgs()[0] == "sound")
 			{
-				ConsoleSystem->Print("-----------------------------------[Info]-------------------------------------");
+				Print("-----------------------------------[Info]-------------------------------------");
 				InfoPrintTypes[2]();
-				ConsoleSystem->Print("------------------------------------------------------------------------------");
+				Print("------------------------------------------------------------------------------");
 				return;
 			}
-			if (ConsoleSystem->CommandArgs()[0] == "csharp")
+			if (CommandArgs()[0] == "csharp")
 			{
-				ConsoleSystem->Print("-----------------------------------[Info]-------------------------------------");
+				Print("-----------------------------------[Info]-------------------------------------");
 				InfoPrintTypes[3]();
-				ConsoleSystem->Print("------------------------------------------------------------------------------");
+				Print("------------------------------------------------------------------------------");
 				return;
 			}
-			ConsoleSystem->Print("Unknown info topic: " + ConsoleSystem->CommandArgs()[0], ErrorLevel::Error);
-			ConsoleSystem->Print("Topics are: version, graphics, sound.", ErrorLevel::Error);
+			Print("Unknown info topic: " + ConsoleSystem->CommandArgs()[0], ErrorLevel::Error);
+			Print("Topics are: version, graphics, sound.", ErrorLevel::Error);
 		}, { Command::Argument("info_type", NativeType::String, true) }));
 
 
-	RegisterCommand(Command("list_pack",
-		[]() {
+	RegisterCommand(Command("list_pack", [this]()
+		{
 			std::string Pack = ConsoleSystem->CommandArgs()[0];
 			auto Result = Pack::GetPackContents(Pack);
 			if (Result.size())
 			{
-				ConsoleSystem->Print("Content of .pack file: " + Pack + ": ");
-				ConsoleSystem->Print("------------------------------------------------------------------------------");
+				Print("Content of .pack file: " + Pack + ": ");
+				Print("------------------------------------------------------------------------------");
 			}
 			else
 			{
-				ConsoleSystem->Print("Pack File is emtpy");
+				Print("Pack File is emtpy");
 				return;
 			}
 			for (size_t i = 0; i < Result.size(); i += 2)
@@ -227,97 +228,92 @@ Console::Console()
 					LogString.resize(35, ' ');
 					LogString.append(Result[i + 1].FileName + " (" + std::to_string(Result[i + 1].Content.size()) + " bytes)");
 				}
-				ConsoleSystem->Print(LogString);
+				Print(LogString);
 			}
 		}, { Command::Argument("pack_file", NativeType::String) }));
 
 
-	RegisterCommand(Command("open", []() {
-		if (std::filesystem::exists(Assets::GetAsset(ConsoleSystem->CommandArgs()[0] + +".jscn")))
+	RegisterCommand(Command("open", [this]()
 		{
-			Scene::LoadNewScene(Assets::GetAsset(ConsoleSystem->CommandArgs()[0] + ".jscn"));
+		if (std::filesystem::exists(Assets::GetAsset(CommandArgs()[0] + +".jscn")))
+		{
+			Scene::LoadNewScene(Assets::GetAsset(CommandArgs()[0] + ".jscn"));
 		}
 		else
 		{
-			ConsoleSystem->Print("Could not find scene \"" + ConsoleSystem->CommandArgs()[0] + "\"", ErrorLevel::Error);
+			Print("Could not find scene \"" + CommandArgs()[0] + "\"", ErrorLevel::Error);
 		}
 		}, { Command::Argument("scene", NativeType::String) }));
 
-	RegisterCommand(Command("help", []() {
-		std::string CommandString = ConsoleSystem->CommandArgs()[0];
-		if (ConsoleSystem->Commands.contains(CommandString))
+	RegisterCommand(Command("help", [this]()
 		{
-			auto& FoundCommand = ConsoleSystem->Commands[CommandString];
-			ConsoleSystem->Print("Help about " + CommandString + ": ");
-			ConsoleSystem->PrintArguments(FoundCommand.Arguments);
-			return;
-		}
-		ConsoleSystem->Print("Help: " + CommandString + " is not a registered command.", ErrorLevel::Error);
+			std::string CommandString = ConsoleSystem->CommandArgs()[0];
+			if (Commands.contains(CommandString))
+			{
+				auto& FoundCommand = ConsoleSystem->Commands[CommandString];
+				Print("Help about " + CommandString + ": ");
+				PrintArguments(FoundCommand.Arguments);
+				return;
+			}
+			Print("Help: " + CommandString + " is not a registered command.", ErrorLevel::Error);
 		}, { Command::Argument("command", NativeType::String) }));
 
-	RegisterCommand(Command("get_commands", []() {
-		for (auto& i : ConsoleSystem->Commands)
+	RegisterCommand(Command("get_commands", [this]()
 		{
-			ConsoleSystem->Print(i.first);
-			ConsoleSystem->PrintArguments(i.second.Arguments);
-		}
+			for (auto& i : ConsoleSystem->Commands)
+			{
+				Print(i.first);
+				PrintArguments(i.second.Arguments);
+			}
 		}, {}));
 
 	RegisterCommand(Command("exit", Application::Quit, {}));
 
-	RegisterCommand(Command("stats", []()
+	RegisterCommand(Command("stats", [this]()
 		{
-			ConsoleSystem->Print("FPS: " + std::to_string(1.f / Stats::DeltaTime) + ", Delta: " + std::to_string(Stats::DeltaTime));
-			ConsoleSystem->Print("DrawCalls: " + std::to_string(Stats::DrawCalls));
+			Print("FPS: " + std::to_string(1.f / Stats::DeltaTime) + ", Delta: " + std::to_string(Stats::DeltaTime));
+			Print("DrawCalls: " + std::to_string(Stats::DrawCalls));
 		}, {}));
 
-	RegisterCommand(Command("locate", []()
+	RegisterCommand(Command("locate", [this]()
 		{
 			Application::Timer t;
-			std::string FoundFile = Assets::GetAsset(ConsoleSystem->CommandArgs()[0]);
+			std::string FoundFile = Assets::GetAsset(CommandArgs()[0]);
 			float Duration = t.Get();
 			if (FoundFile.empty())
 			{
 				FoundFile = "Not found";
 			}
 
-			std::string LogMessage = ConsoleSystem->CommandArgs()[0] + " -> " + FoundFile;
-			if (ConsoleSystem->CommandArgs().size() > 1 && ConsoleSystem->CommandArgs()[1] != "0")
+			std::string LogMessage = CommandArgs()[0] + " -> " + FoundFile;
+			if (CommandArgs().size() > 1 && CommandArgs()[1] != "0")
 			{
 				LogMessage.append(" (" + std::to_string(Duration) + " seconds)");
 			}
 
-			ConsoleSystem->Print(LogMessage);
+			Print(LogMessage);
 		}, { Command::Argument("file", NativeType::String), Command::Argument("print_search_time", NativeType::Bool, true) }));
 
-	RegisterCommand(Command("asset_dump", []()
+	RegisterCommand(Command("asset_dump", [this]()
 		{
 			for (auto& i : Assets::Assets)
 			{
-				ConsoleSystem->Print(i.Filepath + " - " + i.Name);
+				Print(i.Filepath + " - " + i.Name);
 			}
 		}, {  }));
 
-	RegisterCommand(Command("get_class", []()
+	RegisterCommand(Command("get_class", [this]()
 		{
 			for (const auto& i : Objects::ObjectTypes)
 			{
-				if (i.Name == ConsoleSystem->CommandArgs()[0])
+				if (i.Name == CommandArgs()[0])
 				{
-					ConsoleSystem->Print(Objects::GetCategoryFromID(i.ID) + "/" + i.Name);
+					Print(Objects::GetCategoryFromID(i.ID) + "/" + i.Name);
 					return;
 				}
 			}
-			ConsoleSystem->Print("Could not find class " + ConsoleSystem->CommandArgs()[0], ErrorLevel::Error);
+			Print("Could not find class " + CommandArgs()[0], ErrorLevel::Error);
 		}, { Command::Argument("objectName", NativeType::String) }));
-	RegisterConVar(Variable("wireframe", NativeType::Bool, &Graphics::IsWireframe, nullptr));
-	RegisterConVar(Variable("vignette", NativeType::Float, &Graphics::Vignette, nullptr));
-	RegisterConVar(Variable("vsync", NativeType::Bool, &Graphics::VSync, nullptr));
-	RegisterConVar(Variable("timescale", NativeType::Float, &Stats::TimeMultiplier, nullptr));
-	RegisterConVar(Variable("resolution_scale", NativeType::Float, &Graphics::ResolutionScale, []()
-		{
-			Graphics::SetWindowResolution(Application::GetWindowSize());
-		}));
 
 	RegisterCommand(Command("crash", []()
 		{

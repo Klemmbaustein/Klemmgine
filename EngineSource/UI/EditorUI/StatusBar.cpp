@@ -121,10 +121,8 @@ StatusBar::StatusBar()
 	BarBoxes[1] = new UIBox(UIBox::Orientation::Horizontal, 0);
 	StatusBackground = new UIBackground(UIBox::Orientation::Horizontal, Vector2(-1, 0.95f), 1, Vector2(2, 0.05f));
 	StatusBackground->AddChild(BarBoxes[0]
-		->SetPadding(0)
 		->SetMinSize(Vector2(1, 0)));
 	StatusBackground->AddChild(BarBoxes[1]
-		->SetPadding(0)
 		->SetHorizontalAlign(UIBox::Align::Reverse)
 		->SetMinSize(Vector2(1, 0)));
 
@@ -174,8 +172,7 @@ void StatusBar::GenerateMenuBarDropdown(int ButtonIndex)
 	MenuBarDropdown->SetMinSize(Vector2(0.0f, 0.5f));
 	MenuBarButtons[ButtonIndex]->SetColor(EditorUI::UIColors[0] * 1.5f);
 	auto Background = new UIBackground(UIBox::Orientation::Vertical, 0, Vector3::Lerp(EditorUI::UIColors[0], EditorUI::UIColors[2], 0.5f), 0);
-	MenuBarDropdown->AddChild(Background
-		->SetPadding(0));
+	MenuBarDropdown->AddChild(Background);
 	int it = 0;
 	for (auto& i : MenuBarItems[ButtonIndex].Entries)
 	{

@@ -35,7 +35,7 @@ namespace Assets
 			{
 				std::string Path = entry.path().string();
 #if _WIN32 // Replace all backslashes with forward slashes for consistency.
-				for (auto& i : Path)
+				for (char& i : Path)
 				{
 					if (i == '\\')
 					{

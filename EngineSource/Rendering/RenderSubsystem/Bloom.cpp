@@ -10,8 +10,8 @@
 float Bloom::BloomResolutionMultiplier = 0.15f;
 int Bloom::BloomShape = 2;
 Shader* Bloom::BloomShader = nullptr;
-unsigned int Bloom::pingpongFBO[2];
-unsigned int Bloom::pingpongBuffer[2];
+unsigned int Bloom::PingPongFBO[2];
+unsigned int Bloom::PingPongBuffer[2];
 
 unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 {
@@ -24,16 +24,16 @@ unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 		bool horizontal = true, first_iteration = true;
 		unsigned int amount = 15u;
 		BloomShader->Bind();
-		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
+		glBindFramebuffer(GL_FRAMEBUFFER, PingPongFBO[horizontal]);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glUniform1i(glGetUniformLocation(BloomShader->GetShaderID(), "FullScreen"), 1);
 		for (unsigned int i = 0; i < amount; i++)
 		{
-			glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[horizontal]);
+			glBindFramebuffer(GL_FRAMEBUFFER, PingPongFBO[horizontal]);
 			glUniform1i(glGetUniformLocation(BloomShader->GetShaderID(), "horizontal"), (i % (unsigned int)BloomShape) != 0);
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(
-				GL_TEXTURE_2D, first_iteration ? buf : pingpongBuffer[!horizontal]
+				GL_TEXTURE_2D, first_iteration ? buf : PingPongBuffer[!horizontal]
 			);
 			glDrawArrays(GL_TRIANGLES, 0, 3);
 			horizontal = !horizontal;
@@ -44,19 +44,20 @@ unsigned int Bloom::BlurFramebuffer(unsigned int buf)
 		glViewport(0, 0, (unsigned int)Graphics::WindowResolution.X, (unsigned int)Graphics::WindowResolution.Y);
 
 	}
-	return pingpongBuffer[1];
+	return PingPongBuffer[1];
 }
 
 Bloom::Bloom()
+	: RenderSubsystem(true)
 {
 	Name = "Bloom";
 	BloomShader = new Shader("Shaders/Internal/postprocess.vert", "Shaders/Internal/bloom.frag");
-	glGenFramebuffers(2, pingpongFBO);
-	glGenTextures(2, pingpongBuffer);
+	glGenFramebuffers(2, PingPongFBO);
+	glGenTextures(2, PingPongBuffer);
 	for (unsigned int i = 0; i < 2; i++)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+		glBindFramebuffer(GL_FRAMEBUFFER, PingPongFBO[i]);
+		glBindTexture(GL_TEXTURE_2D, PingPongBuffer[i]);
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0, 
@@ -73,7 +74,7 @@ Bloom::Bloom()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glFramebufferTexture2D(
-			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, PingPongBuffer[i], 0
 		);
 	}
 	Console::ConsoleSystem->RegisterConVar(Console::Variable("bloom", NativeType::Bool, &Graphics::Bloom, nullptr));
@@ -82,14 +83,14 @@ Bloom::Bloom()
 
 void Bloom::OnRendererResized()
 {
-	glDeleteFramebuffers(2, pingpongFBO);
-	glDeleteTextures(2, pingpongBuffer);
-	glGenFramebuffers(2, pingpongFBO);
-	glGenTextures(2, pingpongBuffer);
+	glDeleteFramebuffers(2, PingPongFBO);
+	glDeleteTextures(2, PingPongBuffer);
+	glGenFramebuffers(2, PingPongFBO);
+	glGenTextures(2, PingPongBuffer);
 	for (unsigned int i = 0; i < 2; i++)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, pingpongFBO[i]);
-		glBindTexture(GL_TEXTURE_2D, pingpongBuffer[i]);
+		glBindFramebuffer(GL_FRAMEBUFFER, PingPongFBO[i]);
+		glBindTexture(GL_TEXTURE_2D, PingPongBuffer[i]);
 		glTexImage2D(
 			GL_TEXTURE_2D,
 			0,
@@ -106,7 +107,7 @@ void Bloom::OnRendererResized()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glFramebufferTexture2D(
-			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, pingpongBuffer[i], 0
+			GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, PingPongBuffer[i], 0
 		);
 	}
 }

@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CSharp\CSharpUICanvas.cpp" />
+    <ClCompile Include="Engine\AppWindow.cpp" />
     <ClCompile Include="Engine\Subsystem\BackgroundTask.cpp" />
     <ClCompile Include="Engine\Gamepad.cpp" />
     <ClCompile Include="Engine\Subsystem\InputSubsystem.cpp" />
@@ -34,6 +35,8 @@
     <ClCompile Include="Objects\Components\PhysicsComponent.cpp" />
     <ClCompile Include="Rendering\RenderSubsystem\OcclusionCulling.cpp" />
     <ClCompile Include="Rendering\RenderSubsystem\RenderSubsystem.cpp" />
+    <ClInclude Include="Engine\AppWindow.h" />
+    <ClInclude Include="Engine\LaunchArgs.h" />
     <ClInclude Include="Rendering\RenderSubsystem\RenderSubsystem.h" />
     <ClCompile Include="UI\Debug\ConsoleAutoComplete.cpp" />
     <ClCompile Include="UI\EditorUI\AssetBrowser.cpp" />
@@ -98,7 +101,7 @@
     <ClCompile Include="Rendering\Mesh\Model.cpp" />
     <ClCompile Include="Rendering\Mesh\ModelGenerator.cpp" />
     <ClCompile Include="Rendering\Particle.cpp" />
-    <ClCompile Include="Rendering\Renderable.cpp" />
+    <ClCompile Include="Rendering\Drawable.cpp" />
     <ClCompile Include="Rendering\Shader.cpp" />
     <ClCompile Include="Rendering\Texture\Cubemap.cpp" />
     <ClCompile Include="Rendering\Texture\Material.cpp" />
@@ -229,7 +232,7 @@
     <ClInclude Include="Rendering\Mesh\Model.h" />
     <ClInclude Include="Rendering\Mesh\ModelGenerator.h" />
     <ClInclude Include="Rendering\Particle.h" />
-    <ClInclude Include="Rendering\Renderable.h" />
+    <ClInclude Include="Rendering\Drawable.h" />
     <ClInclude Include="Rendering\Shader.h" />
     <ClInclude Include="Rendering\Texture\Cubemap.h" />
     <ClInclude Include="Rendering\Texture\Material.h" />

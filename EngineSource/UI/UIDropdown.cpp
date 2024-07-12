@@ -73,7 +73,6 @@ void UIDropdown::GenerateOptions()
 	for (size_t i = 0; i < Options.size(); i++)
 	{
 		UIButton* NewButton = new UIButton(UIBox::Orientation::Horizontal, 0, Vector3::Lerp(DropdownColor, Color, (i == SelectedIndex) ? 0.5f : 0), nullptr, (int)i);
-		NewButton->SetPadding(0);
 		NewButton->SetMinSize(Vector2(Size, 0));
 		NewButton->ParentOverride = this;
 		NewButton->CurrentScrollObject = this->CurrentScrollObject;

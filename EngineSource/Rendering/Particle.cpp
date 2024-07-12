@@ -16,7 +16,7 @@
 #include <Engine/File/Assets.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Log.h>
-#include <Rendering/Renderable.h>
+#include <Rendering/Drawable.h>
 
 struct Uniform
 {

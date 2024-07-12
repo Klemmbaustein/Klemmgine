@@ -7,6 +7,7 @@
 #include <Engine/EngineProperties.h>
 #include <Engine/Application.h>
 #include <Rendering/RenderSubsystem/CSM.h>
+#include <Engine/AppWindow.h>
 
 /**
 * @brief
@@ -76,7 +77,7 @@ class SettingsPanel : public EditorPanel
 			{
 				if (Stats::Time == 0)
 				{
-					Application::SetFullScreen(std::stoi(NewValue));
+					Window::SetFullScreen(std::stoi(NewValue));
 				}
 			}),
 			}

@@ -10,6 +10,7 @@
 #include <Engine/Utility/StringUtility.h>
 #include <Engine/Log.h>
 #include <cstring>
+#include <Engine/AppWindow.h>
 
 namespace Input
 {
@@ -53,11 +54,11 @@ void InputSubsystem::Update()
 	Input::MouseMovement = Vector2();
 
 	PollInput();
-	if (Input::CursorVisible || !Application::WindowHasFocus())
+	if (Input::CursorVisible || !Window::WindowHasFocus())
 	{
 		SDL_SetRelativeMouseMode(SDL_FALSE);
 		Input::MouseMovement = 0;
-		Input::MouseLocation = Application::GetCursorPosition();
+		Input::MouseLocation = Window::GetCursorPosition();
 	}
 	else
 	{
@@ -172,7 +173,7 @@ void InputSubsystem::PollInput()
 				TextInput::PollForText = false;
 				break;
 			case SDLK_F11:
-				Application::SetFullScreen(!Application::GetFullScreen());
+				Window::SetFullScreen(!Window::GetFullScreen());
 				break;
 			case SDLK_c:
 				if (TextInput::PollForText && (SDL_GetModState() & KMOD_CTRL))
@@ -219,7 +220,7 @@ void InputSubsystem::PollInput()
 			if (Event.window.event == SDL_WINDOWEVENT_RESIZED)
 			{
 				int w, h;
-				SDL_GetWindowSize(Application::Window, &w, &h);
+				SDL_GetWindowSize(Window::SDLWindow, &w, &h);
 				Graphics::SetWindowResolution(Vector2((float)w, (float)h));
 			}
 		}

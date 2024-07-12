@@ -31,7 +31,6 @@ AboutWindow::AboutWindow() : EditorPopup(0, Vector2(0.5f, 0.6f), "About")
 
 	ContentBox = new UIBox(UIBox::Orientation::Vertical, 0);
 	ContentBox
-		->SetPadding(0)
 		->SetMinSize(0.3f);
 	PopupBackground->AddChild(ContentBox);
 
@@ -42,13 +41,11 @@ AboutWindow::AboutWindow() : EditorPopup(0, Vector2(0.5f, 0.6f), "About")
 #endif
 
 	ContentBox->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-		->SetPadding(0)
 		->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, 1, 0.1f))
 			->SetUseTexture(true, EditorUI::Textures[15])
 			->SetPadding(0.01f)
 			->SetSizeMode(UIBox::SizeMode::AspectRelative))
-		->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
-			->SetPadding(0)
+		->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))	
 			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "Klemmgine Editor v" + std::string(VERSION_STRING), EditorUI::Text))
 				->SetPadding(0.005f))
 			->AddChild((new UIText(0.4f, EditorUI::UIColors[2], "  For " + OsString, EditorUI::Text))
@@ -72,8 +69,7 @@ AboutWindow::AboutWindow() : EditorPopup(0, Vector2(0.5f, 0.6f), "About")
 	));
 
 	UIScrollBox* CreditsBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
-	ContentBox->AddChild(CreditsBox
-		->SetPadding(0));
+	ContentBox->AddChild(CreditsBox);
 
 	int ButtonIndex = 1;
 
@@ -83,8 +79,7 @@ AboutWindow::AboutWindow() : EditorPopup(0, Vector2(0.5f, 0.6f), "About")
 			->SetPadding(i.second.empty() ? 0.02f : 0.005f, 0.005f, i.second.empty() ? 0.005f : 0.02f, 0.005f));
 
 		UIBox* ButtonsBox = new UIBox(UIBox::Orientation::Horizontal, 0);
-		CreditsBox->AddChild(ButtonsBox
-			->SetPadding(0));
+		CreditsBox->AddChild(ButtonsBox);
 
 		for (auto& entry : i.second)
 		{
@@ -97,8 +92,7 @@ AboutWindow::AboutWindow() : EditorPopup(0, Vector2(0.5f, 0.6f), "About")
 
 		if (i.second.empty())
 		{
-			ButtonsBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], Vector2(0.5f, 0.003f)))
-				->SetPadding(0));
+			ButtonsBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], Vector2(0.5f, 0.003f))));
 		}
 	}
 	CreditsBox->SetMinSize(Vector2(0.5f, 0.365f));

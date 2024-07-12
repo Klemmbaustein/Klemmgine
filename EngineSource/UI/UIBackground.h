@@ -2,6 +2,7 @@
 #pragma once
 #include <UI/UIBox.h>
 #include <Rendering/Graphics.h>
+#include <Rendering/Texture/Texture.h>
 
 struct Shader;
 
@@ -20,7 +21,7 @@ class UIBackground : public UIBox
 	void MakeGLBuffers(bool InvertTextureCoordinates = false);
 	// 0 = none, 1 = texture, 2 texture that should be unloaded with the box
 	uint8_t TextureMode = 0;
-	unsigned int TextureID = 0;
+	Texture::TextureType TextureID = 0;
 protected:
 	Shader* BackgroundShader = nullptr;
 	Vector3 Color;
@@ -35,7 +36,7 @@ public:
 	Vector3 GetColor() const;
 	bool GetUseTexture() const;
 	void SetInvertTextureCoordinates(bool Invert);
-	UIBackground* SetUseTexture(bool UseTexture, unsigned int TextureID = 0);
+	UIBackground* SetUseTexture(bool UseTexture, Texture::TextureType TextureID = 0);
 	UIBackground* SetUseTexture(bool UseTexture, std::string TextureName);
 	UIBackground(Orientation BoxOrientation, Vector2 Position, Vector3 Color, Vector2 MinScale = Vector2(0), Shader* UsedShader = Graphics::UIShader);
 	virtual ~UIBackground();

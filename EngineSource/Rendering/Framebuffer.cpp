@@ -13,6 +13,7 @@
 #include <Rendering/Texture/Cubemap.h>
 #include <Rendering/RenderSubsystem/OcclusionCulling.h>
 #include <Engine/EngineError.h>
+#include <Engine/AppWindow.h>
 
 FramebufferObject::FramebufferObject()
 {
@@ -58,7 +59,7 @@ void FramebufferObject::ReInit()
 	}
 }
 
-void FramebufferObject::UseWith(Renderable* r)
+void FramebufferObject::UseWith(Drawable* r)
 {
 	Renderables.push_back(r);
 }
@@ -75,7 +76,7 @@ void FramebufferObject::Draw()
 
 #if EDITOR
 
-	if (!Application::WindowHasFocus())
+	if (!Window::WindowHasFocus())
 	{
 		return;
 	}
@@ -143,7 +144,7 @@ void FramebufferObject::Draw()
 
 	Vector2 BufferResolution = UseMainWindowResolution ? Graphics::RenderResolution : CustomFramebufferResolution;
 	glViewport(0, 0, (int)BufferResolution.X, (int)BufferResolution.Y);
-	const auto LightSpaceMatrices = CSM::getLightSpaceMatrices(FramebufferCamera);
+	const auto LightSpaceMatrices = CSM::GetLightSpaceMatrices(FramebufferCamera);
 
 	std::vector<Graphics::Light*> DrawnLights;
 	DrawnLights.reserve(std::min(size_t(8), Lights.size()));
@@ -172,7 +173,7 @@ void FramebufferObject::Draw()
 
 	for (auto& s : ShaderManager::Shaders)
 	{
-		Renderable::ApplyDefaultUniformsToShader(s.second.UsedShader, this == Graphics::MainFramebuffer);
+		Drawable::ApplyDefaultUniformsToShader(s.second.UsedShader, this == Graphics::MainFramebuffer);
 		CSM::BindLightSpaceMatricesToShader(LightSpaceMatrices, s.second.UsedShader);
 
 		for (int i = 0; i < Graphics::MAX_LIGHTS; i++)
@@ -278,8 +279,8 @@ void FramebufferObject::AddEditorGrid()
 
 void FramebufferObject::ClearContent(bool Full)
 {
-	std::vector<Renderable*> Remaining;
-	for (Renderable* r : Renderables)
+	std::vector<Drawable*> Remaining;
+	for (Drawable* r : Renderables)
 	{
 		if (r->DestroyOnUnload || Full)
 		{

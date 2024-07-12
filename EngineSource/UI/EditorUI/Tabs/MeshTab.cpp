@@ -41,24 +41,19 @@ MeshTab::MeshTab(EditorPanel* Parent, std::string File) : EditorTab(Parent, "Mod
 	}
 	auto RowBox = new UIBox(UIBox::Orientation::Horizontal, 0);
 	RowBox->SetVerticalAlign(UIBox::Align::Default);
-	PanelMainBackground->AddChild(RowBox
-		->SetPadding(0));
+	PanelMainBackground->AddChild(RowBox);
 
 	PreviewWindow = new UIBackground(UIBox::Orientation::Horizontal, 0, 1, 0.5f);
 
 	Rows[0] = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	RowBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75))
-		->SetPadding(0)
-		->AddChild(Rows[0]
-			->SetPadding(0)));
+		->AddChild(Rows[0]));
 	Rows[0]->AddChild(PreviewWindow);
 	PreviewWindow->SetBorder(UIBox::BorderType::Rounded, 1);
 
 	Rows[1] = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	RowBox->AddChild((new UIBox(UIBox::Orientation::Vertical, 0))
-		->SetPadding(0)
-		->AddChild(Rows[1]
-			->SetPadding(0)));
+		->AddChild(Rows[1]));
 }
 
 void MeshTab::Tick()
@@ -182,8 +177,7 @@ void MeshTab::Generate()
 			->SetVerticalAlign(UIBox::Align::Centered)
 			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "Material " + std::to_string(MaterialIndex++) + ":  ", EditorUI::Text))
 				->SetPadding(0, 0, 0, 0))
-			->AddChild(NewTextInput
-				->SetPadding(0)));
+			->AddChild(NewTextInput));
 		MaterialTextFields.push_back(NewTextInput);
 	}
 }

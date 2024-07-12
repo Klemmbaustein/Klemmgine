@@ -34,14 +34,13 @@ LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console", "log")
 	LogScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	LogPrompt = new UITextField(0, EditorUI::UIColors[1] * 0.5f, this, 0, EditorUI::MonoText);
 	LogPrompt->HintText = "Console";
-	PanelMainBackground->AddChild((new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[1] * 0.99f, 0))
+	PanelMainBackground->AddChild((new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[1], 0))
 		->SetPadding(0.02f)
 		->AddChild(LogScrollBox
 			->SetScrollSpeed(4)
 			->SetPadding(0, 0, 0.01f, 0))
 		->AddChild(LogPrompt
 			->SetTextSize(0.45f)
-			->SetPadding(0)
 			->SetTryFill(true)));
 
 	AutoComplete = new Debug::ConsoleAutoComplete(EditorUI::MonoText, 0.425f);
@@ -49,11 +48,9 @@ LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console", "log")
 	CommandsBackground = new UIBackground(UIBox::Orientation::Vertical, 0, 0, Vector2(1, 0));
 	CommandHighlightScrollBox = new UIScrollBox(UIBox::Orientation::Vertical, 0, true);
 	CommandHighlightScrollBox
-		->SetTryFill(true)
-		->SetPadding(0);
+		->SetTryFill(true);
 	CommandsBackground
 		->SetOpacity(0.95f)
-		->SetPadding(0)
 		->AddChild(CommandHighlightScrollBox);
 
 	UpdateLogBoxSize();

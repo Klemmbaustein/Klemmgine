@@ -132,9 +132,7 @@ ColorPicker::ColorPicker(UIVectorField* Color)
 	ColorPickerBackgrounds[2]->SetPadding(0.01f, 0.01f, 0.01f, 0.01f);
 
 	RGBBox = new UIBox(UIBox::Orientation::Vertical, 0);
-	RGBBox->SetPadding(0);
 	auto PreviewBox = new UIBox(UIBox::Orientation::Vertical, 0);
-	PreviewBox->SetPadding(0);
 	PreviewBox->AddChild(RGBBox);
 	PreviewBox->AddChild(ColorPickerBackgrounds[2]);
 	PickerBackground->AddChild(ColorPickerBackgrounds[0]);
@@ -248,7 +246,7 @@ void ColorPicker::GenerateRGBDisplay()
 			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
 		RGBTexts[i]->SetText(EditorUI::ToShortString(SelectedColor[(int)i]));
 		RGBBox->AddChild((new UIBox(UIBox::Orientation::Horizontal, 0))
-				->SetPadding(0)
+				
 				->AddChild((new UIText(0.4f, EditorUI::UIColors[2], xyz[i], EditorUI::Text))
 					->SetPadding(0.015f, 0.015f, 0.01f, 0.005f))
 				->AddChild(RGBTexts[i]

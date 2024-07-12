@@ -349,20 +349,20 @@ void EditorUI::SetUseLightMode(bool NewLightMode)
 		{
 			if (dynamic_cast<UIText*>(i))
 			{
-				dynamic_cast<UIText*>(i)->SetColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UIText*>(i)->GetColor()));
+				static_cast<UIText*>(i)->SetColor(Editor::ReplaceWithNewUIColor(static_cast<UIText*>(i)->GetColor()));
 			}
 			if (dynamic_cast<UIButton*>(i))
 			{
-				dynamic_cast<UIButton*>(i)->SetColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UIButton*>(i)->GetColor()));
+				static_cast<UIButton*>(i)->SetColor(Editor::ReplaceWithNewUIColor(static_cast<UIButton*>(i)->GetColor()));
 			}
 			if (dynamic_cast<UIBackground*>(i))
 			{
-				dynamic_cast<UIBackground*>(i)->SetColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UIBackground*>(i)->GetColor()));
+				static_cast<UIBackground*>(i)->SetColor(Editor::ReplaceWithNewUIColor(static_cast<UIBackground*>(i)->GetColor()));
 			}
 			if (dynamic_cast<UITextField*>(i))
 			{
-				dynamic_cast<UITextField*>(i)->SetColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UITextField*>(i)->GetTextColor()));
-				dynamic_cast<UITextField*>(i)->SetTextColor(Editor::ReplaceWithNewUIColor(dynamic_cast<UITextField*>(i)->GetTextColor()));
+				static_cast<UITextField*>(i)->SetColor(Editor::ReplaceWithNewUIColor(static_cast<UITextField*>(i)->GetTextColor()));
+				static_cast<UITextField*>(i)->SetTextColor(Editor::ReplaceWithNewUIColor(static_cast<UITextField*>(i)->GetTextColor()));
 			}
 		}
 		std::swap(Application::EditorInstance->UIColors, Editor::NewUIColors);
@@ -530,7 +530,7 @@ void EditorUI::Update()
 #ifdef ENGINE_CSHARP
 	if (Editor::CanHotreload == true)
 	{
-		Application::EditorInstance->Print("Finished building assembly. HotReloading .dll file.", Subsystem::ErrorLevel::Info);
+		Print("Finished building assembly. HotReloading .dll file.", Subsystem::ErrorLevel::Info);
 		CSharpInterop::CSharpSystem->ReloadCSharpAssembly();
 		for (UICanvas* c : Graphics::UIToRender)
 		{

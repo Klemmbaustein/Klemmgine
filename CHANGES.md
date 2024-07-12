@@ -1,5 +1,22 @@
 # Changes
 
+## Version 1.13.0
+
+### Changes
+
+- Moved all window functions from `Application::` to `Window::` in `AppWindow.h`.
+- Moved many functions from `Application.cpp` into other files.
+- Code cleanup.
+- Renamed Renderable to Drawable.
+
+### Fixes
+
+- Fixed a crash related to saving editor panel layouts.
+- Fixed some incorrect padding.
+- Removed all `UIBox::SetPadding(0)` calls because they're unnecessary after 1.11.0.
+- Fixed `OS::GetMemUsage()` returning incorrect values on Linux.
+- Fixed spamming empty console commands when using some Linux terminals.
+
 ## Version 1.12.0
 
 ### Changes

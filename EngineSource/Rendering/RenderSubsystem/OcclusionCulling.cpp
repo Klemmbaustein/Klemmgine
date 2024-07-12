@@ -8,6 +8,7 @@
 
 
 OcclusionCulling::OcclusionCulling()
+	: RenderSubsystem(true)
 {
 	Name = "Occlude";
 
@@ -30,7 +31,7 @@ bool OcclusionCulling::RenderOccluded(Model* m, size_t i, FramebufferObject* Buf
 	}
 
 	if ((m->Size.extents * m->ModelTransform.Scale).Length() > 500.0f
-		|| (!m->IsOcclusionCulled && i != Application::FrameCount % Buffer->Renderables.size())
+		|| (!m->IsOcclusionCulled && i != Stats::FrameCount % Buffer->Renderables.size())
 		|| !m->ShouldCull)
 	{
 		m->Render(Buffer->FramebufferCamera, Buffer == Graphics::MainFramebuffer, false);

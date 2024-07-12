@@ -244,8 +244,7 @@ SettingsPanel::SettingsPanel(EditorPanel* Parent) : EditorPanel(Parent, "Setting
 {
 	CanBeClosed = true;
 	HorizontalBox = new UIBox(UIBox::Orientation::Horizontal, 0);
-	PanelMainBackground->AddChild(HorizontalBox
-		->SetPadding(0));
+	PanelMainBackground->AddChild(HorizontalBox);
 
 	GenerateUI();
 	Load();

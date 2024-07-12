@@ -114,14 +114,13 @@ void UIVectorField::Generate()
 	};
 	DeleteChildren();
 	FieldBox = new UIBox(UIBox::Orientation::Horizontal, 0);
-	FieldBox->SetPadding(0);
 	AddChild(FieldBox);
 	float ElementSize = Size / 3.0f - 0.015f;
 	for (int i = 0; i < 3; i++)
 	{
 		auto NewItemColor = new UIBackground(UIBox::Orientation::Vertical, 0, Colors[i], 0);
 		NewItemColor
-			->SetPadding(0)
+
 			->SetVerticalAlign(UIBox::Align::Centered)
 			->SetHorizontalAlign(UIBox::Align::Centered)
 			->SetMinSize(Vector2(0.015f, 0.04f))
@@ -132,7 +131,6 @@ void UIVectorField::Generate()
 		FieldBox->AddChild(NewItemColor);
 		NewItemColor->AddChild(ItemName);
 		NewTextField->HintText = DimensionStrings[(int)NativeType][i];
-		NewTextField->SetPadding(0);
 		NewTextField->SetTextColor(EditorUI::UIColors[2]);
 		NewTextField->SetMinSize(Vector2(ElementSize, 0.04f));
 		NewTextField->SetMaxSize(Vector2(ElementSize, 0.04f));
@@ -152,13 +150,12 @@ void UIVectorField::Generate()
 			->SetHorizontalAlign(UIBox::Align::Centered)
 			->SetVerticalAlign(UIBox::Align::Centered);
 		ColorText = new UIText(0.35f, std::max(Value.Length(), 0.0f) < 0.2f ? 1.0f : 0.0f, "Color picker", Renderer);
-		ColorDisplay->AddChild(ColorText->SetPadding(0));
+		ColorDisplay->AddChild(ColorText);
 		AddChild(ColorDisplay);
 		ColorDisplay
 			->SetMinSize(Vector2(Size, 0.03f))
 			->SetBorder(BorderType::Rounded, 0.25f)
-			->SetTryFill(true)
-			->SetPadding(0);
+			->SetTryFill(true);
 	}
 }
 

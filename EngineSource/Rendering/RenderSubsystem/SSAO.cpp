@@ -28,6 +28,7 @@ namespace SSAO_Impl
 }
 
 SSAO::SSAO()
+	: RenderSubsystem(true)
 {
 	using namespace SSAO_Impl;
 	std::default_random_engine ssaoRandom;
