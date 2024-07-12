@@ -1,6 +1,6 @@
 using Engine;
 
-public class $ : WorldObject
+public class $ : SceneObject
 {
 	public override void Begin()
 	{

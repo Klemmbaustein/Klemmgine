@@ -1,7 +1,7 @@
 using Engine;
 namespace @;
 
-public class $ : WorldObject
+public class $ : SceneObject
 {
 	public override void Begin()
 	{
