@@ -46,8 +46,8 @@ public:
 	static uint64_t LightmapResolution;
 
 	static std::vector<std::string> GetBakeLog();
-private:
 	static float GetLightIntensityAt(int64_t x, int64_t y, int64_t z, float ElemaSize);
+private:
 	static void BakeLog(std::string Msg);
 	static void LoadBakeTexture(uint8_t* Texture);
 };

@@ -79,7 +79,6 @@ struct SaveData
 	* Should the save file be updated once this object is destructed.
 	*/
 	SaveData(std::string SaveName, std::string Extension = "kesv", bool InSaveFolder = true, bool SaveOnDestruct = true);
-	SaveData(const SaveData&) = delete;
 
 	/// Parses a string to save data.
 	static SaveData ParseString(std::string Str);
@@ -129,6 +128,7 @@ struct SaveData
 	std::vector<Field>& GetAllFields();
 
 private:
+	SaveData(const SaveData&) = default;
 	static void Error(std::string Message);
 	std::vector<Field> Fields;
 	std::string OpenedSave;
