@@ -212,7 +212,7 @@ public abstract class SceneObject
 	public void SetRotation(Vector3 NewRotation)
 	{
 		Transform NewTransform = GetTransform();
-		NewTransform.Position = NewRotation;
+		NewTransform.Rotation = NewRotation;
 		SetTransform(NewTransform);
 	}
 
@@ -232,7 +232,7 @@ public abstract class SceneObject
 	public void SetScale(Vector3 NewScale)
 	{
 		Transform NewTransform = GetTransform();
-		NewTransform.Position = NewScale;
+		NewTransform.Scale = NewScale;
 		SetTransform(NewTransform);
 	}
 
