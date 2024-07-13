@@ -120,6 +120,8 @@ namespace Engine
 		private delegate void SetCursorVisibleDelegate(bool NewVisible);
 		private delegate Int32 GetNumGamepads();
 		private delegate Gamepad GetGamepadIndex(Int32 GamepadIndex);
+		[return: MarshalAs(UnmanagedType.U1)]
+		private delegate bool GetBool();
 
 		public static bool IsKeyDown(Key k)
 		{
@@ -129,6 +131,35 @@ namespace Engine
 		public static Vector3 GetMouseMovement()
 		{
 			return (Vector3)NativeFunction.CallNativeFunction("GetMouseMovement", typeof(NativeGetMouseMovement), null);
+		}
+
+		public static bool IsLMBDown
+		{
+			get
+			{
+				return (bool)NativeFunction.CallNativeFunction("GetIsLMBDown", typeof(GetBool), []);
+			}
+		}
+		public static bool IsLMBClicked
+		{
+			get
+			{
+				return (bool)NativeFunction.CallNativeFunction("GetIsLMBClicked", typeof(GetBool), []);
+			}
+		}
+		public static bool IsRMBDown
+		{
+			get
+			{
+				return (bool)NativeFunction.CallNativeFunction("GetIsRMBDown", typeof(GetBool), []);
+			}
+		}
+		public static bool IsRMBClicked
+		{
+			get
+			{
+				return (bool)NativeFunction.CallNativeFunction("GetIsRMBClicked", typeof(GetBool), []);
+			}
 		}
 
 		public static void SetCursorVisible(bool NewVisible)

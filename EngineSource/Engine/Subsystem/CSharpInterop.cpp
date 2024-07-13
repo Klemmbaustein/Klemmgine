@@ -272,21 +272,21 @@ CSharpInterop::CSharpInterop()
 	}
 #endif
 	LoadRuntime();
-	void* LogRegister = LoadCSharpFunction("LoadLogFunction", "EngineLog", "LoadFunctionDelegate");
+	void* LogRegister = LoadCSharpFunction("LoadLogFunction", "Engine.Core.EngineLog", "LoadFunctionDelegate");
 
 	StaticCall<void, void*>(LogRegister, (void*)CSharpInternalPrint);
 
-	GetPropertyFunction = LoadCSharpFunction("GetObjectPropertyString", "Engine", "ExecuteOnStringDelegate");
-	SetPropertyFunction = LoadCSharpFunction("SetObjectPropertyString", "Engine", "SetPropertyDelegate");
-	ExecuteOnObjectFunction = LoadCSharpFunction("ExecuteFunctionOnObject", "Engine", "ExecuteOnDelegate");
-	ExecuteStringOnObjectFunction = LoadCSharpFunction("ExecuteStringFunctionOnObject", "Engine", "ExecuteOnStringDelegate");
-	InstantiateFunction = LoadCSharpFunction("Instantiate", "Engine", "InstantiateDelegate");
-	GetPosFunction = LoadCSharpFunction("GetVectorFieldOfObject", "Engine", "GetVectorDelegate");
-	SetPosFunction = LoadCSharpFunction("SetVectorFieldOfObject", "Engine", "SetVectorDelegate");
-	DestroyFunction = LoadCSharpFunction("Destroy", "Engine", "VoidInt32InDelegate");
-	SetDeltaFunction = LoadCSharpFunction("SetDelta", "Engine", "VoidFloatInDelegate");
-	RegisterNativeFunctionPtr = LoadCSharpFunction("RegisterNativeFunction", "CoreNativeFunction", "LoadNativeFunctionDelegate");
-	GetAllClassesPtr = LoadCSharpFunction("GetAllObjectTypes", "Engine", "StringDelegate");
+	GetPropertyFunction = LoadCSharpFunction("GetObjectPropertyString", "Engine.Core.Engine", "ExecuteOnStringDelegate");
+	SetPropertyFunction = LoadCSharpFunction("SetObjectPropertyString", "Engine.Core.Engine", "SetPropertyDelegate");
+	ExecuteOnObjectFunction = LoadCSharpFunction("ExecuteFunctionOnObject", "Engine.Core.Engine", "ExecuteOnDelegate");
+	ExecuteStringOnObjectFunction = LoadCSharpFunction("ExecuteStringFunctionOnObject", "Engine.Core.Engine", "ExecuteOnStringDelegate");
+	InstantiateFunction = LoadCSharpFunction("Instantiate", "Engine.Core.Engine", "InstantiateDelegate");
+	GetPosFunction = LoadCSharpFunction("GetVectorFieldOfObject", "Engine.Core.Engine", "GetVectorDelegate");
+	SetPosFunction = LoadCSharpFunction("SetVectorFieldOfObject", "Engine.Core.Engine", "SetVectorDelegate");
+	DestroyFunction = LoadCSharpFunction("Destroy", "Engine.Core.Engine", "VoidInt32InDelegate");
+	SetDeltaFunction = LoadCSharpFunction("SetDelta", "Engine.Core.Engine", "VoidFloatInDelegate");
+	RegisterNativeFunctionPtr = LoadCSharpFunction("RegisterNativeFunction", "Engine.Core.CoreNativeFunction", "LoadNativeFunctionDelegate");
+	GetAllClassesPtr = LoadCSharpFunction("GetAllObjectTypes", "Engine.Core.Engine", "StringDelegate");
 
 	LoadAssembly();
 	NativeFunctions::RegisterNativeFunctions();
@@ -479,7 +479,7 @@ void* CSharpInterop::LoadCSharpFunction(std::string Function, std::string Namesp
 		dotnetlib_path.c_str(),
 		dotnet_type.c_str(),
 		string_t(Function.begin(), Function.end()).c_str(),
-		(STR("Delegates+") + string_t(DelegateName.begin(), DelegateName.end()) + STR(", ") + string_t(Name.begin(), Name.end())).c_str(),
+		(STR("Engine.Core.Delegates+") + string_t(DelegateName.begin(), DelegateName.end()) + STR(", ") + string_t(Name.begin(), Name.end())).c_str(),
 		nullptr,
 		(void**)&fCallback);
 
@@ -540,10 +540,10 @@ void CSharpInterop::LoadAssembly()
 	}
 
 
-	StaticCall<void, const char*, const char*, int>(CSharpSystem->LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
+	StaticCall<void, const char*, const char*, int>(CSharpSystem->LoadCSharpFunction("LoadAssembly", "Engine.Core.Engine", "LoadAssemblyDelegate"),
 		AssemblyPath.c_str(), "bin/KlemmgineCSharp.dll", Config);
 #else
-	StaticCall<void, const char*, const char*, int>(CSharpSystem->LoadCSharpFunction("LoadAssembly", "Engine", "LoadAssemblyDelegate"),
+	StaticCall<void, const char*, const char*, int>(CSharpSystem->LoadCSharpFunction("LoadAssembly", "Engine.Core.Engine", "LoadAssemblyDelegate"),
 		(std::filesystem::current_path().string() + "/bin/CSharp/CSharpAssembly.dll").c_str(),
 		(std::filesystem::current_path().string() + "/bin/CSharp/Engine/KlemmgineCSharp.dll").c_str(),
 		Config);

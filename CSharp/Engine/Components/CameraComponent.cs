@@ -2,6 +2,16 @@
 using Engine.Native;
 namespace Engine;
 
+/**
+ * @brief
+ * CameraComponent in C#.
+ * 
+ * Can be attached to any Engine.SceneObject.
+ * 
+ * C++ equivalent: CameraComponent.
+ * 
+ * @ingroup CSharp-Components
+ */
 public class CameraComponent : ObjectComponent
 {
 	private delegate IntPtr NewCamera(float FOV, IntPtr Parent);
@@ -14,6 +24,7 @@ public class CameraComponent : ObjectComponent
 	}
 	
 
+	/// Uses the camera, making it the currently active one.
 	public void Use()
 	{
 		if (NativePtr.Equals(new IntPtr()))
@@ -23,6 +34,7 @@ public class CameraComponent : ObjectComponent
 		NativeFunction.CallNativeFunction("UseCamera", typeof(UseCamera), [ NativePtr ]);
 	}
 
+	/// The field of view of the camera in degrees.
 	public float FOV
 	{ 
 		get

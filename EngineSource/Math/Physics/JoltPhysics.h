@@ -11,6 +11,8 @@
 /**
 * @brief
 * Namespace containing the jolt physics implementation.
+* 
+* @ingroup Internal
 */
 namespace JoltPhysics
 {

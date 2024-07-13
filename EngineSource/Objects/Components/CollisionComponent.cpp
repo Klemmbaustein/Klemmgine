@@ -51,6 +51,29 @@ void CollisionComponent::Load(const ModelGenerator::ModelData& Data, Transform R
 	Collider = m;
 }
 
+void CollisionComponent::SetActive(bool NewActive)
+{
+	Physics::PhysicsBody* Body = static_cast<Physics::PhysicsBody*>(Collider);
+	if (NewActive == Active || !Body)
+	{
+		return;
+	}
+	if (NewActive)
+	{
+		Physics::AddBody(Body);
+	}
+	else
+	{
+		Physics::RemoveBody(Body, false);
+	}
+	Active = NewActive;
+}
+
+bool CollisionComponent::GetActive() const
+{
+	return Active;
+}
+
 Transform CollisionComponent::CalculateMeshTransform()
 {
 	return Transform(Vector3::TranslateVector(RelativeTransform.Position, GetParent()->GetTransform()),

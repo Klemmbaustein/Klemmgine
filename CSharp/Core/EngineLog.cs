@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-
+namespace Engine.Core;
 public static class EngineLog
 {
 	[return: MarshalAs(UnmanagedType.LPUTF8Str)]

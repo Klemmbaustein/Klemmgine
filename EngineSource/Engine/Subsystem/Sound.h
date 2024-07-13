@@ -11,6 +11,8 @@
  * This subsystem controls sound functionality. It does nothing if the configuration is `SERVER`.
  * 
  * OpenAL (the underlying sound system) has a limit of 255 sounds playing at once.
+ * 
+ * @ingroup Subsystem
  */
 class Sound : public Subsystem
 {

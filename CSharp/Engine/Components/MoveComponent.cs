@@ -2,6 +2,14 @@
 using Engine.Native;
 namespace Engine;
 
+/**
+* @brief
+* A component for movement.
+* 
+* Contains code for basic movement behavior.
+* 
+* @ingroup CSharp-Components
+*/
 public class MoveComponent : ObjectComponent
 {
 	private delegate IntPtr NewMovement(IntPtr Parent);
@@ -20,7 +28,10 @@ public class MoveComponent : ObjectComponent
 	{
 
 	}
-
+	/**
+	* @brief
+	* Adds an input to the movement. The movement will try to move in this direction.
+	*/
 	public void AddMovementInput(Vector3 Direction)
 	{
 		if (NativePtr == 0)
@@ -30,6 +41,7 @@ public class MoveComponent : ObjectComponent
 		NativeFunction.CallNativeFunction("MovementComponentAddMovementInput", typeof(AddMovementDelegate), [Direction, NativePtr]);
 	}
 
+	/// The maximum movement speed.
 	public float MoveSpeed
 	{
 		set
@@ -41,6 +53,7 @@ public class MoveComponent : ObjectComponent
 			NativeFunction.CallNativeFunction("MoveComponentSetMoveSpeed", typeof(SetFloatDelegate), [NativePtr, value]);
 		}
 	}
+	/// The acceleration of the movement.
 	public float Acceleration
 	{
 		set
@@ -53,6 +66,7 @@ public class MoveComponent : ObjectComponent
 			NativeFunction.CallNativeFunction("MoveComponentSetAcceleration", typeof(SetFloatDelegate), [NativePtr, value]);
 		}
 	}
+	/// The deceleration of the movement.
 	public float Deceleration
 	{
 		set
@@ -66,6 +80,7 @@ public class MoveComponent : ObjectComponent
 		}
 	}
 
+	/// The air acceleration multiplier. If the movement is in air, both acceleration and deceleration will be multipled with this value.
 	public float AirAccel
 	{
 		set
@@ -79,6 +94,7 @@ public class MoveComponent : ObjectComponent
 		}
 	}
 
+	/// The gravity applied to the movement.
 	public float Gravity
 	{
 		set
@@ -92,6 +108,7 @@ public class MoveComponent : ObjectComponent
 		}
 	}
 
+	/// True if the object is touching the ground, false if not.
 	public bool OnGround
 	{
 		get
@@ -105,6 +122,7 @@ public class MoveComponent : ObjectComponent
 		}
 	}
 
+	/// Jump height.
 	public float JumpHeight
 	{
 		set
@@ -118,6 +136,7 @@ public class MoveComponent : ObjectComponent
 		}
 	}
 
+	/// Sets the vertical velocity of the player to the "JumpHeight"
 	public void Jump()
 	{
 		if (NativePtr == 0)

@@ -1,7 +1,14 @@
 #if !SERVER
+#pragma once
 #include "RenderSubsystem.h"
 
-#pragma once
+/**
+* @brief
+* Subsystem for screen space ambient occlusion.
+* 
+* @ingroup Internal
+* @ingroup Subsystem
+*/
 class SSAO : public RenderSubsystem
 {
 public:

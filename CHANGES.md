@@ -1,5 +1,21 @@
 # Changes
 
+## Version 1.13.1
+
+### Changes
+
+- Added a lot more documentation.
+- Moved everything in CSharpCore.dll into the `Engine.Core` namespace.
+- Added PointLightComponent to C#.
+- Added `CollisionComponent::SetActive()`.
+- Added `Engine.SceneObject.New<T>()` to C#.
+- Added `Engine.NativeObject.New()` to C#.
+
+### Fixes
+
+- Fixed missing arguments for `Texture::CreateTexture()`.
+- Fixed a hardcoded max lights value.
+
 ## Version 1.13.0
 
 ### Changes

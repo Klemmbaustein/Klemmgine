@@ -9,7 +9,7 @@
 
 Shader* BillboardSprite::BillboardShader = nullptr;
 
-BillboardSprite::BillboardSprite(unsigned int Texture, FramebufferObject* Buffer)
+BillboardSprite::BillboardSprite(Texture::TextureType Texture, FramebufferObject* Buffer)
 {
 	if (!BillboardShader)
 	{

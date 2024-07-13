@@ -8,9 +8,20 @@ class Model;
 class FramebufferObject;
 struct Shader;
 
+/**
+* @brief
+* Frustum culling subsystem.
+* 
+* @ingroup Subsystem
+* @ingroup Internal
+*/
 class OcclusionCulling : public RenderSubsystem
 {
 public:
+
+	/// True if occlusion culling is active, false if not.
+	bool Active = true;
+
 	OcclusionCulling();
 
 	Shader* CullShader;

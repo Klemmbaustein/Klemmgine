@@ -10,7 +10,7 @@ BillboardComponent::BillboardComponent()
 BillboardComponent::~BillboardComponent()
 {
 #if !SERVER
-	if (LoadedTexture)
+	if (LoadedTexture && OwnsTexture)
 	{
 		Texture::UnloadTexture(LoadedTexture);
 	}
@@ -25,10 +25,11 @@ void BillboardComponent::Load(std::string Texture, Texture::TextureFiltering Fil
 {
 #if !SERVER
 	Load(Texture::LoadTexture(Texture, Filtering));
+	OwnsTexture = true;
 #endif
 }
 
-void BillboardComponent::Load(unsigned int Texture)
+void BillboardComponent::Load(Texture::TextureType Texture)
 {
 #if !SERVER
 	Sprite = new BillboardSprite(Texture, Graphics::MainFramebuffer);

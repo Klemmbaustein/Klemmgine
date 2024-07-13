@@ -3,8 +3,25 @@
 #include <vector>
 
 /**
+* @defgroup Internal Internal
+*
+* Internal engine systems that a normal project won't use.
+*/
+
+/**
+* @defgroup Subsystem Subsystem
+* 
+* Subsystems controlling one feature of the engine.
+* 
+* @ingroup Internal
+*/
+
+
+/**
  * @brief
  * A Subsystem controlling one feature of the engine.
+ * 
+ * @ingroup Subsystem
  */
 class Subsystem
 {

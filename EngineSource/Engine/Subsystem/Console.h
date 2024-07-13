@@ -18,6 +18,9 @@
 
 /**
 * @brief
+* Console subsystem, responsible for handling the engine console.
+* 
+* @ingroup Subsystem
 */
 class Console : public Subsystem
 {

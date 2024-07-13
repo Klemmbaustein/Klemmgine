@@ -1,5 +1,6 @@
 #pragma once
 #include <Rendering/Drawable.h>
+#include <Rendering/Texture/Texture.h>
 
 class Camera;
 class FramebufferObject;
@@ -9,7 +10,7 @@ class BillboardSprite : public Drawable
 {
 public:
 
-	BillboardSprite(unsigned int Texture, FramebufferObject* Buffer);
+	BillboardSprite(Texture::TextureType Texture, FramebufferObject* Buffer);
 	virtual ~BillboardSprite();
 
 	float Size = 1;

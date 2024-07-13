@@ -217,6 +217,11 @@ void PhysicsComponent::SetActive(bool NewActive)
 	Active = NewActive;
 }
 
+bool PhysicsComponent::GetActive() const
+{
+	return Active;
+}
+
 Physics::HitResult PhysicsComponent::ShapeCast(Transform Start, Vector3 End, Physics::Layer Layers, std::set<SceneObject*> ObjectsToIgnore)
 {
 	if (!PhysicsBodyPtr)

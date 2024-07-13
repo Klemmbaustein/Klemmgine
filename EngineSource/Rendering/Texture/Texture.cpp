@@ -126,16 +126,38 @@ namespace Texture
 		return LoadTexture(T.File, T.Filtering, T.Wrap);
 	}
 
-	TextureType CreateTexture(TextureData T)
+	TextureType CreateTexture(TextureData T, TextureFiltering Filtering, TextureWrap Wrap)
 	{
 		unsigned int TextureID;
 		glGenTextures(1, &TextureID);
 		glBindTexture(GL_TEXTURE_2D, TextureID);
 
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		int FilterMode = GL_NEAREST;
+		int WrapMode = GL_REPEAT;
+		switch (Filtering)
+		{
+		case TextureFiltering::Linear:
+			FilterMode = GL_LINEAR;
+			break;
+		default:
+			break;
+		}
+		switch (Wrap)
+		{
+		case TextureWrap::Clamp:
+			WrapMode = GL_CLAMP_TO_EDGE;
+			break;
+		case TextureWrap::Border:
+			WrapMode = GL_CLAMP_TO_BORDER;
+			break;
+		default:
+			break;
+		}
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, FilterMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, WrapMode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, WrapMode);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, T.ResolutionX, T.ResolutionY, 0, GL_RGBA, GL_FLOAT, (void*)T.Pixels.data());
 
 		return TextureID;

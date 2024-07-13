@@ -154,6 +154,15 @@ public abstract class SceneObject
 
 	/**
 	 * @brief
+	 * Creates a new SceneObject with the type T.
+	 */
+	public static T New<T>(Transform t) where T : SceneObject
+	{
+		return NewCSObject(typeof(T).Name, t) as T;
+	}
+
+	/**
+	 * @brief
 	 * Sets the name of the object.
 	 */
 	public void SetName(string NewName)

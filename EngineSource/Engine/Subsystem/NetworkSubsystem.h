@@ -7,6 +7,7 @@
  * Network subsystem.
  * 
  * Subsystem controlling the network functions of the engine.
+ * @ingroup Subsystem
  */
 class NetworkSubsystem : public Subsystem
 {

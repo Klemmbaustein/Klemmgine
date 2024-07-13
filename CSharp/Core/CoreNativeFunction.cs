@@ -2,6 +2,8 @@
 using System.Runtime.InteropServices;
 #nullable enable
 
+namespace Engine.Core;
+
 public static class CoreNativeFunction
 {
 	static Dictionary<string, IntPtr> LoadedNativeFunctions = new Dictionary<string, IntPtr>();

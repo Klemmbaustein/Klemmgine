@@ -147,7 +147,7 @@ void FramebufferObject::Draw()
 	const auto LightSpaceMatrices = CSM::GetLightSpaceMatrices(FramebufferCamera);
 
 	std::vector<Graphics::Light*> DrawnLights;
-	DrawnLights.reserve(std::min(size_t(8), Lights.size()));
+	DrawnLights.reserve(std::min(size_t(Graphics::MAX_LIGHTS), Lights.size()));
 
 	for (auto& Light : Lights)
 	{

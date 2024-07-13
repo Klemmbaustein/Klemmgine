@@ -1,5 +1,6 @@
 ﻿using System;
 
+namespace Engine.Core;
 public static class Delegates
 {
 	public delegate void VoidDelegate();

@@ -11,6 +11,13 @@
 
 class Camera;
 
+/**
+* @brief
+* Cascaded shadow subsystem.
+* 
+* @ingroup Internal
+* @ingroup Subsystem
+*/
 class CSM : public RenderSubsystem
 {
 public:

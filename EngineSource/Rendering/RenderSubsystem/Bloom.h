@@ -3,6 +3,13 @@
 
 struct Shader;
 
+/**
+* @brief
+* Bloom subsystem.
+* 
+* @ingroup Subsystem
+* @ingroup Internal
+*/
 class Bloom : public RenderSubsystem
 {
 public:

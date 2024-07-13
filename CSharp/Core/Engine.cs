@@ -5,6 +5,8 @@ using System.IO;
 using System.Globalization;
 using System.Text.RegularExpressions;
 
+namespace Engine.Core;
+
 [StructLayout(LayoutKind.Sequential)]
 public struct EngineVector
 {

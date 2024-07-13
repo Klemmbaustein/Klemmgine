@@ -17,6 +17,7 @@ class Camera;
 * All behaviour related to subscenes is deprecated.
 * 
 * @todo Fix/reimplement subscenes
+* @ingroup Subsystem
 */
 class Scene : public Subsystem
 {

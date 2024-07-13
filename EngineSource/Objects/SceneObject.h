@@ -120,8 +120,10 @@ public:
 		void Invoke(std::vector<std::string> Arguments) const;
 	};
 
+	/// A property of the object.
 	struct Property
 	{
+		/// Constructs a property from the name, type and pointer to the property data.
 		Property(std::string Name, NativeType::NativeType NativeType, void* Data)
 		{
 			this->Name = Name;
@@ -139,40 +141,50 @@ public:
 
 		}
 
+		/// The name of the property.
 		std::string Name;
 		std::string ValueString;
+		/// The type of the property data.
 		NativeType::NativeType NativeType = NativeType::Null;
+		/// The property's data pointer.
 		void* Data = nullptr;
 		enum class PropertyType
 		{
+			/// The property is saved in the scene file and can be viewed and modified in the editor UI.
 			EditorProperty,
+			/// The property is replicated between the server and clients.
 			NetProperty,
 #if ENGINE_CSHARP
+			/// Like EditorProperty, but the property is defined in C# code.
 			CSharpProperty
 #endif
 		};
+
+		/// The owner of a net property.
 		enum class NetOwner
 		{
+			/// The property is owned by the client and is replicated to the server.
 			Client,
+			/// The property is owned by the server and is replicated to the client.
 			Server
 		};
 
+		/// Converts the value at Data to a string.
 		std::string ValueToString(SceneObject* Context);
 
 		NetOwner PropertyOwner = NetOwner::Server;
 
+		/// The type of the property.
 		PropertyType PType = PropertyType::EditorProperty;
 
 	};
-
-	void _CallEvent(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments);
 
 	/**
 	 * @brief
 	 * Calls the SceneObject::NetEvent that has the given function.
 	 * 
 	 * @code
-	 * void MyObject::HelloWorld()
+	 * void MyObject::HelloWorld(std::vector<std::string>)
 	 * {
 	 *     Log::Print("Hello World");
 	 * }
@@ -216,9 +228,13 @@ public:
 	virtual void Begin();
 	virtual bool GetIsReplicated();
 
+	/// Sets the transform of the object.
 	void SetTransform(Transform NewTransform);
+	/// Gets the transform of the object.
 	Transform& GetTransform();
+	/// Attaches a Component to the object.
 	int Attach(Component* NewComponent);
+	/// The name of the object.
 	std::string Name = "Object";
 
 	/**
@@ -228,16 +244,22 @@ public:
 	ObjectDescription GetObjectDescription();
 	void UpdateComponents();
 
+	/// Adds an editor property to the object. Editor properties will be saved in the scene file, and can be viewed and modified in the editor UI.
 	void AddEditorProperty(Property p);
+	/// Adds a net property to the object. Editor properties are replicated between the server and clients.
 	void AddNetProperty(Property p, Property::NetOwner Owner);
 
+	/// Gets all components of the object.
 	std::vector<Component*> GetComponents()
 	{
 		return Components;
 	}
 	virtual std::string Serialize();
+	/// Detaches and destroys a component from this object.
 	void Detach(Component* C);
 	virtual void DeSerialize(std::string SerializedObject);
+
+	/// This function is called when an editor property (Added with AddEditorProperty()) is set.
 	virtual void OnPropertySet();
 	std::string GetPropertiesAsString();
 	void LoadProperties(std::string in);
@@ -280,6 +302,7 @@ public:
 	std::vector<Property> Properties;
 	std::vector<NetEvent> NetEvents;
 protected:
+	void _CallEvent(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments);
 	std::string TypeName;
 	uint32_t TypeID = 0;
 	std::vector<Component*> Components;

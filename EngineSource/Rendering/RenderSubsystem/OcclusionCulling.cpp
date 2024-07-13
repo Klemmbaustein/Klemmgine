@@ -30,7 +30,8 @@ bool OcclusionCulling::RenderOccluded(Model* m, size_t i, FramebufferObject* Buf
 		return false;
 	}
 
-	if ((m->Size.extents * m->ModelTransform.Scale).Length() > 500.0f
+	if (!Active
+		|| (m->Size.extents * m->ModelTransform.Scale).Length() > 500.0f
 		|| (!m->IsOcclusionCulled && i != Stats::FrameCount % Buffer->Renderables.size())
 		|| !m->ShouldCull)
 	{

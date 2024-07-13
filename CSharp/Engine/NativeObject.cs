@@ -24,6 +24,7 @@ public class NativeObject : SceneObject
 	delegate bool GetPropertyBoolDelegate(IntPtr obj, [MarshalAs(UnmanagedType.LPUTF8Str)] string Name);
 
 	delegate Vector3 GetPropertyVector3Delegate(IntPtr obj, [MarshalAs(UnmanagedType.LPUTF8Str)] string Name);
+	delegate IntPtr NewNativeObjectDelegate([MarshalAs(UnmanagedType.LPUTF8Str)] string Name, Transform t);
 
 	/**
 	 * @brief
@@ -70,6 +71,17 @@ public class NativeObject : SceneObject
 				break;
 		}
 		return null;
+	}
+
+	public static NativeObject New(string TypeName, Transform t)
+	{
+		IntPtr NativePtr = (IntPtr)NativeFunction.CallNativeFunction("NewNativeObject",
+			typeof(NewNativeObjectDelegate),
+			[TypeName, t]);
+
+		var Object = new NativeObject();
+		Object.LoadFromPtr(NativePtr);
+		return Object;
 	}
 
 	public override void Begin()

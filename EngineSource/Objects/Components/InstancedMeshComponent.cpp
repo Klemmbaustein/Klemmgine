@@ -77,7 +77,7 @@ bool InstancedMeshComponent::RemoveInstance(size_t Index)
 	return false;
 }
 
-std::vector<size_t> InstancedMeshComponent::GetInstancesNearLocation(Vector3 Position, float Distance)
+std::vector<size_t> InstancedMeshComponent::GetInstancesNearPosition(Vector3 Position, float Distance)
 {
 	if (!Mesh)
 	{

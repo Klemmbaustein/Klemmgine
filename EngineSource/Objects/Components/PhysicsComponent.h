@@ -86,6 +86,15 @@ public:
 
 	/**
 	* @brief
+	* Gets the activeness of the body
+	*
+	* Active means the collider can interact with the physics system.
+	* Inactive means it can't.
+	*/
+	bool GetActive() const;
+
+	/**
+	* @brief
 	* Casts this physics component shape from Start to End.
 	* 
 	* @param Start

@@ -11,6 +11,7 @@
 #include <Objects/Components/CameraComponent.h>
 #include <Objects/Components/ParticleComponent.h>
 #include <Objects/Components/MoveComponent.h>
+#include <Objects/Components/PointLightComponent.h>
 #include <Objects/CSharpObject.h>
 #include <Rendering/Camera/CameraShake.h>
 #include <Engine/Input.h>
@@ -87,6 +88,13 @@ namespace NativeFunctions
 		MoveComponent* Movement = new MoveComponent();
 		Parent->Attach(Movement);
 		return Movement;
+	}
+
+	static PointLightComponent* NewPointLightComponent(SceneObject* Parent)
+	{
+		PointLightComponent* Light = new PointLightComponent();
+		Parent->Attach(Light);
+		return Light;
 	}
 
 	static PhysicsComponent* NewPhysicsComponent(SceneObject* Parent, Transform t, Physics::PhysicsBody::BodyType BodyType, Physics::MotionType Movability, Physics::Layer Layers)
@@ -273,6 +281,36 @@ namespace NativeFunctions
 		return Cam->GetFOV();
 	}
 
+	static void SetPointLightIntensity(PointLightComponent* Target, float Intensity)
+	{
+		Target->SetIntensity(Intensity);
+	}
+
+	static void SetPointLightFalloff(PointLightComponent* Target, float Falloff)
+	{
+		Target->SetFalloff(Falloff);
+	}
+
+	static void SetPointLightColor(PointLightComponent* Target, Vector3 Color)
+	{
+		Target->SetColor(Color);
+	}
+
+	static float GetPointLightIntensity(PointLightComponent* Target, float Intensity)
+	{
+		return Target->GetIntensity();
+	}
+
+	static float GetPointLightFalloff(PointLightComponent* Target)
+	{
+		return Target->GetFalloff();
+	}
+
+	static Vector3 GetPointLightColor(PointLightComponent* Target)
+	{
+		return Target->GetColor();
+	}
+
 	static void DestroyComponent(Component* c, SceneObject* Parent)
 	{
 		Parent->Detach(c);
@@ -288,11 +326,6 @@ namespace NativeFunctions
 		return c->RelativeTransform;
 	}
 
-	static Vector3 GetMouseMovement()
-	{
-		return Vector3(Input::MouseMovement, 0);
-	}
-
 	static void LoadScene(const char* SceneName)
 	{
 		Scene::LoadNewScene(SceneName);
@@ -303,6 +336,28 @@ namespace NativeFunctions
 		CSharpObject* NewObject = Objects::SpawnObject<CSharpObject>(ObjectTransform, 0);
 		NewObject->LoadClass(TypeName);
 		return NewObject->CS_Obj;
+	}
+
+	static SceneObject* NewNativeObject(const char* TypeName, Transform ObjectTransform)
+	{
+		SceneObject* NewObject = nullptr;
+		for (const auto& i : Objects::ObjectTypes)
+		{
+			if (i.Name == TypeName)
+			{
+				NewObject = Objects::SpawnObjectFromID(i.ID, ObjectTransform);
+			}
+		}
+
+		if (!NewObject)
+		{
+			CSharpInterop::CSharpSystem->CSharpLog(
+				StrUtil::Format("Could not instantiate an object of the type '%s'. That type does not exist.", TypeName),
+				CSharpInterop::CS_Log_Runtime,
+				CSharpInterop::CS_Log_Err);
+		}
+
+		return NewObject;
 	}
 
 	static char* GetTypeNameOfObject(SceneObject* Object)
@@ -558,13 +613,6 @@ namespace NativeFunctions
 #endif
 	}
 
-	static void SetCursorVisible(bool NewVisible)
-	{
-#if !EDITOR && !SERVER
-		Input::CursorVisible = NewVisible;
-#endif
-	}
-
 	static UICanvas* NewUICanvas(void* OnClickedFunction, void* UpdateFunction, void* OnDestroyedFunction)
 	{
 		auto c = UICanvas::CreateNewCanvas<CSharpUICanvas>();
@@ -584,6 +632,7 @@ namespace NativeFunctions
 	}
 #pragma endregion
 
+#pragma region Input
 	static int32_t GetNumGamepads()
 	{
 		return (int32_t)Input::Gamepads.size();
@@ -603,6 +652,40 @@ namespace NativeFunctions
 		}
 		return Input::Gamepad();
 	}
+
+	static void SetCursorVisible(bool NewVisible)
+	{
+#if !EDITOR && !SERVER
+		Input::CursorVisible = NewVisible;
+#endif
+	}
+
+	static Vector3 GetMouseMovement()
+	{
+		return Vector3(Input::MouseMovement, 0);
+	}
+
+	static bool GetIsLMBDown()
+	{
+		return Input::IsLMBDown;
+	}
+
+	static bool GetIsRMBDown()
+	{
+		return Input::IsRMBDown;
+	}
+
+	static bool GetIsLMBClicked()
+	{
+		return Input::IsLMBClicked;
+	}
+
+	static bool GetIsRMBClicked()
+	{
+		return Input::IsRMBClicked;
+	}
+
+#pragma endregion
 
 	static NativeType::NativeType GetObjectPropertyType(SceneObject* Obj, const char* Property)
 	{
@@ -733,6 +816,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(NewParticleComponent);
 	REGISTER_FUNCTION(NewMoveComponent);
 	REGISTER_FUNCTION(NewPhysicsComponent);
+	REGISTER_FUNCTION(NewPointLightComponent);
 
 	REGISTER_FUNCTION(GetObjectTransform);
 	REGISTER_FUNCTION(SetObjectTransform);
@@ -768,10 +852,15 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(PhysicsComponentSetAngularVelocity);
 	REGISTER_FUNCTION(PhysicsComponentCollisionCheck);
 	REGISTER_FUNCTION(PhysicsComponentShapeCast);
+	REGISTER_FUNCTION(SetPointLightIntensity);
+	REGISTER_FUNCTION(SetPointLightFalloff);
+	REGISTER_FUNCTION(SetPointLightColor);
+	REGISTER_FUNCTION(GetPointLightIntensity);
+	REGISTER_FUNCTION(GetPointLightFalloff);
+	REGISTER_FUNCTION(GetPointLightColor);
 
-	REGISTER_FUNCTION(IsKeyDown);
-	REGISTER_FUNCTION(GetMouseMovement);
 	REGISTER_FUNCTION(PlayDefaultCameraShake);
+	REGISTER_FUNCTION(NewNativeObject);
 	REGISTER_FUNCTION(NewCSObject);
 	REGISTER_FUNCTION(LoadScene);
 	REGISTER_FUNCTION(LoadSound);
@@ -782,7 +871,13 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(Vector3::GetScaledAxis);
 	REGISTER_FUNCTION(PrintStackTrace);
 
+	REGISTER_FUNCTION(IsKeyDown);
+	REGISTER_FUNCTION(GetMouseMovement);
 	REGISTER_FUNCTION(SetCursorVisible);
+	REGISTER_FUNCTION(GetIsLMBDown);
+	REGISTER_FUNCTION(GetIsLMBClicked);
+	REGISTER_FUNCTION(GetIsRMBDown);
+	REGISTER_FUNCTION(GetIsRMBClicked);
 
 	REGISTER_FUNCTION(CreateUIBox);
 	REGISTER_FUNCTION(DestroyUIBox);
