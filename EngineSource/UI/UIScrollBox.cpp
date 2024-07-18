@@ -187,8 +187,6 @@ void UIScrollBox::Update()
 	ScrollClass.Speed = Speed;
 	UpdateScrollObjectOfObject(this);
 
-
-	//Tick();
 }
 
 void UIScrollBox::UpdateTickState()
@@ -203,7 +201,6 @@ void UIScrollBox::UpdateTickState()
 
 UIScrollBox::UIScrollBox(Orientation BoxOrientation, Vector2 Position, bool DisplayScrollBar) : UIBox(BoxOrientation, Position)
 {
-	this->MaxScroll = MaxScroll;
 	this->HasMouseCollision = true;
 	SetDisplayScrollBar(DisplayScrollBar);
 	Update();

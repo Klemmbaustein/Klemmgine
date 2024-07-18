@@ -36,7 +36,7 @@ namespace Debug
 		virtual ~DebugUI();
 		void GenerateLog();
 
-		void OnButtonClicked(int Index);
+		void OnButtonClicked(int Index) override;
 	};
 }
 

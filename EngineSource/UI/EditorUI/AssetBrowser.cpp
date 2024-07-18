@@ -30,11 +30,11 @@ std::vector<AssetBrowser::BrowserItem> AssetBrowser::GetBrowserContents()
 			continue;
 		}
 		BrowserItem Item;
-		Item.Name = FileUtil::GetFileNameWithoutExtensionFromPath(File.path().u8string());
-		std::string Ext = FileUtil::GetExtension(File.path().u8string());
+		Item.Name = FileUtil::GetFileNameWithoutExtensionFromPath(StrUtil::UnicodeToAscii(File.path().u8string()));
+		std::string Ext = FileUtil::GetExtension(StrUtil::UnicodeToAscii(File.path().u8string()));
 		Item.Texture =  EditorUI::Textures[5];
 		Item.Color = EditorUI::ItemColors["dir"];
-		Item.Path = File.path().u8string();
+		Item.Path = StrUtil::UnicodeToAscii(File.path().u8string());
 		Item.CanCopy = false;
 		Items.push_back(Item);
 	}
@@ -46,11 +46,11 @@ std::vector<AssetBrowser::BrowserItem> AssetBrowser::GetBrowserContents()
 			continue;
 		}
 		BrowserItem Item;
-		Item.Name = FileUtil::GetFileNameWithoutExtensionFromPath(File.path().u8string());
-		std::string Ext = FileUtil::GetExtension(File.path().u8string());
+		Item.Name = FileUtil::GetFileNameWithoutExtensionFromPath(StrUtil::UnicodeToAscii(File.path().u8string()));
+		std::string Ext = FileUtil::GetExtension(StrUtil::UnicodeToAscii(File.path().u8string()));
 		Item.Texture = EditorUI::Textures[EditorUI::ItemTextures[Ext]];
 		Item.Color = EditorUI::ItemColors[Ext];
-		Item.Path = File.path().u8string();
+		Item.Path = StrUtil::UnicodeToAscii(File.path().u8string());
 		Item.CanCopy = true;
 		Items.push_back(Item);
 	}

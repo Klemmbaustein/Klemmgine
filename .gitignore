@@ -34,3 +34,5 @@ obj/
 *.obj
 Tools/BuildTool/Output/GENERATED/*
 *.pref
+/Projects/*
+*.ilk

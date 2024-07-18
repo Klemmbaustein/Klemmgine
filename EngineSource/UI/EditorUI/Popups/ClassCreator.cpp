@@ -81,9 +81,11 @@ void ClassCreator::OnButtonClicked(int Index)
 	{
 	case 0:
 	{
+#ifdef ENGINE_CSHARP
 		Create(ClassFields[0]->GetText(), PathString, ClassType::CSharp);
 		delete this;
 		return;
+#endif
 	}
 	case 1:
 		delete this;

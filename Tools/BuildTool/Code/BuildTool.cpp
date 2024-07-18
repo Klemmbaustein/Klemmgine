@@ -88,6 +88,9 @@ int main(int argc, char** argv)
 {
 	std::vector<std::string> InLoc;
 	std::string OutLoc;
+
+	bool WriteCSharp = true;
+
 	for (int i = 0; i < argc; i++)
 	{
 		std::string ArgStr = argv[i];
@@ -96,7 +99,7 @@ int main(int argc, char** argv)
 			ArgStr = ArgStr.substr(ArgStr.find_first_of("=") + 1);
 			if (!std::filesystem::exists(ArgStr))
 			{
-				PARSE_ERROR("In path does not exist: " + ArgStr + " - Current Path: " + std::filesystem::current_path().u8string());
+				PARSE_ERROR("In path does not exist: " + ArgStr + " - Current Path: " + std::filesystem::current_path().string());
 			}
 			InLoc.push_back(ArgStr);
 		}
@@ -112,6 +115,11 @@ int main(int argc, char** argv)
 			{
 				PARSE_ERROR("Output path has been defined more than once");
 			}
+		}
+
+		if (ArgStr == "noCSharp")
+		{
+			WriteCSharp = false;
 		}
 	}
 
@@ -135,6 +143,10 @@ int main(int argc, char** argv)
 	std::vector<ParseFile::Object> SceneObjects;
 	for (ParseFile::Object& i : Objects)
 	{
+		if (i.Name == "CSharpObject" && !WriteCSharp)
+		{
+			continue;
+		}
 		if (i.DerivesFromSceneObject(Objects))
 		{
 			i.WriteGeneratedHeader(OutLoc);

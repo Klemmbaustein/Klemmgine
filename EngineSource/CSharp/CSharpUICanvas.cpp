@@ -1,3 +1,4 @@
+#ifdef ENGINE_CSHARP
 #include "CSharpUICanvas.h"
 #include <Engine/Subsystem/CSharpInterop.h>
 
@@ -25,3 +26,4 @@ CSharpUICanvas::~CSharpUICanvas()
 {
 	CSharpInterop::StaticCall<void>(DestroyFunction);
 }
+#endif

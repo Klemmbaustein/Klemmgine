@@ -14,6 +14,16 @@ namespace StrUtil
 
 	std::string VectorToString(std::vector<char> In);
 
+	inline std::u8string AsciiToUnicode(std::string str)
+	{
+		return std::u8string(str.begin(), str.end());
+	}
+
+	inline std::string UnicodeToAscii(std::u8string str)
+	{
+		return std::string(str.begin(), str.end());
+	}
+
 	/**
 	 * @brief
 	 * Splits a string into different substring separated by a char.

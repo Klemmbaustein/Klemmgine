@@ -17,7 +17,7 @@ public:
 	virtual void OnItemClicked(BrowserItem Item) override;
 	virtual void GoBack() override;
 
-	virtual void OnItemDropped(DroppedItem From, BrowserItem To);
+	virtual void OnItemDropped(DroppedItem From, BrowserItem To) override;
 
 	virtual void DeleteItem(BrowserItem Item) override;
 	static void UpdateAll();

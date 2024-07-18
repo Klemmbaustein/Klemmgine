@@ -29,7 +29,7 @@ std::string StrUtil::Format(std::string Format, ...)
 		{
 			delete[] Buffer;
 		}
-		Buffer = new char[Size](0);
+		Buffer = new char[Size]();
 		va_list va;
 		va_start(va, Format);
 		NewSize = vsnprintf(Buffer, Size, Format.c_str(), va);

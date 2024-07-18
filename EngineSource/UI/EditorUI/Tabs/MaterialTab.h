@@ -26,7 +26,7 @@ public:
 	void Tick() override; //Render and Update
 	void Load(std::string File) override;
 	void OnResized() override;
-	void Save();
+	void Save() override;
 	void GenerateUI();
 	void GenerateMaterialProperties();
 	void UpdateModel();

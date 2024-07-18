@@ -9,6 +9,7 @@
 #include <Engine/Stats.h>
 #include <Engine/AppWindow.h>
 #include <Engine/LaunchArgs.h>
+#include <Engine/Utility/StringUtility.h>
 
 #include <Engine/Subsystem/Console.h>
 #include <Engine/Subsystem/Sound.h>
@@ -201,7 +202,7 @@ int Application::Initialize(int argc, char** argv)
 	Application::Timer StartupTimer;
 	OS::SetConsoleWindowVisible(true);
 	Assets::ScanForAssets();
-	Application::EditorPath = std::filesystem::current_path().u8string();
+	Application::EditorPath = StrUtil::UnicodeToAscii(std::filesystem::current_path().u8string());
 	Error::Init();
 
 	InitSDL();

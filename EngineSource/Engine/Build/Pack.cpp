@@ -16,7 +16,7 @@ std::vector<Pack::PackFile> Pack::GetPackContents(std::string Pack)
 		for(uint32_t i = 0; i < AmountOfFiles; i++)
 		{
 			std::string inName;
-			size_t stringlen;
+			size_t stringlen = 0;
 			In.read((char*)&stringlen, sizeof(size_t));
 			char* temp = new char[stringlen + 1];
 			In.read(temp, stringlen);
@@ -25,7 +25,6 @@ std::vector<Pack::PackFile> Pack::GetPackContents(std::string Pack)
 			delete[] temp;
 
 			std::string inContent;
-			stringlen;
 			In.read((char*)&stringlen, sizeof(size_t));
 			temp = new char[stringlen + 1];
 			In.read(temp, stringlen);

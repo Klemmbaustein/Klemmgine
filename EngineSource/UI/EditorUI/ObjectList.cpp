@@ -8,6 +8,7 @@
 #include <UI/EditorUI/EditorUI.h>
 #include <UI/EditorUI/Viewport.h>
 #include <UI/EditorUI/EditorDropdown.h>
+#include <Engine/Utility/FileUtility.h>
 #ifdef ENGINE_CSHARP
 #include <Objects/CSharpObject.h>
 #endif
@@ -113,7 +114,7 @@ void ObjectList::GenerateObjectListSection(std::vector<ObjectListItem> Section, 
 		IsCSObj = Object.Object && Object.Object->GetObjectDescription().ID == CSharpObject::GetID();
 		Vector3 ObjectColor = IsCSObj ? EditorUI::ItemColors.at("cs") : EditorUI::ItemColors.at("cpp");
 #else
-		Vector3 ObjectColor = Editor::ItemColors["cpp"];
+		Vector3 ObjectColor = EditorUI::ItemColors.at("cpp");
 #endif
 
 		unsigned int ElemIcon = 5;
@@ -215,6 +216,7 @@ std::vector<ObjectList::ObjectListItem> ObjectList::GetObjectList()
 
 		// Separate the Object's category into multiple strings
 		std::string CurrentPath = Objects::GetCategoryFromID(o->GetObjectDescription().ID);
+#ifdef ENGINE_CSHARP
 		if (o->GetObjectDescription().ID == CSharpObject::GetID() && static_cast<CSharpObject*>(o)->CS_Obj.ID != 0)
 		{
 			auto Classes = CSharpInterop::CSharpSystem->GetAllClasses();
@@ -234,6 +236,7 @@ std::vector<ObjectList::ObjectListItem> ObjectList::GetObjectList()
 				}
 			}
 		}
+#endif
 
 		std::vector<std::string> PathElements;
 		size_t Index = CurrentPath.find_first_of("/");

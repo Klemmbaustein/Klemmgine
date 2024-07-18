@@ -13,7 +13,7 @@ BackgroundTask::BackgroundTask(std::function<void()> Function, std::function<voi
 {
 	// Using a pointer as an ID. Why not?
 	AllTasks.push_back(this);
-	this->Callback = Callback;
+	this->Callback = CallbackFunction;
 
 	Thread = new std::thread(TaskRun, Function, this);
 }

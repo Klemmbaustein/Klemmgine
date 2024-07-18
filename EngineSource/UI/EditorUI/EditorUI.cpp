@@ -165,13 +165,14 @@ void EditorUI::LaunchInEditor()
 		}
 		Editor::Rebuilding = false;
 #endif
-
+#ifdef ENGINE_CSHARP
 		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll")
 			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
 			&& CSharpInterop::GetUseCSharp())
 		{
 			RebuildAssembly();
 		}
+#endif
 	}
 	catch (std::exception& e)
 	{

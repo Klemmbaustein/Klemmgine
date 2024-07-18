@@ -139,7 +139,7 @@ int main(int argc, char** argv)
 			| std::filesystem::copy_options::overwrite_existing);
 #endif
 
-#if _WIN32
+#if 0
 #if ENGINE_NO_SOURCE
 		if (LaunchArgs["ciBuild"] != "false")
 #endif

@@ -100,12 +100,14 @@ static std::vector<MenuBarItem> MenuBarItems =
 				}
 			),
 		}),
+#ifdef ENGINE_CSHARP
 	MenuBarItem("C#",
 		{
 			MenuBarEntry("Open Solution", []() { OS::OpenFile(Build::GetProjectBuildName() + ".sln"); }),
 			MenuBarEntry("Rebuild C# Assembly", []() { new BackgroundTask(EditorUI::RebuildAssembly); }, true),
 			MenuBarEntry("New Class", []() { new ClassCreator(); }),
 		}),
+#endif
 	MenuBarItem("Help",
 		{
 			MenuBarEntry("Documentation", []() { OS::OpenFile(Application::GetEditorPath() + "/Docs/html/index.html"); }),
@@ -128,11 +130,6 @@ StatusBar::StatusBar()
 
 	StatusBackground->SetBorder(UIBox::BorderType::None, 0);
 
-	std::string VersionText = "Engine v" + std::string(VERSION_STRING);
-#if ENGINE_CSHARP
-	VersionText.append("-C#");
-#endif
-
 	StatusText = new UIText(0.48f, EditorUI::UIColors[2], "FPS: ", EditorUI::Text);
 	BarBoxes[1]->AddChild(StatusText->SetPadding(0, 0, 0.01f, 0.01f));
 	StatusBackground->SetVerticalAlign(UIBox::Align::Centered);
@@ -140,7 +137,11 @@ StatusBar::StatusBar()
 	int Iterator = 0;
 	for (const auto& i : MenuBarItems)
 	{
+#ifdef ENGINE_CSHARP
 		if (i.Name != "C#" || CSharpInterop::GetUseCSharp())
+#else
+		if (true)
+#endif
 		{
 			UIButton* NewButton = new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, this, Iterator);
 			BarBoxes[0]

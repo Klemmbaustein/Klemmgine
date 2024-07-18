@@ -176,7 +176,11 @@ std::string SceneObject::GetPropertiesAsString()
 	std::stringstream OutProperties;
 	for (Property p : Properties)
 	{
+#ifdef ENGINE_CSHARP
 		if (p.PType != Property::PropertyType::EditorProperty && p.PType != Property::PropertyType::CSharpProperty)
+#else
+		if (p.PType != Property::PropertyType::EditorProperty)
+#endif
 		{
 			continue;
 		}
@@ -184,10 +188,13 @@ std::string SceneObject::GetPropertiesAsString()
 		StrUtil::ReplaceChar(p.Name, '#', "\\#");
 		StrUtil::ReplaceChar(p.Name, ';', "\\;");
 
+#ifdef ENGINE_CSHARP
 		if (p.PType == Property::PropertyType::CSharpProperty)
 		{
 			OutProperties << "@csharp_";
 		}
+#endif
+
 		OutProperties << p.Name << ";" << p.NativeType << ";";
 		OutProperties << p.ValueToString(this);
 		OutProperties << "#";
@@ -270,6 +277,7 @@ void SceneObject::LoadProperties(std::string in)
 					continue;
 				}
 				{
+#ifdef ENGINE_CSHARP
 					std::string CSharpSeparator = "@csharp";
 					if (CurrentProperty.Name.substr(0, CSharpSeparator.size()) == CSharpSeparator)
 					{
@@ -278,6 +286,7 @@ void SceneObject::LoadProperties(std::string in)
 						p.ValueString = current;
 						Properties.push_back(p);
 					}
+#endif
 				}
 				for (Property& p : Properties)
 				{

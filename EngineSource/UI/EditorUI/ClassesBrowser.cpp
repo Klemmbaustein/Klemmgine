@@ -5,6 +5,7 @@
 #include <UI/EditorUI/Popups/ClassCreator.h>
 #include <UI/EditorUI/EditorUI.h>
 #include <Engine/Utility/StringUtility.h>
+#include <Engine/Utility/FileUtility.h>
 #include <Engine/OS.h>
 
 std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::CPPClasses;
@@ -29,6 +30,7 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetEditorUIClasse
 	{
 		// First separate the Category into multiple names. For example: "Default/Rendering" -> { "Default", "Rendering" }
 		std::string CurrentPath = Objects::GetCategoryFromID(Object.ID);
+#ifdef ENGINE_CSHARP
 		if (Object.ID == CSharpObject::GetID() && Object.Name != "CSharpObject")
 		{
 			size_t Index = Object.Name.find_last_of("/");
@@ -38,6 +40,7 @@ std::vector<ClassesBrowser::EditorClassesItem> ClassesBrowser::GetEditorUIClasse
 				CurrentPath.clear();
 			}
 		}
+#endif
 		EditorClassesItem* CurrentParent = &RootPath;
 		if (CurrentPath.empty())
 		{
@@ -181,8 +184,11 @@ std::vector<ClassesBrowser::BrowserItem> ClassesBrowser::GetBrowserContents()
 	{
 		BrowserItem New;
 		New.Name = FileUtil::GetFileNameFromPath(i.Name);
+#ifdef ENGINE_CSHARP
 		std::string Ext = (i.Object.ID == CSharpObject::GetID() && i.Object.Name != "CSharpObject") ? "cs" : "cpp";
-
+#else
+		std::string Ext = "cpp";
+#endif
 		New.Color = i.IsFolder ? EditorUI::ItemColors["dir"] : EditorUI::ItemColors[Ext];
 		New.Texture = i.IsFolder ? EditorUI::Textures[5] : EditorUI::Textures[EditorUI::ItemTextures[Ext]];
 		New.Renameable = false;

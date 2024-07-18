@@ -1,5 +1,16 @@
 # Klemmgine
 
+> ## Dev branch: Experimental CMake support
+> 
+> **WIP** CMake support.
+> 
+> ### Todo:
+> - Integrate into project generator (add a command line argument for the build system, add an option for CMake).
+> - Fix game builds from the editor still assuming the project is built using KlemmBuild or MSBuild.
+> - Test on Linux.
+> 
+> This branch also fixes some issues found by compiling the engine with clang-cl on windows.
+
 [![Build binaries](https://github.com/Klemmbaustein/Klemmgine/actions/workflows/build.yml/badge.svg)](https://github.com/Klemmbaustein/Klemmgine/actions/workflows/build.yml)
 
 A simple 3D game engine written in C++ using OpenGL and SDL2 for Windows and Linux. It has basic support for scripting in C#.

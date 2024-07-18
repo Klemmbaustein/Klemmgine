@@ -101,7 +101,7 @@ namespace FileUtil
 	{
 		auto Files = GetAllFilesInFolder(Folder);
 
-		std::filesystem::file_time_type Latest = Latest = std::filesystem::last_write_time(Folder);
+		std::filesystem::file_time_type Latest = std::filesystem::last_write_time(Folder);
 
 		for (auto& i : std::filesystem::directory_iterator(Folder))
 		{

@@ -1,5 +1,7 @@
 ﻿#if !SERVER
+#if _WIN32 && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 #include "TextRenderer.h"
 #define STB_TRUETYPE_IMPLEMENTATION
 #include <Utility/stb_truetype.hpp>
@@ -187,7 +189,7 @@ TextRenderer::TextRenderer(std::string filename)
 	stbtt_InitFont(&FontInfo, ttfBuffer, stbtt_GetFontOffsetForIndex(ttfBuffer, 0));
 
 
-	uint8_t* GlyphBitmap = new uint8_t[FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH](0);
+	uint8_t* GlyphBitmap = new uint8_t[FONT_BITMAP_WIDTH * FONT_BITMAP_WIDTH]();
 	int Offset = 0;
 	int xCoord = 0;
 	int yCoord = 0;

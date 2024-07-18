@@ -98,7 +98,7 @@ void Client::OnConnected(Packet* p)
 	memcpy(&ClientID, &p->Data[1], sizeof(uint64_t));
 	IsConnected = true;
 	Log::PrintMultiLine(StrUtil::Format("Connected to server: %s\nClientUID: %i",
-			Networking::IPtoStr(p->FromAddr),
+			Networking::IPtoStr(p->FromAddr).c_str(),
 			(int)ClientID
 		),
 		Log::LogColor::Green,

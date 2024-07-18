@@ -89,6 +89,7 @@ std::vector<T>& GetVec(void* vec)
 
 void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& Element, SceneObject* ContextObject)
 {
+#ifdef ENGINE_CSHARP
 	UIBox* NewElement = nullptr;
 	CSharpObject* obj = static_cast<CSharpObject*>(ContextObject);
 	std::string Value = obj->GetProperty(Element.Name);
@@ -173,6 +174,7 @@ void ContextMenu::GenerateCSharpProperty(const ContextMenu::ContextMenuSection& 
 			ContextButtons.push_back(NewElement);
 		}
 	}
+#endif
 }
 
 void ContextMenu::GenerateSectionElement(ContextMenuSection Element, SceneObject* ContextObject, std::string Name)
@@ -218,11 +220,13 @@ void ContextMenu::GenerateSectionElement(ContextMenuSection Element, SceneObject
 	{
 		void* val = Element.Variable;
 
+#ifdef ENGINE_CSHARP
 		if (val == nullptr)
 		{
 			GenerateCSharpProperty(Element, ContextObject);
 			continue;
 		}
+#endif
 		if (IsList)
 		{
 			switch (Element.NativeType & ~NativeType::List)
@@ -337,6 +341,7 @@ void ContextMenu::OnButtonClicked(int Index)
 		{
 			if (!ContextSettings[IteratedElement].Variable)
 			{
+#ifdef ENGINE_CSHARP
 				auto& Element = ContextSettings[IteratedElement];
 				CSharpObject* obj = static_cast<CSharpObject*>(EditorUI::SelectedObjects[0]);
 
@@ -381,6 +386,7 @@ void ContextMenu::OnButtonClicked(int Index)
 
 				IteratedElement++;
 				continue;
+#endif
 			}
 			if (ContextSettings[IteratedElement].NativeType & NativeType::List)
 			{
@@ -559,8 +565,11 @@ void ContextMenu::OnResized()
 
 		for (SceneObject::Property i : SelectedObject->Properties)
 		{
-
+#ifdef ENGINE_CSHARP
 			if (i.PType != SceneObject::Property::PropertyType::EditorProperty && i.PType != SceneObject::Property::PropertyType::CSharpProperty)
+#else		
+			if (i.PType != SceneObject::Property::PropertyType::EditorProperty)
+#endif
 			{
 				continue;
 			}
@@ -584,8 +593,6 @@ void ContextMenu::OnResized()
 				Categories[CategoryName].push_back(ContextMenuSection(i.Data, i.NativeType, i.Name));
 			}
 		}
-
-		CSharpObject* CSharp = dynamic_cast<CSharpObject*>(SelectedObject);
 
 		char Iterator = 1;
 		for (auto& i : Categories)

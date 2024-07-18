@@ -173,7 +173,7 @@ void Viewport::OnItemDropped(DroppedItem Item)
 		Point = hit.ImpactPoint;
 	}
 
-
+#ifdef ENGINE_CSHARP
 	if (Item.TypeID == CSharpObject::GetID())
 	{
 		auto Obj = Objects::SpawnObject<CSharpObject>(Transform(Point, 0, 1));
@@ -185,11 +185,15 @@ void Viewport::OnItemDropped(DroppedItem Item)
 		EditorUI::ChangedScene = true;
 		return;
 	}
-	else if (!std::filesystem::exists(Item.Path))
+	else
+#endif
 	{
-		Objects::SpawnObjectFromID(Item.TypeID, Transform(Point, 0, 1))->IsSelected = true;
-		EditorUI::ChangedScene = true;
-		return;
+		if (!std::filesystem::exists(Item.Path))
+		{
+			Objects::SpawnObjectFromID(Item.TypeID, Transform(Point, 0, 1))->IsSelected = true;
+			EditorUI::ChangedScene = true;
+			return;
+		}
 	}
 
 	ClearSelectedObjects();

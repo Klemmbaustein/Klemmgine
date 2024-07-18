@@ -38,7 +38,7 @@ public:
 	Viewport(EditorPanel* Parent);
 	void ClearSelectedObjects();
 	virtual void OnItemDropped(DroppedItem Item) override;
-	void OnButtonClicked(int Index);
+	void OnButtonClicked(int Index) override;
 
 	FramebufferObject* OutlineBuffer = nullptr, *ArrowsBuffer = nullptr;
 
