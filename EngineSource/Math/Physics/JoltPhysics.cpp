@@ -77,7 +77,7 @@ static void TraceImpl(const char* inFMT, ...)
 	PhysicsSubsystem::PhysicsSystem->Print(buffer, Subsystem::ErrorLevel::Error);
 }
 
-#ifndef JPH_ENABLE_ASSERTS
+#ifdef JPH_ENABLE_ASSERTS
 
 static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, uint inLine)
 {
