@@ -13,6 +13,13 @@
 #include <mutex>
 #include "Networking.h"
 
+#undef INADDR_ANY
+#undef INADDR_LOOPBACK
+#undef INADDR_BROADCAST
+#undef INADDR_NONE
+
+#include <WinSock2.h>
+
 const int Packet::MAX_PACKET_SIZE = 512;
 uint64_t Packet::PacketID = 0;
 namespace pkt
@@ -112,9 +119,10 @@ void Packet::EvaluatePacket()
 		{
 			if (i.ID == ObjTypeID)
 			{
-				Log::Print(StrUtil::Format("[Net]: Spawning replicated object %s with owner '%s'", 
+				Log::Print(StrUtil::Format("[Net]: Spawning replicated object %s with owner '%s' (NetID: %i)", 
 					i.Name.c_str(),
-					Networking::ClientIDToString(ObjOwnerID).c_str()),
+					Networking::ClientIDToString(ObjOwnerID).c_str(),
+					(int)ObjNetID),
 					Log::LogColor::Gray);
 			}
 		}
@@ -125,18 +133,6 @@ void Packet::EvaluatePacket()
 	}
 #endif
 	break;
-	case PacketType::ServerSceneTravel:
-#if !SERVER
-	{
-	if (!Client::GetIsConnected())
-	{
-		return;
-	}
-
-	Scene::LoadNewScene(ReadString(), true);
-	}
-#endif
-		break;
 	case PacketType::NetworkEventTrigger:
 		NetworkEvent::HandleNetworkEvent(this);
 		break;
@@ -165,18 +161,19 @@ void Packet::AppendStringToData(std::string str)
 void Packet::Send(void* TargetAddr)
 {
 	IPaddress* Target = (IPaddress*)TargetAddr;
-	Networking::SentPacket->address.host = Target->host;
-	Networking::SentPacket->address.port = Target->port;
-	Networking::SentPacket->len = (int)Data.size() + sizeof(uint64_t);
+	Networking::PacketData->address.host = Target->host;
+	Networking::PacketData->address.port = Target->port;
+	Networking::PacketData->len = (int)Data.size() + sizeof(uint64_t);
 	
-	memcpy(Networking::SentPacket->data + sizeof(uint64_t), Data.data(), Networking::SentPacket->len);
-	memcpy(Networking::SentPacket->data, &PacketID, sizeof(uint64_t));
+	memcpy(Networking::PacketData->data + sizeof(uint64_t), Data.data(), Networking::PacketData->len);
+	memcpy(Networking::PacketData->data, &PacketID, sizeof(uint64_t));
 	PacketID++;
-	int ret = SDLNet_UDP_Send(Networking::Socket, -1, Networking::SentPacket);
+	int Result = SDLNet_UDP_Send(Networking::Socket, -1, Networking::PacketData);
 
-	if (!ret)
+	if (!Result)
 	{
-		std::cout << "Error sending packet: " << SDLNet_GetError() << std::endl;
+		Log::Print(StrUtil::Format("Error sending packet: %s", SDLNet_GetError()));
+		Log::Print(StrUtil::Format("WSAGetLastError: %i", WSAGetLastError()));
 	}
 }
 
@@ -191,7 +188,7 @@ void PacketReceive()
 		int ret = SDLNet_CheckSockets(Networking::SocketSet, 150);
 		if (ret == -1)
 		{
-			std::cout << SDLNet_GetError() << std::endl;
+			Log::Print(StrUtil::Format("Error reading sockets: %s", SDLNet_GetError()));
 		}
 		while (SDLNet_SocketReady(Networking::Socket))
 		{

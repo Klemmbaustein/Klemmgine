@@ -37,7 +37,7 @@ namespace Networking
 	IPaddress srvHost;
 
 	UDPsocket Socket;
-	UDPpacket* SentPacket;
+	UDPpacket* PacketData;
 	float TickTimer = 0;
 	uint64_t GameTick = 0;
 	bool IsServerTickFrame = false;
@@ -48,8 +48,8 @@ namespace Networking
 
 void Networking::InitPacket(IPaddress* Target)
 {
-	SentPacket = SDLNet_AllocPacket(Packet::MAX_PACKET_SIZE);
-	if (!SentPacket)
+	PacketData = SDLNet_AllocPacket(Packet::MAX_PACKET_SIZE);
+	if (!PacketData)
 	{
 		Log::Print("Could not allocate receiving packet", Log::LogColor::Red);
 	}
@@ -84,13 +84,13 @@ void Networking::InitSockets(uint16_t Port)
 		return;
 	}
 
-	SentPacket = SDLNet_AllocPacket(Packet::MAX_PACKET_SIZE);
-	if (!SentPacket)
+	PacketData = SDLNet_AllocPacket(Packet::MAX_PACKET_SIZE);
+	if (!PacketData)
 	{
 		Log::Print("Could not allocate packet", Log::LogColor::Red);
 		return;
 	}
-	Log::Print(StrUtil::Format("[Net]: Listening on port %i", Port), Log::LogColor::Blue);
+	Log::Print(StrUtil::Format("[Net]: Starting server on port %i", Port), Log::LogColor::Blue);
 }
 
 UDPsocket Networking::InitSocketFrom(IPaddress* Target)

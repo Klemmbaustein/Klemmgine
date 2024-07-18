@@ -1,5 +1,6 @@
 #pragma once
 #include <Engine/Application.h>
+#include <functional>
 #if !EDITOR
 #include "Packet.h"
 
@@ -12,9 +13,11 @@ namespace Server
 		uint64_t LastResponseTick = 0;
 		void* IP = nullptr;
 		uint64_t ID = 0;
+		// True if the client has accepted the most recent scene load request.
+		bool LoadedInScene = false;
 
 		void SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform, std::string ObjProperties) const;
-		void SendServerTravelRequest(std::string SceneName) const;
+		void SendServerTravelRequest(std::string SceneName);
 	};
 
 	/**
@@ -35,26 +38,29 @@ namespace Server
 
 	void Init();
 
+	void ChangeScene(std::string NewSceneName);
+
 	bool IsServer();
 
 	void Update();
 	void HandlePacket(Packet* p);
 
 	void SendClientInfo(ClientInfo* c);
-
 	ClientInfo* GetClientInfoFromIP(void* IP);
 	ClientInfo* GetClientInfoFromID(uint64_t ID);
 
 	const std::vector<ClientInfo>& GetClients();
+
+	void OnClientAcceptSceneChange(uint64_t ClientID);
 }
 #endif
 
 namespace Server
 {
-	void AddOnPlayerConnectedCallback(void(*OnJoined)(uint64_t));
+	void AddOnPlayerConnectedCallback(std::function<void(uint64_t PlayerID)> OnJoined);
 	void ClearOnPlayerConnectedCallbacks();
 
-	void AddOnPlayerDisconnectedCallback(void(*OnLeft)(uint64_t));
-	void ClearOnPlayerdisconnectedCallbacks();
+	void AddOnPlayerDisconnectedCallback(std::function<void(uint64_t PlayerID)> OnLeft);
+	void ClearOnPlayerDisconnectedCallbacks();
 
 }

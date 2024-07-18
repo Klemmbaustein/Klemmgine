@@ -1,5 +1,12 @@
 # Changes
 
+## Version 1.13.2
+
+### Changes
+
+- Networking fixes and improvements.
+- Updated all dependencies to their latest versions.
+
 ## Version 1.13.1
 
 ### Changes

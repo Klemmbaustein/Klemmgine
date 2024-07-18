@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <Objects/SceneObject.h>
 #include <Engine/Utility/StringUtility.h>
+#include <Engine/Subsystem/Scene.h>
 
 namespace NetworkEvent
 {
@@ -24,8 +25,9 @@ namespace NetworkEvent
 	std::unordered_set<uint64_t> ReceivedEvents;
 
 	std::vector<Event> SentEvents;
+	static void* CallingClient = nullptr;
 	
-	void SendEvent(const Event& e)
+	static void SendEvent(const Event& e)
 	{
 		Packet p;
 		p.Write((uint8_t)Packet::PacketType::NetworkEventTrigger);
@@ -110,49 +112,65 @@ void NetworkEvent::HandleNetworkEvent(Packet* Data)
 	p.Write((uint8_t)Packet::PacketType::NetworkEventAccept);
 	p.Write(EventID);
 	p.Send(Data->FromAddr);
-	if (!ReceivedEvents.contains(EventID))
-	{
-		ReceivedEvents.insert(EventID);
 
-		SceneObject* Target = Networking::GetObjectFromNetID(ObjID);
-		if (!Target)
+	if (ReceivedEvents.contains(EventID))
+	{
+		return;
+	}
+
+	ReceivedEvents.insert(EventID);
+
+#if !SERVER
+	if (ObjID == UINT64_MAX)
+	{
+		if (Name == "__scene" && Values.size() == 1)
 		{
-			// TODO: Handle missing objects by requesting it from the server
-			Log::Print("[Net]: Unknown object: " + std::to_string(ObjID), Log::LogColor::Yellow);
-			return;
+			Scene::LoadNewScene(Values.at(0), true);
 		}
+		return;
+	}
+#endif
+
+	SceneObject* Target = Networking::GetObjectFromNetID(ObjID);
+	if (!Target)
+	{
+		// TODO: Handle missing objects by requesting it from the server
+		Log::Print("[Net]: Unknown object: " + std::to_string(ObjID), Log::LogColor::Yellow);
+		return;
+	}
 
 #if SERVER
-		if (Server::GetClientInfoFromIP(Data->FromAddr)->ID == Target->NetID)
-		{
-			return;
-		}
+	if (Server::GetClientInfoFromIP(Data->FromAddr)->ID == Target->NetID)
+	{
+		return;
+	}
 #endif
 
 #if !SERVER
-		if (Networking::IPEqual(Client::GetCurrentServerAddr(), Data->FromAddr))
+	if (Networking::IPEqual(Client::GetCurrentServerAddr(), Data->FromAddr))
+	{
+		if (Name == "__destr")
 		{
-			if (Name == "__destr")
-			{
-				Objects::DestroyObject(Target);
-				return;
-			}
+			Objects::DestroyObject(Target);
+			return;
 		}
+	}
 #endif
 
-		for (const auto& i : Target->NetEvents)
-		{
+	for (const auto& i : Target->NetEvents)
+	{
 #if SERVER
-			if (i.NativeType != SceneObject::NetEvent::EventType::Server)
-			{
-				continue;
-			}
+		if (i.NativeType != SceneObject::NetEvent::EventType::Server)
+		{
+			continue;
+		}
 #endif
-			if (i.Name == Name)
-			{
-				(Target->*i.Function)(Values);
-				break;
-			}
+		if (i.Name == Name)
+		{
+			CallingClient = Data->FromAddr;
+			(Target->*i.Function)(Values);
+			CallingClient = nullptr;
+			break;
 		}
 	}
 }
@@ -169,12 +187,27 @@ void NetworkEvent::HandleEventAccept(Packet* Data)
 
 	for (size_t i = 0; i < SentEvents.size(); i++)
 	{
-		if (SentEvents[i].EventID == EventID)
+		if (SentEvents[i].EventID != EventID)
 		{
-			SentEvents.erase(SentEvents.begin() + i);
-			break;
+			continue;
 		}
+#if SERVER
+		auto& EventName = SentEvents[i].Name;
+		size_t FirstSemicolon = EventName.find_first_of(";");
+		if (EventName.substr(0, FirstSemicolon) == "__scene" && SentEvents[i].Object == UINT64_MAX)
+		{
+			Server::OnClientAcceptSceneChange(SentEvents[i].TargetClient);
+		}
+#endif
+
+		SentEvents.erase(SentEvents.begin() + i);
+		break;
 	}
+}
+
+void* NetworkEvent::GetCallingClient()
+{
+	return CallingClient;
 }
 
 void NetworkEvent::Update()

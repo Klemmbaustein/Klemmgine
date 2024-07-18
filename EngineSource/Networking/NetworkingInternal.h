@@ -10,7 +10,7 @@ namespace Networking
 	extern SDLNet_SocketSet SocketSet;
 
 	extern UDPsocket Socket;
-	extern UDPpacket* SentPacket;
+	extern UDPpacket* PacketData;
 	extern float TickTimer;
 	extern size_t GameTick;
 	UDPsocket InitSocketFrom(IPaddress* Target);

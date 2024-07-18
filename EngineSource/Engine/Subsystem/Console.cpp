@@ -232,19 +232,6 @@ Console::Console()
 			}
 		}, { Command::Argument("pack_file", NativeType::String) }));
 
-
-	RegisterCommand(Command("open", [this]()
-		{
-		if (std::filesystem::exists(Assets::GetAsset(CommandArgs()[0] + +".jscn")))
-		{
-			Scene::LoadNewScene(Assets::GetAsset(CommandArgs()[0] + ".jscn"));
-		}
-		else
-		{
-			Print("Could not find scene \"" + CommandArgs()[0] + "\"", ErrorLevel::Error);
-		}
-		}, { Command::Argument("scene", NativeType::String) }));
-
 	RegisterCommand(Command("help", [this]()
 		{
 			std::string CommandString = ConsoleSystem->CommandArgs()[0];

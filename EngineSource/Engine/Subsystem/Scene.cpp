@@ -17,6 +17,8 @@
 #include <Rendering/RenderSubsystem/BakedLighting.h>
 #include <UI/Debug/DebugUI.h>
 #include <Engine/EngineProperties.h>
+#include <Engine/Subsystem/Console.h>
+#include <Networking/Server.h>
 
 // Old scene files do not save the fog and sun properties
 #define SAVE_FOG_AND_SUN 1
@@ -77,20 +79,20 @@ void Scene::LoadSceneInternally(std::string FilePath)
 			Graphics::MainFramebuffer->ReflectionCubemapName.clear();
 		}
 #endif
-		for (int i = 0; i < Objects::AllObjects.size(); i++)
+		for (size_t i = 0; i < Objects::AllObjects.size(); i++)
 		{
 			Objects::AllObjects.at(i)->IsSelected = false;
 		}
 		TextInput::PollForText = false;
 		Stats::EngineStatus = "Loading Scene";
-		for (int i = 0; i < Objects::AllObjects.size(); i++)
+		for (size_t i = 0; i < Objects::AllObjects.size(); i++)
 		{
 			if (Objects::AllObjects[i] != nullptr)
 			{
 				Objects::DestroyObject(Objects::AllObjects[i]);
 			}
 		}
-		SceneObject::DestroyMarkedObjects();
+		SceneObject::DestroyMarkedObjects(false);
 
 		Objects::AllObjects.clear();
 #if !SERVER
@@ -304,6 +306,24 @@ Scene::Scene()
 {
 	Name = "SceneSys";
 	SceneSystem = this;
+
+	Console::ConsoleSystem->RegisterCommand(Console::Command("open", []()
+		{
+			std::string Scene = Console::ConsoleSystem->CommandArgs()[0];
+			if (std::filesystem::exists(Assets::GetAsset(Scene + ".jscn")))
+			{
+#if !SERVER
+				Scene::LoadNewScene(Assets::GetAsset(Scene + ".jscn"));
+#else
+				Server::ChangeScene(Assets::GetAsset(Scene + ".jscn"));
+#endif
+			}
+			else
+			{
+				Console::ConsoleSystem->Print("Could not find scene \"" + Scene + "\"", ErrorLevel::Error);
+			}
+		},
+		{ Console::Command::Argument("scene", NativeType::String) }));
 }
 
 void Scene::Update()

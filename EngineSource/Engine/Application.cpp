@@ -91,7 +91,7 @@ namespace Application
 static void UpdateObjects()
 {
 	Stats::EngineStatus = "Updating objects";
-	SceneObject::DestroyMarkedObjects();
+	SceneObject::DestroyMarkedObjects(true);
 	for (size_t i = 0; i < Objects::AllObjects.size(); i++)
 	{
 		Objects::AllObjects.at(i)->Update();
@@ -120,7 +120,6 @@ static void ApplicationLoop()
 	}
 	UIBox::UpdateUI();
 	UIBox::DrawAllUIElements();
-	float RenderTime = RenderTimer.Get();
 
 #if !EDITOR && !RELEASE
 	if (!Debug::DebugUI::CurrentDebugUI)
@@ -128,8 +127,10 @@ static void ApplicationLoop()
 		new Debug::DebugUI();
 	}
 #endif
+
 	PostProcess::PostProcessSystem->Draw();
 #endif
+	float RenderTime = RenderTimer.Get();
 
 	const Application::Timer SwapTimer;
 #if !SERVER
@@ -144,10 +145,8 @@ static void ApplicationLoop()
 	Stats::SyncTime = SwapTimer.Get();
 	Stats::FrameCount++;
 
-	Stats::DeltaTime = FrameTimer.Get();
-	Stats::DeltaTime *= Stats::TimeMultiplier;
+	Stats::DeltaTime = FrameTimer.Get() * Stats::TimeMultiplier;
 	Stats::FPS = 1 / Stats::DeltaTime;
-	Stats::DeltaTime = std::min(Stats::DeltaTime, 0.1f);
 	Stats::DrawCalls = 0u;
 
 #if EDITOR

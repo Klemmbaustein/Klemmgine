@@ -324,12 +324,12 @@ void SceneObject::LoadProperties(std::string in)
 	}
 }
 
-void SceneObject::DestroyMarkedObjects()
+void SceneObject::DestroyMarkedObjects(bool SendNetworkEvents)
 {
 	for (auto* o : Objects::ObjectsToDestroy)
 	{
 #if !EDITOR
-		if (Client::GetIsConnected() && o->GetIsReplicated())
+		if (Client::GetIsConnected() && o->GetIsReplicated() && SendNetworkEvents)
 		{
 			if (Client::GetClientID() == o->NetOwner || Client::GetClientID() == Networking::ServerID)
 			{
@@ -341,11 +341,11 @@ void SceneObject::DestroyMarkedObjects()
 			}
 		}
 #endif
-		for (int j = 0; j < Objects::AllObjects.size(); j++)
+		for (size_t i = 0; i < Objects::AllObjects.size(); i++)
 		{
-			if (Objects::AllObjects[j] == o)
+			if (Objects::AllObjects[i] == o)
 			{
-				Objects::AllObjects.erase(Objects::AllObjects.begin() + j);
+				Objects::AllObjects.erase(Objects::AllObjects.begin() + i);
 				break;
 			}
 		}

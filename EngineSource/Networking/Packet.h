@@ -14,16 +14,15 @@ struct Packet
 	std::vector<uint8_t> Data;
 	void* FromAddr = nullptr;
 
-	enum class PacketType
+	enum class PacketType : uint8_t
 	{
 		ConnectRequest = 0,
 		ConnectionAccept = 1,
 		DisconnectRequest = 2,
 		ValueUpdate = 3,
 		SpawnObject = 4,
-		ServerSceneTravel = 5,
-		NetworkEventTrigger = 6,
-		NetworkEventAccept = 7,
+		NetworkEventTrigger = 5,
+		NetworkEventAccept = 6,
 	};
 
 

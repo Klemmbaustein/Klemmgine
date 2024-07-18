@@ -482,7 +482,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;JPH_OBJECT_STREAM;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -520,7 +520,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);SERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;JPH_OBJECT_STREAM;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);SERVER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -558,7 +558,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;EDITOR;$(ExternalCompilerOptions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;JPH_OBJECT_STREAM;NDEBUG;_CONSOLE;GLEW_STATIC;EDITOR;$(ExternalCompilerOptions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
@@ -596,7 +596,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ENGINE_CSHARP;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENGINE_CSHARP;JPH_OBJECT_STREAM;NDEBUG;_CONSOLE;GLEW_STATIC;$(ExternalCompilerOptions);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>

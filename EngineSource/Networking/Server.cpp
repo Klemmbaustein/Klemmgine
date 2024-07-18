@@ -3,11 +3,11 @@
 
 namespace Server
 {
-	std::vector<void(*)(uint64_t)> OnConnectedCallbacks;
-	std::vector<void(*)(uint64_t)> OnDisconnectedCallbacks;
+	std::vector<std::function<void(uint64_t)>> OnConnectedCallbacks;
+	std::vector<std::function<void(uint64_t)>> OnDisconnectedCallbacks;
 }
 
-void Server::AddOnPlayerConnectedCallback(void(*OnJoined)(uint64_t))
+void Server::AddOnPlayerConnectedCallback(std::function<void(uint64_t PlayerID)> OnJoined)
 {
 	OnConnectedCallbacks.push_back(OnJoined);
 }
@@ -16,12 +16,12 @@ void Server::ClearOnPlayerConnectedCallbacks()
 	OnConnectedCallbacks.clear();
 }
 
-void Server::AddOnPlayerDisconnectedCallback(void(*OnLeft)(uint64_t))
+void Server::AddOnPlayerDisconnectedCallback(std::function<void(uint64_t PlayerID)> OnLeft)
 {
 	OnDisconnectedCallbacks.push_back(OnLeft);
 }
 
-void Server::ClearOnPlayerdisconnectedCallbacks()
+void Server::ClearOnPlayerDisconnectedCallbacks()
 {
 	OnDisconnectedCallbacks.clear();
 }
@@ -43,6 +43,7 @@ namespace Server
 	static bool ShouldQuitOnPlayerDisconnect = false;
 	static std::vector<ClientInfo> Clients;
 	static uint64_t UIDCounter = 0;
+	static bool LoadingNewScene = false;
 	namespace TPS
 	{
 		static bool PrintTPS = false;
@@ -63,7 +64,9 @@ namespace Server
 				+ "ms", Log::LogColor::Gray);
 		}
 	}
+
 	static ClientInfo* ServerClient = new ClientInfo();
+
 	void ClientInfo::SendClientSpawnRequest(int32_t ObjID, uint64_t NetID, uint64_t NetOwner, Transform SpawnTransform, std::string ObjProperties) const
 	{
 		Packet p;
@@ -76,15 +79,10 @@ namespace Server
 		p.Send(IP);
 
 	}
-	void ClientInfo::SendServerTravelRequest(std::string SceneName) const
+	void ClientInfo::SendServerTravelRequest(std::string SceneName)
 	{
-		Packet p;
-		p.Data =
-		{
-			(uint8_t)Packet::PacketType::ServerSceneTravel,
-		};
-		p.AppendStringToData(SceneName);
-		p.Send(IP);
+		LoadedInScene = false;
+		NetworkEvent::TriggerNetworkEvent("__scene", { SceneName }, nullptr, ID);
 	}
 
 	static void HandleClientDisconnect(ClientInfo* Client)
@@ -140,14 +138,6 @@ void Server::OnConnectRequestReceived(Packet p)
 
 	NewClient.SendServerTravelRequest(FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene));
 
-	for (SceneObject* i : Objects::AllObjects)
-	{
-		if (i->GetIsReplicated())
-		{
-			NewClient.SendClientSpawnRequest(i->GetObjectDescription().ID, i->NetID, i->NetOwner, i->GetTransform(), i->GetPropertiesAsString());
-		}
-	}
-
 	if (Info)
 	{
 		return;
@@ -160,11 +150,6 @@ void Server::OnConnectRequestReceived(Packet p)
 	),
 		Log::LogColor::Blue,
 		"[Net]: ");
-
-	for (auto& i : OnConnectedCallbacks)
-	{
-		i(NewClient.ID);
-	}
 }
 
 void Server::DisconnectPlayer(void* IP)
@@ -175,6 +160,12 @@ void Server::DisconnectPlayer(void* IP)
 		{
 			Log::PrintMultiLine(StrUtil::Format("Client %i has disconnected.",
 				Clients[i].ID), Log::LogColor::Yellow, "[Net]: ");
+			Packet p;
+			p.Data =
+			{
+				(uint8_t)Packet::PacketType::DisconnectRequest
+			};
+			p.Send(Clients[i].IP);
 			HandleClientDisconnect(&Clients[i]);
 			break;
 		}
@@ -204,7 +195,11 @@ void Server::SpawnObject(int32_t ObjID, uint64_t NetID, Transform SpawnTransform
 {
 	for (auto& i : Clients)
 	{
-		i.SendClientSpawnRequest(ObjID, NetID, Networking::ServerID, SpawnTransform, ObjProperties);
+		// The client will receive a list of all replicated objects once it finishes loading into the scene.
+		if (i.LoadedInScene)
+		{
+			i.SendClientSpawnRequest(ObjID, NetID, Networking::ServerID, SpawnTransform, ObjProperties);
+		}
 	}
 }
 
@@ -230,7 +225,10 @@ void Server::SetObjNetOwner(SceneObject* obj, uint64_t NetOwner)
 	p.AppendStringToData("_owner=" + std::to_string(NetOwner));
 	for (auto& i : Clients)
 	{
-		p.Send(i.IP);
+		if (i.LoadedInScene)
+		{
+			p.Send(i.IP);
+		}
 	}
 	obj->NetOwner = NetOwner;
 }
@@ -266,6 +264,16 @@ void Server::Init()
 		}, { }));
 }
 
+void Server::ChangeScene(std::string NewSceneName)
+{
+	Log::Print(StrUtil::Format("[Net]: Server: Changing active scene to '%s'", NewSceneName.c_str()));
+	Scene::LoadNewScene(NewSceneName);
+	for (auto& i : Clients)
+	{
+		i.SendServerTravelRequest(NewSceneName);
+	}
+}
+
 bool Server::IsServer()
 {
 #ifdef SERVER
@@ -292,7 +300,12 @@ void Server::Update()
 	for (size_t i = 0; i < Clients.size(); i++)
 	{
 		SendClientInfo(&Clients[i]);
-		if (Networking::GameTick - Clients[i].LastResponseTick > (size_t)Networking::GetTickRate() * 5)
+
+		// Give the client extra time before timing out if they haven't loaded into the scene yet.
+		// To make sure they didn't time out while still loading in.
+		size_t TimeoutTicks = (size_t)Networking::GetTickRate() * 5 * (Clients[i].LoadedInScene ? 1 : 5);
+
+		if (Networking::GameTick - Clients[i].LastResponseTick > TimeoutTicks)
 		{
 			Log::PrintMultiLine(StrUtil::Format("Client %i has timed out.\n\tLast seen tick: %i\n\tCurrent tick %i",
 				Clients[i].ID,
@@ -350,5 +363,35 @@ Server::ClientInfo* Server::GetClientInfoFromID(uint64_t ID)
 const std::vector<Server::ClientInfo>& Server::GetClients()
 {
 	return Clients;
+}
+void Server::OnClientAcceptSceneChange(uint64_t ClientID)
+{
+	ClientInfo* Client = GetClientInfoFromID(ClientID);
+
+	if (!Client)
+	{
+		Log::Print(StrUtil::Format("[Net]: %s: Invalid client ID: %s", __FUNCTION__, std::to_string(ClientID).c_str()));
+		return;
+	}
+
+	if (Client->LoadedInScene)
+	{
+		return;
+	}
+
+	Client->LoadedInScene = true;
+
+	for (SceneObject* i : Objects::AllObjects)
+	{
+		if (i->GetIsReplicated())
+		{
+			Client->SendClientSpawnRequest(i->GetObjectDescription().ID, i->NetID, i->NetOwner, i->GetTransform(), i->GetPropertiesAsString());
+		}
+	}
+
+	for (std::function<void(uint64_t)>& i : OnConnectedCallbacks)
+	{
+		i(ClientID);
+	}
 }
 #endif

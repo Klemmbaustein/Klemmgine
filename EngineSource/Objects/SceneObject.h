@@ -271,7 +271,7 @@ public:
 	 * @deprecated
 	 */
 	std::string CurrentScene;
-	static void DestroyMarkedObjects();
+	static void DestroyMarkedObjects(bool SendNetworkEvents);
 	
 	/**
 	 * @brief
