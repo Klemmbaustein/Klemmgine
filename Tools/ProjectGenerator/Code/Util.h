@@ -15,12 +15,6 @@ namespace Util
 {
 
 	std::string GetExtension(std::string File);
-	std::string wstrtostr(const std::wstring& wstr);
-	std::string ShowOpenFileDialog();
-	std::string ShowSelectFolderDialog();
-	std::string Ask(std::string Question, std::vector<std::string> Options);
-	std::string AskForFilePath(std::string PathName);
-	void Notify(std::string Message);
 
 	std::string GetFileNameFromPath(std::string FilePath);
 	std::vector<std::string> GetAllFilesInFolder(std::string Folder, bool IncludeFolders = false, bool Recursive = true, std::string RelativePath = "/");

@@ -530,12 +530,15 @@ void CSharpInterop::LoadAssembly()
 
 	try
 	{
+		std::filesystem::create_directories("bin/");
 		std::filesystem::copy(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCSharp.dll",
 			"bin/KlemmgineCSharp.dll",
 			std::filesystem::copy_options::update_existing);
 	}
 	catch (std::exception& e)
 	{
+		Log::Print(std::filesystem::current_path().string());
+		Log::Print(Application::GetEditorPath() + "/CSharp/Engine/Build/KlemmgineCSharp.dll");
 		Log::Print(e.what(), Log::LogColor::Red);
 	}
 

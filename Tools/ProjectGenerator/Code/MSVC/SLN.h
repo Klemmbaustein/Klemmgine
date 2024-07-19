@@ -24,4 +24,6 @@ namespace SLN
 	std::string GetGUID();
 
 	void WriteSolution(std::string Path, std::string Name, std::vector<Project> Projects);
+
+	void WriteMSVCProjectFiles(std::string Path, std::string Name, std::map<std::string, std::string> LaunchArgs);
 }

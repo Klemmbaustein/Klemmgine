@@ -32,7 +32,7 @@ std::vector<AssetBrowser::BrowserItem> AssetBrowser::GetBrowserContents()
 		BrowserItem Item;
 		Item.Name = FileUtil::GetFileNameWithoutExtensionFromPath(StrUtil::UnicodeToAscii(File.path().u8string()));
 		std::string Ext = FileUtil::GetExtension(StrUtil::UnicodeToAscii(File.path().u8string()));
-		Item.Texture =  EditorUI::Textures[5];
+		Item.Texture = EditorUI::Textures[5];
 		Item.Color = EditorUI::ItemColors["dir"];
 		Item.Path = StrUtil::UnicodeToAscii(File.path().u8string());
 		Item.CanCopy = false;

@@ -6,6 +6,7 @@ Docs/
 x64/
 Release/
 .vs/
+!.vs/CMakeWorkspaceSettings.json
 *.filters
 *.user
 Tools/ProjectGenerator/x64/
@@ -34,5 +35,5 @@ obj/
 *.obj
 Tools/BuildTool/Output/GENERATED/*
 *.pref
-/Projects/*
 *.ilk
+/Projects/Shooter

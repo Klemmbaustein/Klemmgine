@@ -1,3 +1,8 @@
+cmake_minimum_required(VERSION 3.15)
+set(CMAKE_CXX_STANDARD 20)
+
+project(KlemmgineBuildTool)
+
 add_executable(BuildTool "Code/BuildTool.cpp" "Code/Log.cpp" "Code/ParseFile.cpp")
 
 macro(KlemmgineDependsOnBuildTool ProjectName OutDir InDir1 InDir2)

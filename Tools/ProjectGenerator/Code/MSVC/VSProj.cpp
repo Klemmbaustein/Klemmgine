@@ -213,7 +213,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 
 std::string VSProj::WriteCSProj(std::string Path, std::string Name, std::string TargetFramework)
 {
-	std::cout << "Writing " << Name << ".csproj for framework version " << TargetFramework << std::endl;
+	std::cout << "Writing " << Name << ".csproj for .NET version " << TargetFramework << std::endl;
 	std::filesystem::path CurrentPath = std::filesystem::current_path();
 
 	std::filesystem::create_directories(Path);
