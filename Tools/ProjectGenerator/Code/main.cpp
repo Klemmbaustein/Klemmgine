@@ -14,6 +14,11 @@ std::vector<std::string> DependencyDlls =
 	"Dependencies/SDL_net/Build/Release/SDL2_net.dll",
 	"CSharp/lib/nethost.dll"
 };
+#else
+std::vector<std::string> DependencyDlls =
+{
+	"CSharp/lib/libnethost.so"
+};
 #endif
 
 int main(int argc, char** argv)
@@ -151,6 +156,7 @@ int main(int argc, char** argv)
 		if (LaunchArgs["buildSystem"] == "msvc")
 #endif
 		{
+#if _WIN32
 			for (auto& i : DependencyDlls)
 			{
 
@@ -161,6 +167,7 @@ int main(int argc, char** argv)
 				}
 				std::filesystem::copy(i, ProjectPath, std::filesystem::copy_options::overwrite_existing);
 			}
+#endif
 		}
 		else if (LaunchArgs["buildSystem"] == "cmake")
 		{
