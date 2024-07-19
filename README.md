@@ -5,10 +5,8 @@
 > **WIP** CMake support.
 > 
 > ### Todo:
-> - Integrate into project generator (add a command line argument for the build system, add an option for CMake).
 > - Fix game builds from the editor still assuming the project is built using KlemmBuild or MSBuild.
 > - Test on Linux.
-> - Add support for C# scripting. (Right now the engine doesn't link with nethost.dll/nethost.so even when it should)
 > 
 > This branch also fixes some issues found by compiling the engine with clang-cl on windows.
 
