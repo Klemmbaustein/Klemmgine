@@ -174,7 +174,7 @@ int main(int argc, char** argv)
 #if _WIN32
 			std::string NetHost = "CSharp/lib/nethost.dll";
 #else
-			std::string NetHost = "CSharp/lib/nethost.so";
+			std::string NetHost = "CSharp/lib/libnethost.so";
 #endif
 			std::filesystem::copy(NetHost, ProjectPath, std::filesystem::copy_options::overwrite_existing);
 		}
