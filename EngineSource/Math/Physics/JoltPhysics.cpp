@@ -75,12 +75,17 @@ static void TraceImpl(const char* inFMT, ...)
 	va_end(list);
 
 	PhysicsSubsystem::PhysicsSystem->Print(buffer, Subsystem::ErrorLevel::Error);
+	Error::PrintStackTrace();
 }
 
 #ifdef JPH_ENABLE_ASSERTS
 
 static bool AssertFailedImpl(const char* inExpression, const char* inMessage, const char* inFile, uint inLine)
 {
+	if (!inMessage)
+	{
+		inMessage = "Unknown error";
+	}
 	Error::AssertFailure("Physics system error: " + std::string(inMessage) + ", " + std::string(inExpression), 
 		StrUtil::Format("%s, Line %i", inFile, inLine));
 
@@ -594,8 +599,6 @@ std::vector<Physics::HitResult> JoltPhysics::CollisionTest(Physics::PhysicsBody*
 
 	CollisionShapeCollectorImpl cl;
 	CollideShapeSettings Settings = CollideShapeSettings();
-	Settings.mPenetrationTolerance = 0;
-	Settings.mCollisionTolerance = 0;
 
 	BroadPhaseLayerFilter BplF;
 	ObjectLayerFilterImpl LayerF;

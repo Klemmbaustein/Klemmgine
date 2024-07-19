@@ -65,6 +65,7 @@
         "ENGINE_NO_SOURCE",
 #endif
         "JPH_OBJECT_STREAM",
+        "JPH_ENABLE_ASSERTS",
         "ENGINE_CSHARP",
         "GLEW_STATIC"
       ],
