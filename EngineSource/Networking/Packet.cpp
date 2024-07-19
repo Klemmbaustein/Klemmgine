@@ -13,13 +13,6 @@
 #include <mutex>
 #include "Networking.h"
 
-#undef INADDR_ANY
-#undef INADDR_LOOPBACK
-#undef INADDR_BROADCAST
-#undef INADDR_NONE
-
-#include <WinSock2.h>
-
 const int Packet::MAX_PACKET_SIZE = 512;
 uint64_t Packet::PacketID = 0;
 namespace pkt
