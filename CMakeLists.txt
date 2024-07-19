@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.15)
 
+project(Klemmgine)
+
 # The engine optionally uses some more modern C++ features.
 # But these are behind preprocessor checks that check if the feature is availabe.
 if("cxx_std_23" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
@@ -18,6 +20,7 @@ endif()
 set(ENGINE_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/EngineSource")
 
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Tools/BuildTool" EXCLUDE_FROM_ALL "BuildTool")
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Tools/ProjectGenerator" "ProjectGenerator")
 
 file(
 	GLOB_RECURSE

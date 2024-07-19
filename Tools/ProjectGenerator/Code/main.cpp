@@ -4,6 +4,7 @@
 #include <fstream>
 #include <map>
 #include <filesystem>
+#include "Util.h"
 
 #if _WIN32
 std::vector<std::string> DependencyDlls =
@@ -194,7 +195,17 @@ int main(int argc, char** argv)
 		std::cout << "Copying files for build system: " << BuildSystem << std::endl;
 		if (BuildSystem == "cmake")
 		{
-			std::filesystem::copy("Tools/ProjectGenerator/BuildFiles/ProjectCMakeLists.txt", ProjectPath + "/CMakeLists.txt");
+			std::ifstream in = std::ifstream("Tools/ProjectGenerator/BuildFiles/ProjectCMakeLists.txt");
+			std::stringstream instr;
+			instr << in.rdbuf();
+			in.close();
+
+			std::ofstream out = std::ofstream(ProjectPath + "/CMakeLists.txt");
+			std::string OutString = instr.str();
+			Util::ReplaceChar(OutString, '#', ProjectName);
+			std::cout << OutString << std::endl;
+			out << OutString;
+			out.close();
 		}
 		else if (BuildSystem == "kbld")
 		{

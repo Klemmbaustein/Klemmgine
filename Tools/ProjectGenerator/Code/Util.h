@@ -21,4 +21,6 @@ namespace Util
 	void CopyFolderContent(std::string Folder, std::string To, std::set<std::string> FilesToIgnore = {}, std::atomic<float>* Progress = nullptr, float ProgressAmount = 1);
 
 	extern std::string ProjectPath;
+
+	void ReplaceChar(std::string& Target, char A, std::string b);
 }

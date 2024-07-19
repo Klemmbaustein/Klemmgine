@@ -3,7 +3,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 project(KlemmgineBuildTool)
 
-add_executable(BuildTool "Code/BuildTool.cpp" "Code/Log.cpp" "Code/ParseFile.cpp")
+add_executable(HeaderGenerate "Code/BuildTool.cpp" "Code/Log.cpp" "Code/ParseFile.cpp")
 
 macro(KlemmgineDependsOnBuildTool ProjectName OutDir InDir1 InDir2)
 	
@@ -26,10 +26,10 @@ macro(KlemmgineDependsOnBuildTool ProjectName OutDir InDir1 InDir2)
 
 	add_custom_command(
 		TARGET ${ProjectName}_WriteHeaders
-		COMMAND $<TARGET_FILE:BuildTool> ${BUILD_TOOL_ARGS}
+		COMMAND $<TARGET_FILE:HeaderGenerate> ${BUILD_TOOL_ARGS}
 	)
 
-	add_dependencies(${ProjectName}_WriteHeaders BuildTool)
+	add_dependencies(${ProjectName}_WriteHeaders HeaderGenerate)
 	add_dependencies(${ProjectName} ${ProjectName}_WriteHeaders)
 
 	target_include_directories(${ProjectName} PRIVATE ${OutDir})

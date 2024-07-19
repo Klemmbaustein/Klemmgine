@@ -12,6 +12,6 @@ add_executable(ProjectGenerator
 )
 
 set_target_properties(ProjectGenerator
-    PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_LIST_DIR}/../../"
+	PROPERTIES
+	RUNTIME_OUTPUT_DIRECTORY  "${CMAKE_CURRENT_LIST_DIR}/../../"
 )
