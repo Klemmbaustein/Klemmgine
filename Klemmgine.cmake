@@ -9,7 +9,7 @@ else()
 	set(CMAKE_CXX_STANDARD 20)
 endif()
 
-if (WIN32)
+if(WIN32)
 	file(COPY "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/nethost.dll" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 else()
 	file(COPY "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/libnethost.so" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
@@ -72,7 +72,11 @@ set_target_properties(LibKlemmgine
 
 if(NOT KLEMMGINE_NO_CSHARP)
 	target_compile_definitions(LibKlemmgine PUBLIC ENGINE_CSHARP)
-	target_link_libraries(LibKlemmgine PUBLIC "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/nethost.lib")
+	if(WIN32)
+		target_link_libraries(LibKlemmgine PUBLIC "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/nethost.lib")
+	else()
+		target_link_libraries(LibKlemmgine PUBLIC "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/libnethost.so")
+	endif()
 endif()
 
 if(EDITOR)
