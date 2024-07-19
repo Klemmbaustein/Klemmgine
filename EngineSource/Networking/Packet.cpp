@@ -166,7 +166,6 @@ void Packet::Send(void* TargetAddr)
 	if (!Result)
 	{
 		Log::Print(StrUtil::Format("Error sending packet: %s", SDLNet_GetError()));
-		Log::Print(StrUtil::Format("WSAGetLastError: %i", WSAGetLastError()));
 	}
 }
 
