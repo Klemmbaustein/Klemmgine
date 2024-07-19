@@ -23,7 +23,7 @@ cmake CMakeLists.txt -DCMAKE_BUILD_TYPE=Release || fail
 make -j 4 assimp || fail
 cd ../JoltPhysics/Build
 # With GCC, JoltPhysics fails to compile with warnings as error due to some uninitialized variables.
-cmake -S . -B Linux_Distribution/ -DCMAKE_BUILD_TYPE=Distribution -DINTERPROCEDURAL_OPTIMIZATION=OFF -DGENERATE_DEBUG_SYMBOLS=OFF || fail
+cmake -S . -B Linux_Distribution/ -DCMAKE_BUILD_TYPE=Distribution -DINTERPROCEDURAL_OPTIMIZATION=OFF -DGENERATE_DEBUG_SYMBOLS=OFF -DUSE_ASSERTS=ON || fail
 cd Linux_Distribution
 make -j 4 Jolt || fail
 cd  ../../../openal-soft

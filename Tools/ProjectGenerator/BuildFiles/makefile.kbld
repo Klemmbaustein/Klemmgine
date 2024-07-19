@@ -13,7 +13,7 @@
 #define LIB_PATH "../../lib/Klemmgine-Server"
 #else
 #error "Neither Debug, Editor nor Release have been defined"
-#endif  
+#endif
 
   "defaultTarget": NAME,
   "targets": [
@@ -28,7 +28,7 @@
 #else
       "debug": false,
 #endif
-#if !RELEASE
+#if !Release
       "outputPath": "bin",
 #else
       "outputPath": "bin/Release",
@@ -69,7 +69,7 @@
         "../../CSharp/lib/nethost"
       ],
       "optimization": "fastest",
-      "u8char": false 
+      "u8char": false
     },
     {
       "name": "RunBuildTool",

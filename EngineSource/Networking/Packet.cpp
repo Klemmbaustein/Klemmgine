@@ -13,13 +13,6 @@
 #include <mutex>
 #include "Networking.h"
 
-#undef INADDR_ANY
-#undef INADDR_LOOPBACK
-#undef INADDR_BROADCAST
-#undef INADDR_NONE
-
-#include <WinSock2.h>
-
 const int Packet::MAX_PACKET_SIZE = 512;
 uint64_t Packet::PacketID = 0;
 namespace pkt
@@ -173,7 +166,6 @@ void Packet::Send(void* TargetAddr)
 	if (!Result)
 	{
 		Log::Print(StrUtil::Format("Error sending packet: %s", SDLNet_GetError()));
-		Log::Print(StrUtil::Format("WSAGetLastError: %i", WSAGetLastError()));
 	}
 }
 
