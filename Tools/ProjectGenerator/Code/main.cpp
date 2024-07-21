@@ -203,7 +203,6 @@ int main(int argc, char** argv)
 			std::ofstream out = std::ofstream(ProjectPath + "/CMakeLists.txt");
 			std::string OutString = instr.str();
 			Util::ReplaceChar(OutString, '#', ProjectName);
-			std::cout << OutString << std::endl;
 			out << OutString;
 			out.close();
 		}

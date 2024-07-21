@@ -22,8 +22,6 @@ macro(KlemmgineDependsOnBuildTool ProjectName OutDir InDir1 InDir2)
 		set(BUILD_TOOL_ARGS ${BUILD_TOOL_ARGS} " " noCSharp)
 	endif()
 
-	message(${BUILD_TOOL_ARGS})
-
 	add_custom_command(
 		TARGET ${ProjectName}_WriteHeaders
 		COMMAND $<TARGET_FILE:HeaderGenerate> ${BUILD_TOOL_ARGS}

@@ -2,15 +2,6 @@ cmake_minimum_required(VERSION 3.15)
 
 project(Klemmgine)
 
-# The engine optionally uses some more modern C++ features.
-# But these are behind preprocessor checks that check if the feature is availabe.
-if("cxx_std_23" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
-	message("Klemmgine: Using C++23")
-	set(CMAKE_CXX_STANDARD 23)
-else()
-	set(CMAKE_CXX_STANDARD 20)
-endif()
-
 if(WIN32)
 	file(COPY "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/nethost.dll" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 else()
@@ -51,14 +42,16 @@ if(EDITOR)
 endif()
 
 add_library(
-   LibKlemmgine STATIC
+   LibKlemmgine STATIC EXCLUDE_FROM_ALL
    ${SRCS}
 )
 
 if(NOT KLEMMGINE_NO_CSHARP)
 	# Build C# libraries
-	execute_process(COMMAND dotnet build WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/CSharp/Core")
-	execute_process(COMMAND dotnet build WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/CSharp/Engine")
+	message(STATUS "Building C#: Engine.Core")
+	execute_process(COMMAND dotnet build WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/CSharp/Core" OUTPUT_QUIET)
+	message(STATUS "Building C#: Engine")
+	execute_process(COMMAND dotnet build WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/CSharp/Engine" OUTPUT_QUIET)
 endif()
 
 KlemmgineDependsOnBuildTool(LibKlemmgine "${CMAKE_BINARY_DIR}/Tools/BuildTool/Output" "${CMAKE_CURRENT_LIST_DIR}/EngineSource/Objects" "")
@@ -68,10 +61,14 @@ if (NOT WIN32)
 	add_link_options("-Wl,-rpath,'$ORIGIN'")
 endif()
 
-set_target_properties(LibKlemmgine
-	PROPERTIES
-	ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
-)
+# The engine optionally uses some more modern C++ features.
+# But these are behind preprocessor checks that check if the feature is availabe.
+if("cxx_std_23" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+	message(STATUS "Klemmgine: Using C++23")
+	set(CMAKE_CXX_STANDARD 23)
+else()
+	set(CMAKE_CXX_STANDARD 20)
+endif()
 
 if(NOT KLEMMGINE_NO_CSHARP)
 	target_compile_definitions(LibKlemmgine PUBLIC ENGINE_CSHARP)
@@ -83,12 +80,16 @@ if(NOT KLEMMGINE_NO_CSHARP)
 endif()
 
 if(EDITOR)
-	message("EDITOR")
 	target_compile_definitions(LibKlemmgine PUBLIC EDITOR)
+	message("Building with EDITOR engine configuration")
 elseif(RELEASE)
 	target_compile_definitions(LibKlemmgine PUBLIC RELEASE)
+	message("Building with RELEASE engine configuration")
 elseif(SERVER)
 	target_compile_definitions(LibKlemmgine PUBLIC SERVER)
+	message("Building with SERVER engine configuration")
+else()
+	message("Building with DEBUG engine configuration")
 endif()
 
 target_include_directories(LibKlemmgine PUBLIC "${ENGINE_SRC_DIR}")

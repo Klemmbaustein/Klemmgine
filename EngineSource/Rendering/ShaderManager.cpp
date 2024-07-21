@@ -9,7 +9,7 @@ std::map<ShaderManager::ShaderDescription, ShaderManager::ShaderElement> ShaderM
 
 bool ShaderManager::operator<(ShaderDescription a, ShaderDescription b)
 {
-	return a.VertexShader < b.VertexShader || a.FragmentShader < b.FragmentShader;
+	return (a.VertexShader + a.FragmentShader) < (b.VertexShader + b.FragmentShader);
 }
 
 Shader* ShaderManager::ReferenceShader(std::string VertexShader, std::string FragmentShader)
