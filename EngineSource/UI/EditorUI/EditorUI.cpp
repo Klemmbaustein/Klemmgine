@@ -152,7 +152,7 @@ void EditorUI::LaunchInEditor()
 			}
 		}
 
-		if (Project::UseNetworkFunctions && LaunchWithServer && (!std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
+		if (LaunchWithServer && (!std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
 			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
 		{
 			Editor::Rebuilding = true;

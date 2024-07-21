@@ -36,8 +36,3 @@ namespace Networking
 	const uint64_t ServerID = UINT64_MAX;
 	SceneObject* GetObjectFromNetID(uint64_t NetID);
 }
-
-namespace Project
-{
-	extern bool UseNetworkFunctions;
-}

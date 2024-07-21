@@ -16,6 +16,11 @@ NetworkSubsystem::~NetworkSubsystem()
 #endif
 }
 
+bool NetworkSubsystem::IsActive()
+{
+	return Subsystem::GetSubsystemByName("Network");
+}
+
 void NetworkSubsystem::Update()
 {
 #if !EDITOR

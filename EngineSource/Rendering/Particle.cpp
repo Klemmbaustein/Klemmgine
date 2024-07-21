@@ -115,6 +115,10 @@ void Particles::ParticleEmitter::SaveToFile(std::vector<ParticleElement> Data, s
 
 void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 {
+	if (ParticleMatrices.empty())
+	{
+		return;
+	}
 	for (unsigned int i = 0; i < ParticleVertexBuffers.size(); i++)
 	{
 		ParticleMatrices.clear();

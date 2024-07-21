@@ -23,5 +23,7 @@ public:
 	NetworkSubsystem(uint16_t DefaultServerPort);
 	~NetworkSubsystem();
 
+	static bool IsActive();
+
 	void Update() override;
 };

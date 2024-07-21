@@ -220,12 +220,6 @@ int Application::Initialize(int argc, char** argv)
 	Subsystem::Load(new InputSubsystem());
 	Subsystem::Load(new Sound());
 #endif
-#if !EDITOR
-	if (Project::UseNetworkFunctions)
-	{
-		Subsystem::Load(new NetworkSubsystem(12345));
-	}
-#endif
 
 	// Evaluating launch args depends on some subsystems (LogSubsystem, Console, Scene...), so these can't be evaluated before here.
 	LaunchArgs::Evaluate(argc, argv);
