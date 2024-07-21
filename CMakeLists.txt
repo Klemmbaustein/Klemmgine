@@ -2,6 +2,15 @@ cmake_minimum_required(VERSION 3.15)
 
 project(Klemmgine)
 
+set(CMAKE_CXX_STANDARD 20)
+
+# The engine optionally uses some more modern C++ features.
+# But these are behind preprocessor checks that check if the feature is availabe.
+if("cxx_std_23" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
+	message(STATUS "Klemmgine: Using C++23")
+	set(CMAKE_CXX_STANDARD 23)
+endif()
+
 if(WIN32)
 	file(COPY "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/nethost.dll" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
 else()
@@ -59,15 +68,6 @@ KlemmgineDependsOnBuildTool(LibKlemmgine "${CMAKE_BINARY_DIR}/Tools/BuildTool/Ou
 # Makes the Linux linker search for shared libraries in the directory where the executable is located.
 if (NOT WIN32)
 	add_link_options("-Wl,-rpath,'$ORIGIN'")
-endif()
-
-# The engine optionally uses some more modern C++ features.
-# But these are behind preprocessor checks that check if the feature is availabe.
-if("cxx_std_23" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
-	message(STATUS "Klemmgine: Using C++23")
-	set(CMAKE_CXX_STANDARD 23)
-else()
-	set(CMAKE_CXX_STANDARD 20)
 endif()
 
 if(NOT KLEMMGINE_NO_CSHARP)
