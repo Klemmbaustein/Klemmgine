@@ -48,6 +48,12 @@ InstancedModel::~InstancedModel()
 
 void InstancedModel::Render(Camera* WorldCamera, bool MainFrameBuffer, bool TransparencyPass)
 {
+	if (MatModel.empty())
+	{
+		return;
+	}
+
+
 	if (TwoSided)
 	{
 		glDisable(GL_CULL_FACE);
@@ -90,6 +96,7 @@ bool InstancedModel::RemoveInstance(size_t Inst)
 void InstancedModel::ConfigureVAO()
 {
 	MatModel.clear();
+	MatModel.reserve(Instances.size());
 	for (Transform &T : Instances)
 	{
 		glm::mat4 Inst = glm::mat4(1.f);
@@ -104,6 +111,14 @@ void InstancedModel::ConfigureVAO()
 	}
 	if(MatBuffer != -1)
 		glDeleteBuffers(1, &MatBuffer);
+
+	MatBuffer = -1;
+
+	if (MatModel.empty())
+	{
+		return;
+	}
+
 	glGenBuffers(1, &MatBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
 	glBufferData(GL_ARRAY_BUFFER, MatModel.size() * sizeof(glm::mat4), &MatModel[0], GL_STATIC_DRAW);
