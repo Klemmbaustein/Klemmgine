@@ -12,7 +12,7 @@ struct Shader
 	Shader(std::string VertexShaderFilename, std::string FragmentShaderFilename, std::string GeometryShader = "");
 	virtual ~Shader();
 
-	void Bind();
+	void Bind() const;
 	void Unbind();
 
 	int GetShaderID()
@@ -20,12 +20,12 @@ struct Shader
 		return ShaderID;
 	}
 
-	void SetInt(std::string Field, int Value);
-	void SetFloat(std::string Field, float Value);
-	void SetVector4(std::string Field, Vector4 Value);
-	void SetVector3(std::string Field, Vector3 Value);
-	void SetVector2(std::string Field, Vector2 Value);
-	void SetMat4(std::string Field, glm::mat4 Value);
+	void SetInt(std::string Field, int Value) const;
+	void SetFloat(std::string Field, float Value) const;
+	void SetVector4(std::string Field, Vector4 Value) const;
+	void SetVector3(std::string Field, Vector3 Value) const;
+	void SetVector2(std::string Field, Vector2 Value) const;
+	void SetMat4(std::string Field, glm::mat4 Value) const;
 
 private:
 	unsigned int Compile(std::string ShaderCode, unsigned int NativeType);

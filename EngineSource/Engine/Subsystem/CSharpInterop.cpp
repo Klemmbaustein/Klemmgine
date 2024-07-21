@@ -117,7 +117,7 @@ namespace CSharp
 	}
 	static void* get_export(void* h, const char* name)
 	{
-		void* f = ::GetProcAddress((HMODULE)h, name);
+		void* f = (void*)::GetProcAddress((HMODULE)h, name);
 		ENGINE_ASSERT(f != nullptr, "Could not export library: " + std::string(name));
 		return f;
 	}

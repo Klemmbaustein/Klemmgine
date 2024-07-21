@@ -1,4 +1,6 @@
+#ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 #include "Shader.h"
 #include <fstream>
 #include <iostream>
@@ -28,7 +30,7 @@ Shader::~Shader()
 	glDeleteProgram(ShaderID);
 }
 
-void Shader::Bind()
+void Shader::Bind() const
 {
 	glUseProgram(ShaderID);
 }
@@ -38,32 +40,32 @@ void Shader::Unbind()
 	glUseProgram(0);
 }
 
-void Shader::SetInt(std::string Field, int Value)
+void Shader::SetInt(std::string Field, int Value) const
 {
 	glUniform1i(glGetUniformLocation(ShaderID, Field.c_str()), Value);
 }
 
-void Shader::SetFloat(std::string Field, float Value)
+void Shader::SetFloat(std::string Field, float Value) const
 {
 	glUniform1f(glGetUniformLocation(ShaderID, Field.c_str()), Value);
 }
 
-void Shader::SetVector4(std::string Field, Vector4 Value)
+void Shader::SetVector4(std::string Field, Vector4 Value) const
 {
 	glUniform4f(glGetUniformLocation(ShaderID, Field.c_str()), Value.X, Value.Y, Value.Z, Value.W);
 }
 
-void Shader::SetVector3(std::string Field, Vector3 Value)
+void Shader::SetVector3(std::string Field, Vector3 Value) const
 {
 	glUniform3f(glGetUniformLocation(ShaderID, Field.c_str()), Value.X, Value.Y, Value.Z);
 }
 
-void Shader::SetVector2(std::string Field, Vector2 Value)
+void Shader::SetVector2(std::string Field, Vector2 Value) const
 {
 	glUniform2f(glGetUniformLocation(ShaderID, Field.c_str()), Value.X, Value.Y);
 }
 
-void Shader::SetMat4(std::string Field, glm::mat4 Value)
+void Shader::SetMat4(std::string Field, glm::mat4 Value) const
 {
 	glUniformMatrix4fv(glGetUniformLocation(ShaderID, Field.c_str()), 1, GL_FALSE, &Value[0][0]);
 }
@@ -106,7 +108,7 @@ std::string Shader::parse(const char* Filename)
 	size_t FileSize = ftell(File);
 	rewind(File);
 	ShaderCode.resize(FileSize);
-	fread(&ShaderCode[0], 1, FileSize, File);
+	int ret = fread(&ShaderCode[0], 1, FileSize, File);
 	fclose(File);
 
 	return ShaderCode;
@@ -116,11 +118,9 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 {
 	std::string vertexCode;
 	std::string fragmentCode;
-	std::string sharedCode;
 	std::string geometryCode;
 	std::ifstream vShaderFile;
 	std::ifstream fShaderFile;
-	std::ifstream fSharedFile;
 	std::ifstream gShaderFile;
 
 	std::vector<std::string> Paths = { VertexShader, FragmentShader };
@@ -137,7 +137,6 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 	vShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	fShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 	gShaderFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
-	fSharedFile.exceptions(std::ifstream::failbit | std::ifstream::badbit);
 
 #if !RELEASE
 	if (EngineDebug || IsInEditor || !std::filesystem::exists("Assets"))
@@ -211,7 +210,7 @@ GLuint Shader::CreateShader(const char* VertexShader, const char* FragmentShader
 		glAttachShader(ShaderID, geometry);
 	glLinkProgram(ShaderID);
 	checkCompileErrors(ShaderID, "PROGRAM", (VertexShader + std::string("-") + FragmentShader));
-	// delete the shaders as they're linked into our program now and no longer necessery
+	// delete the shaders as they're linked into our program now and no longer necessary
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 	if (GeometryShader != nullptr)

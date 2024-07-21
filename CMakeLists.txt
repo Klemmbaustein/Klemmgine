@@ -11,12 +11,6 @@ if("cxx_std_23" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
 	set(CMAKE_CXX_STANDARD 23)
 endif()
 
-if(WIN32)
-	file(COPY "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/nethost.dll" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-else()
-	file(COPY "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/libnethost.so" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
-endif()
-
 set(ENGINE_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/EngineSource")
 
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Tools/BuildTool" EXCLUDE_FROM_ALL "BuildTool")
@@ -51,7 +45,7 @@ if(EDITOR)
 endif()
 
 add_library(
-   LibKlemmgine STATIC EXCLUDE_FROM_ALL
+   LibKlemmgine STATIC
    ${SRCS}
 )
 
@@ -90,6 +84,15 @@ elseif(SERVER)
 	message("Building with SERVER engine configuration")
 else()
 	message("Building with DEBUG engine configuration")
+endif()
+
+if(NOT "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}" STREQUAL "")
+	# Copy the nethost library somewhere where the application can find it.
+	if(WIN32)
+		file(COPY "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/nethost.dll" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+	else()
+		file(COPY "${CMAKE_CURRENT_LIST_DIR}/CSharp/lib/libnethost.so" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+	endif()
 endif()
 
 target_include_directories(LibKlemmgine PUBLIC "${ENGINE_SRC_DIR}")

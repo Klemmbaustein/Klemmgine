@@ -76,6 +76,7 @@ namespace Application
 	{
 		Time = SDL_GetPerformanceCounter();
 	}
+
 	std::string EditorPath;
 
 	void SetEditorPath(std::string NewEditorPath)
