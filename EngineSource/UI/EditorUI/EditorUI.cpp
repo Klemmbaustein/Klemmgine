@@ -140,9 +140,9 @@ void EditorUI::LaunchInEditor()
 	std::string ExecutablePath = "", ServerExecutablePath = "";
 	try
 	{
-#if !ENGINE_NO_SOURCE && !__linux__
+#if !ENGINE_NO_SOURCE
 		// No Solution -> no build name -> probably using CMake on windows.
-		if (Build::GetSolutionName().empty())
+		if (Build::CMake::IsUsingCMake())
 		{
 			std::string CMakeConfigName = "x64-Debug";
 			ExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\" + Build::CMake::GetMSBuildConfig() + "\\" + ProjectName;
@@ -172,6 +172,7 @@ void EditorUI::LaunchInEditor()
 				Build::CMake::BuildWithConfig(CMakeConfigName, "-DSERVER=ON");
 			}
 		}
+#if _WIN32
 		else
 		{
 			ExecutablePath = "bin\\" + ProjectName + "-Debug.exe";
@@ -202,18 +203,24 @@ void EditorUI::LaunchInEditor()
 				}
 			}
 		}
+#endif // WIN32
 		Editor::Rebuilding = false;
-#endif
+#endif // !ENGINE_NO_SOURCE
 
-#if ENGINE_NO_SOURCE
-		ProjectName = "Klemmgine";
-		ExecutablePath = "bin\\" + ProjectName + "-Debug";
-		ServerExecutablePath = "bin\\" + ProjectName + "-Server";
+#if ENGINE_NO_SOURCE || __linux__
+#if !ENGINE_NO_SOURCE
+		if (Build::CMake::IsUsingCMake)
+#endif
+		{
+			ProjectName = "Klemmgine";
+			ExecutablePath = "bin\\" + ProjectName + "-Debug";
+			ServerExecutablePath = "bin\\" + ProjectName + "-Server";
+		}
 #if _WIN32
 		ExecutablePath.append(".exe");
 		ServerExecutablePath.append(".exe");
 #endif
-#endif
+#endif // ENGINE_NO_SOURCE || __linux__
 
 #ifdef ENGINE_CSHARP
 		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll")

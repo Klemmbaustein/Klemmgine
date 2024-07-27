@@ -109,11 +109,15 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				CMake::BuildWithConfig("Release", "-DRELEASE=ON");
 
 				std::string ExecutablePath = CMake::GetBuildRootPath("Release") + "/";
+
+				std::string ExecutableExtension;
+
 #if _WIN32
 				ExecutablePath.append("Release/");
+				ExecutableExtension = ".exe";
 #endif
 
-				std::filesystem::copy(ExecutablePath + Build::GetProjectBuildName() + ".exe", TargetFolder + Project::ProjectName + std::string(".exe"));
+				std::filesystem::copy(ExecutablePath + Build::GetProjectBuildName() + ExecutableExtension, TargetFolder + Project::ProjectName + ExecutableExtension);
 			}
 			else
 			{
