@@ -357,6 +357,8 @@ void Build::CMake::SetMSBuildConfig(std::string Name)
 
 std::string Build::CMake::GetMSBuildConfig()
 {
+#if _WIN32
 	return CMakeMSBuildConfig;
+#endif
 }
 #endif
