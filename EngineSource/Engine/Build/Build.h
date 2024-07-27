@@ -25,6 +25,8 @@ namespace Build
 
 	namespace CMake
 	{
+		void SetCompilationProcessorCount(uint32_t Count);
+
 		std::string GetBuildRootPath(std::string Configuration);
 		bool BuildWithConfig(std::string Configuration, std::string Args = "");
 

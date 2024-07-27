@@ -85,9 +85,15 @@ class SettingsPanel : public EditorPanel
 
 		SettingsCategory("CMake",
 		{
+#if _WIN32
 			SettingsCategory::Setting("MSBuild:Use Debug configuration", NativeType::Bool, "0", [](std::string NewValue)
 			{
 				Build::CMake::SetMSBuildConfig(std::stoi(NewValue) ? "Debug" : "Release");
+			}),
+#endif
+			SettingsCategory::Setting("Compilation:Processor count", NativeType::Int, "12", [](std::string NewValue)
+			{
+				Build::CMake::SetCompilationProcessorCount(std::stoi(NewValue));
 			}),
 		}),
 

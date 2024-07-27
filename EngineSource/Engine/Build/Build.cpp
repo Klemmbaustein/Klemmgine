@@ -279,7 +279,6 @@ int Build::BuildCurrentSolution(std::string Configuration)
 
 #if !RELEASE
 
-
 std::string Build::GetProjectBuildName()
 {
 	std::string Name = GetSolutionName();
@@ -305,6 +304,13 @@ std::string Build::GetSolutionName()
 	return ProjectName;
 }
 
+static std::string CMakeMSBuildConfig = "Release";
+static uint32_t CMakeProcessorCount = 12;
+
+void Build::CMake::SetCompilationProcessorCount(uint32_t Count)
+{
+	CMakeProcessorCount = Count;
+}
 
 std::string Build::CMake::GetBuildRootPath(std::string Configuration)
 {
@@ -316,8 +322,6 @@ std::string Build::CMake::GetBuildRootPath(std::string Configuration)
 #endif
 }
 
-static std::string CMakeMSBuildConfig = "Release";
-
 bool Build::CMake::BuildWithConfig(std::string Configuration, std::string Args)
 {
 	std::string RootPath = GetBuildRootPath(Configuration);
@@ -328,9 +332,9 @@ bool Build::CMake::BuildWithConfig(std::string Configuration, std::string Args)
 	}
 
 #if _WIN32
-	return system(("cmake --build " + RootPath + " --config " + CMakeMSBuildConfig + " -- /m:2 /p:CL_MPCount=12 ").c_str()) == 0;
+	return system(("cmake --build " + RootPath + " --config " + CMakeMSBuildConfig + " -- /m:2 /p:CL_MPCount=" + std::to_string(CMakeProcessorCount)).c_str()) == 0;
 #else
-	return system(("cmake --build " + RootPath).c_str());
+	return system(("cmake --build " + RootPath + " -j " + std::to_string(CMakeProcessorCount)).c_str());
 #endif
 }
 

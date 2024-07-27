@@ -209,7 +209,7 @@ void EditorUI::LaunchInEditor()
 
 #if ENGINE_NO_SOURCE || __linux__
 #if !ENGINE_NO_SOURCE
-		if (Build::CMake::IsUsingCMake)
+		if (!Build::CMake::IsUsingCMake())
 #endif
 		{
 			ProjectName = "Klemmgine";
