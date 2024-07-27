@@ -113,7 +113,10 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				std::string ExecutableExtension;
 
 #if _WIN32
-				ExecutablePath.append("Release/");
+				if (std::filesystem::exists(ExecutablePath + "Release"))
+				{
+					ExecutablePath.append("Release/");
+				}
 				ExecutableExtension = ".exe";
 #endif
 
@@ -305,6 +308,7 @@ std::string Build::GetSolutionName()
 }
 
 static std::string CMakeMSBuildConfig = "Release";
+static std::string CMakeExecutable = "cmake";
 static uint32_t CMakeProcessorCount = 12;
 
 void Build::CMake::SetCompilationProcessorCount(uint32_t Count)
@@ -326,15 +330,15 @@ bool Build::CMake::BuildWithConfig(std::string Configuration, std::string Args)
 {
 	std::string RootPath = GetBuildRootPath(Configuration);
 
-	if (!std::filesystem::exists(RootPath) && system(("cmake -S . -B " + RootPath + " " + Args).c_str()))
+	if (!std::filesystem::exists(RootPath) && system((GetCMakeExecutable() + " -S . -B " + RootPath + " " + Args).c_str()))
 	{
 		return false;
 	}
 
 #if _WIN32
-	return system(("cmake --build " + RootPath + " --config " + CMakeMSBuildConfig + " -- /m:2 /p:CL_MPCount=" + std::to_string(CMakeProcessorCount)).c_str()) == 0;
+	return system((GetCMakeExecutable() + " --build " + RootPath + " --config " + CMakeMSBuildConfig + " -- /m:2 /p:CL_MPCount=" + std::to_string(CMakeProcessorCount)).c_str()) == 0;
 #else
-	return system(("cmake --build " + RootPath + " -j " + std::to_string(CMakeProcessorCount)).c_str());
+	return system((GetCMakeExecutable() + " --build " + RootPath + " -j " + std::to_string(CMakeProcessorCount)).c_str());
 #endif
 }
 
@@ -361,5 +365,15 @@ std::string Build::CMake::GetMSBuildConfig()
 	return CMakeMSBuildConfig;
 #endif
 	return "";
+}
+
+void Build::CMake::SetCMakeExecutable(std::string Path)
+{
+	CMakeExecutable = Path;
+}
+
+std::string Build::CMake::GetCMakeExecutable()
+{
+	return CMakeExecutable;
 }
 #endif

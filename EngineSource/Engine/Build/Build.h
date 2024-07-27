@@ -35,6 +35,9 @@ namespace Build
 
 		void SetMSBuildConfig(std::string Name);
 		std::string GetMSBuildConfig();
+
+		void SetCMakeExecutable(std::string Path);
+		std::string GetCMakeExecutable();
 	}
 }
 #endif

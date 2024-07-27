@@ -115,13 +115,10 @@ void Particles::ParticleEmitter::SaveToFile(std::vector<ParticleElement> Data, s
 
 void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 {
-	if (ParticleInstances.empty())
-	{
-		return;
-	}
 	for (size_t i = 0; i < ParticleVertexBuffers.size(); i++)
 	{
 		ParticleMatrices.clear();
+		ParticleMatrices.reserve(ParticleInstances[i].size());
 		for (const auto& T : ParticleInstances[i])
 		{
 			glm::mat4 Inst = glm::mat4(1.f);
@@ -136,6 +133,12 @@ void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 			
 			ParticleMatrices.push_back(glm::scale(Inst, (glm::vec3)(T.Scale * ScaleMultiplier)));
 		}
+
+		if (ParticleMatrices.empty())
+		{
+			continue;
+		}
+
 		if (MatBuffer != -1)
 			glDeleteBuffers(1, &MatBuffer);
 		glGenBuffers(1, &MatBuffer);

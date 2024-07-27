@@ -144,11 +144,24 @@ void EditorUI::LaunchInEditor()
 		// No Solution -> no build name -> probably using CMake on windows.
 		if (Build::CMake::IsUsingCMake())
 		{
-			std::string CMakeConfigName = "x64-Debug";
-			ExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\" + Build::CMake::GetMSBuildConfig() + "\\" + ProjectName;
+			std::string MsBuildConfig = Build::CMake::GetMSBuildConfig();
+
 #if _WIN32
-			ExecutablePath.append(".exe");
+			std::string ExecExtension = ".exe";
+#else
+			std::string ExecExtension = "";
 #endif
+
+			std::string CMakeConfigName = "x64-Debug";
+			ExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\";
+#if _WIN32
+			if (std::filesystem::exists(ExecutablePath + MsBuildConfig))
+			{
+				ExecutablePath.append(MsBuildConfig + "\\");
+			}
+#endif
+
+			ExecutablePath.append(ProjectName + ExecExtension);
 
 			if (!std::filesystem::exists(ExecutablePath)
 				|| std::filesystem::last_write_time(ExecutablePath) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
@@ -159,10 +172,16 @@ void EditorUI::LaunchInEditor()
 			}
 
 			CMakeConfigName = "x64-Server";
-			ServerExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\" + Build::CMake::GetMSBuildConfig() + "\\" + ProjectName;
+			ServerExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\";
+
 #if _WIN32
-			ServerExecutablePath.append(".exe");
+			if (std::filesystem::exists(ServerExecutablePath + MsBuildConfig))
+			{
+				ServerExecutablePath.append(MsBuildConfig + "\\");
+			}
 #endif
+
+			ServerExecutablePath.append(ProjectName + ExecExtension);
 			if (LaunchWithServer
 				&& (!std::filesystem::exists(ServerExecutablePath)
 					|| std::filesystem::last_write_time(ServerExecutablePath) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))

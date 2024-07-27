@@ -86,7 +86,7 @@ class SettingsPanel : public EditorPanel
 		SettingsCategory("CMake",
 		{
 #if _WIN32
-			SettingsCategory::Setting("MSBuild:Use Debug configuration", NativeType::Bool, "0", [](std::string NewValue)
+			SettingsCategory::Setting("Compilation:Use MSBuild Debug configuration", NativeType::Bool, "0", [](std::string NewValue)
 			{
 				Build::CMake::SetMSBuildConfig(std::stoi(NewValue) ? "Debug" : "Release");
 			}),
@@ -95,7 +95,14 @@ class SettingsPanel : public EditorPanel
 			{
 				Build::CMake::SetCompilationProcessorCount(std::stoi(NewValue));
 			}),
-		}),
+			SettingsCategory::Setting("CMake:Executable", NativeType::String, "cmake", [](std::string NewValue)
+			{
+				Build::CMake::SetCMakeExecutable(NewValue);
+			}),
+			//SettingsCategory::Setting("CMake:Additional configuration arguments", NativeType::String, "", [](std::string NewValue)
+			//{
+			//}),
+}),
 
 		SettingsCategory("Graphics",
 			{
