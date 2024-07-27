@@ -360,5 +360,6 @@ std::string Build::CMake::GetMSBuildConfig()
 #if _WIN32
 	return CMakeMSBuildConfig;
 #endif
+	return "";
 }
 #endif
