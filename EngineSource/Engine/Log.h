@@ -28,6 +28,7 @@ namespace Log
 		const inline Vector3 Yellow = Vector3(1, 1, 0.2f);
 	}
 
+	void EnableColoredOutput(bool NewEnabled);
 
 	/**
 	* Prints the given string with the given string to standard output and to the log display (if avaliable).

@@ -25,5 +25,12 @@ public:
 
 	static bool IsActive();
 
+	static void QuitOnDisconnect();
+	static void Connect(std::string Address, uint16_t Port);
+	static void Connect(std::string Address);
+
 	void Update() override;
+private:
+	static std::string ConnectTarget;
+	static uint16_t ConnectTargetPort;
 };

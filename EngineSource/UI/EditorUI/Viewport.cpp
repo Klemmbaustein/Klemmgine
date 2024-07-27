@@ -326,6 +326,7 @@ void Viewport::Tick()
 				EditorUI::ChangedScene = true;
 			}
 		}
+		ClearSelectedObjects();
 	}
 
 	SetName(EditorUI::ChangedScene ? "Viewport*" : "Viewport");

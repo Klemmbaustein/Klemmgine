@@ -40,6 +40,8 @@ bool Log::GetIsVerbose()
 
 void Log::Print(std::string Message, MessageType NativeType, std::string LogClass)
 {
+
+
 	if (LogClass.empty())
 	{
 		LogClass = MessageTypeStrings[(int)NativeType];

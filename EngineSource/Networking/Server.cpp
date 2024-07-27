@@ -40,7 +40,7 @@ void Server::ClearOnPlayerDisconnectedCallbacks()
 
 namespace Server
 {
-	static bool ShouldQuitOnPlayerDisconnect = false;
+	bool ShouldQuitOnPlayerDisconnect = false;
 	static std::vector<ClientInfo> Clients;
 	static uint64_t UIDCounter = 0;
 	static bool LoadingNewScene = false;
@@ -247,7 +247,7 @@ void Server::Init()
 		Log::PrintMultiLine(StrUtil::Format("Players connected: (%i):\n%s", Clients.size(), PlayerList.c_str()), Log::LogColor::White, "[Net]: ");
 		}, {}));
 
-	Console::ConsoleSystem->RegisterCommand(Console::Command("quitondisconnect", []() {
+	Console::ConsoleSystem->RegisterCommand(Console::Command("quit_on_disconnect", []() {
 		ShouldQuitOnPlayerDisconnect = true;
 		}, {}));
 

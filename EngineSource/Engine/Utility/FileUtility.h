@@ -18,6 +18,8 @@ namespace FileUtil
 {
 	std::string GetFileNameFromPath(std::string FilePath);
 
+	std::string GetPath(std::string FileName);
+
 	/**
 	* @brief
 	* It is a scientific fact that this function has the best name.

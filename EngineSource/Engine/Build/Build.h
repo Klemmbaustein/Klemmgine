@@ -20,5 +20,18 @@ namespace Build
 	int BuildCurrentSolution(std::string Configuration);
 
 	std::string GetProjectBuildName();
+
+	std::string GetSolutionName();
+
+	namespace CMake
+	{
+		std::string GetBuildRootPath(std::string Configuration);
+		bool BuildWithConfig(std::string Configuration, std::string Args = "");
+
+		bool IsUsingCMake();
+
+		void SetMSBuildConfig(std::string Name);
+		std::string GetMSBuildConfig();
+	}
 }
 #endif

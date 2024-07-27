@@ -216,7 +216,7 @@ public:
 	template<typename T>
 	void CallEvent(T Function, std::vector<std::string> Arguments = {})
 	{
-		_CallEvent(static_cast<NetEvent::NetEventFunction>(Function), Arguments);
+		CallEventInternal(static_cast<NetEvent::NetEventFunction>(Function), Arguments);
 	}
 
 
@@ -302,7 +302,7 @@ public:
 	std::vector<Property> Properties;
 	std::vector<NetEvent> NetEvents;
 protected:
-	void _CallEvent(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments);
+	void CallEventInternal(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments);
 	std::string TypeName;
 	uint32_t TypeID = 0;
 	std::vector<Component*> Components;

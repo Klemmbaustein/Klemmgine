@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <ios>
 #include <iostream>
+#include <pwd.h>
 #endif
 
 #include <fstream>
@@ -47,13 +48,18 @@ std::wstring OS::Utf8ToWstring(std::string utf8)
 	return str;
 }
 
+std::string OS::GetExecutableName()
+{
+	char Path[MAX_PATH];
+	GetModuleFileNameA(NULL, Path, MAX_PATH);
+
+	return Path;
+}
+
 void OS::SetConsoleWindowVisible(bool Visible)
 {
 	// Set console code page to UTF-8 so console known how to interpret string data
 	SetConsoleOutputCP(CP_UTF8);
-
-	// Enable buffering to prevent VS from chopping up UTF-8 byte sequences
-	setvbuf(stdout, nullptr, _IOFBF, 1000);
 
 	SetProcessDPIAware();
 
@@ -65,6 +71,32 @@ void OS::SetConsoleWindowVisible(bool Visible)
 #endif
 
 #if __linux__
+std::string OS::GetExecutableName()
+{
+
+	FILE* SelfLinkCommand = popen(("readlink /proc/" + std::to_string(getpid()) + "/exe").c_str(), "r");
+
+	if (SelfLinkCommand == nullptr)
+	{
+		return "";
+	}
+
+	while (!feof(SelfLinkCommand))
+	{
+		char ExecutableBuffer[8000];
+		size_t Read = fread(ExecutableBuffer, 1, sizeof(ExecutableBuffer) - 1, SelfLinkCommand);
+		ExecutableBuffer[Read] = 0;
+		if (Read > 0 && ExecutableBuffer[Read - 1] == '\n')
+		{
+			ExecutableBuffer[Read - 1] = 0;
+		}
+		pclose(SelfLinkCommand);
+		return ExecutableBuffer;
+	}
+	pclose(SelfLinkCommand);
+	return "";
+}
+
 size_t OS::GetMemUsage()
 {
 	using std::ios_base;

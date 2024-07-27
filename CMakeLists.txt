@@ -11,6 +11,11 @@ if("cxx_std_23" IN_LIST CMAKE_CXX_COMPILE_FEATURES)
 	set(CMAKE_CXX_STANDARD 23)
 endif()
 
+# Required for multi processor builds with MSBuild, for some reason cmake doesn't set this by default.
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+	add_compile_options("/MP" "/FS")
+endif()
+
 set(ENGINE_SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/EngineSource")
 
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Tools/BuildTool" EXCLUDE_FROM_ALL "BuildTool")
@@ -32,6 +37,7 @@ set(ONLY_LIBS ON)
 set(USE_STATIC_MSVC_RUNTIME_LIBRARY OFF)
 set(DENABLE_ALL_WARNINGS OFF)
 set(ASSIMP_WARNINGS_AS_ERRORS OFF)
+set(INTERPROCEDURAL_OPTIMIZATION OFF)
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Dependencies/SDL" EXCLUDE_FROM_ALL "deps/SDL")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/Dependencies/SDL_net" EXCLUDE_FROM_ALL "deps/SDL_net")
 set(BUILD_SHARED_LIBS OFF)

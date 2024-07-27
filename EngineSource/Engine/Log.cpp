@@ -18,6 +18,12 @@ namespace Log
 
 	std::mutex LogMutex;
 	std::vector<Message> Messages;
+	bool PrintColor = true;
+
+	void EnableColoredOutput(bool NewEnabled)
+	{
+		PrintColor = NewEnabled;
+	}
 
 	void Print(std::string Text, Vector3 Color)
 	{
@@ -49,11 +55,14 @@ namespace Log
 				NearestValue = Difference;
 			}
 		}
-		OS::SetConsoleColor(OS::ConsoleColor::Gray);
+		if (PrintColor)
+			OS::SetConsoleColor(OS::ConsoleColor::Gray);
 		std::cout << "Log: ";
-		OS::SetConsoleColor(NearestColor);
+		if (PrintColor)
+			OS::SetConsoleColor(NearestColor);
 		std::cout << Text;
-		OS::SetConsoleColor(OS::ConsoleColor::Gray);
+		if (PrintColor)
+			OS::SetConsoleColor(OS::ConsoleColor::Gray);
 		std::cout << std::endl;
 		LogMutex.unlock();
 	}

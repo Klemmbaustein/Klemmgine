@@ -110,12 +110,6 @@ void ObjectList::GenerateObjectListSection(std::vector<ObjectListItem> Section, 
 			Object.Object ? Object.ListIndex : -1 - Object.ListIndex));
 
 		bool IsCSObj = false;
-#if ENGINE_CSHARP
-		IsCSObj = Object.Object && Object.Object->GetObjectDescription().ID == CSharpObject::GetID();
-		Vector3 ObjectColor = IsCSObj ? EditorUI::ItemColors.at("cs") : EditorUI::ItemColors.at("cpp");
-#else
-		Vector3 ObjectColor = EditorUI::ItemColors.at("cpp");
-#endif
 
 		unsigned int ElemIcon = 5;
 
@@ -228,12 +222,13 @@ std::vector<ObjectList::ObjectListItem> ObjectList::GetObjectList()
 				if (LastSlash != std::string::npos)
 				{
 					Path = i.substr(0, LastSlash);
-					Name = i.substr(LastSlash);
+					Name = i.substr(LastSlash + 1);
 				}
-				if (Name == static_cast<CSharpObject*>(o)->CSharpClass)
+				if (Name != static_cast<CSharpObject*>(o)->CSharpClass)
 				{
-					CurrentPath = Path;
+					continue;
 				}
+				CurrentPath = Path;
 			}
 		}
 #endif

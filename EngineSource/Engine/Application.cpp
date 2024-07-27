@@ -152,11 +152,11 @@ static void ApplicationLoop()
 	Stats::DrawCalls = 0u;
 
 #if EDITOR
-	// Slow down the editor if it doesn't have focus.
-	// This saves performance.
-	if (!Window::WindowHasFocus())
+	// Slow down the editor framerate if it doesn't have focus
+	// to save performance.
+	if (!Window::WindowHasFocus() && Stats::DeltaTime < 0.1f)
 	{
-		SDL_Delay(100 - (Uint32)(Stats::DeltaTime * 1000));
+		SDL_Delay(100 - Uint32(Stats::DeltaTime * 1000));
 	}
 #endif
 #if SERVER
@@ -166,10 +166,16 @@ static void ApplicationLoop()
 		// Sleep to maintain a constant update rate on a server
 		float SleepDelay = Networking::GetTickDelta() - Stats::DeltaTime;
 
-		std::this_thread::sleep_for(std::chrono::microseconds(Uint32(1000.0f * 1000.0f * SleepDelay)));
+		SDL_Delay(std::max(Uint32(1000.0f * SleepDelay), Uint32(1)) - 1);
+
+		// Hack since Windows doesn't allow sleeping for less than one millisecond.
+		while (FrameTimer.Get() < Networking::GetTickDelta())
+		{
+			continue;
+		}
 	}
 
-	Stats::DeltaTime = std::max(Stats::DeltaTime, Networking::GetTickDelta());
+	Stats::DeltaTime = FrameTimer.Get();
 #endif
 	Stats::Time += Stats::DeltaTime;
 }
@@ -221,7 +227,7 @@ int Application::Initialize(int argc, char** argv)
 	Subsystem::Load(new Sound());
 #endif
 
-	// Evaluating launch args depends on some subsystems (LogSubsystem, Console, Scene...), so these can't be evaluated before here.
+	// Evaluating launch args depends on some subsystems (LogSubsystem, Console, Scene...), so they can't be evaluated before here.
 	LaunchArgs::Evaluate(argc, argv);
 
 #if ENGINE_CSHARP
@@ -238,7 +244,7 @@ int Application::Initialize(int argc, char** argv)
 	std::string Startup = Project::GetStartupScene();
 
 	// Application::StartupSceneOverride is set mostly by launch args. (-scene xyz)
-	// Some projects might still depend on GetStartupScene always being called, which is why it's alwayys called here.
+	// Some projects might still depend on GetStartupScene always being called, which is why it's always called here.
 	if (!Application::StartupSceneOverride.empty())
 	{
 		Startup = Application::StartupSceneOverride;

@@ -228,10 +228,7 @@ bool EditorPanel::TickPanelInternal()
 		if (!OptionsList.empty())
 		{
 			DropdownPanel = this;
-			new EditorDropdown(
-				{
-					OptionsList
-				}, Input::MouseLocation);
+			new EditorDropdown(OptionsList, Input::MouseLocation);
 		}
 	}
 

@@ -115,11 +115,11 @@ void Particles::ParticleEmitter::SaveToFile(std::vector<ParticleElement> Data, s
 
 void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 {
-	if (ParticleMatrices.empty())
+	if (ParticleInstances.empty())
 	{
 		return;
 	}
-	for (unsigned int i = 0; i < ParticleVertexBuffers.size(); i++)
+	for (size_t i = 0; i < ParticleVertexBuffers.size(); i++)
 	{
 		ParticleMatrices.clear();
 		for (const auto& T : ParticleInstances[i])
@@ -227,25 +227,25 @@ void Particles::ParticleEmitter::Reset()
 	//{
 	//	inst.clear();
 	//}
-	for (unsigned int i = 0; i < ParticleElements.size(); i++)
+	for (size_t i = 0; i < ParticleElements.size(); i++)
 	{
 		SpawnDelays[i] = ParticleElements[i].SpawnDelay;
 	}
 }
 
-constexpr unsigned int MAX_PARTICLES_PER_FRAME = 15;
+constexpr size_t MAX_PARTICLES_PER_FRAME = 15;
 
 void Particles::ParticleEmitter::Update(Camera* MainCamera)
 {
 	IsActive = false;
-	for (unsigned int i = 0; i < ParticleElements.size(); i++)
+	for (size_t i = 0; i < ParticleElements.size(); i++)
 	{
 		SpawnDelays[i] -= Stats::DeltaTime;
 		if (SpawnDelays[i] < 0.0f)
 		{
 			if (ParticleElements[i].SpawnDelay == 0)
 			{
-				for (unsigned int j = 0; j < MAX_PARTICLES_PER_FRAME; j++)
+				for (size_t j = 0; j < MAX_PARTICLES_PER_FRAME; j++)
 				{
 					AddParticleInstance(i);
 					if (ParticleElements[i].RunLoops == 0)
@@ -265,7 +265,7 @@ void Particles::ParticleEmitter::Update(Camera* MainCamera)
 			IsActive = true;
 		}
 	}
-	for (unsigned int elem = 0; elem < ParticleInstances.size(); elem++)
+	for (size_t elem = 0; elem < ParticleInstances.size(); elem++)
 	{
 		std::vector<ParticleInstance> ParticlesToDelete;
 		for (auto& p : ParticleInstances[elem])
@@ -281,7 +281,7 @@ void Particles::ParticleEmitter::Update(Camera* MainCamera)
 
 		for (auto& i : ParticlesToDelete)
 		{
-			unsigned int it = 0;
+			size_t it = 0;
 			for (auto& j : ParticleInstances[elem])
 			{
 				if (i == j)
@@ -303,7 +303,7 @@ void Particles::ParticleEmitter::Draw(Camera* MainCamera , bool MainFrameBuffer,
 	glEnable(GL_BLEND);
 
 	glBindBuffer(GL_ARRAY_BUFFER, MatBuffer);
-	for (unsigned int Elem = 0; Elem < ParticleElements.size(); Elem++)
+	for (size_t Elem = 0; Elem < ParticleElements.size(); Elem++)
 	{
 		unsigned int ElemShader = Contexts[Elem].GetShader()->GetShaderID();
 		Contexts[Elem].Bind();

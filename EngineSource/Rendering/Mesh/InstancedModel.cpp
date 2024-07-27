@@ -53,7 +53,6 @@ void InstancedModel::Render(Camera* WorldCamera, bool MainFrameBuffer, bool Tran
 		return;
 	}
 
-
 	if (TwoSided)
 	{
 		glDisable(GL_CULL_FACE);

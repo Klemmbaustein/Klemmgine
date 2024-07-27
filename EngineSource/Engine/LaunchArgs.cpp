@@ -5,6 +5,7 @@
 #include <Engine/Log.h>
 #include <Engine/OS.h>
 #include <iostream>
+#include <Engine/Subsystem/NetworkSubsystem.h>
 #include <Engine/Subsystem/Scene.h>
 #include <Rendering/Graphics.h>
 #include <Engine/Application.h>
@@ -75,7 +76,7 @@ namespace LaunchArgs
 			Log::Print("Unexpected or missing arguments in -connect", Log::LogColor::Yellow);
 			return;
 		}
-		Console::ExecuteConsoleCommand("connect " + AdditionalArgs[0]);
+		NetworkSubsystem::Connect(AdditionalArgs[0]);
 	}
 
 	static void EditorPath(std::vector<std::string> AdditionalArgs)
@@ -91,8 +92,15 @@ namespace LaunchArgs
 	static void LogVerbose(std::vector<std::string> AdditionalArgs)
 	{
 		if (AdditionalArgs.size())
-			Log::Print("Unexpected arguments in -nostartupinfo", Log::LogColor::Yellow);
+			Log::Print("Unexpected arguments in -verbose", Log::LogColor::Yellow);
 		Subsystem::SetSystemLogVerbose(true);
+	}
+
+	static void NoColor(std::vector<std::string> AdditionalArgs)
+	{
+		if (AdditionalArgs.size())
+			Log::Print("Unexpected arguments in -nocolor", Log::LogColor::Yellow);
+		Log::EnableColoredOutput(false);
 	}
 
 	std::map<std::string, void(*)(std::vector<std::string>)> Commands =
@@ -105,7 +113,8 @@ namespace LaunchArgs
 #if !SERVER
 		std::pair("fullscreen", &FullScreen),
 #endif
-		std::pair("noStartupInfo", &NoStartupInfo),
+		std::pair("nostartupinfo", &NoStartupInfo),
+		std::pair("nocolor", &NoColor),
 		std::pair("connect", &Connect),
 		std::pair("verbose", &LogVerbose),
 #if !RELEASE
@@ -113,7 +122,7 @@ namespace LaunchArgs
 #endif
 #if SERVER
 		std::pair("quitondisconnect", [](std::vector<std::string> arg) {
-			Console::ExecuteConsoleCommand("quitondisconnect");
+			NetworkSubsystem::QuitOnDisconnect();
 		}),
 #endif
 	};

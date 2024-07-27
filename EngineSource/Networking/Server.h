@@ -8,6 +8,7 @@ class SceneObject;
 
 namespace Server
 {
+	extern bool ShouldQuitOnPlayerDisconnect;
 	struct ClientInfo
 	{
 		uint64_t LastResponseTick = 0;

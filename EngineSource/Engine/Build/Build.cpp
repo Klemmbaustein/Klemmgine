@@ -6,6 +6,7 @@
 #include <sstream>
 #include <Engine/Utility/FileUtility.h>
 #include <Engine/Application.h>
+#include <Engine/OS.h>
 
 #if EDITOR
 #include <Engine/Stats.h>
@@ -59,9 +60,19 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			Stats::EngineStatus = "Build: Copying .dll files";
 			Log::Print("[Build]: Copying binary files");
 #if _WIN32
-			std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
-			std::filesystem::copy("SDL2_net.dll", TargetFolder + "SDL2_net.dll");
-			std::filesystem::copy("bin/OpenAL32.dll", TargetFolder + "/OpenAL32.dll");
+			std::string BinaryPath = FileUtil::GetPath(OS::GetExecutableName());
+
+			if (CMake::IsUsingCMake())
+			{
+				std::filesystem::copy(BinaryPath + "/SDL2.dll", TargetFolder + "SDL2.dll");
+				std::filesystem::copy(BinaryPath + "/SDL2_net.dll", TargetFolder + "SDL2_net.dll");
+			}
+			else
+			{
+				std::filesystem::copy("SDL2.dll", TargetFolder + "SDL2.dll");
+				std::filesystem::copy("SDL2_net.dll", TargetFolder + "SDL2_net.dll");
+			}
+			std::filesystem::copy(BinaryPath + "/OpenAL32.dll", TargetFolder + "/OpenAL32.dll");
 #ifdef ENGINE_CSHARP
 			std::filesystem::copy("nethost.dll", TargetFolder + "nethost.dll");
 #endif
@@ -83,47 +94,63 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 			{
 				std::filesystem::copy("Locale", TargetFolder + "Assets/Locale");
 			}
-			Stats::EngineStatus = "Building C++ solution";
-#if _WIN32
+			Stats::EngineStatus = "Building C++ code";
 
 #if ENGINE_NO_SOURCE
+#if _WIN32
 			std::filesystem::copy("bin/Klemmgine-Release.exe", TargetFolder + Project::ProjectName + std::string(".exe"));
-#else
-			int CompileResult = BuildCurrentSolution("Release");
-			if (!CompileResult)
-			{
-				std::filesystem::copy("bin/" + GetProjectBuildName() + "-Release.exe", TargetFolder + Project::ProjectName + std::string(".exe"));
-			}
-			else
-			{
-				Log::Print("[Build]: Failure: MSBuild returned " + std::to_string(CompileResult), Vector3(1, 0, 0));
-				return "";
-			}
-#endif
-#else
-#if !ENGINE_NO_SOURCE
-			Log::Print("[Build]: Running KlemmBuild...");
-			ret = system("KlemmBuild -DRelease");
-			
-			if (ret)
-			{
-				Log::Print("[Build]: Compile failed", Log::LogColor::Red);
-				return "";
-			}
-
-			for (auto& i : std::filesystem::directory_iterator("bin/Release"))
-			{
-				std::filesystem::copy(
-					i,
-					TargetFolder + "/" + i.path().filename().string(),
-					std::filesystem::copy_options::overwrite_existing
-				);
-			}
-			std::filesystem::rename(TargetFolder + "/Klemmgine-Release", TargetFolder + "/" + Project::ProjectName);
 #else
 			std::filesystem::copy("bin/Release/Klemmgine-Release", TargetFolder + Project::ProjectName);
 #endif
+#else // ENGINE_NO_SOURCE
+
+			if (CMake::IsUsingCMake())
+			{
+				CMake::BuildWithConfig("Release", "-DRELEASE=ON");
+
+				std::string ExecutablePath = CMake::GetBuildRootPath("Release") + "/";
+#if _WIN32
+				ExecutablePath.append("Release/");
 #endif
+
+				std::filesystem::copy(ExecutablePath + Build::GetProjectBuildName() + ".exe", TargetFolder + Project::ProjectName + std::string(".exe"));
+			}
+			else
+			{
+#if _WIN32
+				int CompileResult = BuildCurrentSolution("Release");
+				if (!CompileResult)
+				{
+					std::filesystem::copy("bin/" + GetProjectBuildName() + "-Release.exe", TargetFolder + Project::ProjectName + std::string(".exe"));
+				}
+				else
+				{
+					Log::Print("[Build]: Failure: MSBuild returned " + std::to_string(CompileResult), Vector3(1, 0, 0));
+					return "";
+				}
+#else // _WIN32
+				Log::Print("[Build]: Running KlemmBuild...");
+				ret = system("KlemmBuild -DRelease");
+
+				if (ret)
+				{
+					Log::Print("[Build]: Compile failed", Log::LogColor::Red);
+					return "";
+				}
+
+				for (auto& i : std::filesystem::directory_iterator("bin/Release"))
+				{
+					std::filesystem::copy(
+						i,
+						TargetFolder + "/" + i.path().filename().string(),
+						std::filesystem::copy_options::overwrite_existing
+					);
+				}
+				std::filesystem::rename(TargetFolder + "/Klemmgine-Release", TargetFolder + "/" + Project::ProjectName);
+#endif // _WIN32
+
+#endif // ENGINE_NO_SOURCE
+		}
 #if ENGINE_CSHARP
 			if (CSharpInterop::GetUseCSharp())
 			{
@@ -248,7 +275,19 @@ int Build::BuildCurrentSolution(std::string Configuration)
 
 #if !RELEASE
 
+
 std::string Build::GetProjectBuildName()
+{
+	std::string Name = GetSolutionName();
+
+	if (Name.empty())
+	{
+		Name = FileUtil::GetFileNameWithoutExtensionFromPath(OS::GetExecutableName());
+	}
+	return Name;
+}
+
+std::string Build::GetSolutionName()
 {
 	std::string ProjectName;
 	for (auto& i : std::filesystem::directory_iterator("."))
@@ -262,4 +301,54 @@ std::string Build::GetProjectBuildName()
 	return ProjectName;
 }
 
+
+std::string Build::CMake::GetBuildRootPath(std::string Configuration)
+{
+	// (More or less) match the Visual Studio default cmake build root (${projectDir}\out\build\${name})
+#if _WIN32
+	return "out\\engine-build\\" + Configuration;
+#else
+	return "out/engine-build/" + Configuration;
+#endif
+}
+
+static std::string CMakeMSBuildConfig = "Release";
+
+bool Build::CMake::BuildWithConfig(std::string Configuration, std::string Args)
+{
+	std::string RootPath = GetBuildRootPath(Configuration);
+
+	if (!std::filesystem::exists(RootPath) && system(("cmake -S . -B " + RootPath + " " + Args).c_str()))
+	{
+		return false;
+	}
+
+#if _WIN32
+	return system(("cmake --build " + RootPath + " --config " + CMakeMSBuildConfig + " -- /m:2 /p:CL_MPCount=12 ").c_str()) == 0;
+#else
+	return system(("cmake --build " + RootPath).c_str());
+#endif
+}
+
+bool Build::CMake::IsUsingCMake()
+{
+	for (const auto& file : std::filesystem::directory_iterator("."))
+	{
+		if (file.path().filename().u8string() == u8"CMakeLists.txt")
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void Build::CMake::SetMSBuildConfig(std::string Name)
+{
+	CMakeMSBuildConfig = Name;
+}
+
+std::string Build::CMake::GetMSBuildConfig()
+{
+	return CMakeMSBuildConfig;
+}
 #endif

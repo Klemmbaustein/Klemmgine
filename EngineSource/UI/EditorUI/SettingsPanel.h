@@ -83,6 +83,14 @@ class SettingsPanel : public EditorPanel
 			}
 		),
 
+		SettingsCategory("CMake",
+		{
+			SettingsCategory::Setting("MSBuild:Use Debug configuration", NativeType::Bool, "0", [](std::string NewValue)
+			{
+				Build::CMake::SetMSBuildConfig(std::stoi(NewValue) ? "Debug" : "Release");
+			}),
+		}),
+
 		SettingsCategory("Graphics",
 			{
 			SettingsCategory::Setting("Graphics:Shadows", NativeType::Bool, "1", [](std::string NewValue)

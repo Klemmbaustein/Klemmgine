@@ -3,6 +3,7 @@
 #include <Engine/Log.h>
 #include <iostream>
 #include <Rendering/Graphics.h>
+#include <Engine/Utility/StringUtility.h>
 
 float UIText::GetRenderedSize() const
 {

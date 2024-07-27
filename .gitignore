@@ -21,7 +21,7 @@ Tools/BuildTool/Release/
 Engine-*.*
 # C# related
 *.lastcodeanalysissucceeded
-Build
+/Build
 ProjectGenerator
 
 !Tools/ProjectGenerator
@@ -37,3 +37,6 @@ Tools/BuildTool/Output/GENERATED/*
 *.pref
 *.ilk
 /Projects/Shooter
+/CSharp/Core/Build
+/CSharp/Engine/Build
+out

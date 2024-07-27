@@ -12,8 +12,14 @@ namespace FileUtil
 {
 	std::string GetFileNameFromPath(std::string FilePath)
 	{
-		std::string base_filename = FilePath.substr(FilePath.find_last_of("/\\") + 1);
-		return base_filename;
+		std::string Name = FilePath.substr(FilePath.find_last_of("/\\") + 1);
+		return Name;
+	}
+
+	std::string GetPath(std::string FileName)
+	{
+		std::string Path = FileName.substr(0, FileName.find_last_of("/\\"));
+		return Path;
 	}
 
 	std::string GetFileNameWithoutExtensionFromPath(std::string FilePath)

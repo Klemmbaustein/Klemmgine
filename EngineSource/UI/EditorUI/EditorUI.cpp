@@ -34,6 +34,7 @@
 #include <UI/EditorUI/SettingsPanel.h>
 #include <Networking/Networking.h>
 #include <UI/EditorUI/SerializePanel.h>
+#include <Engine/Utility/StringUtility.h>
 
 int EditorUI::NumLaunchClients = 1;
 TextRenderer* EditorUI::Text = nullptr;
@@ -136,35 +137,84 @@ static std::string LaunchCommandLine;
 void EditorUI::LaunchInEditor()
 {
 	std::string ProjectName = Build::GetProjectBuildName();
+	std::string ExecutablePath = "", ServerExecutablePath = "";
 	try
 	{
 #if !ENGINE_NO_SOURCE && !__linux__
-		if (!std::filesystem::exists("bin/" + ProjectName + "-Debug.exe")
-			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Debug.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
+		// No Solution -> no build name -> probably using CMake on windows.
+		if (Build::GetSolutionName().empty())
 		{
-			Editor::Rebuilding = true;
-			Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
-			if (Build::BuildCurrentSolution("Debug"))
+			std::string CMakeConfigName = "x64-Debug";
+			ExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\" + Build::CMake::GetMSBuildConfig() + "\\" + ProjectName;
+#if _WIN32
+			ExecutablePath.append(".exe");
+#endif
+
+			if (!std::filesystem::exists(ExecutablePath)
+				|| std::filesystem::last_write_time(ExecutablePath) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
 			{
-				Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
-				Editor::Rebuilding = false;
-				return;
+				Editor::Rebuilding = true;
+				Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
+				Build::CMake::BuildWithConfig(CMakeConfigName);
+			}
+
+			CMakeConfigName = "x64-Server";
+			ServerExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\" + Build::CMake::GetMSBuildConfig() + "\\" + ProjectName;
+#if _WIN32
+			ServerExecutablePath.append(".exe");
+#endif
+			if (LaunchWithServer
+				&& (!std::filesystem::exists(ServerExecutablePath)
+					|| std::filesystem::last_write_time(ServerExecutablePath) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
+			{
+				Editor::Rebuilding = true;
+				Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
+				Build::CMake::BuildWithConfig(CMakeConfigName, "-DSERVER=ON");
 			}
 		}
-
-		if (LaunchWithServer && (!std::filesystem::exists("bin/" + ProjectName + "-Server.exe")
-			|| std::filesystem::last_write_time("bin/" + ProjectName + "-Server.exe") < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
+		else
 		{
-			Editor::Rebuilding = true;
-			if (Build::BuildCurrentSolution("Server"))
+			ExecutablePath = "bin\\" + ProjectName + "-Debug.exe";
+			if (!std::filesystem::exists(ExecutablePath)
+				|| std::filesystem::last_write_time(ExecutablePath) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
 			{
-				Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
-				Editor::Rebuilding = false;
-				return;
+				Editor::Rebuilding = true;
+				Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
+				if (Build::BuildCurrentSolution("Debug"))
+				{
+					Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
+					Editor::Rebuilding = false;
+					return;
+				}
+			}
+
+			ServerExecutablePath = "bin\\" + ProjectName + "-Server.exe";
+			if (LaunchWithServer 
+				&& (!std::filesystem::exists(ServerExecutablePath)
+					|| std::filesystem::last_write_time(ServerExecutablePath) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
+			{
+				Editor::Rebuilding = true;
+				if (Build::BuildCurrentSolution("Server"))
+				{
+					Log::Print("Build for configuration 'Debug' failed. Cannot launch project.", Log::LogColor::Red);
+					Editor::Rebuilding = false;
+					return;
+				}
 			}
 		}
 		Editor::Rebuilding = false;
 #endif
+
+#if ENGINE_NO_SOURCE
+		ProjectName = "Klemmgine";
+		ExecutablePath = "bin\\" + ProjectName + "-Debug";
+		ServerExecutablePath = "bin\\" + ProjectName + "-Server";
+#if _WIN32
+		ExecutablePath.append(".exe");
+		ServerExecutablePath.append(".exe");
+#endif
+#endif
+
 #ifdef ENGINE_CSHARP
 		if ((!std::filesystem::exists("CSharp/Build/CSharpAssembly.dll")
 			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
@@ -191,15 +241,12 @@ void EditorUI::LaunchInEditor()
 		Args.append(" -scene " + FileUtil::GetFileNameFromPath(Scene::CurrentScene));
 	}
 
-#if ENGINE_NO_SOURCE || __linux__
-	ProjectName = "Klemmgine";
+#if __linux__
+	StrUtil::ReplaceChar(ExecutablePath, '\\', "/");
 #endif
-#if _WIN32
 
-	std::string CommandLine = "bin\\" + ProjectName + "-Debug.exe -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
-#else
-	std::string CommandLine = "./bin/" + ProjectName + "-Debug -nostartupinfo -editorPath " + Application::GetEditorPath() + " " + Args;
-#endif
+	std::string CommandLine = ExecutablePath + " -nostartupinfo -nocolor -editorPath " + Application::GetEditorPath() + " " + Args;
+
 	if (LaunchWithServer)
 	{
 		CommandLine.append(" -connect localhost ");
@@ -245,9 +292,7 @@ void EditorUI::LaunchInEditor()
 	if (LaunchWithServer)
 	{
 #if _WIN32
-		ret = system(("start bin\\"
-			+ ProjectName
-			+ "-Server.exe -nostartupinfo -quitondisconnect -editorPath "
+		ret = system(("start " + ServerExecutablePath + " -nostartupinfo -quitondisconnect -editorPath "
 			+ Application::GetEditorPath()
 			+ " "
 			+ Args).c_str());

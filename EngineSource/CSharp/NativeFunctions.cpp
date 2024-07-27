@@ -216,6 +216,11 @@ namespace NativeFunctions
 		return Response;
 	}
 
+	static void PhysicsComponentSetActive(PhysicsComponent* PhysComponent, bool NewActive)
+	{
+		PhysComponent->SetActive(NewActive);
+	}
+
 	static void MovementComponentJump(MoveComponent* Target)
 	{
 		Target->Jump();
@@ -852,6 +857,7 @@ void NativeFunctions::RegisterNativeFunctions()
 	REGISTER_FUNCTION(PhysicsComponentSetAngularVelocity);
 	REGISTER_FUNCTION(PhysicsComponentCollisionCheck);
 	REGISTER_FUNCTION(PhysicsComponentShapeCast);
+	REGISTER_FUNCTION(PhysicsComponentSetActive);
 	REGISTER_FUNCTION(SetPointLightIntensity);
 	REGISTER_FUNCTION(SetPointLightFalloff);
 	REGISTER_FUNCTION(SetPointLightColor);

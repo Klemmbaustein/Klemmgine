@@ -28,7 +28,7 @@ namespace Objects
 	}
 }
 
-void SceneObject::_CallEvent(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments)
+void SceneObject::CallEventInternal(NetEvent::NetEventFunction Function, std::vector<std::string> Arguments)
 {
 	for (const auto& i : NetEvents)
 	{
