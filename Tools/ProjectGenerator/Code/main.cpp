@@ -181,8 +181,8 @@ int main(int argc, char** argv)
 		}
 	}
 
-#if !ENGINE_NO_SOURCE
 	const std::string& BuildSystem = LaunchArgs["buildSystem"];
+#if !ENGINE_NO_SOURCE
 	if (BuildSystem == "msbuild")
 	{
 		SLN::WriteMSVCProjectFiles(ProjectPath, ProjectName, LaunchArgs);
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 #if ENGINE_NO_SOURCE
 		if (LaunchArgs["ciBuild"] == "false")
 		{
-			return;
+			return 0;
 		}
 #endif
 

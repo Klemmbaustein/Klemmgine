@@ -4,7 +4,7 @@
 
 ### Changes
 
-- Added support for compiling with CMake (On Windows and Linux), it is not the default on Linux.
+- Added support for compiling with CMake (On Windows and Linux). It is now the default on Linux.
 - Slightly reworked the settings page in the editor.
 - Fixed an issue where UI would be placed above the debug console.
 - Removed `Project::UseNetworkFunctions`. To enable network functions now, load the `NetworkSubsystem` subsystem.
