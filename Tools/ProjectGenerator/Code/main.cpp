@@ -191,7 +191,13 @@ int main(int argc, char** argv)
 	{
 #endif
 		VSProj::WriteCSProj(ProjectPath + "/Scripts", "CSharpAssembly", LaunchArgs["netVersion"]);
-#if !ENGINE_NO_SOURCE
+#if ENGINE_NO_SOURCE
+		if (LaunchArgs["ciBuild"] == "false")
+		{
+			return;
+		}
+#endif
+
 		std::cout << "Copying files for build system: " << BuildSystem << std::endl;
 		if (BuildSystem == "cmake")
 		{
@@ -211,5 +217,4 @@ int main(int argc, char** argv)
 			std::filesystem::copy("Tools/ProjectGenerator/BuildFiles/makefile.kbld", ProjectPath + "/makefile.kbld");
 		}
 	}
-#endif
 }
