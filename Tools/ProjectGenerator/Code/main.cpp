@@ -181,22 +181,21 @@ int main(int argc, char** argv)
 		}
 	}
 
+#if ENGINE_NO_SOURCE
+	if (LaunchArgs["ciBuild"] == "false")
+	{
+		return 0;
+	}
+#endif
+
 	const std::string& BuildSystem = LaunchArgs["buildSystem"];
-#if !ENGINE_NO_SOURCE
 	if (BuildSystem == "msbuild")
 	{
 		SLN::WriteMSVCProjectFiles(ProjectPath, ProjectName, LaunchArgs);
 	}
 	else
-#endif
 	{
 		VSProj::WriteCSProj(ProjectPath + "/Scripts", "CSharpAssembly", LaunchArgs["netVersion"]);
-#if ENGINE_NO_SOURCE
-		if (LaunchArgs["ciBuild"] == "false")
-		{
-			return 0;
-		}
-#endif
 
 		std::cout << "Copying files for build system: " << BuildSystem << std::endl;
 		if (BuildSystem == "cmake")
