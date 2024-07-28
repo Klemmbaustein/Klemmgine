@@ -188,8 +188,8 @@ int main(int argc, char** argv)
 		SLN::WriteMSVCProjectFiles(ProjectPath, ProjectName, LaunchArgs);
 	}
 	else
-	{
 #endif
+	{
 		VSProj::WriteCSProj(ProjectPath + "/Scripts", "CSharpAssembly", LaunchArgs["netVersion"]);
 #if ENGINE_NO_SOURCE
 		if (LaunchArgs["ciBuild"] == "false")
