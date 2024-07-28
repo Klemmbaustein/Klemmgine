@@ -54,7 +54,7 @@ fi
 
 echo "Building for CI"
 
-./ProjectGenerator -projectName Klemmgine -includeEngine false -ciBuild true || fail
+./ProjectGenerator -projectName Klemmgine -includeEngine false -ciBuild true -buildSystem kbld || fail
 
 cd Games/Klemmgine
 declare -a configs=("-DEditor" "-DDebug" "-DRelease" "-DServer")

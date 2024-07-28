@@ -134,6 +134,43 @@ bool EditorUI::IsBakingScene = false;
 std::string EditorUI::LaunchInEditorArgs;
 bool EditorUI::LaunchWithServer = false;
 static std::string LaunchCommandLine;
+
+static std::string EditorBuildCMakeConfiguration(std::string Configuration, std::string Name, std::string BuildArgs)
+{
+	std::string MsBuildConfig = Build::CMake::GetMSBuildConfig();
+
+#if _WIN32
+	std::string ExecExtension = ".exe";
+#else
+	std::string ExecExtension = "";
+#endif
+
+	std::string ExecutablePath = Build::CMake::GetBuildRootPath(Configuration) + "\\";
+	if (std::filesystem::exists(ExecutablePath + MsBuildConfig))
+	{
+		ExecutablePath.append(MsBuildConfig + "\\");
+	}
+
+	std::string Executable = ExecutablePath + Name + ExecExtension;
+
+	if (!std::filesystem::exists(Executable)
+		|| std::filesystem::last_write_time(Executable) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
+	{
+		Editor::Rebuilding = true;
+		Log::Print("Found changes to source code - building with configuration: " + Configuration, Log::LogColor::Yellow);
+		Build::CMake::BuildWithConfig(Configuration, BuildArgs);
+
+		// Re-check for a configuration folder, in case this is the first time building.
+		if (std::filesystem::exists(ExecutablePath + MsBuildConfig))
+		{
+			ExecutablePath.append(MsBuildConfig + "\\");
+			Executable = ExecutablePath + Name + ExecExtension;
+		}
+	}
+
+	return Executable;
+}
+
 void EditorUI::LaunchInEditor()
 {
 	std::string ProjectName = Build::GetProjectBuildName();
@@ -144,52 +181,8 @@ void EditorUI::LaunchInEditor()
 		// No Solution -> no build name -> probably using CMake on windows.
 		if (Build::CMake::IsUsingCMake())
 		{
-			std::string MsBuildConfig = Build::CMake::GetMSBuildConfig();
-
-#if _WIN32
-			std::string ExecExtension = ".exe";
-#else
-			std::string ExecExtension = "";
-#endif
-
-			std::string CMakeConfigName = "x64-Debug";
-			ExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\";
-#if _WIN32
-			if (std::filesystem::exists(ExecutablePath + MsBuildConfig))
-			{
-				ExecutablePath.append(MsBuildConfig + "\\");
-			}
-#endif
-
-			ExecutablePath.append(ProjectName + ExecExtension);
-
-			if (!std::filesystem::exists(ExecutablePath)
-				|| std::filesystem::last_write_time(ExecutablePath) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" }))
-			{
-				Editor::Rebuilding = true;
-				Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
-				Build::CMake::BuildWithConfig(CMakeConfigName);
-			}
-
-			CMakeConfigName = "x64-Server";
-			ServerExecutablePath = Build::CMake::GetBuildRootPath(CMakeConfigName) + "\\";
-
-#if _WIN32
-			if (std::filesystem::exists(ServerExecutablePath + MsBuildConfig))
-			{
-				ServerExecutablePath.append(MsBuildConfig + "\\");
-			}
-#endif
-
-			ServerExecutablePath.append(ProjectName + ExecExtension);
-			if (LaunchWithServer
-				&& (!std::filesystem::exists(ServerExecutablePath)
-					|| std::filesystem::last_write_time(ServerExecutablePath) < FileUtil::GetLastWriteTimeOfFolder("Code", { "x64" })))
-			{
-				Editor::Rebuilding = true;
-				Log::Print("Detected uncompiled changes to C++ code. Rebuilding...", Log::LogColor::Yellow);
-				Build::CMake::BuildWithConfig(CMakeConfigName, "-DSERVER=ON");
-			}
+			ExecutablePath = EditorBuildCMakeConfiguration("x64-Debug", ProjectName, "");
+			ServerExecutablePath = EditorBuildCMakeConfiguration("x64-Server", ProjectName, "-DSERVER=ON");
 		}
 #if _WIN32
 		else

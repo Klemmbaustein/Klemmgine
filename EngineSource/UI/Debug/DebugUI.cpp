@@ -175,6 +175,9 @@ void DebugUI::Tick()
 	{
 		IsEditingText = 5;
 		LogPrompt->Edit();
+		LogBackground->SetRenderOrderIndex(SIZE_MAX);
+		LogPrompt->SetRenderOrderIndex(SIZE_MAX);
+		CompleteBackground->SetRenderOrderIndex(SIZE_MAX);
 	}
 	if (!ConsoleReadInput(Input::Key::RETURN) && IsEditingText)
 	{

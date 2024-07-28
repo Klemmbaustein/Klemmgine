@@ -8,6 +8,12 @@
 #include <iostream>
 #include <GL/glew.h>
 #include <Engine/EngineError.h>
+#if _WIN32
+#include <SDL_syswm.h>
+#include <dwmapi.h>
+
+#pragma comment(lib, "Dwmapi.lib")
+#endif
 
 // TODO: Multiple windows?
 
@@ -53,6 +59,22 @@ Vector2 Window::GetCursorPosition()
 	SDL_GetMouseState(&x, &y);
 	Vector2 Size = Window::GetWindowSize();
 	return Vector2((x / Size.X - 0.5f) * 2, 1 - (y / Size.Y * 2));
+}
+
+void Window::SetTitleBarDark(bool NewIsDark)
+{
+	// Adjust some attributes to make the editor window look prettier
+#if _WIN32 && EDITOR
+	SDL_SysWMinfo wmInfo;
+	SDL_VERSION(&wmInfo.version);
+	SDL_GetWindowWMInfo(SDLWindow, &wmInfo);
+	HWND hwnd = wmInfo.info.win.window;
+
+	BOOL UseDarkMode = NewIsDark;
+	DwmSetWindowAttribute(
+		hwnd, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE,
+		&UseDarkMode, sizeof(UseDarkMode));
+#endif
 }
 
 void Window::InitWindow(std::string WindowTitle)
@@ -103,6 +125,8 @@ void Window::InitWindow(std::string WindowTitle)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	std::cout << "GLEW started (No error)" << std::endl;
+
+	SetTitleBarDark(true);
 }
 
 void Window::DestroyWindow()

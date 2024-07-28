@@ -76,5 +76,7 @@ namespace Window
 	* The current position of the cursor.
 	*/
 	Vector2 GetCursorPosition();
+
+	void SetTitleBarDark(bool NewIsDark);
 }
 #endif

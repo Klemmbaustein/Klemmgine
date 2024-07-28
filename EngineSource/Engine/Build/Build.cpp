@@ -310,6 +310,7 @@ std::string Build::GetSolutionName()
 static std::string CMakeMSBuildConfig = "Release";
 static std::string CMakeExecutable = "cmake";
 static uint32_t CMakeProcessorCount = 12;
+std::string Build::CMake::CMakeGenerator;
 
 void Build::CMake::SetCompilationProcessorCount(uint32_t Count)
 {
@@ -330,7 +331,16 @@ bool Build::CMake::BuildWithConfig(std::string Configuration, std::string Args)
 {
 	std::string RootPath = GetBuildRootPath(Configuration);
 
-	if (!std::filesystem::exists(RootPath) && system((GetCMakeExecutable() + " -S . -B " + RootPath + " " + Args).c_str()))
+	std::string GenerateCommand = GetCMakeExecutable() + " -S . -B " + RootPath;
+
+	if (!CMakeGenerator.empty())
+	{
+		GenerateCommand.append(" -G " + CMakeGenerator);
+	}
+
+	GenerateCommand.append(" " + Args);
+
+	if (!std::filesystem::exists(RootPath) && system(GenerateCommand.c_str()))
 	{
 		return false;
 	}

@@ -46,6 +46,7 @@ class SettingsPanel : public EditorPanel
 			SettingsCategory::Setting("UI:Light mode [Experimental]", NativeType::Bool, "0", [](std::string NewValue)
 			{
 				Application::EditorInstance->SetUseLightMode(std::stoi(NewValue));
+				Window::SetTitleBarDark(!std::stoi(NewValue));
 			}),
 			SettingsCategory::Setting("Toolbar:Show Save Button", NativeType::Bool, "1", [](std::string NewValue)
 			{
@@ -98,6 +99,10 @@ class SettingsPanel : public EditorPanel
 			SettingsCategory::Setting("CMake:Executable", NativeType::String, "cmake", [](std::string NewValue)
 			{
 				Build::CMake::SetCMakeExecutable(NewValue);
+			}),
+			SettingsCategory::Setting("CMake:CMake generator (Leave empty for default)", NativeType::String, "", [](std::string NewValue)
+			{
+				Build::CMake::CMakeGenerator = NewValue;
 			}),
 			//SettingsCategory::Setting("CMake:Additional configuration arguments", NativeType::String, "", [](std::string NewValue)
 			//{

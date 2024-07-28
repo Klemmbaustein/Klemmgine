@@ -38,6 +38,8 @@ namespace Build
 
 		void SetCMakeExecutable(std::string Path);
 		std::string GetCMakeExecutable();
+
+		extern std::string CMakeGenerator;
 	}
 }
 #endif

@@ -27,11 +27,24 @@ void SettingsPanel::GenerateUI()
 
 	for (size_t i = 0; i < Preferences.size(); i++)
 	{
-		SettingsCategoryBox->AddChild(
-			(new UIButton(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[1] + (float)(i == SelectedSetting) / 8.f, this, (int)i))
-			->SetPadding(0.005f, 0.005f, 0.01f, 0.01f)->SetBorder(UIBox::BorderType::Rounded, 0.5f)
-			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], Preferences[i].Name, EditorUI::Text))
-				->SetTextWidthOverride(0.2f)
+		if (Preferences[i].Name == "CMake" && !Build::CMake::IsUsingCMake())
+		{
+			continue;
+		}
+
+		UIButton* CategoryButton = (new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[1], this, (int)i));
+
+		if (SelectedSetting == i)
+		{
+			CategoryButton->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], 10))
+				->SetSizeMode(UIBox::SizeMode::PixelRelative)
+				->SetTryFill(true));
+		}
+
+		SettingsCategoryBox->AddChild(CategoryButton
+			->SetMinSize(Vector2(0.2f, 0))
+			->SetPadding(0.005f, 0.005f, 0.01f, 0.01f)
+			->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Preferences[i].Name, EditorUI::Text))
 				->SetPadding(0.01f)));
 	}
 
@@ -40,12 +53,6 @@ void SettingsPanel::GenerateUI()
 	SettingsCategoryBox->SetMinSize(Vector2(0, Scale.Y - 0.005f));
 	SettingsCategoryBox->SetMaxSize(Vector2(2, Scale.Y - 0.005f));
 	SettingsCategoryBox->SetColor(EditorUI::UIColors[0] * 1.2f);
-
-	SettingsBox->AddChild((new UIText(0.8f, EditorUI::UIColors[2], "Settings/" + Preferences[SelectedSetting].Name, EditorUI::Text))
-		->SetPadding(0.01f, 0, 0.01f, 0));
-
-	SettingsBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[2], Vector2(SegmentSize, 0.005f)))
-		->SetPadding(0, 0.05f, 0, 0));
 
 	std::map<std::string, std::vector<SettingsCategory::Setting>> Categories;
 
@@ -83,7 +90,7 @@ void SettingsPanel::GenerateUI()
 			(new UIButton(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[1], this, -400 + CurentCategory))
 				->SetPadding(0.01f, 0.01f, 0, 0)
 				->SetMinSize(Vector2(SegmentSize, 0))
-				->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "> " + cat.first, EditorUI::Text))
+				->AddChild((new UIText(0.5f, EditorUI::UIColors[2], "> " + cat.first, EditorUI::Text))
 					->SetPadding(0.01f)));
 
 		for (size_t i = 0; i < cat.second.size(); i++)
@@ -107,7 +114,7 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 {
 	float Size = std::min(PanelMainBackground->GetUsedSize().X - 0.5f, 0.5f);
 
-	Parent->AddChild((new UIText(0.5f, EditorUI::UIColors[2], Name, EditorUI::Text))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
+	Parent->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Name, EditorUI::Text))->SetPadding(0.01f, 0.01f, 0.05f, 0.02f));
 	UIBox* Element;
 	switch (SectionType)
 	{
@@ -117,8 +124,7 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 		Element = (new UITextField(0, EditorUI::UIColors[1], this, Index, EditorUI::Text))
 			->SetText(Value)
 			->SetMinSize(Vector2(Size, 0))
-			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f)
-			->SetBorder(UIBox::BorderType::Rounded, 0.5f);
+			->SetPadding(0.01f, 0.02f, 0.05f, 0.02f);
 		Parent->AddChild(Element);
 		break;
 	case NativeType::Vector3:
@@ -131,7 +137,7 @@ void SettingsPanel::GenerateSection(UIBox* Parent, std::string Name, int Index, 
 	case NativeType::Bool:
 		if (Value != "0" && Value != "1")
 		{
-			Value = "1";
+			Value = "0";
 		}
 		Element = (new UIButton(UIBox::Orientation::Horizontal, 0, 1, this, Index))
 			->SetUseTexture(std::stoi(Value), Application::EditorInstance->Textures[16])
