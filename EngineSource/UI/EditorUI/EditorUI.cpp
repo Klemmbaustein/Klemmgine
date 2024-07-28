@@ -24,7 +24,7 @@
 #include <Engine/Input.h>
 #include <UI/EditorUI/Popups/DialogBox.h>
 #include <Engine/Subsystem/Console.h>
-#include <Engine/Subsystem/Console.h>
+#include <Engine/Subsystem/NetworkSubsystem.h>
 #include <Rendering/RenderSubsystem/BakedLighting.h>
 #include <Engine/File/Assets.h>
 #include <UI/UIDropdown.h>
@@ -182,7 +182,10 @@ void EditorUI::LaunchInEditor()
 		if (Build::CMake::IsUsingCMake())
 		{
 			ExecutablePath = EditorBuildCMakeConfiguration("x64-Debug", ProjectName, "");
-			ServerExecutablePath = EditorBuildCMakeConfiguration("x64-Server", ProjectName, "-DSERVER=ON");
+			if (NetworkSubsystem::IsActive())
+			{
+				ServerExecutablePath = EditorBuildCMakeConfiguration("x64-Server", ProjectName, "-DSERVER=ON");
+			}
 		}
 #if _WIN32
 		else
