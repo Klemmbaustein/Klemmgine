@@ -1,5 +1,25 @@
 # Changes
 
+## Version 1.14.0
+
+### Changes
+
+- Added support for compiling with CMake (On Windows and Linux), it is not the default on Linux.
+- Slightly reworked the settings page in the editor.
+- Fixed an issue where UI would be placed above the debug console.
+- Removed `Project::UseNetworkFunctions`. To enable network functions now, load the `NetworkSubsystem` subsystem.
+- Enabled `u8char_t` again, added `StrUtil::UnicodeToAscii` and `StrUtil::AsciiToUnicode` functions to convert between `u8char_t` and `char`.
+- Made the title bar dark when using dark mode using
+  [DWMWA_USE_IMMERSIVE_DARK_MODE](https://learn.microsoft.com/en-us/windows/apps/desktop/modernize/apply-windows-themes#enable-a-dark-mode-title-bar-for-win32-applications).
+  The engine now requires the Windows 11 SDK (Build 22000 or higher)
+  because of this, since the `DWMWA_USE_IMMERSIVE_DARK_MODE` enum value didn't exist before.
+
+### Fixes
+
+- Replaced some instances of `int` with `int*_t` or `size_t`.
+- Fixed an incorrect compare function for the shader map.
+- Fixed the engine failing to compile with `KLEMMGINE_NO_CSHARP`.
+
 ## Version 1.13.2
 
 ### Changes

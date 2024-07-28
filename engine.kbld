@@ -77,8 +77,7 @@
       "sources": [
         "Tools/BuildTool/Code/*.cpp"
       ],
-      "outputPath": "Tools/bin",
-      "u8char": false
+      "outputPath": "Tools/bin"
     },
     {
       "name": "ProjectGenerator",
