@@ -155,9 +155,8 @@ std::string Build::TryBuildProject(std::string TargetFolder)
 				}
 				std::filesystem::rename(TargetFolder + "/Klemmgine-Release", TargetFolder + "/" + Project::ProjectName);
 #endif // _WIN32
-
+			}
 #endif // ENGINE_NO_SOURCE
-		}
 #if ENGINE_CSHARP
 			if (CSharpInterop::GetUseCSharp())
 			{
