@@ -1,6 +1,7 @@
 #if !SERVER
 #pragma once
 #include <Math/Vector.h>
+#include <cstdint>
 
 struct Shader;
 class Camera;
@@ -51,15 +52,15 @@ namespace Particles
 		std::vector<float> SpawnDelays;
 		std::vector<ParticleElement> ParticleElements;
 		std::vector<std::vector<ParticleInstance>> ParticleInstances;
-		void SetMaterial(unsigned int Index, Material Mat);
+		void SetMaterial(size_t Index, Material Mat);
 		void AddElement(ParticleElement NewElement, Material Mat);
-		void RemoveElement(unsigned int Index);
+		void RemoveElement(size_t Index);
 		std::vector<VertexBuffer*> ParticleVertexBuffers;
 		unsigned int MatBuffer = -1;
 		std::vector<glm::mat4> ParticleMatrices;
 		std::vector<ObjectRenderContext> Contexts;
 		void UpdateParticlePositions(Camera* MainCamera);
-		void AddParticleInstance(unsigned int Element);
+		void AddParticleInstance(size_t Element);
 		ParticleEmitter();
 		~ParticleEmitter();
 		void Reset();

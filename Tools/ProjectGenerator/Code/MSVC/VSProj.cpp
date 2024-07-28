@@ -161,7 +161,7 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 				.Add(XML("PreprocessorDefinitions", "$(ExternalCompilerOptions);%(PreprocessorDefinitions)"))
 				.Add(XML("PreprocessorDefinitions", UpperCaseName + ";NDEBUG;_CONSOLE;GLEW_STATIC;ENGINE_CSHARP;%(PreprocessorDefinitions)"))
 				.Add(XML("ObjectFileName", "..\\$(IntDir)"))
-				.Add(XML("AdditionalOptions", "/Zc:char8_t- %(AdditionalOptions)")))
+				.Add(XML("AdditionalOptions", "%(AdditionalOptions)")))
 			.Add(XML("Link")
 				.Add(XML("OptimizeReferences", "true"))
 				.Add(XML("EnableCOMDATFolding", "true"))

@@ -495,7 +495,6 @@
       <ModuleDependenciesFile>..\$(IntDir)</ModuleDependenciesFile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -533,7 +532,6 @@
       <ModuleDependenciesFile>..\$(IntDir)</ModuleDependenciesFile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -571,7 +569,6 @@
       <ModuleDependenciesFile>..\$(IntDir)</ModuleDependenciesFile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -609,7 +606,6 @@
       <ModuleDependenciesFile>..\$(IntDir)</ModuleDependenciesFile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalOptions>/Zc:char8_t- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

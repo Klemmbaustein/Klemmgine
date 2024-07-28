@@ -108,7 +108,7 @@ std::string Shader::parse(const char* Filename)
 	size_t FileSize = ftell(File);
 	rewind(File);
 	ShaderCode.resize(FileSize);
-	int ret = fread(&ShaderCode[0], 1, FileSize, File);
+	auto ret = fread(&ShaderCode[0], 1, FileSize, File);
 	fclose(File);
 
 	return ShaderCode;

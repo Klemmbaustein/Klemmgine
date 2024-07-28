@@ -31,7 +31,7 @@ struct Uniform
 	}
 };
 
-void Particles::ParticleEmitter::SetMaterial(unsigned int Index, Material Mat)
+void Particles::ParticleEmitter::SetMaterial(size_t Index, Material Mat)
 {
 	Contexts[Index] = ObjectRenderContext(Mat);
 }
@@ -166,7 +166,7 @@ void Particles::ParticleEmitter::UpdateParticlePositions(Camera* MainCamera)
 	}
 }
 
-void Particles::ParticleEmitter::AddParticleInstance(unsigned int Element)
+void Particles::ParticleEmitter::AddParticleInstance(size_t Element)
 {
 	if (ParticleElements[Element].RunLoops != 0 && Active)
 	{
@@ -198,7 +198,7 @@ Particles::ParticleEmitter::ParticleEmitter()
 }
 
 #define REMOVE_ARRAY_IND(Arr, Ind) Arr.erase(Arr.begin() + Ind)
-void Particles::ParticleEmitter::RemoveElement(unsigned int Index)
+void Particles::ParticleEmitter::RemoveElement(size_t Index)
 {
 	REMOVE_ARRAY_IND(ParticleElements, Index);
 	REMOVE_ARRAY_IND(SpawnDelays, Index);
