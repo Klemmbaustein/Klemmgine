@@ -36,7 +36,6 @@
       "sources": [
         "EngineSource/*.cpp"
       ],
-      "u8char": false,
 #if !CiBuild && !Release
       "debug": true,
 #else
