@@ -46,20 +46,26 @@ bool EditorPopup::IsHoveringAnyPopup()
 EditorPopup::EditorPopup(Vector2 Position, Vector2 Scale, std::string Name)
 {
 	Position = Position - Scale / 2;
-	RootBox = new UIBox(UIBox::Orientation::Vertical, Position);
+	RootBox = new UIBackground(UIBox::Orientation::Vertical, Position, 0.5f);
 
 	TitleBackground = new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75, Vector2(Scale.X, 0.05f));
 	OptionsList = new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[1], Vector2(Scale.X, 0.05f));
 	PopupBackground = new UIBackground(UIBox::Orientation::Vertical, 0, EditorUI::UIColors[0]);
 	RootBox
 		->AddChild(TitleBackground
+			->SetPadding(1, 0, 1, 1)
+			->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetVerticalAlign(UIBox::Align::Centered)
 			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], Name, EditorUI::Text))
 				->SetPadding(0, 0, 0.01f, 0.01f)))
 		->AddChild(PopupBackground
+			->SetPadding(0, 0, 1, 1)
+			->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetBorder(UIBox::BorderType::DarkenedEdge, 0.2f)
 			->SetMinSize(Scale - Vector2(0, 0.1f)))
 		->AddChild(OptionsList
+			->SetPadding(0, 1, 1, 1)
+			->SetPaddingSizeMode(UIBox::SizeMode::PixelRelative)
 			->SetHorizontalAlign(UIBox::Align::Reverse));
 
 	RootBox->HasMouseCollision = true;
@@ -76,7 +82,9 @@ void EditorPopup::TickPopup()
 
 	if (DraggedPopup == this)
 	{
-		RootBox->SetPosition(Input::MouseLocation - DraggedOffset);
+		Vector2 NewPosition = Input::MouseLocation - DraggedOffset;
+		NewPosition = NewPosition.Clamp(-1, 1 - RootBox->GetUsedSize());
+		RootBox->SetPosition(NewPosition);
 	}
 	if (!Input::IsLMBDown && DraggedPopup)
 	{

@@ -498,11 +498,7 @@ void UIBox::GetPaddingScreenSize(Vector2& UpDown, Vector2& LeftRight) const
 		UpDown = UpDown / Graphics::WindowResolution.Y * 2;
 	}
 
-	LeftRight = GetLeftRightPadding(this);
-	if (PaddingSizeMode == SizeMode::PixelRelative)
-	{
-		LeftRight = LeftRight / Graphics::WindowResolution.X * 2;
-	}
+	LeftRight = GetLeftRightPadding();
 }
 
 Vector2 UIBox::PixelSizeToScreenSize(Vector2 PixelSize)
@@ -510,15 +506,6 @@ Vector2 UIBox::PixelSizeToScreenSize(Vector2 PixelSize)
 	PixelSize.X = PixelSize.X / Graphics::WindowResolution.X * 2 * DpiScale;
 	PixelSize.Y = PixelSize.Y / Graphics::WindowResolution.Y * 2 * DpiScale;
 	return PixelSize;
-}
-
-Vector2 UIBox::GetLeftRightPadding(const UIBox* Target) const
-{
-	if (Target->PaddingSizeMode != SizeMode::AspectRelative)
-	{
-		return Vector2(Target->LeftPadding, Target->RightPadding);
-	}
-	return Vector2(Target->LeftPadding, Target->RightPadding) / Graphics::AspectRatio;
 }
 
 void UIBox::Update()
@@ -896,11 +883,11 @@ float UIBox::GetVerticalOffset()
 
 float UIBox::GetHorizontalOffset()
 {
-	float HorizontalOffset = GetLeftRightPadding(this).X;
-
+	float HorizontalOffset = GetLeftRightPadding().X;
+	
 	if (Parent->HorizontalBoxAlign == Align::Reverse)
 	{
-		HorizontalOffset = Parent->Size.X - GetLeftRightPadding(this).Y - Size.X;
+		HorizontalOffset = Parent->Size.X - GetLeftRightPadding().Y - Size.X;
 	}
 	else if (Parent->HorizontalBoxAlign == Align::Centered)
 	{
@@ -909,13 +896,17 @@ float UIBox::GetHorizontalOffset()
 	return HorizontalOffset;
 }
 
-Vector2 UIBox::GetLeftRightPadding(UIBox* Target)
+Vector2 UIBox::GetLeftRightPadding() const
 {
-	if (Target->PaddingSizeMode == SizeMode::ScreenRelative)
+	if (PaddingSizeMode == SizeMode::ScreenRelative)
 	{
-		return Vector2(Target->LeftPadding, Target->RightPadding);
+		return Vector2(LeftPadding, RightPadding);
 	}
-	return Vector2(Target->LeftPadding, Target->RightPadding) / Graphics::AspectRatio;
+	if (PaddingSizeMode == SizeMode::PixelRelative)
+	{
+		return Vector2(PixelSizeToScreenSize(Vector2(LeftPadding, 0)).X, PixelSizeToScreenSize(Vector2(RightPadding, 0)).X);
+	}
+	return Vector2(LeftPadding, RightPadding) / Graphics::AspectRatio;
 }
 
 void UIBox::DrawThisAndChildren(RedrawBox Area)

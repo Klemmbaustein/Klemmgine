@@ -326,14 +326,13 @@ public:
 	static void RedrawArea(RedrawBox Box);
 
 	UIBox* GetParent();
-	void GetLeftRightPadding();
+	Vector2 GetLeftRightPadding() const;
 	void GetPaddingScreenSize(Vector2& UpDown, Vector2& LeftRight) const;
 	static Vector2 PixelSizeToScreenSize(Vector2 PixelSize);
 
 	static float DpiScale;
 
 protected:
-	Vector2 GetLeftRightPadding(const UIBox* Target) const;
 	bool ShouldBeTicked = true;
 	bool TryFill = false;
 	virtual void Update();
@@ -362,7 +361,6 @@ private:
 	void SetOffsetPosition(Vector2 NewPos);
 	float GetVerticalOffset();
 	float GetHorizontalOffset();
-	Vector2 GetLeftRightPadding(UIBox* Target);
 	void DrawThisAndChildren(RedrawBox Area);
 	Orientation ChildrenOrientation = Orientation::Horizontal;
 	bool PrevIsVisible = true;

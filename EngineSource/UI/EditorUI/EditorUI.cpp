@@ -595,10 +595,11 @@ void EditorUI::OnLeave()
 void EditorUI::Update()
 {
 	EditorPanel::TickPanels();
+	Window::SetWindowTitle(StrUtil::Format("%s.jscn - %s", Scene::CurrentScene.c_str(), Project::ProjectName));
 #ifdef ENGINE_CSHARP
 	if (Editor::CanHotreload == true)
 	{
-		Print("Finished building assembly. HotReloading .dll file.", Subsystem::ErrorLevel::Info);
+		Print("Finished building assembly. Reloading .dll file.", Subsystem::ErrorLevel::Info);
 		CSharpInterop::CSharpSystem->ReloadCSharpAssembly();
 		for (UICanvas* c : Graphics::UIToRender)
 		{
