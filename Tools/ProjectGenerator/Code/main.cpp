@@ -193,6 +193,18 @@ int main(int argc, char** argv)
 #if ENGINE_NO_SOURCE
 	if (LaunchArgs["ciBuild"] == "false")
 	{
+		std::string ScriptsGuid = VSProj::WriteCSProj(ProjectPath + "/Scripts", "CSharpAssembly", LaunchArgs["netVersion"]);
+
+		SLN::WriteSolution(ProjectPath, ProjectName, 
+			{ 
+				SLN::Project
+				{
+					.GUID = ScriptsGuid,
+					.Path = "Scripts",
+					.Name = "CSharpAssembly",
+					.NativeType = "csproj",
+				} 
+			});
 		return 0;
 	}
 #endif
