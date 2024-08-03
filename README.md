@@ -76,46 +76,13 @@ For shaders, I recommend [this Visual Studio extension](https://marketplace.visu
 
   5. Set the project configuration of your project to `Editor` and press F5 to run the editor.
 
-### Linux
+### CMake
 
-- #### Requirements:
-  
-  - The SDL2, OpenAL and GLEW development libraries.
-    
-    With apt: 
-    ```sh
-    sudo apt-get install libsdl2-dev
-    sudo apt-get install libglew-dev
-    sudo apt-get install libopenal-dev
-    ```
+The engine can be built using cmake for both Windows and Linux.
 
-  - The [KlemmBuild](https://github.com/Klemmbaustein/KlemmBuild) build system is required to build the engine.
-
-- #### How to build
-  
-  1. Clone the repository and it's submodules.
-
-     ```sh
-     git clone https://github.com/Klemmbaustein/Klemmgine.git --recurse-submodules
-     ``` 
-  2. Run the setup script.
-     ```sh
-     ./setup.sh
-     ```
-  3. Build the project generator
-     ```sh
-     KlemmBuild engine.kbld -DGenerator
-     ```
-  4. Run the project generator
-     ```sh
-     ./ProjectGenerator -projectName {Project name}
-     ```
-  5. Build and run the project
-     ```sh
-     cd Games/{Project name}
-     KlemmBuild -DEditor
-     ./Editor.sh
-     ```
+1. Run cmake in the root directory to compile the project generator.
+2. Use the project generator to generate a new project. On Windows, `-buildSystem cmake` needs to be added as a command argument.
+3. The new project will have a CMakeLists.txt file to compile it.
 
 ## Building documentation
 
