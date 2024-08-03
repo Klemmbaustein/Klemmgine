@@ -17,7 +17,7 @@ float UIText::GetRenderedSize() const
 
 float UIText::GetWrapDistance() const
 {
-	float Distance = WrapDistance;
+	float Distance = WrapDistance * 2;
 	if (WrapSizeMode == SizeMode::AspectRelative)
 	{
 		Distance /= Graphics::AspectRatio;

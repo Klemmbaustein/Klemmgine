@@ -10,6 +10,8 @@
 #include <UI/EditorUI/Popups/DialogBox.h>
 #include <UI/EditorUI/Popups/ClassCreator.h>
 #include <UI/EditorUI/Popups/BakeMenu.h>
+#include <UI/EditorUI/Tabs/CSharpErrorList.h>
+#include <UI/EditorUI/LogUI.h>
 #include <thread>
 #include "Viewport.h"
 #include <Engine/Subsystem/BackgroundTask.h>
@@ -104,7 +106,10 @@ static std::vector<MenuBarItem> MenuBarItems =
 	MenuBarItem("C#",
 		{
 			MenuBarEntry("Open Solution", []() { OS::OpenFile(Build::GetProjectBuildName() + ".sln"); }),
-			MenuBarEntry("Rebuild C# Assembly", []() { new BackgroundTask(EditorUI::RebuildAssembly); }, true),
+			MenuBarEntry("Rebuild C# Assembly", []() { new BackgroundTask(EditorUI::RebuildAssembly); }),
+#if 0
+			MenuBarEntry("Error List", []() { LogUI::Current->AddTab(new CSharpErrorList()); }, true),
+#endif
 			MenuBarEntry("New Class", []() { new ClassCreator(); }),
 		}),
 #endif

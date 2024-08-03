@@ -245,10 +245,10 @@ void MaterialTab::GenerateUI()
 			->SetMinSize(Vector2(DescriptionSize, 0.1f))
 			->SetPadding(0.005f)
 			->AddChild((new UIText(0.5f, EditorUI::UIColors[2], i.UniformName, EditorUI::MonoText))
-				->SetWrapEnabled(true, DescriptionSize * 1.6f, UIBox::SizeMode::ScreenRelative)
+				->SetWrapEnabled(true, DescriptionSize, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0.005f))
 			->AddChild((new UIText(0.4f, Vector3::Lerp(EditorUI::UIColors[2], 0.5f, 0.25f), Description, EditorUI::Text))
-				->SetWrapEnabled(true, DescriptionSize * 1.6f, UIBox::SizeMode::ScreenRelative)
+				->SetWrapEnabled(true, DescriptionSize, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(0.005f)));
 
 		ParamBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal, 0, EditorUI::UIColors[0] * 0.75f, Vector2(2.0f / Graphics::WindowResolution.X, 0)))

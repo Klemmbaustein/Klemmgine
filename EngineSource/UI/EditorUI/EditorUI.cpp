@@ -101,7 +101,7 @@ namespace Editor
 		bool Async = false;
 	};
 
-	static void ReadProcessPipe(FILE* p, ProcessInfo* Info)
+	static int ReadProcessPipe(FILE* p, ProcessInfo* Info)
 	{
 		std::string CurrentMessage;
 		while (!feof(p))
@@ -118,9 +118,14 @@ namespace Editor
 				CurrentMessage.append({ NewChar });
 			}
 		}
-		fclose(p);
-
+#if _WIN32
+		int ret = _pclose(p);
+#else
+		int ret = pclose(p);
+#endif
 		Info->Active = false;
+
+		return ret;
 	}
 }
 
@@ -242,13 +247,17 @@ void EditorUI::LaunchInEditor()
 			|| std::filesystem::last_write_time("CSharp/Build/CSharpAssembly.dll") < FileUtil::GetLastWriteTimeOfFolder("Scripts", { "obj" }))
 			&& CSharpInterop::GetUseCSharp())
 		{
-			RebuildAssembly();
+			if (!RebuildAssembly())
+			{
+				Log::Print("Failed to build C# assembly.", Log::LogColor::Red);
+				return;
+			}
 		}
 #endif
 	}
 	catch (std::exception& e)
 	{
-		Log::Print("Exception thrown when trying to check for rebuild. " + std::string(e.what()));
+		Log::Print("Exception thrown when trying to check for rebuild. " + std::string(e.what()), Log::LogColor::Red);
 		return;
 	}
 
@@ -267,6 +276,8 @@ void EditorUI::LaunchInEditor()
 	StrUtil::ReplaceChar(ExecutablePath, '\\', "/");
 #endif
 
+	// -nostartupinfo: Do not show any version information on startup, this just clutters the editor log.
+	// -nocolor: Do not print any color. The editor log ignores it anyways, and on Linux this just puts color codes everywhere.
 	std::string CommandLine = ExecutablePath + " -nostartupinfo -nocolor -editorPath " + Application::GetEditorPath() + " " + Args;
 
 	if (LaunchWithServer)
@@ -335,12 +346,13 @@ void EditorUI::SetSaveSceneOnLaunch(bool NewValue)
 }
 
 #ifdef ENGINE_CSHARP
-void EditorUI::RebuildAssembly()
+bool EditorUI::RebuildAssembly()
 {
 	Editor::ReloadingCSharp = true;
-	PipeProcessToLog("cd Scripts && dotnet build", "[C#]: [Build]: ");
+	bool Success = PipeProcessToLog("cd Scripts && dotnet build", "[C#]: [Build]: ") == 0;
 	Editor::ReloadingCSharp = false;
-	Editor::CanHotreload = true;
+	Editor::CanHotreload = Success;
+	return Success;
 }
 #endif
 
@@ -483,7 +495,7 @@ void EditorUI::LoadPanelLayout(EditorPanel* From)
 	RootPanel = From;
 }
 
-void EditorUI::PipeProcessToLog(std::string Command, std::string Prefix)
+int EditorUI::PipeProcessToLog(std::string Command, std::string Prefix)
 {
 	using namespace Editor;
 
@@ -500,7 +512,7 @@ void EditorUI::PipeProcessToLog(std::string Command, std::string Prefix)
 	proc.Command = Command;
 	proc.Pipe = process;
 
-	ReadProcessPipe(process, &proc);
+	return ReadProcessPipe(process, &proc);
 }
 
 void EditorUI::CreateFile(std::string Path, std::string Name, std::string Ext)

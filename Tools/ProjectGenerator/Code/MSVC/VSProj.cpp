@@ -214,10 +214,8 @@ std::string VSProj::WriteVCXProj(std::string Path, std::string Name, std::string
 std::string VSProj::WriteCSProj(std::string Path, std::string Name, std::string TargetFramework)
 {
 	std::cout << "Writing " << Name << ".csproj for .NET version " << TargetFramework << std::endl;
-	std::filesystem::path CurrentPath = std::filesystem::current_path();
 
 	std::filesystem::create_directories(Path);
-	std::filesystem::current_path(Path);
 	XML Project = XML("Project");
 	/*
 	*  <ItemGroup>
@@ -235,13 +233,12 @@ std::string VSProj::WriteCSProj(std::string Path, std::string Name, std::string 
 			.Add(XML("AppendTargetFrameworkToOutputPath", "false")))
 		.Add(XML("ItemGroup")
 			.Add(XML("Reference").AddTag("Include", "KlemmgineCSharp.dll")
-			.Add(XML("HintPath", CurrentPath.string() + "/CSharp/Engine/Build/KlemmgineCSharp.dll"))));
+			.Add(XML("HintPath", std::filesystem::canonical(std::filesystem::current_path()).string() + "/CSharp/Engine/Build/KlemmgineCSharp.dll"))));
 
-	std::ofstream out = std::ofstream(Name + ".csproj");
+	std::ofstream out = std::ofstream(Path + "/" + Name + ".csproj");
 	out << Project.Write();
 	out.close();
 
-	std::filesystem::current_path(CurrentPath);
 	std::string GUID = SLN::GetGUID();
 	std::cout << "Finished writing csproj - " << GUID << std::endl << std::endl;
 	return GUID;

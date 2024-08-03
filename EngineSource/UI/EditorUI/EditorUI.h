@@ -39,7 +39,7 @@ public:
 	* @brief
 	* Rebuilds the project's CSharpAssembly and reloads it.
 	*/
-	static void RebuildAssembly();
+	static bool RebuildAssembly();
 #endif
 	
 	/**
@@ -126,7 +126,7 @@ public:
 	* @param Prefix
 	* Log prefix added to the output of the command.
 	*/
-	static void PipeProcessToLog(std::string Command, std::string Prefix = "");
+	static int PipeProcessToLog(std::string Command, std::string Prefix = "");
 
 	/**
 	* @brief

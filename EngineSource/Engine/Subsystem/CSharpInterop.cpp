@@ -293,7 +293,7 @@ CSharpInterop::CSharpInterop()
 
 #if ENGINE_NO_SOURCE && !SERVER
 	Window::SetWindowTitle(CSharpInterop::StaticCall<const char*>(
-		CSharpInterop::CSharpSystem->LoadCSharpFunction("GetNameInternally", "Engine", "StringDelegate")
+		CSharpInterop::CSharpSystem->LoadCSharpFunction("GetNameInternally", "Engine.Core.Engine", "StringDelegate")
 	));
 #endif
 }

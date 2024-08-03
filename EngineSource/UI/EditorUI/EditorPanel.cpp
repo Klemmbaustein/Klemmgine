@@ -153,7 +153,7 @@ void EditorPanel::HandlePanelDrag(int Index)
 
 void EditorPanel::OnButtonClicked(int Index)
 {
-	if (Tabs[Index] != UI::HoveredBox)
+	if (Tabs[Index] != UI::HoveredBox && Children.size())
 	{
 		delete Children[Index];
 		return;
@@ -422,8 +422,11 @@ void EditorPanel::AddTab(EditorPanel* NewTab, ChildrenType Align, size_t TabPosi
 			NewPanel->AddTab(this);
 		}
 		Parent->ActiveTab = std::min(TabPosition, Parent->Children.size() - 1);
-		NewTab->Size = NewPanel->Scale.Y / 2;
-		Size = NewPanel->Size / 2;
+
+		float NewSize = Align == ChildrenType::Horizontal ? PanelMainBackground->GetUsedSize().X : PanelMainBackground->GetUsedSize().Y;
+
+		NewTab->Size = NewSize / 2;
+		Size = NewTab->Size;
 		GetAbsoluteParent()->ReSort();
 		GetAbsoluteParent()->OnPanelResized();
 	}

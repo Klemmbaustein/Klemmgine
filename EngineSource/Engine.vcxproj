@@ -120,6 +120,7 @@
     <ClCompile Include="UI\Default\ScrollObject.cpp" />
     <ClCompile Include="UI\Default\TextRenderer.cpp" />
     <ClCompile Include="UI\EditorUI\SerializePanel.cpp" />
+    <ClCompile Include="UI\EditorUI\Tabs\CSharpErrorList.cpp" />
     <ClCompile Include="UI\UICanvas.cpp" />
     <ClCompile Include="UI\EditorUI\ContextMenu.cpp" />
     <ClCompile Include="UI\EditorUI\EditorPanel.cpp" />
@@ -252,6 +253,7 @@
     <ClInclude Include="UI\Default\TextRenderer.h" />
     <ClInclude Include="UI\Default\TextSegment.h" />
     <ClInclude Include="UI\EditorUI\SerializePanel.h" />
+    <ClInclude Include="UI\EditorUI\Tabs\CSharpErrorList.h" />
     <ClInclude Include="UI\UICanvas.h" />
     <ClInclude Include="UI\EditorUI\ContextMenu.h" />
     <ClInclude Include="UI\EditorUI\EditorPanel.h" />

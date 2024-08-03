@@ -73,6 +73,7 @@ void Error::PrintStackTrace()
 	auto trace = std::stacktrace::current();
 	if (trace.empty())
 	{
+		Log::Print("[Error]: No stack trace available. Missing debug symbols?", Log::LogColor::Red);
 		return;
 	}
 	Log::Print("[Error]: ---------------------------------[Stack trace]---------------------------------", Log::LogColor::Red);

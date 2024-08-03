@@ -541,10 +541,10 @@ void ContextMenu::OnResized()
 		}
 
 		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Object: " + SelectedObject->Name, EditorUI::Text))
-			->SetWrapEnabled(true, Scale.X * 2.0f - 0.1f, UIBox::SizeMode::ScreenRelative)
+			->SetWrapEnabled(true, Scale.X - 0.1f, UIBox::SizeMode::ScreenRelative)
 			->SetPadding(0.01f, 0, 0.01f, 0.01f));
 		BackgroundBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], "Class: " + SelectedObject->GetObjectDescription().Name, EditorUI::Text))
-			->SetWrapEnabled(true, Scale.X * 2.0f - 0.1f, UIBox::SizeMode::ScreenRelative)
+			->SetWrapEnabled(true, Scale.X - 0.1f, UIBox::SizeMode::ScreenRelative)
 			->SetPadding(0.005f, 0, 0.01f, 0.01f));
 		BackgroundBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal,
 			0,
@@ -605,15 +605,14 @@ void ContextMenu::OnResized()
 	{
 		BackgroundBox->AddChild((new UIText(0.55f, EditorUI::UIColors[2], "Scene: "
 			+ FileUtil::GetFileNameWithoutExtensionFromPath(Scene::CurrentScene), EditorUI::Text))
-			->SetWrapEnabled(true, Scale.X * 2.0f - 0.1f, UIBox::SizeMode::ScreenRelative)
+			->SetWrapEnabled(true, Scale.X - 0.1f, UIBox::SizeMode::ScreenRelative)
 			->SetPadding(0.01f, 0, 0.01f, 0.01f));
-		BackgroundBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], "Path: " + Scene::CurrentScene + ".jscn", EditorUI::Text))
-			->SetWrapEnabled(true, Scale.X * 2.0f - 0.1f, UIBox::SizeMode::ScreenRelative)
-			->SetPadding(0.005f, 0, 0.01f, 0.01f));
 		BackgroundBox->AddChild((new UIBackground(UIBox::Orientation::Horizontal,
 			0, 
 			EditorUI::UIColors[2], 
-			Vector2(Scale.X - 0.005f, 2.0f / Graphics::WindowResolution.Y)))
+			Vector2(1)))
+			->SetSizeMode(UIBox::SizeMode::PixelRelative)
+			->SetTryFill(true)
 			->SetPadding(0, 0.005f, 0.0025f, 0));
 
 

@@ -48,6 +48,8 @@ namespace Application
 	std::string StartupSceneOverride;
 	bool ShowStartupInfo = true;
 
+	int Initialize(int argc, char** argv);
+
 	bool ShouldClose = false;
 
 	void Quit()

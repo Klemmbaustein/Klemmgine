@@ -100,7 +100,7 @@ void ClassCreator::Create(std::string Name, std::string Namespace, ClassType New
 	case ClassCreator::ClassType::CPlusPlus:
 		std::filesystem::copy(Application::GetEditorPath() + "/EditorContent/CodeTemplates/Class.h", "Code/Objects/Class.h");
 		std::filesystem::copy(Application::GetEditorPath() + "/EditorContent/CodeTemplates/Class.cpp", "Code/Objects/Class.cpp");
-		system("\"..\\..\\Tools\\bin\\Bui.ldToolexe\" in=../../EngineSource/Objects in=Code/Objects out=GeneratedIncludes");
+		system("\"..\\..\\Tools\\bin\\BuildToolexe\" in=../../EngineSource/Objects in=Code/Objects out=GeneratedIncludes");
 		system(("cd ../.. && ProjectGenerator.exe -projectName " + Build::GetProjectBuildName() + " -onlyBuildFiles").c_str());
 		break;
 #endif

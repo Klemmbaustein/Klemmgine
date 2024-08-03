@@ -12,6 +12,7 @@
 
 static float LogTextSize = 0.38f;
 static std::vector<UIBox*> LogElements;
+LogUI* LogUI::Current = nullptr;
 
 void LogUI::UpdateLogBoxSize()
 {
@@ -52,6 +53,7 @@ LogUI::LogUI(EditorPanel* Parent) : EditorPanel(Parent, "Console", "log")
 	CommandsBackground
 		->SetOpacity(0.95f)
 		->AddChild(CommandHighlightScrollBox);
+	Current = this;
 
 	UpdateLogBoxSize();
 }
@@ -63,7 +65,7 @@ void LogUI::OnResized()
 	{
 		for (UIText* i : LogTexts)
 		{
-			i->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative);
+			i->SetWrapEnabled(true, LogScrollBox->GetUsedSize().X - 0.05f, UIBox::SizeMode::ScreenRelative);
 		}
 		ResetScroll();
 	}
@@ -166,7 +168,7 @@ void LogUI::Tick()
 			LogTexts.push_back((new UIText(LogTextSize, LogMessages.at(PrevLogLength).Color, Text, EditorUI::MonoText)));
 
 			LogScrollBox->AddChild(LogTexts.at(LogTexts.size() - 1)
-				->SetWrapEnabled(true, 1.75f * LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative)
+				->SetWrapEnabled(true, LogScrollBox->GetUsedSize().X, UIBox::SizeMode::ScreenRelative)
 				->SetPadding(-0.001f, PrevLogLength == LogMessages.size() - 1 ? 0.015f : -0.001f, 0.001f, 0.001f));
 			PrevAmount = LogMessages.at(LogMessages.size() - 1).Amount;
 		}

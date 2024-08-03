@@ -133,7 +133,6 @@ int main(int argc, char** argv)
 		}
 
 		std::cout << "Copying project files" << std::endl;
-		std::filesystem::create_directories(ProjectPath + "/Code/Objects");
 		std::filesystem::copy("Tools/ProjectGenerator/ProjectFiles", ProjectPath,
 			std::filesystem::copy_options::recursive
 			| std::filesystem::copy_options::overwrite_existing);
@@ -150,11 +149,13 @@ int main(int argc, char** argv)
 		std::filesystem::copy("Tools/ProjectGenerator/ProjectFilesNoSource", ProjectPath,
 			std::filesystem::copy_options::recursive
 			| std::filesystem::copy_options::overwrite_existing);
+#else
+		std::filesystem::create_directories(ProjectPath + "/Code/Objects");
 #endif
 #if ENGINE_NO_SOURCE
 		if (LaunchArgs["ciBuild"] != "false")
 #else
-		if (LaunchArgs["buildSystem"] == "msvc")
+		if (LaunchArgs["buildSystem"] == "msbuild")
 #endif
 		{
 #if _WIN32

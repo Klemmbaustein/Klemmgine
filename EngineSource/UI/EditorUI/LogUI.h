@@ -25,6 +25,9 @@ class LogUI : public EditorPanel
 	void UpdateLogBoxSize();
 	void UpdateAutoComplete();
 public:
+
+	static LogUI* Current;
+
 	LogUI(EditorPanel* Parent);
 	void OnResized() override;
 

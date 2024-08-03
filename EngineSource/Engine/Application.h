@@ -24,8 +24,6 @@ namespace Application
 
 	extern bool ShowStartupInfo;
 
-	int Initialize(int argc, char** argv);
-
 	/**
 	* @brief
 	* DeInitializes the engine, quits the application.

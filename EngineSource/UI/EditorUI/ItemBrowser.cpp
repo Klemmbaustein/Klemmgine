@@ -216,7 +216,7 @@ void ItemBrowser::GenerateTopBox()
 		->SetSizeMode(UIBox::SizeMode::AspectRelative));
 
 	TopBox->AddChild((new UIText(0.45f, EditorUI::UIColors[2], Path, EditorUI::Text))
-		->SetWrapEnabled(true, Scale.X * 1.2f, UIBox::SizeMode::ScreenRelative)
+		->SetWrapEnabled(true, Scale.X - 0.1f / Graphics::AspectRatio, UIBox::SizeMode::ScreenRelative)
 		->SetPadding(0.005f));
 }
 
@@ -265,7 +265,7 @@ void ItemBrowser::GenerateAssetList()
 				->SetSizeMode(UIBox::SizeMode::AspectRelative)
 				->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative))
 			->AddChild((new UIText(0.38f, EditorUI::UIColors[2], Item.Name, EditorUI::Text))
-				->SetWrapEnabled(true, 0.23f, UIBox::SizeMode::AspectRelative)
+				->SetWrapEnabled(true, 0.12f, UIBox::SizeMode::AspectRelative)
 				->SetPadding(0, 0, 0.005f, 0.005f)
 				->SetPaddingSizeMode(UIBox::SizeMode::AspectRelative)));
 		Index++;
@@ -274,7 +274,7 @@ void ItemBrowser::GenerateAssetList()
 	if (LoadedItems.empty())
 	{
 		HorizontalBoxes[0]->AddChild((new UIText(0.45f, EditorUI::UIColors[2], EmptyText, EditorUI::Text))
-			->SetWrapEnabled(true, Scale.X * 2.0f - 0.1f, UIBox::SizeMode::ScreenRelative)
+			->SetWrapEnabled(true, Scale.X - 0.1f, UIBox::SizeMode::ScreenRelative)
 			->SetPadding(0.01f));
 	}
 }
