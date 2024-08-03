@@ -116,6 +116,8 @@ int main(int argc, char** argv)
 		ProjectPath = "Games/" + ProjectName;
 	}
 
+	std::filesystem::create_directories(ProjectPath);
+
 	if (LaunchArgs["onlyBuildFiles"] == "false")
 	{
 		if (std::filesystem::exists(ProjectPath) && LaunchArgs["upgrade"] == "false")
