@@ -151,6 +151,12 @@ int main(int argc, char** argv)
 		std::filesystem::copy("Tools/ProjectGenerator/ProjectFilesNoSource", ProjectPath,
 			std::filesystem::copy_options::recursive
 			| std::filesystem::copy_options::overwrite_existing);
+
+		if (LaunchArgs["ciBuild"] != "false")
+		{
+			std::filesystem::create_directories(ProjectPath + "/Code/Objects");
+		}
+
 #else
 		std::filesystem::create_directories(ProjectPath + "/Code/Objects");
 #endif
